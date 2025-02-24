@@ -1,10 +1,9 @@
 use std::path::PathBuf;
 
-use codt;
 use pyo3::prelude::*;
 
 #[pyfunction]
-fn solve_classification(path: PathBuf, max_depth: u32, max_num_nodes: u32) -> PyResult<String> {
+fn solve_classification(_path: PathBuf, _max_depth: u32, _max_num_nodes: u32) -> PyResult<String> {
     codt::say_hi();
     Ok("hi".to_string())
 }
