@@ -1,7 +1,11 @@
 [package]
 name = "codt"
 version = "0.1.0"
+description = "A library for solving optimal decision trees for data sets with continuous features."
 edition = { workspace = true }
+authors = { workspace = true }
+license = { workspace = true }
+repository = { workspace = true }
 
 [dependencies]
 log = { workspace = true }

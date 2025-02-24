@@ -1,7 +1,11 @@
 [package]
 name = "codt-py"
 version = "0.1.0"
-edition = "2021"
+description = "Python bindings for codt (Continuous Optimal Decision Trees)."
+edition = { workspace = true }
+authors = { workspace = true }
+license = { workspace = true }
+repository = { workspace = true }
 
 [lib]
 name = "codt_py"

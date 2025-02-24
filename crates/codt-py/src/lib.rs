@@ -1,7 +1,7 @@
 use std::path::PathBuf;
 
-use pyo3::prelude::*;
 use codt;
+use pyo3::prelude::*;
 
 #[pyfunction]
 fn solve_classification(path: PathBuf, max_depth: u32, max_num_nodes: u32) -> PyResult<String> {

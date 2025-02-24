@@ -1,7 +1,11 @@
 [package]
 name = "codt-cli"
 version = "0.1.0"
-edition = "2021"
+description = "CLI interface for codt (Continuous Optimal Decision Trees)."
+edition = { workspace = true }
+authors = { workspace = true }
+license = { workspace = true }
+repository = { workspace = true }
 
 [dependencies]
 clap = { workspace = true }
