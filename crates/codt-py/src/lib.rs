@@ -1,7 +1,5 @@
 mod tree;
 
-use std::path::PathBuf;
-
 use pyo3::prelude::*;
 use tree::OptimalDecisionTreeClassifier;
 
