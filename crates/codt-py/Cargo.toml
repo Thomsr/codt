@@ -13,4 +13,5 @@ crate-type = ["cdylib"]
 
 [dependencies]
 pyo3 = { workspace = true }
+numpy = { workspace = true }
 codt = { workspace = true }

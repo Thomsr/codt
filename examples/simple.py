@@ -1,4 +1,11 @@
-import codt_py
+from codt_py import OptimalDecisionTreeClassifier
+import pandas as pd
 
-result = codt_py.solve_classification("../contree/datasets/bank.txt", 2, 3)
-print(result)
+df = pd.read_csv("../contree/datasets/bank.txt", sep=" ", header=None)
+
+X = df[df.columns[1:]].to_numpy()
+y = df[0].to_numpy()
+
+classifier = OptimalDecisionTreeClassifier(max_depth=2, max_nodes=3)
+classifier.fit(X, y)
+print(classifier.predict(X))
