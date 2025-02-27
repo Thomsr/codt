@@ -59,12 +59,12 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
-          python-version: 3.x
+          python-version: 3.13
       - name: Build wheels
         uses: PyO3/maturin-action@v1
         with:
           target: ${{ matrix.platform.target }}
-          args: --release --out dist -i python
+          args: --release --out dist -i python3.13
           # The following can be enabled when rust-numpy 0.24 fixes python 3.13t support
           # args: --release --out dist --find-interpreter
           sccache: 'true'
@@ -93,12 +93,12 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
-          python-version: 3.x
+          python-version: 3.13
       - name: Build wheels
         uses: PyO3/maturin-action@v1
         with:
           target: ${{ matrix.platform.target }}
-          args: --release --out dist -i python
+          args: --release --out dist -i python3.13
           # The following can be enabled when rust-numpy 0.24 fixes python 3.13t support
           # args: --release --out dist --find-interpreter
           sccache: 'true'
@@ -123,13 +123,13 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
-          python-version: 3.x
+          python-version: 3.13
           architecture: ${{ matrix.platform.target }}
       - name: Build wheels
         uses: PyO3/maturin-action@v1
         with:
           target: ${{ matrix.platform.target }}
-          args: --release --out dist -i python
+          args: --release --out dist -i python3.13
           # The following can be enabled when rust-numpy 0.24 fixes python 3.13t support
           # args: --release --out dist --find-interpreter
           sccache: 'true'
@@ -153,12 +153,12 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
-          python-version: 3.x
+          python-version: 3.13
       - name: Build wheels
         uses: PyO3/maturin-action@v1
         with:
           target: ${{ matrix.platform.target }}
-          args: --release --out dist -i python
+          args: --release --out dist -i python3.13
           # The following can be enabled when rust-numpy 0.24 fixes python 3.13t support
           # args: --release --out dist --find-interpreter
           sccache: 'true'
