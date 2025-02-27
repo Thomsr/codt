@@ -6,7 +6,14 @@ pub trait Instance {
 
 pub struct ClassificationInstance {
     id: i32,
+    #[allow(dead_code)]
     label: i32,
+}
+
+impl ClassificationInstance {
+    pub fn new(label: i32) -> Self {
+        Self { id: 0, label }
+    }
 }
 
 impl Instance for ClassificationInstance {

@@ -1,3 +1,4 @@
+use codt::model::{data::DataSet, instance::ClassificationInstance};
 use numpy::{IntoPyArray, PyArray1, PyReadonlyArray1, PyReadonlyArray2, ndarray::Axis};
 use pyo3::prelude::*;
 
@@ -7,6 +8,7 @@ pub struct OptimalDecisionTreeClassifier {
     max_depth: i32,
     #[allow(dead_code)]
     max_nodes: i32,
+    dataset: Option<DataSet<ClassificationInstance>>,
 }
 
 #[pymethods]
@@ -18,13 +20,22 @@ impl OptimalDecisionTreeClassifier {
         OptimalDecisionTreeClassifier {
             max_depth,
             max_nodes,
+            dataset: None,
         }
     }
 
     #[pyo3(signature = (X, y))]
     fn fit<'py>(&mut self, X: PyReadonlyArray2<'py, f64>, y: PyReadonlyArray1<'py, i64>) {
-        let _ = X;
-        let _ = y;
+        let x_arr = X.as_array();
+        let y_arr = y.as_array();
+        let mut dataset = DataSet::<ClassificationInstance>::default();
+        for i in 0..y_arr.dim() {
+            let features = x_arr.index_axis(Axis(0), i);
+            dataset.add_instance(ClassificationInstance::new(y_arr[i] as i32), features);
+        }
+        dataset.preprocess_after_adding_instances();
+
+        self.dataset = Some(dataset);
     }
 
     #[pyo3(signature = (X))]
@@ -33,6 +44,7 @@ impl OptimalDecisionTreeClassifier {
         py: Python<'py>,
         X: PyReadonlyArray2<'py, f64>,
     ) -> Bound<'py, PyArray1<i64>> {
-        X.as_array().map_axis(Axis(1), |_| 5).into_pyarray(py)
+        let ret = self.dataset.as_ref().unwrap().original_feature_values[0][0] as i64;
+        X.as_array().map_axis(Axis(1), |_| ret).into_pyarray(py)
     }
 }
