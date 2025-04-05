@@ -21,18 +21,14 @@ impl<I: Instance> Default for DataSet<I> {
 }
 
 impl<I: Instance> DataSet<I> {
-    pub fn instances_mut(&mut self) -> &mut Vec<I> {
-        &mut self.instances
-    }
-
     /// Add an instance to the data set.
-    pub fn add_instance<'a, T>(&mut self, instance: I, feature_values: T)
+    pub fn add_instance<T>(&mut self, instance: I, feature_values: T)
     where
-        T: IntoIterator<Item = &'a f64>,
+        T: IntoIterator<Item = f64>,
     {
         self.instances.push(instance);
 
-        for (i, &feature_value) in feature_values.into_iter().enumerate() {
+        for (i, feature_value) in feature_values.into_iter().enumerate() {
             if i >= self.original_feature_values.len() {
                 self.original_feature_values.push(Vec::new());
             }

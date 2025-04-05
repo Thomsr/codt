@@ -3,12 +3,12 @@ use crate::model::{dataview::DataView, instance::ClassificationInstance};
 use super::OptimizationTask;
 
 #[derive(Default)]
-pub struct ClassificationTask {
+pub struct AccuracyTask {
     dataset_size: usize,
     num_labels: i32,
 }
 
-impl OptimizationTask for ClassificationTask {
+impl OptimizationTask for AccuracyTask {
     type InstanceType = ClassificationInstance;
     type CostType = i32;
 

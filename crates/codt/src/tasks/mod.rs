@@ -1,11 +1,11 @@
-pub mod classification;
-pub mod regression;
-
 use crate::model::dataset::DataSet;
 use crate::model::{dataview::DataView, instance::Instance};
 
 use std::fmt::Debug;
 use std::ops::Add;
+
+pub mod accuracy;
+pub mod regression;
 
 pub trait OptimizationTask {
     type InstanceType: Instance;

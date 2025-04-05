@@ -31,7 +31,10 @@ impl OptimalDecisionTreeClassifier {
         let mut dataset = DataSet::<ClassificationInstance>::default();
         for i in 0..y_arr.dim() {
             let features = x_arr.index_axis(Axis(0), i);
-            dataset.add_instance(ClassificationInstance::new(y_arr[i] as i32), features);
+            dataset.add_instance(
+                ClassificationInstance::new(y_arr[i] as i32),
+                features.iter().copied(),
+            );
         }
         dataset.preprocess_after_adding_instances();
 

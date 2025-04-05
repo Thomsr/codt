@@ -11,9 +11,10 @@ pub struct Solver<'a, OT: OptimizationTask> {
 }
 
 impl<OT: OptimizationTask> Solver<'_, OT> {
-    pub fn solve(&mut self) -> SolveResult<OT> {
+    pub fn solve(&mut self, max_depth: u32) -> SolveResult<OT> {
         self.task.prepare_for_data(&mut self.dataview);
 
+        let _ = max_depth;
         let solution = self.task.leaf_cost(&self.dataview);
 
         SolveResult {

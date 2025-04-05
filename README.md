@@ -4,7 +4,7 @@ Finds optimal classification and regression trees for data sets with continuous 
 ## Quickstart
 For python bindings: install [`uv`](https://github.com/astral-sh/uv) (faster pip replacement) and run `uv run examples/simple.py`.
 
-For rust CLI: run `cargo run --release`
+For rust CLI: run `cargo run --release -- -f ../contree/datasets/bank.txt -d 2 accuracy`
 
 ## Profiling
 To profile the program using samply follow the following steps.
