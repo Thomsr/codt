@@ -2,11 +2,10 @@ use super::instance::Instance;
 
 pub struct DataSet<I: Instance> {
     /// Collection of instances. The index into this array determines its instance_id.
-    instances: Vec<I>,
+    pub instances: Vec<I>,
     /// The original float feature values. Indexed first by feature_id, then by instance_id. Only used in the final tree.
     pub original_feature_values: Vec<Vec<f64>>,
     /// The internally used feature values. Indexed first by feature_id, then by instance_id.
-    /// Preprocessed so they are subsubsequent integer values (non-unique values get the same int value)
     pub feature_values: Vec<Vec<i32>>,
 }
 
@@ -49,7 +48,7 @@ impl<I: Instance> DataSet<I> {
             ids.sort_by(|&a, &b| {
                 self.original_feature_values[i][a]
                     .partial_cmp(&self.original_feature_values[i][b])
-                    .unwrap()
+                    .expect("Uncomparable floating point value in feature values. E.g. NaN.")
             });
 
             let mut feature_values = vec![0; self.original_feature_values[i].len()];

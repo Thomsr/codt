@@ -1,4 +1,4 @@
-use codt::model::{data::DataSet, instance::ClassificationInstance};
+use codt::model::{dataset::DataSet, instance::ClassificationInstance};
 use numpy::{IntoPyArray, PyArray1, PyReadonlyArray1, PyReadonlyArray2, ndarray::Axis};
 use pyo3::prelude::*;
 

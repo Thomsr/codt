@@ -1,0 +1,44 @@
+use crate::model::{dataview::DataView, instance::ClassificationInstance};
+
+use super::OptimizationTask;
+
+#[derive(Default)]
+pub struct ClassificationTask {
+    dataset_size: usize,
+    num_labels: i32,
+}
+
+impl OptimizationTask for ClassificationTask {
+    type InstanceType = ClassificationInstance;
+    type CostType = i32;
+
+    fn prepare_for_data(&mut self, dataview: &mut DataView<Self::InstanceType>) {
+        self.dataset_size = dataview.num_instances();
+        self.num_labels = 0;
+        for instance in &dataview.dataset.instances {
+            self.num_labels = self.num_labels.max(instance.label + 1);
+        }
+    }
+
+    fn print_cost(&mut self, cost: &Self::CostType) -> String {
+        format!(
+            "Misclassifications: {}. Accuracy: {}%",
+            cost,
+            (1.0 - *cost as f64 / self.dataset_size as f64) * 100.0
+        )
+    }
+
+    fn leaf_cost(&self, dataview: &DataView<Self::InstanceType>) -> i32 {
+        let mut instance_count_per_class = vec![0; self.num_labels as usize];
+
+        for instance_id in dataview.instances_iter() {
+            instance_count_per_class[dataview.dataset.instances[instance_id].label as usize] += 1;
+        }
+
+        let largest_class_size = instance_count_per_class
+            .iter()
+            .fold(i32::MAX, |acc, e| acc.min(*e));
+
+        dataview.num_instances() as i32 - largest_class_size
+    }
+}
