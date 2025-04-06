@@ -118,6 +118,7 @@ name = "codt"
 version = "0.1.0"
 dependencies = [
  "log",
+ "rustc-hash",
 ]
 
 [[package]]

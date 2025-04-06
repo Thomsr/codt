@@ -11,6 +11,7 @@ pub struct AccuracyTask {
 impl OptimizationTask for AccuracyTask {
     type InstanceType = ClassificationInstance;
     type CostType = i32;
+    const MIN_COST: Self::CostType = 0;
 
     fn prepare_for_data(&mut self, dataview: &mut DataView<Self::InstanceType>) {
         self.dataset_size = dataview.num_instances();

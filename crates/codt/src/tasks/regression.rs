@@ -10,6 +10,7 @@ pub struct RegressionTask {
 impl OptimizationTask for RegressionTask {
     type InstanceType = RegressionInstance;
     type CostType = f64;
+    const MIN_COST: Self::CostType = 0.0;
 
     fn prepare_for_data(&mut self, dataview: &mut DataView<Self::InstanceType>) {
         self.dataset_size = dataview.num_instances();

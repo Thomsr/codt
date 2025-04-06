@@ -9,7 +9,9 @@ pub mod regression;
 
 pub trait OptimizationTask {
     type InstanceType: Instance;
-    type CostType: PartialOrd + Add<Output = Self::CostType> + Debug;
+    type CostType: Clone + Copy + PartialOrd + Add<Output = Self::CostType> + Debug;
+    /// The minimum possible cost, to e.g. initialize lower bounds. Usually zero.
+    const MIN_COST: Self::CostType;
 
     fn preprocess_dataset(dataset: &mut DataSet<Self::InstanceType>) {
         let _ = dataset;
