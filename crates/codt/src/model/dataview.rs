@@ -1,8 +1,12 @@
 use super::{dataset::DataSet, instance::Instance};
 
-#[derive(Clone, Copy)]
+use std::fmt::Debug;
+
+#[derive(Clone, Copy, PartialEq, Eq)]
 pub struct FeatureValue {
+    /// The id of the instance that has this feature value
     pub instance_id: usize,
+
     /// Float feature values are substituted by subsequent integer values such that
     /// `x.feature_value < y.feature_value` iff `x.original_feature_value < y.original_feature_value`
     /// (non-unique values get the same int value).
@@ -14,6 +18,16 @@ pub struct DataView<'a, I: Instance> {
     pub dataset: &'a DataSet<I>,
     /// The feature values for instances that remain in this view. Indexed first by feature_id, then sorted by feature value.
     pub feature_values_sorted: Vec<Vec<FeatureValue>>,
+}
+
+impl<I: Instance> Debug for DataView<'_, I> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let mut d = f.debug_struct("DataView");
+        for feature in &self.feature_values_sorted {
+            d.field("feature_values_sorted", &feature.len());
+        }
+        d.finish()
+    }
 }
 
 impl<'a, I: Instance> DataView<'a, I> {
@@ -30,6 +44,8 @@ impl<'a, I: Instance> DataView<'a, I> {
                     feature_value,
                 })
             }
+
+            feature_values_sorted_i.sort_by_key(|fv| fv.feature_value);
 
             feature_values_sorted.push(feature_values_sorted_i)
         }

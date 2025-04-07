@@ -23,38 +23,27 @@ where
     (label, parts.collect::<Vec<_>>().join(" "))
 }
 
-// Classification
-
-pub struct ClassificationInstance {
-    pub label: i32,
+/// An instance with a constant label. For example, used in classifcation/regression.
+pub struct LabeledInstance<T: FromStr>
+where
+    <T as FromStr>::Err: Debug,
+{
+    pub label: T,
 }
 
-impl ClassificationInstance {
-    pub fn new(label: i32) -> Self {
+impl<T: FromStr> LabeledInstance<T>
+where
+    <T as FromStr>::Err: Debug,
+{
+    pub fn new(label: T) -> Self {
         Self { label }
     }
 }
 
-impl Instance for ClassificationInstance {
-    fn read(line: String) -> (Self, String) {
-        let (label, remainder) = read_label(line);
-        (Self { label }, remainder)
-    }
-}
-
-// Regression
-
-pub struct RegressionInstance {
-    pub label: f64,
-}
-
-impl RegressionInstance {
-    pub fn new(label: f64) -> Self {
-        Self { label }
-    }
-}
-
-impl Instance for RegressionInstance {
+impl<T: FromStr> Instance for LabeledInstance<T>
+where
+    <T as FromStr>::Err: Debug,
+{
     fn read(line: String) -> (Self, String) {
         let (label, remainder) = read_label(line);
         (Self { label }, remainder)

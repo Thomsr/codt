@@ -1,4 +1,4 @@
-use codt::model::{dataset::DataSet, instance::ClassificationInstance};
+use codt::model::{dataset::DataSet, instance::LabeledInstance};
 use numpy::{IntoPyArray, PyArray1, PyReadonlyArray1, PyReadonlyArray2, ndarray::Axis};
 use pyo3::prelude::*;
 
@@ -8,7 +8,7 @@ pub struct OptimalDecisionTreeClassifier {
     max_depth: i32,
     #[allow(dead_code)]
     max_nodes: i32,
-    dataset: Option<DataSet<ClassificationInstance>>,
+    dataset: Option<DataSet<LabeledInstance<i32>>>,
 }
 
 #[pymethods]
@@ -28,11 +28,11 @@ impl OptimalDecisionTreeClassifier {
     fn fit<'py>(&mut self, X: PyReadonlyArray2<'py, f64>, y: PyReadonlyArray1<'py, i64>) {
         let x_arr = X.as_array();
         let y_arr = y.as_array();
-        let mut dataset = DataSet::<ClassificationInstance>::default();
+        let mut dataset = DataSet::<LabeledInstance<i32>>::default();
         for i in 0..y_arr.dim() {
             let features = x_arr.index_axis(Axis(0), i);
             dataset.add_instance(
-                ClassificationInstance::new(y_arr[i] as i32),
+                LabeledInstance::new(y_arr[i] as i32),
                 features.iter().copied(),
             );
         }

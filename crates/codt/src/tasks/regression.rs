@@ -1,4 +1,4 @@
-use crate::model::{dataview::DataView, instance::RegressionInstance};
+use crate::model::{dataview::DataView, instance::LabeledInstance};
 
 use super::OptimizationTask;
 
@@ -8,7 +8,7 @@ pub struct RegressionTask {
 }
 
 impl OptimizationTask for RegressionTask {
-    type InstanceType = RegressionInstance;
+    type InstanceType = LabeledInstance<f64>;
     type CostType = f64;
     const MIN_COST: Self::CostType = 0.0;
 

@@ -1,4 +1,4 @@
-use crate::model::{dataview::DataView, instance::ClassificationInstance};
+use crate::model::{dataview::DataView, instance::LabeledInstance};
 
 use super::OptimizationTask;
 
@@ -9,7 +9,7 @@ pub struct AccuracyTask {
 }
 
 impl OptimizationTask for AccuracyTask {
-    type InstanceType = ClassificationInstance;
+    type InstanceType = LabeledInstance<i32>;
     type CostType = i32;
     const MIN_COST: Self::CostType = 0;
 
@@ -38,7 +38,7 @@ impl OptimizationTask for AccuracyTask {
 
         let largest_class_size = instance_count_per_class
             .iter()
-            .fold(i32::MAX, |acc, e| acc.min(*e));
+            .fold(0, |acc, e| acc.max(*e));
 
         dataview.num_instances() as i32 - largest_class_size
     }

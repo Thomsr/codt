@@ -1,3 +1,5 @@
+use log::info;
+
 use crate::{model::dataview::DataView, tasks::OptimizationTask};
 
 use super::{graph::SearchGraph, node::Node};
@@ -19,35 +21,36 @@ impl<OT: OptimizationTask> Solver<'_, OT> {
 
         self.task.prepare_for_data(&mut dataview);
 
-        let _ = max_depth;
-
         let mut graph = SearchGraph {
-            root: Node::new(&self.task, dataview),
+            root: Node::new(&self.task, dataview, max_depth),
         };
 
         while let Some(mut path) = graph.select() {
+            info!("Selected path: {:?}", path);
+
             let mut current = path.pop().unwrap();
-            let parent = path.pop();
+            let mut parent = path.pop();
             graph.expand(
                 &self.task,
                 &mut current,
-                parent.as_ref().map(|p| p.left_child.as_ref().unwrap()),
+                parent.as_mut().and_then(|p| p.current_node_mut()),
             );
             if let Some(parent) = parent {
                 path.push(parent)
             }
             path.push(current);
+            graph.backtrack(path);
+
+            info!(
+                "LB: {:?}, UB: {:?}",
+                graph.root.cost_lower_bound, graph.root.cost_upper_bound
+            );
         }
 
         let solution = graph.root.cost_upper_bound;
 
         // Take back ownership of the dataset.
         self.dataview = Some(graph.root.dataview);
-
-        let solution = match solution {
-            std::ops::Bound::Included(ub) => ub,
-            _ => self.task.leaf_cost(self.dataview.as_ref().unwrap()),
-        };
 
         SolveResult {
             cost_str: self.task.print_cost(&solution),
