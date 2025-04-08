@@ -5,7 +5,7 @@ use std::{
     ops::{Bound, Range},
 };
 
-use log::info;
+use log::trace;
 
 use crate::{model::dataview::DataView, tasks::OptimizationTask};
 
@@ -346,7 +346,7 @@ impl<'a, OT: OptimizationTask> Node<'a, OT> {
 
     pub fn backtrack_item(&mut self, mut item: QueueItem<'a, OT>) {
         if let Some(ub) = self.get_upper_and_update_lower_bound_from_children(&mut item) {
-            info!("New UB: {:?}", ub);
+            trace!("New UB: {:?}", ub);
             if self.cost_upper_bound > ub {
                 self.cost_upper_bound = ub;
                 self.best = (item.feature as i32, item.split_points.clone(), ub)

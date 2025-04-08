@@ -18,7 +18,7 @@ pub fn get_cli_args() -> CliParams {
 )]
 pub struct CliParams {
     /// Determines if the solver should print logging information to standard output.
-    #[arg(short, long, action=ArgAction::Set, default_value_t=true)]
+    #[arg(short, long, action=ArgAction::Set, default_value_t=false)]
     pub verbose: bool,
 
     /// Location of the (training) dataset.

@@ -67,8 +67,20 @@ impl<'a, I: Instance> DataView<'a, I> {
 
             for &value in feature {
                 if self.dataset.feature_values[split_feature][value.instance_id] <= threshold {
+                    // Assure the compiler that we do not need reallocation when pushing.
+                    unsafe {
+                        std::hint::assert_unchecked(
+                            feature_values_left_i.len() < feature_values_left_i.capacity(),
+                        )
+                    }
                     feature_values_left_i.push(value);
                 } else {
+                    // Assure the compiler that we do not need reallocation when pushing.
+                    unsafe {
+                        std::hint::assert_unchecked(
+                            feature_values_right_i.len() < feature_values_right_i.capacity(),
+                        )
+                    }
                     feature_values_right_i.push(value);
                 }
             }

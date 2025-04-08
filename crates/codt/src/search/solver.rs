@@ -1,4 +1,4 @@
-use log::info;
+use log::trace;
 
 use crate::{model::dataview::DataView, tasks::OptimizationTask};
 
@@ -26,7 +26,7 @@ impl<OT: OptimizationTask> Solver<'_, OT> {
         };
 
         while let Some(mut path) = graph.select() {
-            info!("Selected path: {:?}", path);
+            trace!("Selected path: {:?}", path);
 
             let mut current = path.pop().unwrap();
             let mut parent = path.pop();
@@ -41,7 +41,7 @@ impl<OT: OptimizationTask> Solver<'_, OT> {
             path.push(current);
             graph.backtrack(path);
 
-            info!(
+            trace!(
                 "LB: {:?}, UB: {:?}",
                 graph.root.cost_lower_bound, graph.root.cost_upper_bound
             );

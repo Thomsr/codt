@@ -69,7 +69,7 @@ jobs:
           # args: --release --out dist --find-interpreter
           sccache: 'true'
           manylinux: auto
-          rust-toolchain: 1.85.0
+          rust-toolchain: nightly
       - name: Upload wheels
         uses: actions/upload-artifact@v4
         with:
@@ -103,7 +103,7 @@ jobs:
           # args: --release --out dist --find-interpreter
           sccache: 'true'
           manylinux: musllinux_1_2
-          rust-toolchain: 1.85.0
+          rust-toolchain: nightly
       - name: Upload wheels
         uses: actions/upload-artifact@v4
         with:
@@ -133,7 +133,7 @@ jobs:
           # The following can be enabled when rust-numpy 0.24 fixes python 3.13t support
           # args: --release --out dist --find-interpreter
           sccache: 'true'
-          rust-toolchain: 1.85.0
+          rust-toolchain: nightly
       - name: Upload wheels
         uses: actions/upload-artifact@v4
         with:
@@ -162,7 +162,7 @@ jobs:
           # The following can be enabled when rust-numpy 0.24 fixes python 3.13t support
           # args: --release --out dist --find-interpreter
           sccache: 'true'
-          rust-toolchain: 1.85.0
+          rust-toolchain: nightly
       - name: Upload wheels
         uses: actions/upload-artifact@v4
         with:
@@ -178,7 +178,7 @@ jobs:
         with:
           command: sdist
           args: --out dist
-          rust-toolchain: 1.85.0
+          rust-toolchain: nightly
       - name: Upload sdist
         uses: actions/upload-artifact@v4
         with:
@@ -211,4 +211,4 @@ jobs:
         with:
           command: upload
           args: --non-interactive --skip-existing wheels-*/*
-          rust-toolchain: 1.85.0
+          rust-toolchain: nightly
