@@ -96,4 +96,8 @@ impl<'a, I: Instance> DataView<'a, I> {
     pub fn num_instances(&self) -> usize {
         self.feature_values_sorted[0].len()
     }
+
+    pub fn num_features(&self) -> usize {
+        self.feature_values_sorted.len()
+    }
 }
