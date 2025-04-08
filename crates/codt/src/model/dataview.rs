@@ -1,6 +1,6 @@
 use super::{dataset::DataSet, instance::Instance};
 
-use std::fmt::Debug;
+use std::{cmp::Ordering, fmt::Debug, ops::Range};
 
 #[derive(Clone, Copy, PartialEq, Eq)]
 pub struct FeatureValue {
@@ -17,7 +17,7 @@ pub struct DataView<'a, I: Instance> {
     /// This struct is a view over this dataset.
     pub dataset: &'a DataSet<I>,
     /// The feature values for instances that remain in this view. Indexed first by feature_id, then sorted by feature value.
-    pub feature_values_sorted: Vec<Vec<FeatureValue>>,
+    feature_values_sorted: Vec<Vec<FeatureValue>>,
 }
 
 impl<I: Instance> Debug for DataView<'_, I> {
@@ -103,6 +103,41 @@ impl<'a, I: Instance> DataView<'a, I> {
 
     pub fn instances_iter(&self) -> impl Iterator<Item = usize> {
         self.feature_values_sorted[0].iter().map(|i| i.instance_id)
+    }
+
+    pub fn remaining_feature_ranges(&self) -> impl Iterator<Item = (usize, Range<i32>)> {
+        self.feature_values_sorted
+            .iter()
+            .enumerate()
+            .filter_map(|(feature, values)| match (values.first(), values.last()) {
+                (Some(x), Some(y)) => {
+                    // For each feature, consider all useful splitting points. Note: last feature value is
+                    // not a useful splitting point because all instances would go to the left. The range
+                    // excludes the endpoint.
+                    assert!(x.feature_value <= y.feature_value);
+                    if x.feature_value != y.feature_value {
+                        Some((feature, x.feature_value..y.feature_value))
+                    } else {
+                        None
+                    }
+                }
+                // No branching decisions for this feature.
+                _ => None,
+            })
+    }
+
+    pub fn feature_range_remains(&self, feature: usize, range: &Range<i32>) -> bool {
+        self.feature_values_sorted[feature]
+            .binary_search_by(|a| {
+                if a.feature_value < range.start {
+                    Ordering::Less
+                } else if a.feature_value >= range.end {
+                    Ordering::Greater
+                } else {
+                    Ordering::Equal
+                }
+            })
+            .is_ok()
     }
 
     pub fn num_instances(&self) -> usize {

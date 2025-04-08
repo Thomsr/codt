@@ -21,4 +21,16 @@ pub trait OptimizationTask {
     }
     fn leaf_cost(&self, dataview: &DataView<Self::InstanceType>) -> Self::CostType;
     fn print_cost(&mut self, cost: &Self::CostType) -> String;
+
+    fn update_lowerbound(lb: &mut Self::CostType, candidate: &Self::CostType) {
+        if candidate > lb {
+            *lb = *candidate;
+        }
+    }
+
+    fn update_upperbound(ub: &mut Self::CostType, candidate: &Self::CostType) {
+        if candidate < ub {
+            *ub = *candidate;
+        }
+    }
 }

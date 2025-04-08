@@ -1,13 +1,26 @@
+use std::marker::PhantomData;
+
 use crate::tasks::OptimizationTask;
 
-use super::node::{Node, QueueItem};
+use super::{
+    node::{Node, QueueItem},
+    strategy::SearchStrategy,
+};
 
-pub struct SearchGraph<'a, OT: OptimizationTask> {
-    pub root: Node<'a, OT>,
+pub struct SearchGraph<'a, OT: OptimizationTask, SS: SearchStrategy> {
+    pub root: Node<'a, OT, SS>,
+    _ss: PhantomData<SS>,
 }
 
-impl<'a, OT: OptimizationTask> SearchGraph<'a, OT> {
-    pub fn find_lowest_cost_split(&self, item: &QueueItem<'a, OT>) -> i32 {
+impl<'a, OT: OptimizationTask, SS: SearchStrategy> SearchGraph<'a, OT, SS> {
+    pub fn new(root: Node<'a, OT, SS>) -> Self {
+        Self {
+            root,
+            _ss: PhantomData,
+        }
+    }
+
+    pub fn find_lowest_cost_split(&self, item: &QueueItem<'a, OT, SS>) -> i32 {
         // get rs = right solution
         // get ls = left solution
         // for x = distance from a solution:
@@ -17,7 +30,7 @@ impl<'a, OT: OptimizationTask> SearchGraph<'a, OT> {
         item.split_points.start + (item.split_points.end - item.split_points.start) / 2
     }
 
-    pub fn select(&mut self) -> Option<Vec<QueueItem<'a, OT>>> {
+    pub fn select(&mut self) -> Option<Vec<QueueItem<'a, OT, SS>>> {
         if self.root.is_complete() {
             return None;
         }
@@ -29,13 +42,12 @@ impl<'a, OT: OptimizationTask> SearchGraph<'a, OT> {
             let mut current = next_from_root;
 
             while let Some(children) = &mut current.children {
-                let next = children[current.current_child].queue.pop();
-                if let Some(item) = next {
-                    path.push(current);
-                    current = item;
-                } else {
-                    break;
-                }
+                let item = children[current.current_child]
+                    .queue
+                    .pop()
+                    .expect("Queue cannot be empty since the root is not complete");
+                path.push(current);
+                current = item;
             }
             path.push(current);
             Some(path)
@@ -47,8 +59,8 @@ impl<'a, OT: OptimizationTask> SearchGraph<'a, OT> {
     pub fn expand(
         &mut self,
         task: &OT,
-        item: &mut QueueItem<'a, OT>,
-        parent: Option<&mut Node<'a, OT>>,
+        item: &mut QueueItem<'a, OT, SS>,
+        parent: Option<&mut Node<'a, OT, SS>>,
     ) {
         assert!(!item.is_expanded());
 
@@ -59,20 +71,31 @@ impl<'a, OT: OptimizationTask> SearchGraph<'a, OT> {
 
         let parent = parent.unwrap_or(&mut self.root);
         if let Some(left_item) = left_item {
-            parent.queue.push(left_item);
+            if parent
+                .dataview
+                .feature_range_remains(item.feature, &left_item.split_points)
+            {
+                parent.queue.push(left_item);
+            }
         }
         if let Some(right_item) = right_item {
-            parent.queue.push(right_item);
+            if parent
+                .dataview
+                .feature_range_remains(item.feature, &right_item.split_points)
+            {
+                parent.queue.push(right_item);
+            }
         }
 
         let (left, right) = parent.split(task, item.feature, x);
         item.children = Some([left, right]);
     }
 
-    pub fn backtrack(&mut self, mut path: Vec<QueueItem<'a, OT>>) {
+    pub fn backtrack(&mut self, mut path: Vec<QueueItem<'a, OT, SS>>) {
         let mut current = path.pop();
         let mut parent_item = path.pop();
-        // recompute lower bounds for all items in the queue until the first with no change.
+
+        // Return ownership of all the items in the selected path to their respective nodes.
         while let Some(item) = current {
             let parent = parent_item
                 .as_mut()

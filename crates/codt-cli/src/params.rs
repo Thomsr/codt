@@ -1,6 +1,6 @@
 use std::path::PathBuf;
 
-use clap::{ArgAction, Args, Parser, Subcommand, value_parser};
+use clap::{ArgAction, Args, Parser, Subcommand, ValueEnum, value_parser};
 
 use super::value_parser::RangedF64ValueParser;
 
@@ -32,6 +32,10 @@ pub struct CliParams {
     /// The task to optimize.
     #[command(subcommand)]
     pub task: OptimizationTaskEnum,
+
+    /// The search strategy to use.
+    #[arg(short, long)]
+    pub strategy: SearchStrategy,
 }
 
 #[derive(Subcommand)]
@@ -40,6 +44,14 @@ pub enum OptimizationTaskEnum {
     Accuracy,
     /// Optimizes squared error
     Regression(RegressionParams),
+}
+
+#[derive(ValueEnum, Clone, Debug)]
+pub enum SearchStrategy {
+    /// Use a depth-first search strategy
+    Dfs,
+    /// Use an and-or best-first search strategy
+    AndOr,
 }
 
 #[derive(Args)]

@@ -1,29 +1,31 @@
+use std::marker::PhantomData;
+
 use log::trace;
 
 use crate::{model::dataview::DataView, tasks::OptimizationTask};
 
-use super::{graph::SearchGraph, node::Node};
+use super::{graph::SearchGraph, node::Node, strategy::SearchStrategy};
 
 pub struct SolveResult<OT: OptimizationTask> {
     pub cost: OT::CostType,
     pub cost_str: String,
 }
 
-pub struct Solver<'a, OT: OptimizationTask> {
+pub struct Solver<'a, OT: OptimizationTask, SS: SearchStrategy> {
     task: OT,
     /// Dataview for which the solver finds an optimal decision tree. None during search.
     dataview: Option<DataView<'a, OT::InstanceType>>,
+    _ss: PhantomData<SS>,
 }
 
-impl<OT: OptimizationTask> Solver<'_, OT> {
+impl<OT: OptimizationTask, SS: SearchStrategy> Solver<'_, OT, SS> {
     pub fn solve(&mut self, max_depth: u32) -> SolveResult<OT> {
         let mut dataview = self.dataview.take().unwrap();
 
         self.task.prepare_for_data(&mut dataview);
 
-        let mut graph = SearchGraph {
-            root: Node::new(&self.task, dataview, max_depth),
-        };
+        let mut graph: SearchGraph<'_, OT, SS> =
+            SearchGraph::new(Node::new(&self.task, dataview, max_depth));
 
         while let Some(mut path) = graph.select() {
             trace!("Selected path: {:?}", path);
@@ -61,10 +63,11 @@ impl<OT: OptimizationTask> Solver<'_, OT> {
     pub fn new(
         task: OT,
         dataview: DataView<'_, <OT as OptimizationTask>::InstanceType>,
-    ) -> Solver<OT> {
-        Solver::<'_, OT> {
+    ) -> Solver<OT, SS> {
+        Solver::<'_, OT, SS> {
             task,
             dataview: Some(dataview),
+            _ss: PhantomData,
         }
     }
 }
