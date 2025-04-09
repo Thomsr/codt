@@ -7,10 +7,10 @@ use super::{pruner::Pruner, strategy::SearchStrategy};
 pub struct QueueItem<'a, OT: OptimizationTask, SS: SearchStrategy> {
     pub cost_lower_bound: OT::CostType,
 
-    /// The branching test for this node is one of `feature <= s` where s in split_points.
+    /// The branching test for this node is one of `feature <= possible_split_points[s]` where s in split_points.
     pub feature: usize,
-    /// The branching test for this node is one of `feature <= s` where s in split_points.
-    pub split_points: Range<i32>,
+    /// The branching test for this node is one of `feature <= possible_split_points[s]` where s in split_points.
+    pub split_points: Range<usize>,
 
     // Child nodes can only be initiated once the size of the `split_points` range is one.
     pub children: Option<[Node<'a, OT, SS>; 2]>,
@@ -57,7 +57,7 @@ impl<OT: OptimizationTask, SS: SearchStrategy> Ord for QueueItem<'_, OT, SS> {
 }
 
 impl<'a, OT: OptimizationTask, SS: SearchStrategy> QueueItem<'a, OT, SS> {
-    fn new(feature: usize, split_points: Range<i32>) -> Self {
+    fn new(feature: usize, split_points: Range<usize>) -> Self {
         Self {
             cost_lower_bound: OT::MIN_COST,
             feature,
@@ -68,7 +68,7 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> QueueItem<'a, OT, SS> {
         }
     }
 
-    pub fn split_at(&mut self, split: i32) -> (Option<Self>, Option<Self>) {
+    pub fn split_at(&mut self, split: usize) -> (Option<Self>, Option<Self>) {
         let mut left = None;
         let mut right = None;
         if split - self.split_points.start > 0 {
@@ -124,7 +124,7 @@ pub struct Node<'a, OT: OptimizationTask, SS: SearchStrategy> {
 
     pub remaining_depth_budget: u32,
 
-    pub dataview: DataView<'a, OT::InstanceType>,
+    pub dataview: DataView<'a, OT>,
 
     pub queue: BinaryHeap<QueueItem<'a, OT, SS>>,
 
@@ -136,15 +136,18 @@ pub struct Node<'a, OT: OptimizationTask, SS: SearchStrategy> {
 }
 
 impl<'a, OT: OptimizationTask, SS: SearchStrategy> Node<'a, OT, SS> {
-    pub fn new(task: &OT, dataview: DataView<'a, OT::InstanceType>, max_depth: u32) -> Self {
-        let ub = task.leaf_cost(&dataview);
+    pub fn new(dataview: DataView<'a, OT>, max_depth: u32) -> Self {
+        let ub = (&dataview.cost_summer).into();
         let lb = if max_depth == 0 { ub } else { OT::MIN_COST };
 
         let mut queue = BinaryHeap::new();
 
         if max_depth > 0 {
-            for (feature, range) in dataview.remaining_feature_ranges() {
-                queue.push(QueueItem::new(feature, range));
+            for feature in 0..dataview.num_features() {
+                let n_splitpoints = dataview.possible_split_values[feature].len();
+                if n_splitpoints > 0 {
+                    queue.push(QueueItem::new(feature, 0..n_splitpoints));
+                }
             }
         }
 
@@ -163,13 +166,24 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> Node<'a, OT, SS> {
         self.cost_lower_bound >= self.cost_upper_bound
     }
 
-    pub fn split(&self, task: &OT, feature: usize, split: i32) -> (Self, Self) {
+    pub fn split(&self, feature: usize, split: usize) -> (Self, Self) {
         let (left_view, right_view) = self.dataview.split(feature, split);
 
-        let left = Self::new(task, left_view, self.remaining_depth_budget - 1);
-        let right = Self::new(task, right_view, self.remaining_depth_budget - 1);
+        let left = Self::new(left_view, self.remaining_depth_budget - 1);
+        let right = Self::new(right_view, self.remaining_depth_budget - 1);
 
         (left, right)
+    }
+
+    pub fn find_lowest_cost_split(&self, _feature: usize, range: &Range<usize>) -> usize {
+        // get rs = right solution
+        // get ls = left solution
+        // for x = distance from a solution:
+        // lower bound for left = max(ls.left, rs.left-worst*x)
+        // lower bound for right = max(rs.right, ls.right-worst*x)
+        // find minimum index of left_lb + right_lb. If in a flat area, pick the center of that area.
+
+        (range.start + range.end) / 2
     }
 
     fn get_upper_and_update_lower_bound_from_children(

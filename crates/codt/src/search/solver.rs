@@ -14,7 +14,7 @@ pub struct SolveResult<OT: OptimizationTask> {
 pub struct Solver<'a, OT: OptimizationTask, SS: SearchStrategy> {
     task: OT,
     /// Dataview for which the solver finds an optimal decision tree. None during search.
-    dataview: Option<DataView<'a, OT::InstanceType>>,
+    dataview: Option<DataView<'a, OT>>,
     _ss: PhantomData<SS>,
 }
 
@@ -24,8 +24,7 @@ impl<OT: OptimizationTask, SS: SearchStrategy> Solver<'_, OT, SS> {
 
         self.task.prepare_for_data(&mut dataview);
 
-        let mut graph: SearchGraph<'_, OT, SS> =
-            SearchGraph::new(Node::new(&self.task, dataview, max_depth));
+        let mut graph: SearchGraph<'_, OT, SS> = SearchGraph::new(Node::new(dataview, max_depth));
 
         while let Some(mut path) = graph.select() {
             trace!("Selected path: {:?}", path);
@@ -33,7 +32,6 @@ impl<OT: OptimizationTask, SS: SearchStrategy> Solver<'_, OT, SS> {
             let mut current = path.pop().unwrap();
             let mut parent = path.pop();
             graph.expand(
-                &self.task,
                 &mut current,
                 parent.as_mut().and_then(|p| p.current_node_mut()),
             );
@@ -60,10 +58,7 @@ impl<OT: OptimizationTask, SS: SearchStrategy> Solver<'_, OT, SS> {
         }
     }
 
-    pub fn new(
-        task: OT,
-        dataview: DataView<'_, <OT as OptimizationTask>::InstanceType>,
-    ) -> Solver<OT, SS> {
+    pub fn new(task: OT, dataview: DataView<'_, OT>) -> Solver<OT, SS> {
         Solver::<'_, OT, SS> {
             task,
             dataview: Some(dataview),

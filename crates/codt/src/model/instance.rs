@@ -24,14 +24,15 @@ where
 }
 
 /// An instance with a constant label. For example, used in classifcation/regression.
-pub struct LabeledInstance<T: FromStr>
+#[derive(Clone, Copy)]
+pub struct LabeledInstance<T: FromStr + Clone + Copy>
 where
     <T as FromStr>::Err: Debug,
 {
     pub label: T,
 }
 
-impl<T: FromStr> LabeledInstance<T>
+impl<T: FromStr + Clone + Copy> LabeledInstance<T>
 where
     <T as FromStr>::Err: Debug,
 {
@@ -40,7 +41,7 @@ where
     }
 }
 
-impl<T: FromStr> Instance for LabeledInstance<T>
+impl<T: FromStr + Clone + Copy> Instance for LabeledInstance<T>
 where
     <T as FromStr>::Err: Debug,
 {

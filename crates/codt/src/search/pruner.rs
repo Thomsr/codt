@@ -11,14 +11,14 @@ pub struct Pruner<OT: OptimizationTask> {
     /// Presence of tuple (threshold, cost) means that from 0 to
     /// threshold inclusive, cost is the highest lower bound for
     /// the left subtree found so far.
-    pub best_left_subtree_left_of: Vec<BTreeMap<i32, OT::CostType>>,
+    pub best_left_subtree_left_of: Vec<BTreeMap<usize, OT::CostType>>,
 
     /// Lookup for finding lower bounds. Note: sorted increasing in threshold
     /// and decreasing in cost.
     /// Presence of tuple (threshold, cost) means that from threshold to
     /// inf inclusive, cost is the highest lower bound for
     /// the right subtree found so far.
-    pub best_right_subtree_right_of: Vec<BTreeMap<i32, OT::CostType>>,
+    pub best_right_subtree_right_of: Vec<BTreeMap<usize, OT::CostType>>,
 }
 
 impl<OT: OptimizationTask> Pruner<OT> {
@@ -29,7 +29,7 @@ impl<OT: OptimizationTask> Pruner<OT> {
         }
     }
 
-    pub fn insert_left_subtree(&mut self, feature: usize, threshold: i32, lb: OT::CostType) {
+    pub fn insert_left_subtree(&mut self, feature: usize, threshold: usize, lb: OT::CostType) {
         // Find point to insert
         let mut cursor =
             self.best_left_subtree_left_of[feature].upper_bound_mut(Bound::Included(&threshold));
@@ -66,7 +66,7 @@ impl<OT: OptimizationTask> Pruner<OT> {
         }
     }
 
-    pub fn insert_right_subtree(&mut self, feature: usize, threshold: i32, lb: OT::CostType) {
+    pub fn insert_right_subtree(&mut self, feature: usize, threshold: usize, lb: OT::CostType) {
         // Find point to insert
         let mut cursor =
             self.best_right_subtree_right_of[feature].lower_bound_mut(Bound::Included(&threshold));
@@ -103,7 +103,7 @@ impl<OT: OptimizationTask> Pruner<OT> {
         }
     }
 
-    pub fn lb_for(&self, feature: usize, threshold: &Range<i32>) -> OT::CostType {
+    pub fn lb_for(&self, feature: usize, threshold: &Range<usize>) -> OT::CostType {
         // Any left subtree from a tree with threshold <= this one is a lower bound. Vice versa for right.
         let lb_left = self.best_left_subtree_left_of[feature]
             .range(..(threshold.start + 1))

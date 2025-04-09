@@ -1,4 +1,6 @@
-use crate::model::{dataview::DataView, instance::LabeledInstance};
+use std::ops::{AddAssign, SubAssign};
+
+use crate::model::{dataset::DataSet, dataview::DataView, instance::LabeledInstance};
 
 use super::OptimizationTask;
 
@@ -8,12 +10,75 @@ pub struct AccuracyTask {
     num_labels: i32,
 }
 
+#[derive(Clone)]
+pub struct AccuracyCostSummer {
+    instance_count_per_class: Vec<i32>,
+}
+
+impl SubAssign<&AccuracyCostSummer> for AccuracyCostSummer {
+    fn sub_assign(&mut self, rhs: &Self) {
+        assert_eq!(
+            self.instance_count_per_class.len(),
+            rhs.instance_count_per_class.len()
+        );
+        for (count, other) in self
+            .instance_count_per_class
+            .iter_mut()
+            .zip(rhs.instance_count_per_class.iter())
+        {
+            *count -= other;
+        }
+    }
+}
+
+impl SubAssign<&LabeledInstance<i32>> for AccuracyCostSummer {
+    fn sub_assign(&mut self, rhs: &LabeledInstance<i32>) {
+        self.instance_count_per_class[rhs.label as usize] -= 1;
+    }
+}
+
+impl AddAssign<&AccuracyCostSummer> for AccuracyCostSummer {
+    fn add_assign(&mut self, rhs: &Self) {
+        assert_eq!(
+            self.instance_count_per_class.len(),
+            rhs.instance_count_per_class.len()
+        );
+        for (count, other) in self
+            .instance_count_per_class
+            .iter_mut()
+            .zip(rhs.instance_count_per_class.iter())
+        {
+            *count += other;
+        }
+    }
+}
+
+impl AddAssign<&LabeledInstance<i32>> for AccuracyCostSummer {
+    fn add_assign(&mut self, rhs: &LabeledInstance<i32>) {
+        self.instance_count_per_class[rhs.label as usize] += 1;
+    }
+}
+
+impl From<&AccuracyCostSummer> for i32 {
+    fn from(value: &AccuracyCostSummer) -> Self {
+        let (total, largest_class_size) = value
+            .instance_count_per_class
+            .iter()
+            .fold((0, 0), |(acc_total, acc_max), e| {
+                (acc_total + *e, acc_max.max(*e))
+            });
+
+        total - largest_class_size
+    }
+}
+
 impl OptimizationTask for AccuracyTask {
     type InstanceType = LabeledInstance<i32>;
     type CostType = i32;
+    type CostSummer = AccuracyCostSummer;
     const MIN_COST: Self::CostType = 0;
 
-    fn prepare_for_data(&mut self, dataview: &mut DataView<Self::InstanceType>) {
+    fn prepare_for_data(&mut self, dataview: &mut DataView<Self>) {
         self.dataset_size = dataview.num_instances();
         self.num_labels = 0;
         for instance in &dataview.dataset.instances {
@@ -29,17 +94,14 @@ impl OptimizationTask for AccuracyTask {
         )
     }
 
-    fn leaf_cost(&self, dataview: &DataView<Self::InstanceType>) -> i32 {
-        let mut instance_count_per_class = vec![0; self.num_labels as usize];
-
-        for instance_id in dataview.instances_iter() {
-            instance_count_per_class[dataview.dataset.instances[instance_id].label as usize] += 1;
+    fn init_costsum(dataset: &DataSet<Self::InstanceType>) -> Self::CostSummer {
+        let mut num_labels = 0;
+        for instance in &dataset.instances {
+            num_labels = num_labels.max(instance.label + 1);
         }
 
-        let largest_class_size = instance_count_per_class
-            .iter()
-            .fold(0, |acc, e| acc.max(*e));
-
-        dataview.num_instances() as i32 - largest_class_size
+        Self::CostSummer {
+            instance_count_per_class: vec![0; num_labels as usize],
+        }
     }
 }

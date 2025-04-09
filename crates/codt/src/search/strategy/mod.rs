@@ -4,6 +4,12 @@ use crate::tasks::OptimizationTask;
 
 use super::node::{Node, QueueItem};
 
+// Todo:
+// add priority attribute, set the priority to the lowest of its two children. If no children, then lower bound.
+// pub mod bfs;
+// AndOr search, but limited to k-quantiles at a time. Essentially Quant-BnB but best-first.
+// pub mod quant;
+// ------
 pub mod andor;
 pub mod dfs;
 

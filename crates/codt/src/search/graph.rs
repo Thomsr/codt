@@ -20,16 +20,6 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> SearchGraph<'a, OT, SS> {
         }
     }
 
-    pub fn find_lowest_cost_split(&self, item: &QueueItem<'a, OT, SS>) -> i32 {
-        // get rs = right solution
-        // get ls = left solution
-        // for x = distance from a solution:
-        // lower bound for left = max(ls.left, rs.left-worst*x)
-        // lower bound for right = max(rs.right, ls.right-worst*x)
-        // find minimum index of left_lb + right_lb. If in a flat area, pick the center of that area.
-        item.split_points.start + (item.split_points.end - item.split_points.start) / 2
-    }
-
     pub fn select(&mut self) -> Option<Vec<QueueItem<'a, OT, SS>>> {
         if self.root.is_complete() {
             return None;
@@ -58,36 +48,25 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> SearchGraph<'a, OT, SS> {
 
     pub fn expand(
         &mut self,
-        task: &OT,
         item: &mut QueueItem<'a, OT, SS>,
         parent: Option<&mut Node<'a, OT, SS>>,
     ) {
         assert!(!item.is_expanded());
 
-        let x = self.find_lowest_cost_split(item);
+        let parent = parent.unwrap_or(&mut self.root);
+        let x = parent.find_lowest_cost_split(item.feature, &item.split_points);
         assert!(item.split_points.start <= x && x < item.split_points.end);
 
         let (left_item, right_item) = item.split_at(x);
 
-        let parent = parent.unwrap_or(&mut self.root);
         if let Some(left_item) = left_item {
-            if parent
-                .dataview
-                .feature_range_remains(item.feature, &left_item.split_points)
-            {
-                parent.queue.push(left_item);
-            }
+            parent.queue.push(left_item);
         }
         if let Some(right_item) = right_item {
-            if parent
-                .dataview
-                .feature_range_remains(item.feature, &right_item.split_points)
-            {
-                parent.queue.push(right_item);
-            }
+            parent.queue.push(right_item);
         }
 
-        let (left, right) = parent.split(task, item.feature, x);
+        let (left, right) = parent.split(item.feature, x);
         item.children = Some([left, right]);
     }
 
