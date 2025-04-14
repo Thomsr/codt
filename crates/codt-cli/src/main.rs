@@ -36,6 +36,8 @@ fn run_solver_for_task<T: OptimizationTask, SS: SearchStrategy>(
 
     info!("Read time (s): {}", read_time);
     info!("Solve time (s): {}", solve_time);
+    info!("Graph expansions: {}", result.graph_expansions);
+    info!("Tree: {}", result.tree);
     println!("{}", result.cost_str);
 }
 

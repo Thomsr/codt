@@ -1,10 +1,16 @@
-use std::{cmp::Ordering, collections::BinaryHeap, fmt::Debug, marker::PhantomData, ops::Range};
+use std::{
+    cmp::Ordering, collections::BinaryHeap, fmt::Debug, marker::PhantomData, ops::Range, rc::Rc,
+};
 
-use crate::{model::dataview::DataView, tasks::OptimizationTask};
+use crate::{
+    model::{dataview::DataView, tree::Tree},
+    tasks::{CostSum, OptimizationTask},
+};
 
 use super::{pruner::Pruner, strategy::SearchStrategy};
 
 pub struct QueueItem<'a, OT: OptimizationTask, SS: SearchStrategy> {
+    /// The current lower bound on the error for this item in the queue.
     pub cost_lower_bound: OT::CostType,
 
     /// The branching test for this node is one of `feature <= possible_split_points[s]` where s in split_points.
@@ -68,6 +74,9 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> QueueItem<'a, OT, SS> {
         }
     }
 
+    /// Sets this item to split at an exact point. Returns the QueueItems left
+    /// after splitting at this concrete splitting point. Only returns an item
+    /// if there are remaining splits in that interval.
     pub fn split_at(&mut self, split: usize) -> (Option<Self>, Option<Self>) {
         let mut left = None;
         let mut right = None;
@@ -120,24 +129,21 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> QueueItem<'a, OT, SS> {
 /// Represents a search node for a concrete feature test.
 pub struct Node<'a, OT: OptimizationTask, SS: SearchStrategy> {
     pub cost_lower_bound: OT::CostType,
-    pub cost_upper_bound: OT::CostType,
-
     pub remaining_depth_budget: u32,
 
     pub dataview: DataView<'a, OT>,
 
     pub queue: BinaryHeap<QueueItem<'a, OT, SS>>,
 
-    /// Best upper bound of feature test, split point, and cost.
-    /// TODO
-    pub best: (i32, Range<i32>, OT::CostType),
+    /// Best tree found so far.
+    pub best: Rc<Tree<OT>>,
 
     pruner: Pruner<OT>,
 }
 
 impl<'a, OT: OptimizationTask, SS: SearchStrategy> Node<'a, OT, SS> {
     pub fn new(dataview: DataView<'a, OT>, max_depth: u32) -> Self {
-        let ub = (&dataview.cost_summer).into();
+        let ub = dataview.cost_summer.cost();
         let lb = if max_depth == 0 { ub } else { OT::MIN_COST };
 
         let mut queue = BinaryHeap::new();
@@ -153,17 +159,16 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> Node<'a, OT, SS> {
 
         Node {
             cost_lower_bound: lb,
-            cost_upper_bound: ub,
             remaining_depth_budget: max_depth,
             pruner: Pruner::new(dataview.num_features()),
+            best: Rc::new(Tree::new_leaf(dataview.cost_summer.label(), ub)),
             dataview,
             queue,
-            best: (-1, -1..0, ub),
         }
     }
 
     pub fn is_complete(&self) -> bool {
-        self.cost_lower_bound >= self.cost_upper_bound
+        self.cost_lower_bound >= self.best.cost()
     }
 
     pub fn split(&self, feature: usize, split: usize) -> (Self, Self) {
@@ -182,7 +187,7 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> Node<'a, OT, SS> {
         // lower bound for left = max(ls.left, rs.left-worst*x)
         // lower bound for right = max(rs.right, ls.right-worst*x)
         // find minimum index of left_lb + right_lb. If in a flat area, pick the center of that area.
-
+        assert!(range.start < range.end);
         (range.start + range.end) / 2
     }
 
@@ -212,7 +217,7 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> Node<'a, OT, SS> {
                 item.current_child = 1 - item.current_child;
             }
 
-            Some(children[0].cost_upper_bound + children[1].cost_upper_bound)
+            Some(children[0].best.cost() + children[1].best.cost())
         } else {
             None
         }
@@ -220,24 +225,39 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> Node<'a, OT, SS> {
 
     pub fn recalculate_item_lb(&mut self, item: &mut QueueItem<'a, OT, SS>) {
         let lb = self.pruner.lb_for(item.feature, &item.split_points);
-
-        if lb > item.cost_lower_bound {
-            item.cost_lower_bound = lb;
-        }
+        OT::update_lowerbound(&mut item.cost_lower_bound, &lb);
     }
 
     pub fn backtrack_item(&mut self, mut item: QueueItem<'a, OT, SS>) {
+        // Update our upper bound if the item is the current best.
         if let Some(ub) = self.get_upper_and_update_lower_bound_from_children(&mut item) {
-            OT::update_upperbound(&mut self.cost_upper_bound, &ub);
+            if ub < self.best.cost() {
+                assert!(item.split_points.start == item.split_points.end - 1);
+                let children = item
+                    .children
+                    .as_ref()
+                    .expect("An item can only be backtracked once it is expanded.");
+                self.best = Rc::new(Tree::new_branch(
+                    item.feature,
+                    self.dataview.threshold_from_split(item.split_points.start),
+                    children[0].best.clone(),
+                    children[1].best.clone(),
+                ))
+            }
         }
 
+        // Search strategy specific algorithm for backtracking items.
+        // After this runs, the next item in the queue will have updated lower bounds.
         let mut next_o = Some(item);
-        while let Some(next) = next_o.take() {
+        while let Some(mut next) = next_o.take() {
+            self.recalculate_item_lb(&mut next);
             next_o = SS::backtrack_item(self, next)
         }
 
+        // Remove all items from the front of the queue that are infeasible
+        // TODO now we need to ensure front has updated lower bounds again
         while let Some(next) = self.queue.peek() {
-            if next.cost_lower_bound > self.cost_upper_bound {
+            if next.cost_lower_bound > self.best.cost() {
                 self.queue.pop();
             } else {
                 break;
@@ -246,7 +266,7 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> Node<'a, OT, SS> {
 
         if self.queue.is_empty() {
             // Queue empty, we are done.
-            OT::update_lowerbound(&mut self.cost_lower_bound, &self.cost_upper_bound);
+            OT::update_lowerbound(&mut self.cost_lower_bound, &self.best.cost());
         }
     }
 }

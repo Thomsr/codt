@@ -1,26 +1,30 @@
 use crate::model::dataset::DataSet;
 use crate::model::{dataview::DataView, instance::Instance};
 
-use std::fmt::Debug;
+use std::fmt::{Debug, Display};
 use std::ops::{Add, AddAssign, SubAssign};
 
 pub mod accuracy;
 pub mod regression;
 
+pub trait CostSum<LabelType, InstanceType, CostType>:
+    for<'a> AddAssign<&'a Self>
+    + for<'a> AddAssign<&'a InstanceType>
+    + for<'a> SubAssign<&'a Self>
+    + for<'a> SubAssign<&'a InstanceType>
+    + Clone
+{
+    fn label(&self) -> LabelType;
+    fn cost(&self) -> CostType;
+}
+
 pub trait OptimizationTask {
+    type LabelType: Display;
     type InstanceType: Instance;
-    type CostType: Clone
-        + Copy
-        + PartialOrd
-        + Add<Output = Self::CostType>
-        + Debug
-        + for<'a> From<&'a Self::CostSummer>;
-    /// A type from which the cost is easily derivable, and that can be summed and subtracted easily.
-    type CostSummer: for<'a> AddAssign<&'a Self::CostSummer>
-        + for<'a> AddAssign<&'a Self::InstanceType>
-        + for<'a> SubAssign<&'a Self::CostSummer>
-        + for<'a> SubAssign<&'a Self::InstanceType>
-        + Clone;
+    type CostType: Clone + Copy + PartialOrd + Add<Output = Self::CostType> + Debug;
+    /// A type from which the cost is easily derivable. When a CostSum for disjoint datasets
+    /// are summed, it results in the CostSum of their union.
+    type CostSumType: CostSum<Self::LabelType, Self::InstanceType, Self::CostType>;
     /// The minimum possible cost, to e.g. initialize lower bounds. Usually zero.
     const MIN_COST: Self::CostType;
 
@@ -29,7 +33,7 @@ pub trait OptimizationTask {
     }
 
     /// Initialize a costsum, this should only be done once at the start.
-    fn init_costsum(dataset: &DataSet<Self::InstanceType>) -> Self::CostSummer;
+    fn init_costsum(dataset: &DataSet<Self::InstanceType>) -> Self::CostSumType;
 
     fn prepare_for_data(&mut self, dataview: &mut DataView<Self>)
     where

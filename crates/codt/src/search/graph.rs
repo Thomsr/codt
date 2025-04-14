@@ -20,6 +20,7 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> SearchGraph<'a, OT, SS> {
         }
     }
 
+    /// Select the path to the node to expand next.
     pub fn select(&mut self) -> Option<Vec<QueueItem<'a, OT, SS>>> {
         if self.root.is_complete() {
             return None;
@@ -46,14 +47,17 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> SearchGraph<'a, OT, SS> {
         }
     }
 
+    /// Expand an item from the queue one level by selecting a concrete split and instantiating its children.
     pub fn expand(
         &mut self,
         item: &mut QueueItem<'a, OT, SS>,
         parent: Option<&mut Node<'a, OT, SS>>,
     ) {
-        assert!(!item.is_expanded());
-
         let parent = parent.unwrap_or(&mut self.root);
+
+        assert!(!item.is_expanded());
+        assert!(parent.remaining_depth_budget > 0);
+
         let x = parent.find_lowest_cost_split(item.feature, &item.split_points);
         assert!(item.split_points.start <= x && x < item.split_points.end);
 

@@ -31,10 +31,8 @@ impl SearchStrategy for DfsSearchStrategy {
 
     fn backtrack_item<'a, OT: OptimizationTask, SS: SearchStrategy>(
         node: &mut crate::search::node::Node<'a, OT, SS>,
-        mut item: QueueItem<'a, OT, SS>,
+        item: QueueItem<'a, OT, SS>,
     ) -> Option<QueueItem<'a, OT, SS>> {
-        node.recalculate_item_lb(&mut item);
-
         if !item.is_complete() {
             // Only revisit this node if it is not yet fully explored.
             node.queue.push(item);

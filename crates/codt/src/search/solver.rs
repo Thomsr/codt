@@ -1,14 +1,18 @@
-use std::marker::PhantomData;
+use std::{marker::PhantomData, rc::Rc};
 
 use log::trace;
 
-use crate::{model::dataview::DataView, tasks::OptimizationTask};
+use crate::{
+    model::{dataview::DataView, tree::Tree},
+    tasks::OptimizationTask,
+};
 
 use super::{graph::SearchGraph, node::Node, strategy::SearchStrategy};
 
 pub struct SolveResult<OT: OptimizationTask> {
-    pub cost: OT::CostType,
+    pub tree: Rc<Tree<OT>>,
     pub cost_str: String,
+    pub graph_expansions: i32,
 }
 
 pub struct Solver<'a, OT: OptimizationTask, SS: SearchStrategy> {
@@ -26,7 +30,10 @@ impl<OT: OptimizationTask, SS: SearchStrategy> Solver<'_, OT, SS> {
 
         let mut graph: SearchGraph<'_, OT, SS> = SearchGraph::new(Node::new(dataview, max_depth));
 
+        let mut graph_expansions = 0;
+
         while let Some(mut path) = graph.select() {
+            graph_expansions += 1;
             trace!("Selected path: {:?}", path);
 
             let mut current = path.pop().unwrap();
@@ -43,18 +50,20 @@ impl<OT: OptimizationTask, SS: SearchStrategy> Solver<'_, OT, SS> {
 
             trace!(
                 "LB: {:?}, UB: {:?}",
-                graph.root.cost_lower_bound, graph.root.cost_upper_bound
+                graph.root.cost_lower_bound,
+                graph.root.best.cost()
             );
         }
 
-        let solution = graph.root.cost_upper_bound;
+        let solution = graph.root.best;
 
         // Take back ownership of the dataset.
         self.dataview = Some(graph.root.dataview);
 
         SolveResult {
-            cost_str: self.task.print_cost(&solution),
-            cost: solution,
+            cost_str: self.task.print_cost(&solution.cost()),
+            tree: solution,
+            graph_expansions,
         }
     }
 

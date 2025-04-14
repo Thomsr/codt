@@ -2,7 +2,7 @@ use std::ops::{AddAssign, SubAssign};
 
 use crate::model::{dataset::DataSet, dataview::DataView, instance::LabeledInstance};
 
-use super::OptimizationTask;
+use super::{CostSum, OptimizationTask};
 
 #[derive(Default)]
 pub struct AccuracyTask {
@@ -11,11 +11,11 @@ pub struct AccuracyTask {
 }
 
 #[derive(Clone)]
-pub struct AccuracyCostSummer {
+pub struct AccuracyCostSum {
     instance_count_per_class: Vec<i32>,
 }
 
-impl SubAssign<&AccuracyCostSummer> for AccuracyCostSummer {
+impl SubAssign<&AccuracyCostSum> for AccuracyCostSum {
     fn sub_assign(&mut self, rhs: &Self) {
         assert_eq!(
             self.instance_count_per_class.len(),
@@ -31,13 +31,13 @@ impl SubAssign<&AccuracyCostSummer> for AccuracyCostSummer {
     }
 }
 
-impl SubAssign<&LabeledInstance<i32>> for AccuracyCostSummer {
+impl SubAssign<&LabeledInstance<i32>> for AccuracyCostSum {
     fn sub_assign(&mut self, rhs: &LabeledInstance<i32>) {
         self.instance_count_per_class[rhs.label as usize] -= 1;
     }
 }
 
-impl AddAssign<&AccuracyCostSummer> for AccuracyCostSummer {
+impl AddAssign<&AccuracyCostSum> for AccuracyCostSum {
     fn add_assign(&mut self, rhs: &Self) {
         assert_eq!(
             self.instance_count_per_class.len(),
@@ -53,15 +53,24 @@ impl AddAssign<&AccuracyCostSummer> for AccuracyCostSummer {
     }
 }
 
-impl AddAssign<&LabeledInstance<i32>> for AccuracyCostSummer {
+impl AddAssign<&LabeledInstance<i32>> for AccuracyCostSum {
     fn add_assign(&mut self, rhs: &LabeledInstance<i32>) {
         self.instance_count_per_class[rhs.label as usize] += 1;
     }
 }
 
-impl From<&AccuracyCostSummer> for i32 {
-    fn from(value: &AccuracyCostSummer) -> Self {
-        let (total, largest_class_size) = value
+impl CostSum<i32, LabeledInstance<i32>, i32> for AccuracyCostSum {
+    fn label(&self) -> i32 {
+        self.instance_count_per_class
+            .iter()
+            .enumerate()
+            .max_by_key(|(_, val)| *val)
+            .map(|(idx, _)| idx)
+            .expect("Expected at least one class") as i32
+    }
+
+    fn cost(&self) -> i32 {
+        let (total, largest_class_size) = self
             .instance_count_per_class
             .iter()
             .fold((0, 0), |(acc_total, acc_max), e| {
@@ -73,9 +82,10 @@ impl From<&AccuracyCostSummer> for i32 {
 }
 
 impl OptimizationTask for AccuracyTask {
+    type LabelType = i32;
     type InstanceType = LabeledInstance<i32>;
     type CostType = i32;
-    type CostSummer = AccuracyCostSummer;
+    type CostSumType = AccuracyCostSum;
     const MIN_COST: Self::CostType = 0;
 
     fn prepare_for_data(&mut self, dataview: &mut DataView<Self>) {
@@ -94,13 +104,13 @@ impl OptimizationTask for AccuracyTask {
         )
     }
 
-    fn init_costsum(dataset: &DataSet<Self::InstanceType>) -> Self::CostSummer {
+    fn init_costsum(dataset: &DataSet<Self::InstanceType>) -> Self::CostSumType {
         let mut num_labels = 0;
         for instance in &dataset.instances {
             num_labels = num_labels.max(instance.label + 1);
         }
 
-        Self::CostSummer {
+        Self::CostSumType {
             instance_count_per_class: vec![0; num_labels as usize],
         }
     }

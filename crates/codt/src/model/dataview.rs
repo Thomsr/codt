@@ -1,4 +1,4 @@
-use crate::tasks::OptimizationTask;
+use crate::tasks::{CostSum, OptimizationTask};
 
 use super::dataset::DataSet;
 
@@ -24,7 +24,7 @@ pub struct DataView<'a, OT: OptimizationTask> {
     /// All of the feature values that are still possible to split on per feature.
     /// A reduced set of all unique values of `feature_values_sorted`.
     pub possible_split_values: Vec<Vec<i32>>,
-    pub cost_summer: OT::CostSummer,
+    pub cost_summer: OT::CostSumType,
 }
 
 impl<OT: OptimizationTask> Debug for DataView<'_, OT> {
@@ -38,6 +38,7 @@ impl<OT: OptimizationTask> Debug for DataView<'_, OT> {
 }
 
 impl<'a, OT: OptimizationTask> DataView<'a, OT> {
+    /// Initialize a dataview from a dataset. The new dataview contains all instances of the dataset
     pub fn from_dataset(dataset: &'a DataSet<OT::InstanceType>) -> Self {
         // Copy over all the feature values from the dataset, and sort them by the feature values.
         let mut feature_values_sorted = Vec::new();
@@ -68,7 +69,7 @@ impl<'a, OT: OptimizationTask> DataView<'a, OT> {
             for fv in &feature_values_sorted_i {
                 costsum += &dataset.instances[fv.instance_id];
 
-                let cost: OT::CostType = (&costsum).into();
+                let cost: OT::CostType = costsum.cost();
 
                 if cost == OT::MIN_COST {
                     if biggest_left_min_cost_split.is_none() {
@@ -106,7 +107,8 @@ impl<'a, OT: OptimizationTask> DataView<'a, OT> {
         }
     }
 
-    /// Split this dataview into two, the first containing only those instances where `split_feature <= threshold`, and the second where `split_feature > threshold`.
+    /// Split this dataview into two, the first containing only those instances where
+    /// `split_feature <= threshold`, and the second where `split_feature > threshold`.
     pub fn split(&self, split_feature: usize, split_value: usize) -> (Self, Self) {
         let threshold = self.possible_split_values[split_feature][split_value];
         let mut feature_values_left = Vec::with_capacity(self.feature_values_sorted.len());
@@ -209,5 +211,10 @@ impl<'a, OT: OptimizationTask> DataView<'a, OT> {
 
     pub fn num_features(&self) -> usize {
         self.feature_values_sorted.len()
+    }
+
+    pub fn threshold_from_split(&self, split_value: usize) -> f64 {
+        // TODO
+        split_value as f64
     }
 }

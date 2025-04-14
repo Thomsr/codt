@@ -14,16 +14,15 @@ impl SearchStrategy for AndOrSearchStrategy {
         // First ordered by the objective value, so more promising nodes are explored first.
         // Then by completeness, if the most promising node is also complete, then we are done.
         // Then by expanded, so we expand the least number of nodes possible.
-        // Then by feature, so we focus on each feature individually. Bounds do not propagate between features.
         // Then by interval size, so we get a good spread for bounds.
-        // Then by interval start, for a deterministic ordering.
+        // Then by feature and interval start, for a deterministic ordering.
         a.cost_lower_bound
             .partial_cmp(&b.cost_lower_bound)
             .unwrap_or(Ordering::Equal)
             .then(a.is_complete().cmp(&b.is_complete()))
             .then(a.is_expanded().cmp(&b.is_expanded()))
-            .then(a.feature.cmp(&b.feature))
             .then(a.split_points.len().cmp(&b.split_points.len()))
+            .then(a.feature.cmp(&b.feature))
             .then(a.split_points.start.cmp(&b.split_points.start))
     }
 
@@ -44,9 +43,8 @@ impl SearchStrategy for AndOrSearchStrategy {
 
     fn backtrack_item<'a, OT: OptimizationTask, SS: SearchStrategy>(
         node: &mut crate::search::node::Node<'a, OT, SS>,
-        mut item: QueueItem<'a, OT, SS>,
+        item: QueueItem<'a, OT, SS>,
     ) -> Option<QueueItem<'a, OT, SS>> {
-        node.recalculate_item_lb(&mut item);
         let prev_lb = item.cost_lower_bound;
 
         // Only revisit this node if it is not yet fully explored.
@@ -58,12 +56,10 @@ impl SearchStrategy for AndOrSearchStrategy {
             let lowest_lb = next_in_line.cost_lower_bound;
 
             // Lower bound of the node is at least the minimum lower bound in the queue.
-            if lowest_lb > node.cost_lower_bound {
-                node.cost_lower_bound = lowest_lb;
-            }
+            OT::update_lowerbound(&mut node.cost_lower_bound, &lowest_lb);
 
             // Early exit check
-            if node.cost_lower_bound > node.cost_upper_bound {
+            if node.cost_lower_bound > node.best.cost() {
                 node.queue.clear();
                 return None;
             }
