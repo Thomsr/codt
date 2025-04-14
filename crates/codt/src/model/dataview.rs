@@ -136,14 +136,17 @@ impl<'a, OT: OptimizationTask> DataView<'a, OT> {
                         std::hint::assert_unchecked(
                             feature_values_left_i.len() < feature_values_left_i.capacity(),
                         );
-                        std::hint::assert_unchecked(
-                            possible_split_values_left_i.len()
-                                < possible_split_values_left_i.capacity(),
-                        )
                     }
                     feature_values_left_i.push(value);
                     if value.feature_value != last_feature_value_left {
-                        possible_split_values_left_i.push(last_feature_value_left);
+                        // TODO: readd this guarantee when preprocessing here is as strict as in from_dataset
+                        // unsafe {
+                        //     std::hint::assert_unchecked(
+                        //         possible_split_values_left_i.len()
+                        //             < possible_split_values_left_i.capacity(),
+                        //     )
+                        // }
+                        possible_split_values_left_i.push(value.feature_value);
                     }
                     last_feature_value_left = value.feature_value;
                 } else {
@@ -152,14 +155,17 @@ impl<'a, OT: OptimizationTask> DataView<'a, OT> {
                         std::hint::assert_unchecked(
                             feature_values_right_i.len() < feature_values_right_i.capacity(),
                         );
-                        std::hint::assert_unchecked(
-                            possible_split_values_right_i.len()
-                                < possible_split_values_right_i.capacity(),
-                        )
                     }
                     feature_values_right_i.push(value);
                     if value.feature_value != last_feature_value_right {
-                        possible_split_values_right_i.push(last_feature_value_right);
+                        // TODO: readd this guarantee when preprocessing here is as strict as in from_dataset
+                        // unsafe {
+                        //     std::hint::assert_unchecked(
+                        //         possible_split_values_right_i.len()
+                        //             < possible_split_values_right_i.capacity(),
+                        //     )
+                        // }
+                        possible_split_values_right_i.push(value.feature_value);
                     }
                     last_feature_value_right = value.feature_value;
 
