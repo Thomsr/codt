@@ -258,10 +258,10 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> Node<'a, OT, SS> {
             next_o = SS::backtrack_item(self, next)
         }
 
-        // Remove all items from the front of the queue that are infeasible
+        // Remove all items from the front of the queue that cannot improve the current best solution.
         // TODO now we need to ensure front has updated lower bounds again
         while let Some(next) = self.queue.peek() {
-            if next.cost_lower_bound > self.best.cost() {
+            if next.cost_lower_bound >= self.best.cost() {
                 self.queue.pop();
             } else {
                 break;
