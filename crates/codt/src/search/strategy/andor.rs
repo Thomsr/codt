@@ -7,6 +7,8 @@ use super::SearchStrategy;
 pub struct AndOrSearchStrategy;
 
 impl SearchStrategy for AndOrSearchStrategy {
+    const FRONT_OF_QUEUE_IS_LOWEST_LB: bool = true;
+
     fn cmp_item<'a, OT: OptimizationTask, SS: SearchStrategy>(
         a: &QueueItem<'a, OT, SS>,
         b: &QueueItem<'a, OT, SS>,
@@ -38,41 +40,6 @@ impl SearchStrategy for AndOrSearchStrategy {
             0
         } else {
             1
-        }
-    }
-
-    fn backtrack_item<'a, OT: OptimizationTask, SS: SearchStrategy>(
-        node: &mut crate::search::node::Node<'a, OT, SS>,
-        item: QueueItem<'a, OT, SS>,
-    ) -> Option<QueueItem<'a, OT, SS>> {
-        let prev_lb = item.cost_lower_bound;
-
-        // Only revisit this node if it is not yet fully explored.
-        if !item.is_complete() {
-            node.queue.push(item);
-        }
-
-        if let Some(next_in_line) = node.queue.peek() {
-            let lowest_lb = next_in_line.cost_lower_bound;
-
-            // Lower bound of the node is at least the minimum lower bound in the queue.
-            OT::update_lowerbound(&mut node.cost_lower_bound, &lowest_lb);
-
-            // Early exit check
-            if node.cost_lower_bound > node.best.cost() {
-                node.queue.clear();
-                return None;
-            }
-
-            // If the front of the queue has a lesser lower bound than the
-            // one we just reinserted, then we need to continue updating.
-            if lowest_lb < prev_lb {
-                node.queue.pop()
-            } else {
-                None
-            }
-        } else {
-            None
         }
     }
 }

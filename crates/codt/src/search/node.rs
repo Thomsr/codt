@@ -250,25 +250,41 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> Node<'a, OT, SS> {
             }
         }
 
-        // Search strategy specific algorithm for backtracking items.
-        // After this runs, the next item in the queue will have updated lower bounds.
-        let mut next_o = Some(item);
-        while let Some(mut next) = next_o.take() {
-            self.recalculate_item_lb(&mut next);
-            next_o = SS::backtrack_item(self, next)
-        }
+        // Reinsert the item in the queue, and ensure the item in the front
+        // of the queue has updated lower bounds for the next iteration.
+        let mut maybe_item = Some(item);
+        while let Some(mut item) = maybe_item.take() {
+            self.recalculate_item_lb(&mut item);
 
-        // Remove all items from the front of the queue that cannot improve the current best solution.
-        // TODO now we need to ensure front has updated lower bounds again
-        while let Some(next) = self.queue.peek() {
-            if next.cost_lower_bound >= self.best.cost() {
-                self.queue.pop();
+            let update_needed = if item.is_complete() || item.cost_lower_bound >= self.best.cost() {
+                // Don't add it back to the queue if the item cannot further improve the solution.
+                // Should update the lower bounds of the next queue item.
+                true
             } else {
-                break;
+                let update_needed = if let Some(next) = self.queue.peek() {
+                    // Update needed if the current item will not be returned to the front of the queue.
+                    next > &item
+                } else {
+                    // This is the last item in the queue, no further updates needed.
+                    false
+                };
+
+                self.queue.push(item);
+                update_needed
+            };
+
+            maybe_item = if update_needed {
+                self.queue.pop()
+            } else {
+                None
             }
         }
 
-        if self.queue.is_empty() {
+        if let Some(next) = self.queue.peek() {
+            if SS::FRONT_OF_QUEUE_IS_LOWEST_LB {
+                OT::update_lowerbound(&mut self.cost_lower_bound, &next.cost_lower_bound);
+            }
+        } else {
             // Queue empty, we are done.
             OT::update_lowerbound(&mut self.cost_lower_bound, &self.best.cost());
         }
