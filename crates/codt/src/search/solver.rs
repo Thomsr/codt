@@ -32,7 +32,9 @@ impl<OT: OptimizationTask, SS: SearchStrategy> Solver<'_, OT, SS> {
 
         let mut graph_expansions = 0;
 
-        while let Some(mut path) = graph.select() {
+        let mut path = Vec::new();
+
+        while graph.select(&mut path) {
             graph_expansions += 1;
             trace!("Selected path: {:?}", path);
 
@@ -46,7 +48,7 @@ impl<OT: OptimizationTask, SS: SearchStrategy> Solver<'_, OT, SS> {
                 path.push(parent)
             }
             path.push(current);
-            graph.backtrack(path);
+            graph.backtrack(&mut path);
 
             trace!(
                 "LB: {:?}, UB: {:?}",

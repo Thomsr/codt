@@ -21,15 +21,16 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> SearchGraph<'a, OT, SS> {
     }
 
     /// Select the path to the node to expand next.
-    pub fn select(&mut self) -> Option<Vec<QueueItem<'a, OT, SS>>> {
+    pub fn select(&mut self, path_buffer: &mut Vec<QueueItem<'a, OT, SS>>) -> bool {
+        assert!(path_buffer.is_empty());
+
         if self.root.is_complete() {
-            return None;
+            return false;
         }
 
         let next_from_root = self.root.queue.pop();
 
         if let Some(next_from_root) = next_from_root {
-            let mut path = Vec::new();
             let mut current = next_from_root;
 
             while let Some(children) = &mut current.children {
@@ -37,11 +38,11 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> SearchGraph<'a, OT, SS> {
                     .queue
                     .pop()
                     .expect("Queue cannot be empty since the root is not complete");
-                path.push(current);
+                path_buffer.push(current);
                 current = item;
             }
-            path.push(current);
-            Some(path)
+            path_buffer.push(current);
+            true
         } else {
             unreachable!("Queue cannot be empty since the root is not complete")
         }
@@ -74,7 +75,7 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> SearchGraph<'a, OT, SS> {
         item.children = Some([left, right]);
     }
 
-    pub fn backtrack(&mut self, mut path: Vec<QueueItem<'a, OT, SS>>) {
+    pub fn backtrack(&mut self, path: &mut Vec<QueueItem<'a, OT, SS>>) {
         let mut current = path.pop();
         let mut parent_item = path.pop();
 

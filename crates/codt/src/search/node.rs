@@ -109,6 +109,8 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> QueueItem<'a, OT, SS> {
         self.children.is_some()
     }
 
+    /// A queue item is complete if it is guaranteed that it has expanded its best solution,
+    /// or that this node is not part of the optimal solution (lower bound > upper bound).
     pub fn is_complete(&self) -> bool {
         if let Some(children) = &self.children {
             children[0].is_complete() && children[1].is_complete()
@@ -167,6 +169,8 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> Node<'a, OT, SS> {
         }
     }
 
+    /// A search node is complete if it is guaranteed that it has expanded its best solution,
+    /// or that this node is not part of the optimal solution (lower bound > upper bound).
     pub fn is_complete(&self) -> bool {
         self.cost_lower_bound >= self.best.cost()
     }
