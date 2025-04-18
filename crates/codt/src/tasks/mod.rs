@@ -19,7 +19,7 @@ pub trait CostSum<LabelType, InstanceType, CostType>:
 }
 
 pub trait OptimizationTask {
-    type LabelType: Display;
+    type LabelType: Clone + Copy + Display;
     type InstanceType: Instance;
     type CostType: Clone + Copy + PartialOrd + Add<Output = Self::CostType> + Debug;
     /// A type from which the cost is easily derivable. When a CostSum for disjoint datasets

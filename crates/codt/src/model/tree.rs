@@ -1,4 +1,4 @@
-use std::{fmt::Display, rc::Rc};
+use std::{fmt::Display, sync::Arc};
 
 use crate::tasks::OptimizationTask;
 
@@ -28,8 +28,8 @@ impl<OT: OptimizationTask> Tree<OT> {
     pub fn new_branch(
         split_feature: usize,
         split_threshold: f64,
-        left_child: Rc<Tree<OT>>,
-        right_child: Rc<Tree<OT>>,
+        left_child: Arc<Tree<OT>>,
+        right_child: Arc<Tree<OT>>,
     ) -> Self {
         let cost = left_child.cost() + right_child.cost();
         Self::Branch(BranchNode {
@@ -47,14 +47,27 @@ impl<OT: OptimizationTask> Tree<OT> {
             Self::Leaf(leaf) => leaf.cost,
         }
     }
+
+    pub fn predict(&self, features: Vec<f64>) -> OT::LabelType {
+        match self {
+            Self::Branch(branch) => {
+                if features[branch.split_feature] <= branch.split_threshold {
+                    branch.left_child.predict(features)
+                } else {
+                    branch.right_child.predict(features)
+                }
+            }
+            Self::Leaf(leaf) => leaf.label,
+        }
+    }
 }
 
 pub struct BranchNode<OT: OptimizationTask> {
     pub cost: OT::CostType,
     pub split_feature: usize,
     pub split_threshold: f64,
-    pub left_child: Rc<Tree<OT>>,
-    pub right_child: Rc<Tree<OT>>,
+    pub left_child: Arc<Tree<OT>>,
+    pub right_child: Arc<Tree<OT>>,
 }
 
 pub struct LeafNode<OT: OptimizationTask> {

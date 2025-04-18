@@ -1,4 +1,4 @@
-use std::{marker::PhantomData, rc::Rc};
+use std::{marker::PhantomData, sync::Arc};
 
 use log::trace;
 
@@ -10,7 +10,7 @@ use crate::{
 use super::{graph::SearchGraph, node::Node, strategy::SearchStrategy};
 
 pub struct SolveResult<OT: OptimizationTask> {
-    pub tree: Rc<Tree<OT>>,
+    pub tree: Arc<Tree<OT>>,
     pub cost_str: String,
     pub graph_expansions: i32,
 }

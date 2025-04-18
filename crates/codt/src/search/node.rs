@@ -1,5 +1,5 @@
 use std::{
-    cmp::Ordering, collections::BinaryHeap, fmt::Debug, marker::PhantomData, ops::Range, rc::Rc,
+    cmp::Ordering, collections::BinaryHeap, fmt::Debug, marker::PhantomData, ops::Range, sync::Arc,
 };
 
 use crate::{
@@ -138,7 +138,7 @@ pub struct Node<'a, OT: OptimizationTask, SS: SearchStrategy> {
     pub queue: BinaryHeap<QueueItem<'a, OT, SS>>,
 
     /// Best tree found so far.
-    pub best: Rc<Tree<OT>>,
+    pub best: Arc<Tree<OT>>,
 
     pruner: Pruner<OT>,
 }
@@ -163,7 +163,7 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> Node<'a, OT, SS> {
             cost_lower_bound: lb,
             remaining_depth_budget: max_depth,
             pruner: Pruner::new(dataview.num_features()),
-            best: Rc::new(Tree::new_leaf(dataview.cost_summer.label(), ub)),
+            best: Arc::new(Tree::new_leaf(dataview.cost_summer.label(), ub)),
             dataview,
             queue,
         }
@@ -241,9 +241,10 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> Node<'a, OT, SS> {
                     .children
                     .as_ref()
                     .expect("An item can only be backtracked once it is expanded.");
-                self.best = Rc::new(Tree::new_branch(
+                self.best = Arc::new(Tree::new_branch(
                     item.feature,
-                    self.dataview.threshold_from_split(item.split_points.start),
+                    self.dataview
+                        .threshold_from_split(item.feature, item.split_points.start),
                     children[0].best.clone(),
                     children[1].best.clone(),
                 ))

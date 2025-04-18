@@ -219,8 +219,20 @@ impl<'a, OT: OptimizationTask> DataView<'a, OT> {
         self.feature_values_sorted.len()
     }
 
-    pub fn threshold_from_split(&self, split_value: usize) -> f64 {
-        // TODO
-        split_value as f64
+    pub fn threshold_from_split(&self, split_feature: usize, split_value: usize) -> f64 {
+        let current_split_value = self.possible_split_values[split_feature][split_value];
+        let next_split_value = match self.possible_split_values[split_feature].get(split_value + 1) {
+            Some(&next_split_value) => next_split_value,
+            None => self.feature_values_sorted[split_feature]
+                .last()
+                .expect("There is at least one threshold remaining, otherwise there would be no useful values to split on, and this method would never be called.")
+                .feature_value
+        };
+
+        let current_threshold = self.dataset.internal_to_original_feature_value[split_feature]
+            [current_split_value as usize];
+        let next_threshold = self.dataset.internal_to_original_feature_value[split_feature]
+            [next_split_value as usize];
+        (current_threshold + next_threshold) / 2.0
     }
 }

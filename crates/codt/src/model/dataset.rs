@@ -3,10 +3,12 @@ use super::instance::Instance;
 pub struct DataSet<I: Instance> {
     /// Collection of instances. The index into this array determines its instance_id.
     pub instances: Vec<I>,
-    /// The original float feature values. Indexed first by feature_id, then by instance_id. Only used in the final tree.
+    /// The original float feature values. Indexed first by feature_id, then by instance_id. Only used to read the data.
     pub original_feature_values: Vec<Vec<f64>>,
     /// The internally used feature values. Indexed first by feature_id, then by instance_id.
     pub feature_values: Vec<Vec<i32>>,
+    /// The original float feature values. Indexed first by feature_id, then by feature_value. Used to reconstruct the final tree.
+    pub internal_to_original_feature_value: Vec<Vec<f64>>,
 }
 
 /// Explicit implementation of Default, since I is not constrained by Default
@@ -16,6 +18,7 @@ impl<I: Instance> Default for DataSet<I> {
             instances: Vec::new(),
             original_feature_values: Vec::new(),
             feature_values: Vec::new(),
+            internal_to_original_feature_value: Vec::new(),
         }
     }
 }
@@ -48,8 +51,10 @@ impl<I: Instance> DataSet<I> {
             });
 
             let mut feature_values = vec![0; self.original_feature_values[i].len()];
+            let mut internal_to_original_feature_value = Vec::new();
 
             feature_values[ids[0]] = 0;
+            internal_to_original_feature_value.push(self.original_feature_values[i][ids[0]]);
             for idx in 1..ids.len() {
                 let last_original = self.original_feature_values[i][ids[idx - 1]];
                 let this_original = self.original_feature_values[i][ids[idx]];
@@ -58,11 +63,15 @@ impl<I: Instance> DataSet<I> {
                 feature_values[ids[idx]] = if last_original == this_original {
                     last_feature_value
                 } else {
-                    last_feature_value + 1
+                    let new_id = last_feature_value + 1;
+                    internal_to_original_feature_value.push(this_original);
+                    new_id
                 }
             }
 
             self.feature_values.push(feature_values);
+            self.internal_to_original_feature_value
+                .push(internal_to_original_feature_value);
         }
     }
 }
