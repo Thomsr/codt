@@ -146,7 +146,6 @@ pub struct Node<'a, OT: OptimizationTask, SS: SearchStrategy> {
 impl<'a, OT: OptimizationTask, SS: SearchStrategy> Node<'a, OT, SS> {
     pub fn new(dataview: DataView<'a, OT>, max_depth: u32) -> Self {
         let ub = dataview.cost_summer.cost();
-        let lb = if max_depth == 0 { ub } else { OT::MIN_COST };
 
         let mut queue = BinaryHeap::new();
 
@@ -158,6 +157,12 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> Node<'a, OT, SS> {
                 }
             }
         }
+
+        let lb = if max_depth == 0 || queue.is_empty() {
+            ub
+        } else {
+            OT::MIN_COST
+        };
 
         Node {
             cost_lower_bound: lb,
@@ -200,6 +205,7 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> Node<'a, OT, SS> {
         item: &mut QueueItem<'a, OT, SS>,
     ) -> Option<OT::CostType> {
         if let Some(children) = &item.children {
+            // No actual LB update here, add the solution to the pruner. The LB will be updated by it later.
             self.pruner.insert_left_subtree(
                 item.feature,
                 item.split_points.start,
@@ -207,13 +213,9 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> Node<'a, OT, SS> {
             );
             self.pruner.insert_right_subtree(
                 item.feature,
-                item.split_points.end,
+                item.split_points.end - 1,
                 children[1].cost_lower_bound,
             );
-            let lb = children[0].cost_lower_bound + children[1].cost_lower_bound;
-            if item.cost_lower_bound < lb {
-                item.cost_lower_bound = lb
-            }
 
             item.current_child = SS::child_priority(&children[0], &children[1]);
 
@@ -237,6 +239,10 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> Node<'a, OT, SS> {
         if let Some(ub) = self.get_upper_and_update_lower_bound_from_children(&mut item) {
             if ub < self.best.cost() {
                 assert!(item.split_points.start == item.split_points.end - 1);
+                if ub == OT::MIN_COST {
+                    // We cannot find a better solution: quickly clear the queue.
+                    self.queue.clear();
+                }
                 let children = item
                     .children
                     .as_ref()

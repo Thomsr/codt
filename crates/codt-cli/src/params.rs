@@ -52,6 +52,7 @@ pub enum SearchStrategy {
     Dfs,
     /// Use an and-or best-first search strategy
     AndOr,
+    DfsPrio,
 }
 
 #[derive(Args)]

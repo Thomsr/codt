@@ -12,6 +12,7 @@ use super::node::{Node, QueueItem};
 // ------
 pub mod andor;
 pub mod dfs;
+pub mod dfsprio;
 
 pub trait SearchStrategy {
     const FRONT_OF_QUEUE_IS_LOWEST_LB: bool;

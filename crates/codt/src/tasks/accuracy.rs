@@ -27,6 +27,7 @@ impl SubAssign<&AccuracyCostSum> for AccuracyCostSum {
             .zip(rhs.instance_count_per_class.iter())
         {
             *count -= other;
+            assert!(*count >= 0);
         }
     }
 }
@@ -34,6 +35,7 @@ impl SubAssign<&AccuracyCostSum> for AccuracyCostSum {
 impl SubAssign<&LabeledInstance<i32>> for AccuracyCostSum {
     fn sub_assign(&mut self, rhs: &LabeledInstance<i32>) {
         self.instance_count_per_class[rhs.label as usize] -= 1;
+        assert!(self.instance_count_per_class[rhs.label as usize] >= 0);
     }
 }
 

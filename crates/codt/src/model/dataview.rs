@@ -71,6 +71,8 @@ impl<'a, OT: OptimizationTask> DataView<'a, OT> {
 
                 let cost: OT::CostType = costsum.cost();
 
+                // TODO: this check may only be done at actual thresholds.
+                // E.g. for cost sequence 0 0 1 and feature values 0 1 1, only the 0 threshold is a zero-cost split.
                 if cost == OT::MIN_COST {
                     if biggest_left_min_cost_split.is_none() {
                         // Reserve a slot at the start for this.
@@ -180,6 +182,9 @@ impl<'a, OT: OptimizationTask> DataView<'a, OT> {
             // not a useful splitting point because all instances would go to the left.
             possible_split_values_left_i.pop();
             possible_split_values_right_i.pop();
+
+            assert!(!feature_values_left_i.is_empty());
+            assert!(!feature_values_right_i.is_empty());
 
             feature_values_left.push(feature_values_left_i);
             feature_values_right.push(feature_values_right_i);

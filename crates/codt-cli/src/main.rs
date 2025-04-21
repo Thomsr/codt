@@ -4,7 +4,10 @@ use codt::{
     model::{dataset::DataSet, dataview::DataView},
     search::{
         solver::Solver,
-        strategy::{SearchStrategy, andor::AndOrSearchStrategy, dfs::DfsSearchStrategy},
+        strategy::{
+            SearchStrategy, andor::AndOrSearchStrategy, dfs::DfsSearchStrategy,
+            dfsprio::DfsPrioSearchStrategy,
+        },
     },
     tasks::{OptimizationTask, accuracy::AccuracyTask, regression::RegressionTask},
 };
@@ -62,6 +65,11 @@ fn main() {
                 params::SearchStrategy::AndOr => {
                     run_solver_for_task::<_, AndOrSearchStrategy>(&args.file, args.max_depth, task)
                 }
+                params::SearchStrategy::DfsPrio => run_solver_for_task::<_, DfsPrioSearchStrategy>(
+                    &args.file,
+                    args.max_depth,
+                    task,
+                ),
             };
         }
         OptimizationTaskEnum::Regression(params) => {
@@ -74,6 +82,11 @@ fn main() {
                 params::SearchStrategy::AndOr => {
                     run_solver_for_task::<_, AndOrSearchStrategy>(&args.file, args.max_depth, task)
                 }
+                params::SearchStrategy::DfsPrio => run_solver_for_task::<_, DfsPrioSearchStrategy>(
+                    &args.file,
+                    args.max_depth,
+                    task,
+                ),
             };
         }
     }

@@ -30,6 +30,11 @@ impl<OT: OptimizationTask> Pruner<OT> {
     }
 
     pub fn insert_left_subtree(&mut self, feature: usize, threshold: usize, lb: OT::CostType) {
+        if lb == OT::MIN_COST {
+            // Don't bother storing trivial lower bounds.
+            return;
+        }
+
         // Find point to insert
         let mut cursor =
             self.best_left_subtree_left_of[feature].upper_bound_mut(Bound::Included(&threshold));
@@ -38,14 +43,18 @@ impl<OT: OptimizationTask> Pruner<OT> {
         let needs_insert = match cursor.peek_prev() {
             Some((&k, v)) => {
                 if *v >= lb {
+                    // There already exist a lower bound that is usable in strictly more scenarios that is better.
                     return;
                 } else if k == threshold {
+                    // We found a better lower bound for an existing node, only need to update it
                     *v = lb;
                     false
                 } else {
+                    // We found a better lower bound at a new position, we need to insert it.
                     true
                 }
             }
+            // This is the first lower bound we have, we need to insert it.
             None => true,
         };
 
@@ -67,6 +76,11 @@ impl<OT: OptimizationTask> Pruner<OT> {
     }
 
     pub fn insert_right_subtree(&mut self, feature: usize, threshold: usize, lb: OT::CostType) {
+        if lb == OT::MIN_COST {
+            // Don't bother storing trivial lower bounds.
+            return;
+        }
+
         // Find point to insert
         let mut cursor =
             self.best_right_subtree_right_of[feature].lower_bound_mut(Bound::Included(&threshold));
