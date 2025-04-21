@@ -64,9 +64,7 @@ jobs:
         uses: PyO3/maturin-action@v1
         with:
           target: ${{ matrix.platform.target }}
-          args: --release --out dist -i python3.13
-          # The following can be enabled when rust-numpy 0.24 fixes python 3.13t support
-          # args: --release --out dist --find-interpreter
+          args: --release --out dist --find-interpreter
           sccache: 'true'
           manylinux: auto
           rust-toolchain: nightly
@@ -98,9 +96,7 @@ jobs:
         uses: PyO3/maturin-action@v1
         with:
           target: ${{ matrix.platform.target }}
-          args: --release --out dist -i python3.13
-          # The following can be enabled when rust-numpy 0.24 fixes python 3.13t support
-          # args: --release --out dist --find-interpreter
+          args: --release --out dist --find-interpreter
           # The musllinux image removes rust stable, this breaks sccache
           # sccache: 'true'
           manylinux: musllinux_1_2
@@ -130,9 +126,7 @@ jobs:
         uses: PyO3/maturin-action@v1
         with:
           target: ${{ matrix.platform.target }}
-          args: --release --out dist -i python3.13
-          # The following can be enabled when rust-numpy 0.24 fixes python 3.13t support
-          # args: --release --out dist --find-interpreter
+          args: --release --out dist --find-interpreter
           sccache: 'true'
           rust-toolchain: nightly
       - name: Upload wheels
@@ -159,9 +153,7 @@ jobs:
         uses: PyO3/maturin-action@v1
         with:
           target: ${{ matrix.platform.target }}
-          args: --release --out dist -i python3.13
-          # The following can be enabled when rust-numpy 0.24 fixes python 3.13t support
-          # args: --release --out dist --find-interpreter
+          args: --release --out dist --find-interpreter
           sccache: 'true'
           rust-toolchain: nightly
       - name: Upload wheels
