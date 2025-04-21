@@ -101,7 +101,8 @@ jobs:
           args: --release --out dist -i python3.13
           # The following can be enabled when rust-numpy 0.24 fixes python 3.13t support
           # args: --release --out dist --find-interpreter
-          sccache: 'true'
+          # The musllinux image removes rust stable, this breaks sccache
+          # sccache: 'true'
           manylinux: musllinux_1_2
           rust-toolchain: nightly
       - name: Upload wheels
