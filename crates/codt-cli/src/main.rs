@@ -44,6 +44,25 @@ fn run_solver_for_task<T: OptimizationTask, SS: SearchStrategy>(
     println!("{}", result.cost_str);
 }
 
+fn run_with_strategy<T: OptimizationTask>(
+    file: &PathBuf,
+    max_depth: u32,
+    task: T,
+    strategy: params::SearchStrategy,
+) {
+    match strategy {
+        params::SearchStrategy::Dfs => {
+            run_solver_for_task::<_, DfsSearchStrategy>(file, max_depth, task)
+        }
+        params::SearchStrategy::AndOr => {
+            run_solver_for_task::<_, AndOrSearchStrategy>(file, max_depth, task)
+        }
+        params::SearchStrategy::DfsPrio => {
+            run_solver_for_task::<_, DfsPrioSearchStrategy>(file, max_depth, task)
+        }
+    };
+}
+
 fn main() {
     let args = get_cli_args();
 
@@ -58,36 +77,12 @@ fn main() {
     match args.task {
         OptimizationTaskEnum::Accuracy => {
             let task = AccuracyTask::default();
-            match args.strategy {
-                params::SearchStrategy::Dfs => {
-                    run_solver_for_task::<_, DfsSearchStrategy>(&args.file, args.max_depth, task)
-                }
-                params::SearchStrategy::AndOr => {
-                    run_solver_for_task::<_, AndOrSearchStrategy>(&args.file, args.max_depth, task)
-                }
-                params::SearchStrategy::DfsPrio => run_solver_for_task::<_, DfsPrioSearchStrategy>(
-                    &args.file,
-                    args.max_depth,
-                    task,
-                ),
-            };
+            run_with_strategy(&args.file, args.max_depth, task, args.strategy);
         }
         OptimizationTaskEnum::Regression(params) => {
             let _ = params;
             let task = RegressionTask::default();
-            match args.strategy {
-                params::SearchStrategy::Dfs => {
-                    run_solver_for_task::<_, DfsSearchStrategy>(&args.file, args.max_depth, task)
-                }
-                params::SearchStrategy::AndOr => {
-                    run_solver_for_task::<_, AndOrSearchStrategy>(&args.file, args.max_depth, task)
-                }
-                params::SearchStrategy::DfsPrio => run_solver_for_task::<_, DfsPrioSearchStrategy>(
-                    &args.file,
-                    args.max_depth,
-                    task,
-                ),
-            };
+            run_with_strategy(&args.file, args.max_depth, task, args.strategy);
         }
     }
 }
