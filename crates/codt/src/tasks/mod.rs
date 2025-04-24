@@ -21,7 +21,13 @@ pub trait CostSum<LabelType, InstanceType, CostType>:
 pub trait OptimizationTask {
     type LabelType: Clone + Copy + Display;
     type InstanceType: Instance;
-    type CostType: Clone + Copy + PartialOrd + Add<Output = Self::CostType> + Debug;
+    /// The TryInto<f64> is only required for global best first search. May be implemented using `unimplemented` macro if not required.
+    type CostType: Clone
+        + Copy
+        + PartialOrd
+        + Add<Output = Self::CostType>
+        + TryInto<f64, Error: Debug>
+        + Debug;
     /// A type from which the cost is easily derivable. When a CostSum for disjoint datasets
     /// are summed, it results in the CostSum of their union.
     type CostSumType: CostSum<Self::LabelType, Self::InstanceType, Self::CostType>;

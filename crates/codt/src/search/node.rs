@@ -13,6 +13,10 @@ pub struct QueueItem<'a, OT: OptimizationTask, SS: SearchStrategy> {
     /// The current lower bound on the error for this item in the queue.
     pub cost_lower_bound: OT::CostType,
 
+    /// The fraction of remaining instances from the original dataset in the dataview of this item.
+    /// Used by some search heuristics.
+    pub remaining_fraction: f64,
+
     /// The branching test for this node is one of `feature <= possible_split_points[s]` where s in split_points.
     pub feature: usize,
     /// The branching test for this node is one of `feature <= possible_split_points[s]` where s in split_points.
@@ -63,9 +67,10 @@ impl<OT: OptimizationTask, SS: SearchStrategy> Ord for QueueItem<'_, OT, SS> {
 }
 
 impl<'a, OT: OptimizationTask, SS: SearchStrategy> QueueItem<'a, OT, SS> {
-    fn new(feature: usize, split_points: Range<usize>) -> Self {
+    fn new(feature: usize, split_points: Range<usize>, remaining_fraction: f64) -> Self {
         Self {
             cost_lower_bound: OT::MIN_COST,
+            remaining_fraction,
             feature,
             split_points,
             children: None,
@@ -83,6 +88,7 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> QueueItem<'a, OT, SS> {
         if split - self.split_points.start > 0 {
             left = Some(Self {
                 cost_lower_bound: self.cost_lower_bound,
+                remaining_fraction: self.remaining_fraction,
                 feature: self.feature,
                 split_points: self.split_points.start..split,
                 children: None,
@@ -93,6 +99,7 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> QueueItem<'a, OT, SS> {
         if self.split_points.end - 1 - split > 0 {
             right = Some(Self {
                 cost_lower_bound: self.cost_lower_bound,
+                remaining_fraction: self.remaining_fraction,
                 feature: self.feature,
                 split_points: (split + 1)..self.split_points.end,
                 children: None,
@@ -126,17 +133,37 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> QueueItem<'a, OT, SS> {
     pub fn current_node_mut(&mut self) -> Option<&mut Node<'a, OT, SS>> {
         self.children.as_mut().map(|c| &mut c[self.current_child])
     }
+
+    /// The lowest heuristic value of an unexpanded node descendant. Own lower bound if
+    /// not expanded, otherwise the lowest of its children.
+    pub fn lowest_descendant_heuristic(&self) -> f64 {
+        if let Some(children) = &self.children {
+            children[0]
+                .lowest_descendant_heuristic
+                .min(children[1].lowest_descendant_heuristic)
+        } else {
+            SS::heuristic_from_lb_and_remaining_fraction::<OT>(
+                self.cost_lower_bound,
+                self.remaining_fraction,
+            )
+        }
+    }
 }
 
 /// Represents a search node for a concrete feature test.
 pub struct Node<'a, OT: OptimizationTask, SS: SearchStrategy> {
+    /// The lower bound on the cost for this node.
     pub cost_lower_bound: OT::CostType,
+    /// The lowest heuristic value (search strategy dependent) of any
+    /// descendant of this node (including the node itself). This value
+    /// is used to emulate a global queue for some heuristic selection methods.
+    pub lowest_descendant_heuristic: f64,
+    /// The remaining depth for the tree rooted at this node.
     pub remaining_depth_budget: u32,
-
+    /// The view of the dataset containing each remaining instance.
     pub dataview: DataView<'a, OT>,
-
+    /// The remaining candidate children for an optimal solution.
     pub queue: BinaryHeap<QueueItem<'a, OT, SS>>,
-
     /// Best tree found so far.
     pub best: Arc<Tree<OT>>,
 
@@ -153,7 +180,11 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> Node<'a, OT, SS> {
             for feature in 0..dataview.num_features() {
                 let n_splitpoints = dataview.possible_split_values[feature].len();
                 if n_splitpoints > 0 {
-                    queue.push(QueueItem::new(feature, 0..n_splitpoints));
+                    queue.push(QueueItem::new(
+                        feature,
+                        0..n_splitpoints,
+                        dataview.remaining_fraction(),
+                    ));
                 }
             }
         }
@@ -166,6 +197,10 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> Node<'a, OT, SS> {
 
         Node {
             cost_lower_bound: lb,
+            lowest_descendant_heuristic: SS::heuristic_from_lb_and_remaining_fraction::<OT>(
+                lb,
+                dataview.remaining_fraction(),
+            ),
             remaining_depth_budget: max_depth,
             pruner: Pruner::new(dataview.num_features()),
             best: Arc::new(Tree::new_leaf(dataview.cost_summer.label(), ub)),
@@ -288,12 +323,20 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> Node<'a, OT, SS> {
         }
 
         if let Some(next) = self.queue.peek() {
-            if SS::FRONT_OF_QUEUE_IS_LOWEST_LB {
+            if SS::item_front_of_queue_is_lowest_lb(next) {
                 OT::update_lowerbound(&mut self.cost_lower_bound, &next.cost_lower_bound);
             }
+            // Self or front of queue, since for bfs the front of queue will contain the lowest heuristic value.
+            self.lowest_descendant_heuristic = SS::heuristic_from_lb_and_remaining_fraction::<OT>(
+                self.cost_lower_bound,
+                self.dataview.remaining_fraction(),
+            )
+            .min(next.lowest_descendant_heuristic())
         } else {
             // Queue empty, we are done.
             OT::update_lowerbound(&mut self.cost_lower_bound, &self.best.cost());
+            // Set heuristic to max, so partially unfinished queue items take the lower bound from its sibling, and not from a completed node.
+            self.lowest_descendant_heuristic = f64::MAX;
         }
     }
 }

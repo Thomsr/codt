@@ -7,8 +7,6 @@ use super::SearchStrategy;
 pub struct DfsPrioSearchStrategy;
 
 impl SearchStrategy for DfsPrioSearchStrategy {
-    const FRONT_OF_QUEUE_IS_LOWEST_LB: bool = false;
-
     fn cmp_item<'a, OT: OptimizationTask, SS: SearchStrategy>(
         a: &QueueItem<'a, OT, SS>,
         b: &QueueItem<'a, OT, SS>,
@@ -45,5 +43,20 @@ impl SearchStrategy for DfsPrioSearchStrategy {
         } else {
             1
         }
+    }
+
+    fn item_front_of_queue_is_lowest_lb<OT: OptimizationTask, SS: SearchStrategy>(
+        item: &QueueItem<OT, SS>,
+    ) -> bool {
+        // If the item front of queue is not expanded, then there are no other
+        // expanded in queue, and the next ordering is by lower bound.
+        !item.is_expanded()
+    }
+
+    fn heuristic_from_lb_and_remaining_fraction<OT: OptimizationTask>(
+        _lb: OT::CostType,
+        _remaining_fraction: f64,
+    ) -> f64 {
+        0.0 // Not used
     }
 }

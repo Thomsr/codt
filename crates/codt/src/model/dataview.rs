@@ -220,6 +220,10 @@ impl<'a, OT: OptimizationTask> DataView<'a, OT> {
         self.feature_values_sorted[0].len()
     }
 
+    pub fn remaining_fraction(&self) -> f64 {
+        self.num_instances() as f64 / self.dataset.num_instances() as f64
+    }
+
     pub fn num_features(&self) -> usize {
         self.feature_values_sorted.len()
     }

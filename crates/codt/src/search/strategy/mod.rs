@@ -11,12 +11,11 @@ use super::node::{Node, QueueItem};
 // pub mod quant;
 // ------
 pub mod andor;
+pub mod bfs;
 pub mod dfs;
 pub mod dfsprio;
 
 pub trait SearchStrategy {
-    const FRONT_OF_QUEUE_IS_LOWEST_LB: bool;
-
     /// The order in which the items in the queue should be handled. Items are handled in asceding order.
     fn cmp_item<'a, OT: OptimizationTask, SS: SearchStrategy>(
         a: &QueueItem<'a, OT, SS>,
@@ -28,4 +27,15 @@ pub trait SearchStrategy {
         a: &Node<'a, OT, SS>,
         b: &Node<'a, OT, SS>,
     ) -> usize;
+
+    /// In some search strategies, the front of the queue is the lowest possible
+    /// lowest bound, and can be used as a lower bound for the node.
+    fn item_front_of_queue_is_lowest_lb<OT: OptimizationTask, SS: SearchStrategy>(
+        item: &QueueItem<OT, SS>,
+    ) -> bool;
+
+    fn heuristic_from_lb_and_remaining_fraction<OT: OptimizationTask>(
+        lb: OT::CostType,
+        remaining_fraction: f64,
+    ) -> f64;
 }

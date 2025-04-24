@@ -74,4 +74,8 @@ impl<I: Instance> DataSet<I> {
                 .push(internal_to_original_feature_value);
         }
     }
+
+    pub fn num_instances(&self) -> usize {
+        self.feature_values[0].len()
+    }
 }

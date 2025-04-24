@@ -5,7 +5,10 @@ use codt::{
     search::{
         solver::Solver,
         strategy::{
-            SearchStrategy, andor::AndOrSearchStrategy, dfs::DfsSearchStrategy,
+            SearchStrategy,
+            andor::AndOrSearchStrategy,
+            bfs::{BfsSearchStrategy, CuriosityHeuristic, GOSDTHeuristic, LBHeuristic},
+            dfs::DfsSearchStrategy,
             dfsprio::DfsPrioSearchStrategy,
         },
     },
@@ -59,6 +62,15 @@ fn run_with_strategy<T: OptimizationTask>(
         }
         params::SearchStrategy::DfsPrio => {
             run_solver_for_task::<_, DfsPrioSearchStrategy>(file, max_depth, task)
+        }
+        params::SearchStrategy::BfsLb => {
+            run_solver_for_task::<_, BfsSearchStrategy<LBHeuristic>>(file, max_depth, task)
+        }
+        params::SearchStrategy::BfsCuriosity => {
+            run_solver_for_task::<_, BfsSearchStrategy<CuriosityHeuristic>>(file, max_depth, task)
+        }
+        params::SearchStrategy::BfsGosdt => {
+            run_solver_for_task::<_, BfsSearchStrategy<GOSDTHeuristic>>(file, max_depth, task)
         }
     };
 }

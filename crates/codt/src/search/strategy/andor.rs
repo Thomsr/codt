@@ -7,8 +7,6 @@ use super::SearchStrategy;
 pub struct AndOrSearchStrategy;
 
 impl SearchStrategy for AndOrSearchStrategy {
-    const FRONT_OF_QUEUE_IS_LOWEST_LB: bool = true;
-
     fn cmp_item<'a, OT: OptimizationTask, SS: SearchStrategy>(
         a: &QueueItem<'a, OT, SS>,
         b: &QueueItem<'a, OT, SS>,
@@ -41,5 +39,18 @@ impl SearchStrategy for AndOrSearchStrategy {
         } else {
             1
         }
+    }
+
+    fn item_front_of_queue_is_lowest_lb<OT: OptimizationTask, SS: SearchStrategy>(
+        _item: &QueueItem<OT, SS>,
+    ) -> bool {
+        true
+    }
+
+    fn heuristic_from_lb_and_remaining_fraction<OT: OptimizationTask>(
+        _lb: OT::CostType,
+        _remaining_fraction: f64,
+    ) -> f64 {
+        0.0 // Not used
     }
 }
