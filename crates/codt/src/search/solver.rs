@@ -1,4 +1,4 @@
-use std::{marker::PhantomData, sync::Arc};
+use std::{collections::VecDeque, marker::PhantomData, sync::Arc};
 
 use log::trace;
 
@@ -7,7 +7,7 @@ use crate::{
     tasks::OptimizationTask,
 };
 
-use super::{graph::SearchGraph, node::Node, strategy::SearchStrategy};
+use super::{node::Node, strategy::SearchStrategy};
 
 pub struct SolveResult<OT: OptimizationTask> {
     pub tree: Arc<Tree<OT>>,
@@ -28,39 +28,50 @@ impl<OT: OptimizationTask, SS: SearchStrategy> Solver<'_, OT, SS> {
 
         self.task.prepare_for_data(&mut dataview);
 
-        let mut graph: SearchGraph<'_, OT, SS> = SearchGraph::new(Node::new(dataview, max_depth));
+        let mut root: Node<'_, OT, SS> = Node::new(dataview, max_depth);
 
         let mut graph_expansions = 0;
 
-        let mut path = Vec::new();
+        let mut path = VecDeque::new();
 
-        while graph.select(&mut path) {
+        while !root.is_complete() {
             graph_expansions += 1;
+            root.select(&mut path);
             trace!("Selected path: {:?}", path);
 
-            let mut current = path.pop().unwrap();
-            let mut parent = path.pop();
-            graph.expand(
-                &mut current,
-                parent.as_mut().and_then(|p| p.current_node_mut()),
-            );
-            if let Some(parent) = parent {
-                path.push(parent)
+            let mut current = path.pop_front();
+            let mut parent_item = path.pop_front();
+
+            let parent = parent_item
+                .as_mut()
+                .and_then(|p| p.current_node_mut())
+                .unwrap_or(&mut root);
+            parent.expand(current.as_mut().unwrap());
+
+            // Return ownership of all the items in the selected path to their respective nodes.
+            while let Some(item) = current {
+                let parent = parent_item
+                    .as_mut()
+                    .and_then(|p| p.current_node_mut())
+                    .unwrap_or(&mut root);
+
+                parent.backtrack_item(item);
+
+                current = parent_item;
+                parent_item = path.pop_front();
             }
-            path.push(current);
-            graph.backtrack(&mut path);
 
             trace!(
                 "LB: {:?}, UB: {:?}",
-                graph.root.cost_lower_bound,
-                graph.root.best.cost()
+                root.cost_lower_bound,
+                root.best.cost()
             );
         }
 
-        let solution = graph.root.best;
+        let solution = root.best;
 
         // Take back ownership of the dataset.
-        self.dataview = Some(graph.root.dataview);
+        self.dataview = Some(root.dataview);
 
         SolveResult {
             cost_str: self.task.print_cost(&solution.cost()),

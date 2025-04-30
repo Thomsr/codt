@@ -1,5 +1,10 @@
 use std::{
-    cmp::Ordering, collections::BinaryHeap, fmt::Debug, marker::PhantomData, ops::Range, sync::Arc,
+    cmp::Ordering,
+    collections::{BinaryHeap, VecDeque},
+    fmt::Debug,
+    marker::PhantomData,
+    ops::Range,
+    sync::Arc,
 };
 
 use crate::{
@@ -15,7 +20,7 @@ pub struct QueueItem<'a, OT: OptimizationTask, SS: SearchStrategy> {
 
     /// The fraction of remaining instances from the original dataset in the dataview of this item.
     /// Used by some search heuristics.
-    pub remaining_fraction: f64,
+    remaining_fraction: f64,
 
     /// The branching test for this node is one of `feature <= possible_split_points[s]` where s in split_points.
     pub feature: usize,
@@ -23,10 +28,10 @@ pub struct QueueItem<'a, OT: OptimizationTask, SS: SearchStrategy> {
     pub split_points: Range<usize>,
 
     // Child nodes can only be initiated once the size of the `split_points` range is one.
-    pub children: Option<[Node<'a, OT, SS>; 2]>,
+    children: Option<[Node<'a, OT, SS>; 2]>,
 
     /// The index of the child currently under consideration. E.g. for best first search, the child with the lowest lower bound.
-    pub current_child: usize,
+    current_child: usize,
 
     _ss: PhantomData<SS>,
 }
@@ -82,7 +87,7 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> QueueItem<'a, OT, SS> {
     /// Sets this item to split at an exact point. Returns the QueueItems left
     /// after splitting at this concrete splitting point. Only returns an item
     /// if there are remaining splits in that interval.
-    pub fn split_at(&mut self, split: usize) -> (Option<Self>, Option<Self>) {
+    fn split_at(&mut self, split: usize) -> (Option<Self>, Option<Self>) {
         let mut left = None;
         let mut right = None;
         if split - self.split_points.start > 0 {
@@ -126,10 +131,7 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> QueueItem<'a, OT, SS> {
         }
     }
 
-    pub fn current_node(&self) -> Option<&Node<'a, OT, SS>> {
-        self.children.as_ref().map(|c| &c[self.current_child])
-    }
-
+    /// If expanded, returns either the left or right child which should be explored next.
     pub fn current_node_mut(&mut self) -> Option<&mut Node<'a, OT, SS>> {
         self.children.as_mut().map(|c| &mut c[self.current_child])
     }
@@ -215,7 +217,7 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> Node<'a, OT, SS> {
         self.cost_lower_bound >= self.best.cost()
     }
 
-    pub fn split(&self, feature: usize, split: usize) -> (Self, Self) {
+    fn split(&self, feature: usize, split: usize) -> (Self, Self) {
         let (left_view, right_view) = self.dataview.split(feature, split);
 
         let left = Self::new(left_view, self.remaining_depth_budget - 1);
@@ -224,7 +226,7 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> Node<'a, OT, SS> {
         (left, right)
     }
 
-    pub fn find_lowest_cost_split(&self, _feature: usize, range: &Range<usize>) -> usize {
+    fn find_lowest_cost_split(&self, _feature: usize, range: &Range<usize>) -> usize {
         // get rs = right solution
         // get ls = left solution
         // for x = distance from a solution:
@@ -264,11 +266,12 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> Node<'a, OT, SS> {
         }
     }
 
-    pub fn recalculate_item_lb(&mut self, item: &mut QueueItem<'a, OT, SS>) {
+    fn recalculate_item_lb(&mut self, item: &mut QueueItem<'a, OT, SS>) {
         let lb = self.pruner.lb_for(item.feature, &item.split_points);
         OT::update_lowerbound(&mut item.cost_lower_bound, &lb);
     }
 
+    /// Reinsert an updated item in the queue after expanding a descendant.
     pub fn backtrack_item(&mut self, mut item: QueueItem<'a, OT, SS>) {
         // Update our upper bound if the item is the current best.
         if let Some(ub) = self.get_upper_and_update_lower_bound_from_children(&mut item) {
@@ -338,5 +341,43 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> Node<'a, OT, SS> {
             // Set heuristic to max, so partially unfinished queue items take the lower bound from its sibling, and not from a completed node.
             self.lowest_descendant_heuristic = f64::MAX;
         }
+    }
+
+    /// Select the path to the item to expand next. The deepest item is first in the path.
+    pub fn select(&mut self, path_buffer: &mut VecDeque<QueueItem<'a, OT, SS>>) {
+        assert!(path_buffer.is_empty());
+        assert!(!self.is_complete());
+
+        let mut next = self
+            .queue
+            .pop()
+            .expect("Select should only be called when the node is not yet complete.");
+
+        if let Some(child) = next.current_node_mut() {
+            child.select(path_buffer);
+        }
+
+        path_buffer.push_back(next);
+    }
+
+    /// Expand an item from the queue one level by selecting a concrete split and instantiating its children.
+    pub fn expand(&mut self, item: &mut QueueItem<'a, OT, SS>) {
+        assert!(!item.is_expanded());
+        assert!(self.remaining_depth_budget > 0);
+
+        let x = self.find_lowest_cost_split(item.feature, &item.split_points);
+        assert!(item.split_points.start <= x && x < item.split_points.end);
+
+        let (left_item, right_item) = item.split_at(x);
+
+        if let Some(left_item) = left_item {
+            self.queue.push(left_item);
+        }
+        if let Some(right_item) = right_item {
+            self.queue.push(right_item);
+        }
+
+        let (left, right) = self.split(item.feature, x);
+        item.children = Some([left, right]);
     }
 }
