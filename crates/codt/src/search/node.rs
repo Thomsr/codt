@@ -314,6 +314,7 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> Node<'a, OT, SS> {
                     false
                 };
 
+                // Note that the order needs to be antisymmetric, so this is guaranteed to return to front of queue if next <= &item
                 self.queue.push(item);
                 update_needed
             };

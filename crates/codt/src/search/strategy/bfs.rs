@@ -43,6 +43,8 @@ impl<H: BfsHeuristic> SearchStrategy for BfsSearchStrategy<H> {
         a.lowest_descendant_heuristic()
             .partial_cmp(&b.lowest_descendant_heuristic())
             .expect("No NaN allowed in heuristic value")
+            .then(a.feature.cmp(&b.feature))
+            .then(a.split_points.start.cmp(&b.split_points.start))
     }
 
     fn child_priority<'a, OT: OptimizationTask, SS: SearchStrategy>(

@@ -4,7 +4,12 @@ use codt::{
     model::{dataset::DataSet, dataview::DataView, instance::LabeledInstance},
     search::{
         solver::{SolveResult, Solver},
-        strategy::{andor::AndOrSearchStrategy, dfs::DfsSearchStrategy},
+        strategy::{
+            andor::AndOrSearchStrategy,
+            bfs::{BfsSearchStrategy, CuriosityHeuristic, GOSDTHeuristic, LBHeuristic},
+            dfs::DfsSearchStrategy,
+            dfsprio::DfsPrioSearchStrategy,
+        },
     },
     tasks::{OptimizationTask, accuracy::AccuracyTask, regression::RegressionTask},
 };
@@ -16,6 +21,10 @@ use pyo3::prelude::*;
 pub enum SearchStrategyEnum {
     Dfs,
     AndOr,
+    BfsLb,
+    BfsCuriosity,
+    BfsGosdt,
+    DfsPrio,
 }
 
 #[pyclass]
@@ -128,6 +137,26 @@ where
             }
             SearchStrategyEnum::AndOr => {
                 let mut solver: Solver<'_, OT, AndOrSearchStrategy> = Solver::new(task, full_view);
+                solver.solve(self.max_depth)
+            }
+            SearchStrategyEnum::BfsLb => {
+                let mut solver: Solver<'_, OT, BfsSearchStrategy<LBHeuristic>> =
+                    Solver::new(task, full_view);
+                solver.solve(self.max_depth)
+            }
+            SearchStrategyEnum::BfsCuriosity => {
+                let mut solver: Solver<'_, OT, BfsSearchStrategy<CuriosityHeuristic>> =
+                    Solver::new(task, full_view);
+                solver.solve(self.max_depth)
+            }
+            SearchStrategyEnum::BfsGosdt => {
+                let mut solver: Solver<'_, OT, BfsSearchStrategy<GOSDTHeuristic>> =
+                    Solver::new(task, full_view);
+                solver.solve(self.max_depth)
+            }
+            SearchStrategyEnum::DfsPrio => {
+                let mut solver: Solver<'_, OT, DfsPrioSearchStrategy> =
+                    Solver::new(task, full_view);
                 solver.solve(self.max_depth)
             }
         };
