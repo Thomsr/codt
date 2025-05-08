@@ -35,9 +35,9 @@ impl SearchStrategy for DfsSearchStrategy {
         false
     }
 
-    fn heuristic_from_lb_and_remaining_fraction<OT: OptimizationTask>(
+    fn heuristic_from_lb_and_support<OT: OptimizationTask>(
         _lb: OT::CostType,
-        _remaining_fraction: f64,
+        _support: usize,
     ) -> f64 {
         0.0 // Not used
     }

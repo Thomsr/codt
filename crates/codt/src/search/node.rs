@@ -18,9 +18,9 @@ pub struct QueueItem<'a, OT: OptimizationTask, SS: SearchStrategy> {
     /// The current lower bound on the error for this item in the queue.
     pub cost_lower_bound: OT::CostType,
 
-    /// The fraction of remaining instances from the original dataset in the dataview of this item.
+    /// The number of instances that reach this node.
     /// Used by some search heuristics.
-    remaining_fraction: f64,
+    support: usize,
 
     /// The branching test for this node is one of `feature <= possible_split_points[s]` where s in split_points.
     pub feature: usize,
@@ -72,10 +72,10 @@ impl<OT: OptimizationTask, SS: SearchStrategy> Ord for QueueItem<'_, OT, SS> {
 }
 
 impl<'a, OT: OptimizationTask, SS: SearchStrategy> QueueItem<'a, OT, SS> {
-    fn new(feature: usize, split_points: Range<usize>, remaining_fraction: f64) -> Self {
+    fn new(feature: usize, split_points: Range<usize>, support: usize) -> Self {
         Self {
             cost_lower_bound: OT::MIN_COST,
-            remaining_fraction,
+            support,
             feature,
             split_points,
             children: None,
@@ -93,7 +93,7 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> QueueItem<'a, OT, SS> {
         if split - self.split_points.start > 0 {
             left = Some(Self {
                 cost_lower_bound: self.cost_lower_bound,
-                remaining_fraction: self.remaining_fraction,
+                support: self.support,
                 feature: self.feature,
                 split_points: self.split_points.start..split,
                 children: None,
@@ -104,7 +104,7 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> QueueItem<'a, OT, SS> {
         if self.split_points.end - 1 - split > 0 {
             right = Some(Self {
                 cost_lower_bound: self.cost_lower_bound,
-                remaining_fraction: self.remaining_fraction,
+                support: self.support,
                 feature: self.feature,
                 split_points: (split + 1)..self.split_points.end,
                 children: None,
@@ -144,10 +144,7 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> QueueItem<'a, OT, SS> {
                 .lowest_descendant_heuristic
                 .min(children[1].lowest_descendant_heuristic)
         } else {
-            SS::heuristic_from_lb_and_remaining_fraction::<OT>(
-                self.cost_lower_bound,
-                self.remaining_fraction,
-            )
+            SS::heuristic_from_lb_and_support::<OT>(self.cost_lower_bound, self.support)
         }
     }
 }
@@ -185,7 +182,7 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> Node<'a, OT, SS> {
                     queue.push(QueueItem::new(
                         feature,
                         0..n_splitpoints,
-                        dataview.remaining_fraction(),
+                        dataview.num_instances(),
                     ));
                 }
             }
@@ -199,9 +196,9 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> Node<'a, OT, SS> {
 
         Node {
             cost_lower_bound: lb,
-            lowest_descendant_heuristic: SS::heuristic_from_lb_and_remaining_fraction::<OT>(
+            lowest_descendant_heuristic: SS::heuristic_from_lb_and_support::<OT>(
                 lb,
-                dataview.remaining_fraction(),
+                dataview.num_instances(),
             ),
             remaining_depth_budget: max_depth,
             pruner: Pruner::new(dataview.num_features()),
@@ -331,9 +328,9 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> Node<'a, OT, SS> {
                 OT::update_lowerbound(&mut self.cost_lower_bound, &next.cost_lower_bound);
             }
             // Self or front of queue, since for bfs the front of queue will contain the lowest heuristic value.
-            self.lowest_descendant_heuristic = SS::heuristic_from_lb_and_remaining_fraction::<OT>(
+            self.lowest_descendant_heuristic = SS::heuristic_from_lb_and_support::<OT>(
                 self.cost_lower_bound,
-                self.dataview.remaining_fraction(),
+                self.dataview.num_instances(),
             )
             .min(next.lowest_descendant_heuristic())
         } else {

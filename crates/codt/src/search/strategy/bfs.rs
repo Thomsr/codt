@@ -9,25 +9,25 @@ pub struct CuriosityHeuristic;
 pub struct GOSDTHeuristic;
 
 pub trait BfsHeuristic {
-    fn heuristic_from_lb_and_remaining_fraction(lb: f64, remaining_fraction: f64) -> f64;
+    fn heuristic_from_lb_and_support(lb: f64, support: usize) -> f64;
 }
 
 impl BfsHeuristic for LBHeuristic {
-    fn heuristic_from_lb_and_remaining_fraction(lb: f64, _remaining_fraction: f64) -> f64 {
+    fn heuristic_from_lb_and_support(lb: f64, _support: usize) -> f64 {
         lb
     }
 }
 
 impl BfsHeuristic for CuriosityHeuristic {
-    fn heuristic_from_lb_and_remaining_fraction(lb: f64, remaining_fraction: f64) -> f64 {
-        lb / remaining_fraction
+    fn heuristic_from_lb_and_support(lb: f64, support: usize) -> f64 {
+        lb / support as f64
     }
 }
 
 impl BfsHeuristic for GOSDTHeuristic {
-    fn heuristic_from_lb_and_remaining_fraction(lb: f64, remaining_fraction: f64) -> f64 {
-        // TODO figure out why lb + remaining_fraction seems to work well.
-        lb - remaining_fraction
+    fn heuristic_from_lb_and_support(lb: f64, support: usize) -> f64 {
+        // TODO figure out why lb + support seems to work well. Maybe due to faster LB discovery
+        lb + support as f64
     }
 }
 
@@ -64,13 +64,13 @@ impl<H: BfsHeuristic> SearchStrategy for BfsSearchStrategy<H> {
         false
     }
 
-    fn heuristic_from_lb_and_remaining_fraction<OT: OptimizationTask>(
+    fn heuristic_from_lb_and_support<OT: OptimizationTask>(
         lb: OT::CostType,
-        remaining_fraction: f64,
+        support: usize,
     ) -> f64 {
         let lb_float: f64 = lb
             .try_into()
             .expect("Global best first search only works for numeric costs");
-        H::heuristic_from_lb_and_remaining_fraction(lb_float, remaining_fraction)
+        H::heuristic_from_lb_and_support(lb_float, support)
     }
 }

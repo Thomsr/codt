@@ -34,8 +34,6 @@ pub trait SearchStrategy {
         item: &QueueItem<OT, SS>,
     ) -> bool;
 
-    fn heuristic_from_lb_and_remaining_fraction<OT: OptimizationTask>(
-        lb: OT::CostType,
-        remaining_fraction: f64,
-    ) -> f64;
+    fn heuristic_from_lb_and_support<OT: OptimizationTask>(lb: OT::CostType, support: usize)
+    -> f64;
 }
