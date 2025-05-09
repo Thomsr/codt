@@ -1,7 +1,7 @@
-use std::{fmt::Debug, marker::PhantomData, str::FromStr};
+use std::{convert::Infallible, fmt::Debug, marker::PhantomData, str::FromStr};
 
 use codt::{
-    model::{dataset::DataSet, dataview::DataView, instance::LabeledInstance},
+    model::{dataset::DataSet, dataview::DataView, instance::LabeledInstance, tree::Tree},
     search::{
         solver::{SolveResult, Solver},
         strategy::{
@@ -14,7 +14,29 @@ use codt::{
     tasks::{OptimizationTask, accuracy::AccuracyTask, regression::RegressionTask},
 };
 use numpy::{IntoPyArray, PyArray1, PyReadonlyArray1, PyReadonlyArray2, ndarray::Axis};
-use pyo3::prelude::*;
+use pyo3::{prelude::*, types::PyList};
+
+fn tree_to_py<'a, 'py, OT: OptimizationTask, X>(
+    tree: &'a Tree<OT>,
+    py: Python<'py>,
+) -> Result<Bound<'py, PyAny>, PyErr>
+where
+    OT::LabelType: IntoPyObject<'py, Target = X, Output = Bound<'py, X>, Error = Infallible>,
+{
+    Ok(match tree {
+        Tree::Branch(b) => PyList::new(
+            py,
+            &[
+                b.split_feature.into_pyobject(py)?.into_any(),
+                b.split_threshold.into_pyobject(py)?.into_any(),
+                tree_to_py(b.left_child.as_ref(), py)?,
+                tree_to_py(b.right_child.as_ref(), py)?,
+            ],
+        )?
+        .into_any(),
+        Tree::Leaf(l) => l.label.into_pyobject(py)?.into_any(),
+    })
+}
 
 #[pyclass(eq, eq_int)]
 #[derive(PartialEq, Eq, Clone, Copy)]
@@ -52,6 +74,18 @@ impl OptimalDecisionTreeClassifier {
     ) -> Bound<'py, PyArray1<i64>> {
         self.0.predict(py, X)
     }
+
+    #[pyo3(signature = ())]
+    fn tree<'py>(&mut self, py: Python<'py>) -> Result<Bound<'py, PyAny>, PyErr> {
+        let tree = &self
+            .0
+            .result
+            .as_ref()
+            .expect(".fit(X,y) before .predict(X) should be checked in the python wrapper")
+            .tree;
+
+        tree_to_py(tree, py)
+    }
 }
 
 #[pyclass]
@@ -78,6 +112,18 @@ impl OptimalDecisionTreeRegressor {
         X: PyReadonlyArray2<'py, f64>,
     ) -> Bound<'py, PyArray1<f64>> {
         self.0.predict(py, X)
+    }
+
+    #[pyo3(signature = ())]
+    fn tree<'py>(&mut self, py: Python<'py>) -> Result<Bound<'py, PyAny>, PyErr> {
+        let tree = &self
+            .0
+            .result
+            .as_ref()
+            .expect(".fit(X,y) before .predict(X) should be checked in the python wrapper")
+            .tree;
+
+        tree_to_py(tree, py)
     }
 }
 
@@ -165,7 +211,7 @@ where
     }
 
     fn predict<'py>(
-        &mut self,
+        &self,
         py: Python<'py>,
         X: PyReadonlyArray2<'py, f64>,
     ) -> Bound<'py, PyArray1<PyLabelType>> {

@@ -17,6 +17,11 @@ class OptimalDecisionTreeClassifier(BaseEstimator, ClassifierMixin):
         check_is_fitted(self)
         X = validate_data(self, X, reset=False, dtype=np.float64)
         return np.take(self.classes_, self.tree_.predict(X))
+    
+    def get_tree(self):
+        check_is_fitted(self)
+        return self.tree_.tree()
+
 
 class OptimalDecisionTreeRegressor(BaseEstimator, RegressorMixin):
     def __init__(self, max_depth, strategy=SearchStrategyEnum.Dfs):
@@ -32,3 +37,7 @@ class OptimalDecisionTreeRegressor(BaseEstimator, RegressorMixin):
         check_is_fitted(self)
         X = validate_data(self, X, reset=False, dtype=np.float64)
         return self.tree_.predict(X)
+    
+    def get_tree(self):
+        check_is_fitted(self)
+        return self.tree_.tree()
