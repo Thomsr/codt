@@ -1,4 +1,4 @@
-use std::{collections::VecDeque, marker::PhantomData, sync::Arc};
+use std::{collections::VecDeque, marker::PhantomData, sync::Arc, time::Instant};
 
 use log::trace;
 
@@ -13,6 +13,8 @@ pub struct SolveResult<OT: OptimizationTask> {
     pub tree: Arc<Tree<OT>>,
     pub cost_str: String,
     pub graph_expansions: i32,
+    pub intermediate_lbs: Vec<(OT::CostType, i32, f64)>,
+    pub intermediate_ubs: Vec<(OT::CostType, i32, f64)>,
 }
 
 pub struct Solver<'a, OT: OptimizationTask, SS: SearchStrategy> {
@@ -33,6 +35,11 @@ impl<OT: OptimizationTask, SS: SearchStrategy> Solver<'_, OT, SS> {
         let mut graph_expansions = 0;
 
         let mut path = VecDeque::new();
+
+        let start_time = Instant::now();
+
+        let mut intermediate_lbs = vec![(root.cost_lower_bound, graph_expansions, 0.0)];
+        let mut intermediate_ubs = vec![(root.best.cost(), graph_expansions, 0.0)];
 
         while !root.is_complete() {
             graph_expansions += 1;
@@ -61,11 +68,13 @@ impl<OT: OptimizationTask, SS: SearchStrategy> Solver<'_, OT, SS> {
                 parent_item = path.pop_front();
             }
 
-            trace!(
-                "LB: {:?}, UB: {:?}",
-                root.cost_lower_bound,
-                root.best.cost()
-            );
+            if root.cost_lower_bound > intermediate_lbs.last().unwrap().0 {
+                intermediate_lbs.push((root.cost_lower_bound, graph_expansions, start_time.elapsed().as_secs_f64()))
+            }
+
+            if root.best.cost() < intermediate_ubs.last().unwrap().0 {
+                intermediate_ubs.push((root.best.cost(), graph_expansions, start_time.elapsed().as_secs_f64()))
+            }
         }
 
         let solution = root.best;
@@ -77,6 +86,8 @@ impl<OT: OptimizationTask, SS: SearchStrategy> Solver<'_, OT, SS> {
             cost_str: self.task.print_cost(&solution.cost()),
             tree: solution,
             graph_expansions,
+            intermediate_lbs,
+            intermediate_ubs,
         }
     }
 

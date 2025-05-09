@@ -81,10 +81,32 @@ impl OptimalDecisionTreeClassifier {
             .0
             .result
             .as_ref()
-            .expect(".fit(X,y) before .predict(X) should be checked in the python wrapper")
+            .expect(".fit(X,y) should be called before this function and should be checked in the python wrapper")
             .tree;
 
         tree_to_py(tree, py)
+    }
+
+    #[pyo3(signature = ())]
+    fn intermediate_lbs<'py>(&mut self, py: Python<'py>) -> Result<Bound<'py, PyAny>, PyErr> {
+        let intermediates = &self
+            .0
+            .result
+            .as_ref()
+            .expect(".fit(X,y) should be called before this function and should be checked in the python wrapper")
+            .intermediate_lbs;
+        intermediates.into_pyobject(py)
+    }
+
+    #[pyo3(signature = ())]
+    fn intermediate_ubs<'py>(&mut self, py: Python<'py>) -> Result<Bound<'py, PyAny>, PyErr> {
+        let intermediates = &self
+            .0
+            .result
+            .as_ref()
+            .expect(".fit(X,y) should be called before this function and should be checked in the python wrapper")
+            .intermediate_ubs;
+        intermediates.into_pyobject(py)
     }
 }
 
@@ -120,10 +142,32 @@ impl OptimalDecisionTreeRegressor {
             .0
             .result
             .as_ref()
-            .expect(".fit(X,y) before .predict(X) should be checked in the python wrapper")
+            .expect(".fit(X,y) should be called before this function and should be checked in the python wrapper")
             .tree;
 
         tree_to_py(tree, py)
+    }
+
+    #[pyo3(signature = ())]
+    fn intermediate_lbs<'py>(&mut self, py: Python<'py>) -> Result<Bound<'py, PyAny>, PyErr> {
+        let intermediates = &self
+            .0
+            .result
+            .as_ref()
+            .expect(".fit(X,y) should be called before this function and should be checked in the python wrapper")
+            .intermediate_lbs;
+        intermediates.into_pyobject(py)
+    }
+
+    #[pyo3(signature = ())]
+    fn intermediate_ubs<'py>(&mut self, py: Python<'py>) -> Result<Bound<'py, PyAny>, PyErr> {
+        let intermediates = &self
+            .0
+            .result
+            .as_ref()
+            .expect(".fit(X,y) should be called before this function and should be checked in the python wrapper")
+            .intermediate_ubs;
+        intermediates.into_pyobject(py)
     }
 }
 

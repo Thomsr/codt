@@ -21,6 +21,14 @@ class OptimalDecisionTreeClassifier(BaseEstimator, ClassifierMixin):
     def get_tree(self):
         check_is_fitted(self)
         return self.tree_.tree()
+    
+    def intermediate_lbs(self):
+        check_is_fitted(self)
+        return self.tree_.intermediate_lbs()
+    
+    def intermediate_ubs(self):
+        check_is_fitted(self)
+        return self.tree_.intermediate_ubs()
 
 
 class OptimalDecisionTreeRegressor(BaseEstimator, RegressorMixin):
@@ -41,3 +49,11 @@ class OptimalDecisionTreeRegressor(BaseEstimator, RegressorMixin):
     def get_tree(self):
         check_is_fitted(self)
         return self.tree_.tree()
+    
+    def intermediate_lbs(self):
+        check_is_fitted(self)
+        return self.tree_.intermediate_lbs()
+    
+    def intermediate_ubs(self):
+        check_is_fitted(self)
+        return self.tree_.intermediate_ubs()
