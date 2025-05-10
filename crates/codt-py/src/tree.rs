@@ -11,10 +11,10 @@ use codt::{
             dfsprio::DfsPrioSearchStrategy,
         },
     },
-    tasks::{OptimizationTask, accuracy::AccuracyTask, regression::RegressionTask},
+    tasks::{OptimizationTask, accuracy::AccuracyTask, squared_error::SquaredErrorTask},
 };
 use numpy::{IntoPyArray, PyArray1, PyReadonlyArray1, PyReadonlyArray2, ndarray::Axis};
-use pyo3::{prelude::*, types::PyList};
+use pyo3::{exceptions::PyValueError, prelude::*, types::PyList};
 
 fn tree_to_py<'a, 'py, OT: OptimizationTask, X>(
     tree: &'a Tree<OT>,
@@ -49,6 +49,31 @@ pub enum SearchStrategyEnum {
     DfsPrio,
 }
 
+#[pyfunction(signature = ())]
+pub fn all_search_strategies() -> Vec<String> {
+    vec![
+        "dfs".to_string(),
+        "dfs-prio".to_string(),
+        "and-or".to_string(),
+        "bfs-lb".to_string(),
+        "bfs-curiosity".to_string(),
+        "bfs-gosdt".to_string(),
+    ]
+}
+
+#[pyfunction(signature = (strategy=""))]
+pub fn search_strategy_from_string(strategy: &str) -> Result<SearchStrategyEnum, PyErr> {
+    match strategy {
+        "dfs" => Ok(SearchStrategyEnum::Dfs),
+        "dfs-prio" => Ok(SearchStrategyEnum::DfsPrio),
+        "and-or" => Ok(SearchStrategyEnum::AndOr),
+        "bfs-lb" => Ok(SearchStrategyEnum::BfsLb),
+        "bfs-curiosity" => Ok(SearchStrategyEnum::BfsCuriosity),
+        "bfs-gosdt" => Ok(SearchStrategyEnum::BfsGosdt),
+        _ => Err(PyValueError::new_err("Not a valid search strategy")),
+    }
+}
+
 #[pyclass]
 pub struct OptimalDecisionTreeClassifier(OptimalDecisionTree<AccuracyTask, i64>);
 
@@ -56,9 +81,17 @@ pub struct OptimalDecisionTreeClassifier(OptimalDecisionTree<AccuracyTask, i64>)
 #[allow(non_snake_case)]
 impl OptimalDecisionTreeClassifier {
     #[new]
-    #[pyo3(signature = (max_depth=2, strategy=SearchStrategyEnum::Dfs))]
-    fn new(max_depth: u32, strategy: SearchStrategyEnum) -> OptimalDecisionTreeClassifier {
-        OptimalDecisionTreeClassifier(OptimalDecisionTree::new(max_depth, strategy))
+    #[pyo3(signature = (max_depth=2, strategy=SearchStrategyEnum::Dfs, complexity_cost=0.0))]
+    fn new(
+        max_depth: u32,
+        strategy: SearchStrategyEnum,
+        complexity_cost: f64,
+    ) -> OptimalDecisionTreeClassifier {
+        OptimalDecisionTreeClassifier(OptimalDecisionTree::new(
+            max_depth,
+            strategy,
+            AccuracyTask::new(complexity_cost),
+        ))
     }
 
     #[pyo3(signature = (X, y))]
@@ -111,15 +144,23 @@ impl OptimalDecisionTreeClassifier {
 }
 
 #[pyclass]
-pub struct OptimalDecisionTreeRegressor(OptimalDecisionTree<RegressionTask, f64>);
+pub struct OptimalDecisionTreeRegressor(OptimalDecisionTree<SquaredErrorTask, f64>);
 
 #[pymethods]
 #[allow(non_snake_case)]
 impl OptimalDecisionTreeRegressor {
     #[new]
-    #[pyo3(signature = (max_depth=2, strategy=SearchStrategyEnum::Dfs))]
-    fn new(max_depth: u32, strategy: SearchStrategyEnum) -> OptimalDecisionTreeRegressor {
-        OptimalDecisionTreeRegressor(OptimalDecisionTree::new(max_depth, strategy))
+    #[pyo3(signature = (max_depth=2, strategy=SearchStrategyEnum::Dfs, complexity_cost=0.0))]
+    fn new(
+        max_depth: u32,
+        strategy: SearchStrategyEnum,
+        complexity_cost: f64,
+    ) -> OptimalDecisionTreeRegressor {
+        OptimalDecisionTreeRegressor(OptimalDecisionTree::new(
+            max_depth,
+            strategy,
+            SquaredErrorTask::new(complexity_cost),
+        ))
     }
 
     #[pyo3(signature = (X, y))]
@@ -180,6 +221,7 @@ pub struct OptimalDecisionTree<
 > {
     max_depth: u32,
     strategy: SearchStrategyEnum,
+    task: OT,
     result: Option<SolveResult<OT>>,
     _phantom: PhantomData<PyLabelType>,
 }
@@ -187,17 +229,18 @@ pub struct OptimalDecisionTree<
 #[allow(non_snake_case)]
 impl<
     LabelType: FromStr + Clone + Copy + Into<PyLabelType> + TryFrom<PyLabelType>,
-    OT: OptimizationTask<InstanceType = LabeledInstance<LabelType>, LabelType = LabelType> + Default,
+    OT: OptimizationTask<InstanceType = LabeledInstance<LabelType>, LabelType = LabelType> + Clone,
     PyLabelType: Copy + numpy::Element,
 > OptimalDecisionTree<OT, PyLabelType>
 where
     <LabelType as FromStr>::Err: Debug,
     <LabelType as TryFrom<PyLabelType>>::Error: Debug,
 {
-    fn new(max_depth: u32, strategy: SearchStrategyEnum) -> Self {
+    fn new(max_depth: u32, strategy: SearchStrategyEnum, task: OT) -> Self {
         Self {
             max_depth,
             strategy,
+            task,
             result: None,
             _phantom: PhantomData,
         }
@@ -217,36 +260,37 @@ where
         dataset.preprocess_after_adding_instances();
 
         OT::preprocess_dataset(&mut dataset);
-        let task = OT::default();
         let full_view = DataView::from_dataset(&dataset);
 
         let result = match self.strategy {
             SearchStrategyEnum::Dfs => {
-                let mut solver: Solver<'_, OT, DfsSearchStrategy> = Solver::new(task, full_view);
+                let mut solver: Solver<'_, OT, DfsSearchStrategy> =
+                    Solver::new(self.task.clone(), full_view);
                 solver.solve(self.max_depth)
             }
             SearchStrategyEnum::AndOr => {
-                let mut solver: Solver<'_, OT, AndOrSearchStrategy> = Solver::new(task, full_view);
+                let mut solver: Solver<'_, OT, AndOrSearchStrategy> =
+                    Solver::new(self.task.clone(), full_view);
                 solver.solve(self.max_depth)
             }
             SearchStrategyEnum::BfsLb => {
                 let mut solver: Solver<'_, OT, BfsSearchStrategy<LBHeuristic>> =
-                    Solver::new(task, full_view);
+                    Solver::new(self.task.clone(), full_view);
                 solver.solve(self.max_depth)
             }
             SearchStrategyEnum::BfsCuriosity => {
                 let mut solver: Solver<'_, OT, BfsSearchStrategy<CuriosityHeuristic>> =
-                    Solver::new(task, full_view);
+                    Solver::new(self.task.clone(), full_view);
                 solver.solve(self.max_depth)
             }
             SearchStrategyEnum::BfsGosdt => {
                 let mut solver: Solver<'_, OT, BfsSearchStrategy<GOSDTHeuristic>> =
-                    Solver::new(task, full_view);
+                    Solver::new(self.task.clone(), full_view);
                 solver.solve(self.max_depth)
             }
             SearchStrategyEnum::DfsPrio => {
                 let mut solver: Solver<'_, OT, DfsPrioSearchStrategy> =
-                    Solver::new(task, full_view);
+                    Solver::new(self.task.clone(), full_view);
                 solver.solve(self.max_depth)
             }
         };

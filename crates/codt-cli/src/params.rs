@@ -41,9 +41,9 @@ pub struct CliParams {
 #[derive(Subcommand)]
 pub enum OptimizationTaskEnum {
     /// Optimizes classification accuracy
-    Accuracy,
+    Accuracy(AccuracyParams),
     /// Optimizes squared error
-    Regression(RegressionParams),
+    SquaredError(SquaredErrorParams),
 }
 
 #[derive(ValueEnum, Clone, Debug)]
@@ -60,8 +60,16 @@ pub enum SearchStrategy {
 
 #[derive(Args)]
 #[command(next_help_heading = "Task Parameters")]
-pub struct RegressionParams {
-    /// The cost for adding an extra node to the tree. 0.01 means one extra node is only jusitified if it results in at least one percent better training score than a constant predictor.
+pub struct AccuracyParams {
+    /// The cost for adding an extra node to the tree. 0.01 means one extra node is only jusitified if it results in at least one percent better training score.
     #[arg(long, value_parser=RangedF64ValueParser::<f64>::new().range(0.0..=1.0), default_value_t=0.0)]
-    pub complexity_penalty: f64,
+    pub complexity_cost: f64,
+}
+
+#[derive(Args)]
+#[command(next_help_heading = "Task Parameters")]
+pub struct SquaredErrorParams {
+    /// The cost for adding an extra node to the tree. 0.01 means one extra node is only jusitified if it results in at least one percent better training score.
+    #[arg(long, value_parser=RangedF64ValueParser::<f64>::new().range(0.0..=1.0), default_value_t=0.0)]
+    pub complexity_cost: f64,
 }

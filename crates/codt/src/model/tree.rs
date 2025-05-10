@@ -30,8 +30,8 @@ impl<OT: OptimizationTask> Tree<OT> {
         split_threshold: f64,
         left_child: Arc<Tree<OT>>,
         right_child: Arc<Tree<OT>>,
+        cost: OT::CostType,
     ) -> Self {
-        let cost = left_child.cost() + right_child.cost();
         Self::Branch(BranchNode {
             split_feature,
             split_threshold,

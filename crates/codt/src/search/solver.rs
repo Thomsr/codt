@@ -24,13 +24,31 @@ pub struct Solver<'a, OT: OptimizationTask, SS: SearchStrategy> {
     _ss: PhantomData<SS>,
 }
 
+pub enum UpperboundStrategy {
+    BacktrackOnly,
+    TightFromSibling,
+    ForRemainingInterval,
+}
+
+pub struct SolveContext<'a, OT: OptimizationTask, SS: SearchStrategy> {
+    pub task: &'a OT,
+    pub ub_strategy: UpperboundStrategy,
+    _ss: PhantomData<SS>,
+}
+
 impl<OT: OptimizationTask, SS: SearchStrategy> Solver<'_, OT, SS> {
     pub fn solve(&mut self, max_depth: u32) -> SolveResult<OT> {
         let mut dataview = self.dataview.take().unwrap();
 
         self.task.prepare_for_data(&mut dataview);
 
-        let mut root: Node<'_, OT, SS> = Node::new(dataview, max_depth);
+        let context = SolveContext {
+            task: &self.task,
+            ub_strategy: UpperboundStrategy::BacktrackOnly,
+            _ss: PhantomData,
+        };
+
+        let mut root: Node<'_, OT, SS> = Node::new(&context, dataview, max_depth);
 
         let mut graph_expansions = 0;
 
@@ -53,7 +71,7 @@ impl<OT: OptimizationTask, SS: SearchStrategy> Solver<'_, OT, SS> {
                 .as_mut()
                 .and_then(|p| p.current_node_mut())
                 .unwrap_or(&mut root);
-            parent.expand(current.as_mut().unwrap());
+            parent.expand(&context, current.as_mut().unwrap());
 
             // Return ownership of all the items in the selected path to their respective nodes.
             while let Some(item) = current {
@@ -62,18 +80,26 @@ impl<OT: OptimizationTask, SS: SearchStrategy> Solver<'_, OT, SS> {
                     .and_then(|p| p.current_node_mut())
                     .unwrap_or(&mut root);
 
-                parent.backtrack_item(item);
+                parent.backtrack_item(&context, item);
 
                 current = parent_item;
                 parent_item = path.pop_front();
             }
 
             if root.cost_lower_bound > intermediate_lbs.last().unwrap().0 {
-                intermediate_lbs.push((root.cost_lower_bound, graph_expansions, start_time.elapsed().as_secs_f64()))
+                intermediate_lbs.push((
+                    root.cost_lower_bound,
+                    graph_expansions,
+                    start_time.elapsed().as_secs_f64(),
+                ))
             }
 
             if root.best.cost() < intermediate_ubs.last().unwrap().0 {
-                intermediate_ubs.push((root.best.cost(), graph_expansions, start_time.elapsed().as_secs_f64()))
+                intermediate_ubs.push((
+                    root.best.cost(),
+                    graph_expansions,
+                    start_time.elapsed().as_secs_f64(),
+                ))
             }
         }
 

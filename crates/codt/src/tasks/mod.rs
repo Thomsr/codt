@@ -5,7 +5,7 @@ use std::fmt::{Debug, Display};
 use std::ops::{Add, AddAssign, SubAssign};
 
 pub mod accuracy;
-pub mod regression;
+pub mod squared_error;
 
 pub trait CostSum<LabelType, InstanceType, CostType>:
     for<'a> AddAssign<&'a Self>
@@ -60,4 +60,6 @@ pub trait OptimizationTask {
             *ub = *candidate;
         }
     }
+
+    fn branching_cost(&self) -> Self::CostType;
 }

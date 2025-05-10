@@ -12,7 +12,7 @@ use codt::{
             dfsprio::DfsPrioSearchStrategy,
         },
     },
-    tasks::{OptimizationTask, accuracy::AccuracyTask, regression::RegressionTask},
+    tasks::{OptimizationTask, accuracy::AccuracyTask, squared_error::SquaredErrorTask},
 };
 use file_reader::read_from_file;
 use log::info;
@@ -87,13 +87,12 @@ fn main() {
     log_builer.init();
 
     match args.task {
-        OptimizationTaskEnum::Accuracy => {
-            let task = AccuracyTask::default();
+        OptimizationTaskEnum::Accuracy(params) => {
+            let task = AccuracyTask::new(params.complexity_cost);
             run_with_strategy(&args.file, args.max_depth, task, args.strategy);
         }
-        OptimizationTaskEnum::Regression(params) => {
-            let _ = params;
-            let task = RegressionTask::default();
+        OptimizationTaskEnum::SquaredError(params) => {
+            let task = SquaredErrorTask::new(params.complexity_cost);
             run_with_strategy(&args.file, args.max_depth, task, args.strategy);
         }
     }

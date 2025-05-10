@@ -4,10 +4,23 @@ use crate::model::{dataset::DataSet, dataview::DataView, instance::LabeledInstan
 
 use super::{CostSum, OptimizationTask};
 
-#[derive(Default)]
+#[derive(Clone)]
 pub struct AccuracyTask {
     dataset_size: usize,
     num_labels: i32,
+    branching_cost: f64,
+    complexity_cost: f64,
+}
+
+impl AccuracyTask {
+    pub fn new(complexity_cost: f64) -> Self {
+        Self {
+            dataset_size: 0,
+            num_labels: 0,
+            branching_cost: 0.0,
+            complexity_cost,
+        }
+    }
 }
 
 #[derive(Clone)]
@@ -61,7 +74,7 @@ impl AddAssign<&LabeledInstance<i32>> for AccuracyCostSum {
     }
 }
 
-impl CostSum<i32, LabeledInstance<i32>, i32> for AccuracyCostSum {
+impl CostSum<i32, LabeledInstance<i32>, f64> for AccuracyCostSum {
     fn label(&self) -> i32 {
         self.instance_count_per_class
             .iter()
@@ -71,7 +84,7 @@ impl CostSum<i32, LabeledInstance<i32>, i32> for AccuracyCostSum {
             .expect("Expected at least one class") as i32
     }
 
-    fn cost(&self) -> i32 {
+    fn cost(&self) -> f64 {
         let (total, largest_class_size) = self
             .instance_count_per_class
             .iter()
@@ -79,16 +92,16 @@ impl CostSum<i32, LabeledInstance<i32>, i32> for AccuracyCostSum {
                 (acc_total + *e, acc_max.max(*e))
             });
 
-        total - largest_class_size
+        (total - largest_class_size) as f64
     }
 }
 
 impl OptimizationTask for AccuracyTask {
     type LabelType = i32;
     type InstanceType = LabeledInstance<i32>;
-    type CostType = i32;
+    type CostType = f64;
     type CostSumType = AccuracyCostSum;
-    const MIN_COST: Self::CostType = 0;
+    const MIN_COST: Self::CostType = 0.0;
 
     fn prepare_for_data(&mut self, dataview: &mut DataView<Self>) {
         self.dataset_size = dataview.num_instances();
@@ -96,13 +109,14 @@ impl OptimizationTask for AccuracyTask {
         for instance in &dataview.dataset.instances {
             self.num_labels = self.num_labels.max(instance.label + 1);
         }
+        self.branching_cost = self.complexity_cost * dataview.num_instances() as f64
     }
 
     fn print_cost(&mut self, cost: &Self::CostType) -> String {
         format!(
-            "Misclassifications: {}. Accuracy: {}%",
+            "Misclassifications: {}. Accuracy: {}%. (Only accurate when complexity cost is zero)",
             cost,
-            (1.0 - *cost as f64 / self.dataset_size as f64) * 100.0
+            (1.0 - *cost / self.dataset_size as f64) * 100.0
         )
     }
 
@@ -115,5 +129,9 @@ impl OptimizationTask for AccuracyTask {
         Self::CostSumType {
             instance_count_per_class: vec![0; num_labels as usize],
         }
+    }
+
+    fn branching_cost(&self) -> Self::CostType {
+        self.branching_cost
     }
 }

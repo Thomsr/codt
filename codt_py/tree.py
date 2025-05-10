@@ -1,16 +1,17 @@
 from sklearn.base import BaseEstimator, ClassifierMixin, RegressorMixin, check_is_fitted, validate_data
-from .codt_py import OptimalDecisionTreeClassifier as OCT, OptimalDecisionTreeRegressor as ORT, SearchStrategyEnum
+from .codt_py import OptimalDecisionTreeClassifier as OCT, OptimalDecisionTreeRegressor as ORT, search_strategy_from_string
 import numpy as np
 
 class OptimalDecisionTreeClassifier(BaseEstimator, ClassifierMixin):
-    def __init__(self, max_depth, strategy=SearchStrategyEnum.Dfs):
+    def __init__(self, max_depth=2, strategy="dfs", complexity_cost=0.0):
         self.max_depth = max_depth
         self.strategy = strategy
+        self.complexity_cost = complexity_cost
 
     def fit(self, X, y):
         X, y = validate_data(self, X, y, ensure_min_samples=2, dtype=np.float64)
         self.classes_, y = np.unique(y, return_inverse=True)
-        self.tree_ = OCT(self.max_depth, self.strategy)
+        self.tree_ = OCT(self.max_depth, search_strategy_from_string(self.strategy), self.complexity_cost)
         self.tree_.fit(X, y)
 
     def predict(self, X):
@@ -32,13 +33,14 @@ class OptimalDecisionTreeClassifier(BaseEstimator, ClassifierMixin):
 
 
 class OptimalDecisionTreeRegressor(BaseEstimator, RegressorMixin):
-    def __init__(self, max_depth, strategy=SearchStrategyEnum.Dfs):
+    def __init__(self, max_depth=2, strategy="dfs", complexity_cost=0.0):
         self.max_depth = max_depth
         self.strategy = strategy
+        self.complexity_cost = complexity_cost
 
     def fit(self, X, y):
         X, y = validate_data(self, X, y, ensure_min_samples=2, dtype=np.float64, y_numeric=True)
-        self.tree_ = ORT(self.max_depth, self.strategy)
+        self.tree_ = ORT(self.max_depth, search_strategy_from_string(self.strategy), self.complexity_cost)
         self.tree_.fit(X, y)
 
     def predict(self, X):

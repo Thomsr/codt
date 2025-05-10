@@ -4,19 +4,31 @@ use crate::model::{dataset::DataSet, dataview::DataView, instance::LabeledInstan
 
 use super::{CostSum, OptimizationTask};
 
-#[derive(Default)]
-pub struct RegressionTask {
+#[derive(Clone)]
+pub struct SquaredErrorTask {
     dataset_size: usize,
+    branching_cost: f64,
+    complexity_cost: f64,
+}
+
+impl SquaredErrorTask {
+    pub fn new(complexity_cost: f64) -> Self {
+        Self {
+            dataset_size: 0,
+            branching_cost: 0.0,
+            complexity_cost,
+        }
+    }
 }
 
 #[derive(Clone)]
-pub struct RegressionCostSum {
+pub struct SquaredErrorCostSum {
     y: f64,
     y2: f64,
     n: i32,
 }
 
-impl AddAssign<&RegressionCostSum> for RegressionCostSum {
+impl AddAssign<&SquaredErrorCostSum> for SquaredErrorCostSum {
     fn add_assign(&mut self, rhs: &Self) {
         self.y += rhs.y;
         self.y2 += rhs.y2;
@@ -24,7 +36,7 @@ impl AddAssign<&RegressionCostSum> for RegressionCostSum {
     }
 }
 
-impl AddAssign<&LabeledInstance<f64>> for RegressionCostSum {
+impl AddAssign<&LabeledInstance<f64>> for SquaredErrorCostSum {
     fn add_assign(&mut self, rhs: &LabeledInstance<f64>) {
         self.y += rhs.label;
         self.y2 += rhs.label * rhs.label;
@@ -32,7 +44,7 @@ impl AddAssign<&LabeledInstance<f64>> for RegressionCostSum {
     }
 }
 
-impl SubAssign<&RegressionCostSum> for RegressionCostSum {
+impl SubAssign<&SquaredErrorCostSum> for SquaredErrorCostSum {
     fn sub_assign(&mut self, rhs: &Self) {
         self.y -= rhs.y;
         self.y2 -= rhs.y2;
@@ -40,7 +52,7 @@ impl SubAssign<&RegressionCostSum> for RegressionCostSum {
     }
 }
 
-impl SubAssign<&LabeledInstance<f64>> for RegressionCostSum {
+impl SubAssign<&LabeledInstance<f64>> for SquaredErrorCostSum {
     fn sub_assign(&mut self, rhs: &LabeledInstance<f64>) {
         self.y -= rhs.label;
         self.y2 -= rhs.label * rhs.label;
@@ -48,7 +60,7 @@ impl SubAssign<&LabeledInstance<f64>> for RegressionCostSum {
     }
 }
 
-impl CostSum<f64, LabeledInstance<f64>, f64> for RegressionCostSum {
+impl CostSum<f64, LabeledInstance<f64>, f64> for SquaredErrorCostSum {
     fn label(&self) -> f64 {
         // The mean gives the optimal SSE in a leaf.
         self.y / (self.n as f64)
@@ -60,19 +72,24 @@ impl CostSum<f64, LabeledInstance<f64>, f64> for RegressionCostSum {
     }
 }
 
-impl OptimizationTask for RegressionTask {
+impl OptimizationTask for SquaredErrorTask {
     type LabelType = f64;
     type InstanceType = LabeledInstance<f64>;
     type CostType = f64;
-    type CostSumType = RegressionCostSum;
+    type CostSumType = SquaredErrorCostSum;
     const MIN_COST: Self::CostType = 0.0;
 
     fn prepare_for_data(&mut self, dataview: &mut DataView<Self>) {
         self.dataset_size = dataview.num_instances();
+        self.branching_cost = dataview.cost_summer.cost() * self.complexity_cost;
     }
 
     fn print_cost(&mut self, cost: &Self::CostType) -> String {
-        format!("SSE: {}. MSE: {}.", cost, *cost / self.dataset_size as f64)
+        format!(
+            "SSE: {}. MSE: {}. (Only accurate when complexity cost is zero)",
+            cost,
+            *cost / self.dataset_size as f64
+        )
     }
 
     fn init_costsum(_dataset: &DataSet<Self::InstanceType>) -> Self::CostSumType {
@@ -81,5 +98,9 @@ impl OptimizationTask for RegressionTask {
             y2: 0.0,
             n: 0,
         }
+    }
+
+    fn branching_cost(&self) -> Self::CostType {
+        self.branching_cost
     }
 }

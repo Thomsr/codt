@@ -12,10 +12,10 @@ use crate::{
     tasks::{CostSum, OptimizationTask},
 };
 
-use super::{pruner::Pruner, strategy::SearchStrategy};
+use super::{pruner::Pruner, solver::SolveContext, strategy::SearchStrategy};
 
 pub struct QueueItem<'a, OT: OptimizationTask, SS: SearchStrategy> {
-    /// The current lower bound on the error for this item in the queue.
+    /// The current lower bound on the error for this item in the queue. This is including possible branching costs
     pub cost_lower_bound: OT::CostType,
 
     /// The number of instances that reach this node.
@@ -72,9 +72,14 @@ impl<OT: OptimizationTask, SS: SearchStrategy> Ord for QueueItem<'_, OT, SS> {
 }
 
 impl<'a, OT: OptimizationTask, SS: SearchStrategy> QueueItem<'a, OT, SS> {
-    fn new(feature: usize, split_points: Range<usize>, support: usize) -> Self {
+    fn new(
+        context: &SolveContext<OT, SS>,
+        feature: usize,
+        split_points: Range<usize>,
+        support: usize,
+    ) -> Self {
         Self {
-            cost_lower_bound: OT::MIN_COST,
+            cost_lower_bound: context.task.branching_cost(),
             support,
             feature,
             split_points,
@@ -170,16 +175,17 @@ pub struct Node<'a, OT: OptimizationTask, SS: SearchStrategy> {
 }
 
 impl<'a, OT: OptimizationTask, SS: SearchStrategy> Node<'a, OT, SS> {
-    pub fn new(dataview: DataView<'a, OT>, max_depth: u32) -> Self {
+    pub fn new(context: &SolveContext<OT, SS>, dataview: DataView<'a, OT>, max_depth: u32) -> Self {
         let ub = dataview.cost_summer.cost();
 
         let mut queue = BinaryHeap::new();
 
-        if max_depth > 0 {
+        if max_depth > 0 && context.task.branching_cost() < ub {
             for feature in 0..dataview.num_features() {
                 let n_splitpoints = dataview.possible_split_values[feature].len();
                 if n_splitpoints > 0 {
                     queue.push(QueueItem::new(
+                        context,
                         feature,
                         0..n_splitpoints,
                         dataview.num_instances(),
@@ -191,7 +197,7 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> Node<'a, OT, SS> {
         let lb = if max_depth == 0 || queue.is_empty() {
             ub
         } else {
-            OT::MIN_COST
+            context.task.branching_cost()
         };
 
         Node {
@@ -214,11 +220,11 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> Node<'a, OT, SS> {
         self.cost_lower_bound >= self.best.cost()
     }
 
-    fn split(&self, feature: usize, split: usize) -> (Self, Self) {
+    fn split(&self, context: &SolveContext<OT, SS>, feature: usize, split: usize) -> (Self, Self) {
         let (left_view, right_view) = self.dataview.split(feature, split);
 
-        let left = Self::new(left_view, self.remaining_depth_budget - 1);
-        let right = Self::new(right_view, self.remaining_depth_budget - 1);
+        let left = Self::new(context, left_view, self.remaining_depth_budget - 1);
+        let right = Self::new(context, right_view, self.remaining_depth_budget - 1);
 
         (left, right)
     }
@@ -236,6 +242,7 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> Node<'a, OT, SS> {
 
     fn get_upper_and_update_lower_bound_from_children(
         &mut self,
+        context: &SolveContext<OT, SS>,
         item: &mut QueueItem<'a, OT, SS>,
     ) -> Option<OT::CostType> {
         if let Some(children) = &item.children {
@@ -257,21 +264,30 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> Node<'a, OT, SS> {
                 item.current_child = 1 - item.current_child;
             }
 
-            Some(children[0].best.cost() + children[1].best.cost())
+            Some(children[0].best.cost() + children[1].best.cost() + context.task.branching_cost())
         } else {
             None
         }
     }
 
-    fn recalculate_item_lb(&mut self, item: &mut QueueItem<'a, OT, SS>) {
-        let lb = self.pruner.lb_for(item.feature, &item.split_points);
+    fn recalculate_item_lb(
+        &mut self,
+        context: &SolveContext<OT, SS>,
+        item: &mut QueueItem<'a, OT, SS>,
+    ) {
+        let lb =
+            self.pruner.lb_for(item.feature, &item.split_points) + context.task.branching_cost();
         OT::update_lowerbound(&mut item.cost_lower_bound, &lb);
     }
 
     /// Reinsert an updated item in the queue after expanding a descendant.
-    pub fn backtrack_item(&mut self, mut item: QueueItem<'a, OT, SS>) {
+    pub fn backtrack_item(
+        &mut self,
+        context: &SolveContext<OT, SS>,
+        mut item: QueueItem<'a, OT, SS>,
+    ) {
         // Update our upper bound if the item is the current best.
-        if let Some(ub) = self.get_upper_and_update_lower_bound_from_children(&mut item) {
+        if let Some(ub) = self.get_upper_and_update_lower_bound_from_children(context, &mut item) {
             if ub < self.best.cost() {
                 assert!(item.split_points.start == item.split_points.end - 1);
                 if ub == OT::MIN_COST {
@@ -288,6 +304,7 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> Node<'a, OT, SS> {
                         .threshold_from_split(item.feature, item.split_points.start),
                     children[0].best.clone(),
                     children[1].best.clone(),
+                    ub,
                 ))
             }
         }
@@ -296,7 +313,7 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> Node<'a, OT, SS> {
         // of the queue has updated lower bounds for the next iteration.
         let mut maybe_item = Some(item);
         while let Some(mut item) = maybe_item.take() {
-            self.recalculate_item_lb(&mut item);
+            self.recalculate_item_lb(context, &mut item);
 
             let update_needed = if item.is_complete() || item.cost_lower_bound >= self.best.cost() {
                 // Don't add it back to the queue if the item cannot further improve the solution.
@@ -359,7 +376,7 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> Node<'a, OT, SS> {
     }
 
     /// Expand an item from the queue one level by selecting a concrete split and instantiating its children.
-    pub fn expand(&mut self, item: &mut QueueItem<'a, OT, SS>) {
+    pub fn expand(&mut self, context: &SolveContext<OT, SS>, item: &mut QueueItem<'a, OT, SS>) {
         assert!(!item.is_expanded());
         assert!(self.remaining_depth_budget > 0);
 
@@ -375,7 +392,7 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> Node<'a, OT, SS> {
             self.queue.push(right_item);
         }
 
-        let (left, right) = self.split(item.feature, x);
+        let (left, right) = self.split(context, item.feature, x);
         item.children = Some([left, right]);
     }
 }

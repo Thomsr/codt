@@ -144,20 +144,20 @@ mod tests {
     #[test]
     fn test_correctness() {
         let mut pruner: Pruner<AccuracyTask> = Pruner::new(1);
-        assert_eq!(pruner.lb_for(0, &(10..11)), 0);
-        pruner.insert_left_subtree(0, 5, 4);
-        assert_eq!(pruner.lb_for(0, &(10..11)), 4);
-        pruner.insert_left_subtree(0, 10, 5);
-        assert_eq!(pruner.lb_for(0, &(10..11)), 5);
-        pruner.insert_left_subtree(0, 8, 6);
-        assert_eq!(pruner.lb_for(0, &(10..11)), 6);
-        pruner.insert_left_subtree(0, 11, 20);
-        assert_eq!(pruner.lb_for(0, &(10..11)), 6);
-        pruner.insert_right_subtree(0, 9, 6);
-        assert_eq!(pruner.lb_for(0, &(10..11)), 6);
-        pruner.insert_right_subtree(0, 10, 6);
-        assert_eq!(pruner.lb_for(0, &(10..11)), 12);
-        pruner.insert_right_subtree(0, 10, 8);
-        assert_eq!(pruner.lb_for(0, &(10..11)), 14);
+        assert_eq!(pruner.lb_for(0, &(10..11)), 0.0);
+        pruner.insert_left_subtree(0, 5, 4.0);
+        assert_eq!(pruner.lb_for(0, &(10..11)), 4.0);
+        pruner.insert_left_subtree(0, 10, 5.0);
+        assert_eq!(pruner.lb_for(0, &(10..11)), 5.0);
+        pruner.insert_left_subtree(0, 8, 6.0);
+        assert_eq!(pruner.lb_for(0, &(10..11)), 6.0);
+        pruner.insert_left_subtree(0, 11, 20.0);
+        assert_eq!(pruner.lb_for(0, &(10..11)), 6.0);
+        pruner.insert_right_subtree(0, 9, 6.0);
+        assert_eq!(pruner.lb_for(0, &(10..11)), 6.0);
+        pruner.insert_right_subtree(0, 10, 6.0);
+        assert_eq!(pruner.lb_for(0, &(10..11)), 12.0);
+        pruner.insert_right_subtree(0, 10, 8.0);
+        assert_eq!(pruner.lb_for(0, &(10..11)), 14.0);
     }
 }
