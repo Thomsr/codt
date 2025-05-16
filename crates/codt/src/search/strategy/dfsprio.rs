@@ -35,8 +35,8 @@ impl SearchStrategy for DfsPrioSearchStrategy {
         // We choose the path in the graph as the most promising
         // solution (lowest lower bound), but when choosing which
         // 'and' node to expand, we choose the node most likely to
-        // change the estimate (highest lower bound).
-        if a.cost_lower_bound >= b.cost_lower_bound {
+        // change the estimate (highest upper bound).
+        if a.cost_upper_bound >= b.cost_upper_bound {
             0
         } else {
             1

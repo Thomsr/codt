@@ -2,7 +2,7 @@ use crate::model::dataset::DataSet;
 use crate::model::{dataview::DataView, instance::Instance};
 
 use std::fmt::{Debug, Display};
-use std::ops::{Add, AddAssign, SubAssign};
+use std::ops::{Add, AddAssign, Sub, SubAssign};
 
 pub mod accuracy;
 pub mod squared_error;
@@ -26,6 +26,7 @@ pub trait OptimizationTask {
         + Copy
         + PartialOrd
         + Add<Output = Self::CostType>
+        + Sub<Output = Self::CostType>
         + TryInto<f64, Error: Debug>
         + Debug;
     /// A type from which the cost is easily derivable. When a CostSum for disjoint datasets

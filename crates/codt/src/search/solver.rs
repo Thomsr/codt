@@ -25,14 +25,22 @@ pub struct Solver<'a, OT: OptimizationTask, SS: SearchStrategy> {
 }
 
 pub enum UpperboundStrategy {
-    BacktrackOnly,
+    SolutionsOnly,
     TightFromSibling,
     ForRemainingInterval,
+}
+
+pub enum TerminalSolver {
+    Leaf,
+    LeftRight,
+    D2,
 }
 
 pub struct SolveContext<'a, OT: OptimizationTask, SS: SearchStrategy> {
     pub task: &'a OT,
     pub ub_strategy: UpperboundStrategy,
+    pub terminal_solver: TerminalSolver,
+    pub track_intermediates: bool,
     _ss: PhantomData<SS>,
 }
 
@@ -44,7 +52,9 @@ impl<OT: OptimizationTask, SS: SearchStrategy> Solver<'_, OT, SS> {
 
         let context = SolveContext {
             task: &self.task,
-            ub_strategy: UpperboundStrategy::BacktrackOnly,
+            ub_strategy: UpperboundStrategy::SolutionsOnly,
+            terminal_solver: TerminalSolver::LeftRight,
+            track_intermediates: true,
             _ss: PhantomData,
         };
 
@@ -88,20 +98,40 @@ impl<OT: OptimizationTask, SS: SearchStrategy> Solver<'_, OT, SS> {
                 parent_item = path.pop_front();
             }
 
-            if root.cost_lower_bound > intermediate_lbs.last().unwrap().0 {
-                intermediate_lbs.push((
-                    root.cost_lower_bound,
-                    graph_expansions,
-                    start_time.elapsed().as_secs_f64(),
-                ))
-            }
+            if context.track_intermediates {
+                let lowest_remaining_lb = root.queue.iter().fold(None, |val, i| {
+                    let mut lb = root.pruner.lb_for(i.feature, &i.split_points)
+                        + context.task.branching_cost();
+                    OT::update_lowerbound(&mut lb, &i.cost_lower_bound);
+                    if val.is_none() || val > Some(lb) {
+                        Some(lb)
+                    } else {
+                        val
+                    }
+                });
 
-            if root.best.cost() < intermediate_ubs.last().unwrap().0 {
-                intermediate_ubs.push((
-                    root.best.cost(),
-                    graph_expansions,
-                    start_time.elapsed().as_secs_f64(),
-                ))
+                let mut actual_lb = root.cost_lower_bound;
+                if let Some(lb) = lowest_remaining_lb {
+                    if lb > actual_lb {
+                        actual_lb = lb
+                    }
+                }
+
+                if actual_lb > intermediate_lbs.last().unwrap().0 {
+                    intermediate_lbs.push((
+                        actual_lb,
+                        graph_expansions,
+                        start_time.elapsed().as_secs_f64(),
+                    ))
+                }
+
+                if root.best.cost() < intermediate_ubs.last().unwrap().0 {
+                    intermediate_ubs.push((
+                        root.best.cost(),
+                        graph_expansions,
+                        start_time.elapsed().as_secs_f64(),
+                    ))
+                }
             }
         }
 

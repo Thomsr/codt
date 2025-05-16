@@ -12,6 +12,7 @@ use crate::{
         dataview::DataView,
         tree::{BranchNode, LeafNode, Tree},
     },
+    search::solver::UpperboundStrategy,
     tasks::{CostSum, OptimizationTask},
 };
 
@@ -44,6 +45,17 @@ impl<OT: OptimizationTask, SS: SearchStrategy> ExpandedQueueItem<'_, OT, SS> {
     }
 
     fn upper_bound(&self, context: &SolveContext<'_, OT, SS>) -> OT::CostType {
+        match self {
+            Self::Children(children) => {
+                children[0].cost_upper_bound
+                    + children[1].cost_upper_bound
+                    + context.task.branching_cost()
+            }
+            Self::Solution(tree) => tree.cost(),
+        }
+    }
+
+    fn best_cost(&self, context: &SolveContext<'_, OT, SS>) -> OT::CostType {
         match self {
             Self::Children(children) => {
                 children[0].best.cost() + children[1].best.cost() + context.task.branching_cost()
@@ -161,8 +173,8 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> QueueItem<'a, OT, SS> {
     /// A queue item is complete if it is guaranteed that it has expanded its best solution,
     /// or that this node is not part of the optimal solution (lower bound > upper bound).
     pub fn is_complete(&self) -> bool {
-        if let Some(children) = &self.expanded {
-            match children {
+        if let Some(expanded) = &self.expanded {
+            match expanded {
                 ExpandedQueueItem::Children(children) => {
                     children[0].is_complete() && children[1].is_complete()
                 }
@@ -201,8 +213,8 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> QueueItem<'a, OT, SS> {
     /// The lowest heuristic value of an unexpanded node descendant. Own lower bound if
     /// not expanded, otherwise the lowest of its children.
     pub fn lowest_descendant_heuristic(&self) -> f64 {
-        if let Some(children) = &self.expanded {
-            match children {
+        if let Some(expanded) = &self.expanded {
+            match expanded {
                 ExpandedQueueItem::Children(children) => children[0]
                     .lowest_descendant_heuristic
                     .min(children[1].lowest_descendant_heuristic),
@@ -217,6 +229,8 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> QueueItem<'a, OT, SS> {
 
 /// Represents a search node for a concrete feature test.
 pub struct Node<'a, OT: OptimizationTask, SS: SearchStrategy> {
+    /// The upper bound on the cost for this node.
+    pub cost_upper_bound: OT::CostType,
     /// The lower bound on the cost for this node.
     pub cost_lower_bound: OT::CostType,
     /// The lowest heuristic value (search strategy dependent) of any
@@ -231,8 +245,8 @@ pub struct Node<'a, OT: OptimizationTask, SS: SearchStrategy> {
     pub queue: BinaryHeap<QueueItem<'a, OT, SS>>,
     /// Best tree found so far.
     pub best: Arc<Tree<OT>>,
-
-    pruner: Pruner<OT>,
+    /// Keeps track of found lower bounds for pruning similar items
+    pub pruner: Pruner<OT>,
 }
 
 impl<'a, OT: OptimizationTask, SS: SearchStrategy> Node<'a, OT, SS> {
@@ -262,6 +276,7 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> Node<'a, OT, SS> {
         };
 
         Node {
+            cost_upper_bound: ub,
             cost_lower_bound: lb,
             lowest_descendant_heuristic: SS::heuristic_from_lb_and_support::<OT>(
                 lb,
@@ -281,7 +296,7 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> Node<'a, OT, SS> {
     /// A search node is complete if it is guaranteed that it has expanded its best solution,
     /// or that this node is not part of the optimal solution (lower bound > upper bound).
     pub fn is_complete(&self) -> bool {
-        self.cost_lower_bound >= self.best.cost()
+        self.cost_lower_bound >= self.best.cost() || self.cost_lower_bound > self.cost_upper_bound
     }
 
     fn split(
@@ -309,11 +324,33 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> Node<'a, OT, SS> {
         (range.start + range.end) / 2
     }
 
-    fn recalculate_item_lb(
+    fn compute_child_upper_bound(
+        &self,
+        context: &SolveContext<OT, SS>,
+        child: &mut Node<'a, OT, SS>,
+        sibling_lb: OT::CostType,
+    ) {
+        let ub_new = match context.ub_strategy {
+            UpperboundStrategy::SolutionsOnly => child.cost_upper_bound,
+            UpperboundStrategy::TightFromSibling => self.cost_upper_bound - sibling_lb,
+            UpperboundStrategy::ForRemainingInterval => self.cost_upper_bound - sibling_lb, // TODO + margin_of_interval,
+        };
+
+        OT::update_upperbound(&mut child.cost_upper_bound, &ub_new);
+    }
+
+    fn recalculate_item_bounds(
         &mut self,
         context: &SolveContext<OT, SS>,
         item: &mut QueueItem<'a, OT, SS>,
     ) {
+        if let Some(ExpandedQueueItem::Children(children)) = &mut item.expanded {
+            let child0_lb = children[0].cost_lower_bound;
+            let child1_lb = children[1].cost_lower_bound;
+            self.compute_child_upper_bound(context, &mut children[0], child1_lb);
+            self.compute_child_upper_bound(context, &mut children[1], child0_lb);
+        }
+
         let lb =
             self.pruner.lb_for(item.feature, &item.split_points) + context.task.branching_cost();
         OT::update_lowerbound(&mut item.cost_lower_bound, &lb);
@@ -321,35 +358,41 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> Node<'a, OT, SS> {
 
     /// Reinsert an updated item in the queue after expanding a descendant.
     pub fn backtrack_item(&mut self, context: &SolveContext<OT, SS>, item: QueueItem<'a, OT, SS>) {
-        if let Some(children) = &item.expanded {
+        // Logic below depends on only expanded nodes being backtracked.
+        assert!(item.split_points.start == item.split_points.end - 1);
+
+        if let Some(expanded) = &item.expanded {
             // No actual LB update here, add the solution to the pruner. The LB of the item will be updated by the pruner later.
             self.pruner.insert_left_subtree(
                 item.feature,
                 item.split_points.start,
-                children.lower_bound_left(),
+                expanded.lower_bound_left(),
             );
             self.pruner.insert_right_subtree(
                 item.feature,
                 item.split_points.end - 1,
-                children.lower_bound_right(),
+                expanded.lower_bound_right(),
             );
 
-            // Update our upper bound if the item is the current best.
-            let ub = children.upper_bound(context);
-            if ub < self.best.cost() {
-                assert!(item.split_points.start == item.split_points.end - 1);
-                if ub == OT::ZERO_COST {
-                    // We cannot find a better solution: quickly clear the queue.
-                    self.queue.clear();
-                }
-                let children = item
+            // Update our upper bound if based on the upper bound of this item.
+            let ub = expanded.upper_bound(context);
+            OT::update_upperbound(&mut self.cost_upper_bound, &ub);
+            if ub == context.task.branching_cost() {
+                // We cannot find a better solution from splitting: quickly clear the queue.
+                self.queue.clear();
+            }
+
+            // Update our current best item.
+            let best_cost = expanded.best_cost(context);
+            if best_cost < self.best.cost() {
+                let expanded = item
                     .expanded
                     .as_ref()
                     .expect("An item can only be backtracked once it is expanded.");
 
-                self.best = match children {
+                self.best = match expanded {
                     ExpandedQueueItem::Children(children) => Arc::new(Tree::Branch(BranchNode {
-                        cost: ub,
+                        cost: best_cost,
                         split_feature: item.feature,
                         split_threshold: self
                             .dataview
@@ -366,9 +409,12 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> Node<'a, OT, SS> {
         // of the queue has updated lower bounds for the next iteration.
         let mut maybe_item = Some(item);
         while let Some(mut item) = maybe_item.take() {
-            self.recalculate_item_lb(context, &mut item);
+            self.recalculate_item_bounds(context, &mut item);
 
-            let update_needed = if item.is_complete() || item.cost_lower_bound >= self.best.cost() {
+            let update_needed = if item.is_complete()
+                || item.cost_lower_bound >= self.best.cost()
+                || item.cost_lower_bound > self.cost_upper_bound
+            {
                 // Don't add it back to the queue if the item cannot further improve the solution.
                 // Should update the lower bounds of the next queue item.
                 true
