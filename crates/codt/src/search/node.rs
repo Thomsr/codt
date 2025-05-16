@@ -8,11 +8,50 @@ use std::{
 };
 
 use crate::{
-    model::{dataview::DataView, tree::Tree},
+    model::{
+        dataview::DataView,
+        tree::{BranchNode, LeafNode, Tree},
+    },
     tasks::{CostSum, OptimizationTask},
 };
 
 use super::{pruner::Pruner, solver::SolveContext, strategy::SearchStrategy};
+
+enum ExpandedQueueItem<'a, OT: OptimizationTask, SS: SearchStrategy> {
+    Children([Node<'a, OT, SS>; 2]),
+    Solution(Arc<Tree<OT>>),
+}
+
+impl<OT: OptimizationTask, SS: SearchStrategy> ExpandedQueueItem<'_, OT, SS> {
+    fn lower_bound_left(&self) -> OT::CostType {
+        match self {
+            Self::Children(children) => children[0].cost_lower_bound,
+            Self::Solution(tree) => match (*tree).as_ref() {
+                Tree::Branch(branch) => branch.left_child.cost(),
+                _ => unreachable!(),
+            },
+        }
+    }
+
+    fn lower_bound_right(&self) -> OT::CostType {
+        match self {
+            Self::Children(children) => children[1].cost_lower_bound,
+            Self::Solution(tree) => match (*tree).as_ref() {
+                Tree::Branch(branch) => branch.right_child.cost(),
+                _ => unreachable!(),
+            },
+        }
+    }
+
+    fn upper_bound(&self, context: &SolveContext<'_, OT, SS>) -> OT::CostType {
+        match self {
+            Self::Children(children) => {
+                children[0].best.cost() + children[1].best.cost() + context.task.branching_cost()
+            }
+            Self::Solution(tree) => tree.cost(),
+        }
+    }
+}
 
 pub struct QueueItem<'a, OT: OptimizationTask, SS: SearchStrategy> {
     /// The current lower bound on the error for this item in the queue. This is including possible branching costs
@@ -27,11 +66,8 @@ pub struct QueueItem<'a, OT: OptimizationTask, SS: SearchStrategy> {
     /// The branching test for this node is one of `feature <= possible_split_points[s]` where s in split_points.
     pub split_points: Range<usize>,
 
-    // Child nodes can only be initiated once the size of the `split_points` range is one.
-    children: Option<[Node<'a, OT, SS>; 2]>,
-
-    /// The index of the child currently under consideration. E.g. for best first search, the child with the lowest lower bound.
-    current_child: usize,
+    // Item can only be expanded once the size of the `split_points` range is one.
+    expanded: Option<ExpandedQueueItem<'a, OT, SS>>,
 
     _ss: PhantomData<SS>,
 }
@@ -42,8 +78,7 @@ impl<OT: OptimizationTask, SS: SearchStrategy> Debug for QueueItem<'_, OT, SS> {
             .field("cost_lower_bound", &self.cost_lower_bound)
             .field("feature", &self.feature)
             .field("split_points", &self.split_points)
-            .field("children", &self.children.is_some())
-            .field("current_child", &self.current_child)
+            .field("children", &self.expanded.is_some())
             .finish()
     }
 }
@@ -83,8 +118,7 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> QueueItem<'a, OT, SS> {
             support,
             feature,
             split_points,
-            children: None,
-            current_child: 0,
+            expanded: None,
             _ss: PhantomData,
         }
     }
@@ -101,8 +135,7 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> QueueItem<'a, OT, SS> {
                 support: self.support,
                 feature: self.feature,
                 split_points: self.split_points.start..split,
-                children: None,
-                current_child: 0,
+                expanded: None,
                 _ss: PhantomData,
             })
         }
@@ -112,8 +145,7 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> QueueItem<'a, OT, SS> {
                 support: self.support,
                 feature: self.feature,
                 split_points: (split + 1)..self.split_points.end,
-                children: None,
-                current_child: 0,
+                expanded: None,
                 _ss: PhantomData,
             })
         }
@@ -123,31 +155,60 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> QueueItem<'a, OT, SS> {
     }
 
     pub fn is_expanded(&self) -> bool {
-        self.children.is_some()
+        self.expanded.is_some()
     }
 
     /// A queue item is complete if it is guaranteed that it has expanded its best solution,
     /// or that this node is not part of the optimal solution (lower bound > upper bound).
     pub fn is_complete(&self) -> bool {
-        if let Some(children) = &self.children {
-            children[0].is_complete() && children[1].is_complete()
+        if let Some(children) = &self.expanded {
+            match children {
+                ExpandedQueueItem::Children(children) => {
+                    children[0].is_complete() && children[1].is_complete()
+                }
+                ExpandedQueueItem::Solution(_) => true,
+            }
         } else {
             false
         }
     }
 
+    pub fn child_by_idx(&mut self, idx: usize) -> Option<&mut Node<'a, OT, SS>> {
+        self.expanded.as_mut().and_then(|children| match children {
+            ExpandedQueueItem::Children(children) => Some(&mut children[idx]),
+            ExpandedQueueItem::Solution(_) => None,
+        })
+    }
+
     /// If expanded, returns either the left or right child which should be explored next.
-    pub fn current_node_mut(&mut self) -> Option<&mut Node<'a, OT, SS>> {
-        self.children.as_mut().map(|c| &mut c[self.current_child])
+    pub fn current_node(&mut self) -> Option<usize> {
+        self.expanded.as_mut().and_then(|children| match children {
+            ExpandedQueueItem::Children(children) => {
+                let heuristic_child = SS::child_priority(&children[0], &children[1]);
+
+                let selected_child = if children[heuristic_child].is_complete() {
+                    1 - heuristic_child
+                } else {
+                    heuristic_child
+                };
+
+                Some(selected_child)
+            }
+            ExpandedQueueItem::Solution(_) => None,
+        })
     }
 
     /// The lowest heuristic value of an unexpanded node descendant. Own lower bound if
     /// not expanded, otherwise the lowest of its children.
     pub fn lowest_descendant_heuristic(&self) -> f64 {
-        if let Some(children) = &self.children {
-            children[0]
-                .lowest_descendant_heuristic
-                .min(children[1].lowest_descendant_heuristic)
+        if let Some(children) = &self.expanded {
+            match children {
+                ExpandedQueueItem::Children(children) => children[0]
+                    .lowest_descendant_heuristic
+                    .min(children[1].lowest_descendant_heuristic),
+                // Set heuristic to max, so partially unfinished queue items take the lower bound from its sibling, and not from a completed node.
+                ExpandedQueueItem::Solution(_) => f64::MAX,
+            }
         } else {
             SS::heuristic_from_lb_and_support::<OT>(self.cost_lower_bound, self.support)
         }
@@ -208,7 +269,10 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> Node<'a, OT, SS> {
             ),
             remaining_depth_budget: max_depth,
             pruner: Pruner::new(dataview.num_features()),
-            best: Arc::new(Tree::new_leaf(dataview.cost_summer.label(), ub)),
+            best: Arc::new(Tree::Leaf(LeafNode {
+                cost: ub,
+                label: dataview.cost_summer.label(),
+            })),
             dataview,
             queue,
         }
@@ -220,13 +284,18 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> Node<'a, OT, SS> {
         self.cost_lower_bound >= self.best.cost()
     }
 
-    fn split(&self, context: &SolveContext<OT, SS>, feature: usize, split: usize) -> (Self, Self) {
+    fn split(
+        &self,
+        context: &SolveContext<OT, SS>,
+        feature: usize,
+        split: usize,
+    ) -> ExpandedQueueItem<'a, OT, SS> {
         let (left_view, right_view) = self.dataview.split(feature, split);
 
         let left = Self::new(context, left_view, self.remaining_depth_budget - 1);
         let right = Self::new(context, right_view, self.remaining_depth_budget - 1);
 
-        (left, right)
+        ExpandedQueueItem::Children([left, right])
     }
 
     fn find_lowest_cost_split(&self, _feature: usize, range: &Range<usize>) -> usize {
@@ -240,36 +309,6 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> Node<'a, OT, SS> {
         (range.start + range.end) / 2
     }
 
-    fn get_upper_and_update_lower_bound_from_children(
-        &mut self,
-        context: &SolveContext<OT, SS>,
-        item: &mut QueueItem<'a, OT, SS>,
-    ) -> Option<OT::CostType> {
-        if let Some(children) = &item.children {
-            // No actual LB update here, add the solution to the pruner. The LB will be updated by it later.
-            self.pruner.insert_left_subtree(
-                item.feature,
-                item.split_points.start,
-                children[0].cost_lower_bound,
-            );
-            self.pruner.insert_right_subtree(
-                item.feature,
-                item.split_points.end - 1,
-                children[1].cost_lower_bound,
-            );
-
-            item.current_child = SS::child_priority(&children[0], &children[1]);
-
-            if children[item.current_child].is_complete() {
-                item.current_child = 1 - item.current_child;
-            }
-
-            Some(children[0].best.cost() + children[1].best.cost() + context.task.branching_cost())
-        } else {
-            None
-        }
-    }
-
     fn recalculate_item_lb(
         &mut self,
         context: &SolveContext<OT, SS>,
@@ -281,31 +320,45 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> Node<'a, OT, SS> {
     }
 
     /// Reinsert an updated item in the queue after expanding a descendant.
-    pub fn backtrack_item(
-        &mut self,
-        context: &SolveContext<OT, SS>,
-        mut item: QueueItem<'a, OT, SS>,
-    ) {
-        // Update our upper bound if the item is the current best.
-        if let Some(ub) = self.get_upper_and_update_lower_bound_from_children(context, &mut item) {
+    pub fn backtrack_item(&mut self, context: &SolveContext<OT, SS>, item: QueueItem<'a, OT, SS>) {
+        if let Some(children) = &item.expanded {
+            // No actual LB update here, add the solution to the pruner. The LB of the item will be updated by the pruner later.
+            self.pruner.insert_left_subtree(
+                item.feature,
+                item.split_points.start,
+                children.lower_bound_left(),
+            );
+            self.pruner.insert_right_subtree(
+                item.feature,
+                item.split_points.end - 1,
+                children.lower_bound_right(),
+            );
+
+            // Update our upper bound if the item is the current best.
+            let ub = children.upper_bound(context);
             if ub < self.best.cost() {
                 assert!(item.split_points.start == item.split_points.end - 1);
-                if ub == OT::MIN_COST {
+                if ub == OT::ZERO_COST {
                     // We cannot find a better solution: quickly clear the queue.
                     self.queue.clear();
                 }
                 let children = item
-                    .children
+                    .expanded
                     .as_ref()
                     .expect("An item can only be backtracked once it is expanded.");
-                self.best = Arc::new(Tree::new_branch(
-                    item.feature,
-                    self.dataview
-                        .threshold_from_split(item.feature, item.split_points.start),
-                    children[0].best.clone(),
-                    children[1].best.clone(),
-                    ub,
-                ))
+
+                self.best = match children {
+                    ExpandedQueueItem::Children(children) => Arc::new(Tree::Branch(BranchNode {
+                        cost: ub,
+                        split_feature: item.feature,
+                        split_threshold: self
+                            .dataview
+                            .threshold_from_split(item.feature, item.split_points.start),
+                        left_child: children[0].best.clone(),
+                        right_child: children[1].best.clone(),
+                    })),
+                    ExpandedQueueItem::Solution(tree) => tree.clone(),
+                }
             }
         }
 
@@ -359,7 +412,11 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> Node<'a, OT, SS> {
     }
 
     /// Select the path to the item to expand next. The deepest item is first in the path.
-    pub fn select(&mut self, path_buffer: &mut VecDeque<QueueItem<'a, OT, SS>>) {
+    pub fn select(
+        &mut self,
+        path_buffer: &mut VecDeque<(usize, QueueItem<'a, OT, SS>)>,
+        source: usize,
+    ) {
         assert!(path_buffer.is_empty());
         assert!(!self.is_complete());
 
@@ -368,11 +425,168 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> Node<'a, OT, SS> {
             .pop()
             .expect("Select should only be called when the node is not yet complete.");
 
-        if let Some(child) = next.current_node_mut() {
-            child.select(path_buffer);
+        if let Some(child_idx) = next.current_node() {
+            let child = next.child_by_idx(child_idx).unwrap();
+            child.select(path_buffer, child_idx);
         }
 
-        path_buffer.push_back(next);
+        path_buffer.push_back((source, next));
+    }
+
+    /// Exhaustive search for a node with depth two, given a fixed feature split.
+    fn solve_left_right(
+        &self,
+        context: &SolveContext<OT, SS>,
+        feature: usize,
+        split_index: usize,
+    ) -> ExpandedQueueItem<'a, OT, SS> {
+        //let (left, right) = self.dataview.split(feature, split_index);
+
+        let split_value = self.dataview.possible_split_values[feature][split_index];
+        let mut total_right = self.dataview.cost_summer.clone();
+
+        for instance in self.dataview.instances_iter(feature) {
+            if self.dataview.dataset.feature_values[feature][instance] > split_value {
+                break;
+            } else {
+                total_right -= &self.dataview.dataset.instances[instance];
+            }
+        }
+
+        let mut total_left = self.dataview.cost_summer.clone();
+        total_left -= &total_right;
+
+        let mut left_tracker = D1ScoreTracker {
+            cost: total_left.cost(),
+            branching_cost: OT::ZERO_COST,
+            feature: None,
+            threshold: None,
+            left_leaf: None,
+            right_leaf: None,
+        };
+        let mut right_tracker = D1ScoreTracker {
+            cost: total_right.cost(),
+            branching_cost: OT::ZERO_COST,
+            feature: None,
+            threshold: None,
+            left_leaf: None,
+            right_leaf: None,
+        };
+
+        for feature_2 in 0..self.dataview.num_features() {
+            // init totals of the left left node and right left node to zero.
+            let mut total_left_left = total_left.clone();
+            total_left_left -= &total_left;
+            let mut total_right_left = total_left.clone();
+            total_right_left -= &total_left;
+
+            let mut prev_left_feature_value = None;
+            let mut prev_right_feature_value = None;
+
+            for instance in self.dataview.instances_iter(feature_2) {
+                let feature1_value = self.dataview.dataset.feature_values[feature][instance];
+                let feature2_value = self.dataview.dataset.feature_values[feature_2][instance];
+                if feature1_value <= split_value {
+                    // Check if this is a point we can split at
+                    if let Some(prev_left_feature_value) = prev_left_feature_value {
+                        if prev_left_feature_value != feature2_value {
+                            let mut total_left_right = total_left.clone();
+                            total_left_right -= &total_left_left;
+
+                            let cost_ll = total_left_left.cost();
+                            let cost_lr = total_left_right.cost();
+                            let cost = cost_ll + cost_lr;
+                            let branching_cost = context.task.branching_cost();
+                            let total_cost = cost + branching_cost;
+
+                            if total_cost < left_tracker.total_cost() {
+                                let current_threshold =
+                                    self.dataview.dataset.internal_to_original_feature_value
+                                        [feature_2]
+                                        [prev_left_feature_value as usize];
+                                let next_threshold =
+                                    self.dataview.dataset.internal_to_original_feature_value
+                                        [feature_2]
+                                        [feature2_value as usize];
+
+                                left_tracker = D1ScoreTracker {
+                                    cost,
+                                    branching_cost,
+                                    feature: Some(feature_2),
+                                    threshold: Some((current_threshold + next_threshold) / 2.0),
+                                    left_leaf: Some(LeafNode {
+                                        cost: cost_ll,
+                                        label: total_left_left.label(),
+                                    }),
+                                    right_leaf: Some(LeafNode {
+                                        cost: cost_lr,
+                                        label: total_left_right.label(),
+                                    }),
+                                }
+                            }
+                        }
+                    }
+                    total_left_left += &self.dataview.dataset.instances[instance];
+                    prev_left_feature_value = Some(feature2_value);
+                } else {
+                    // Check if this is a point we can split at
+                    if let Some(prev_right_feature_value) = prev_right_feature_value {
+                        if prev_right_feature_value != feature2_value {
+                            let mut total_right_right = total_right.clone();
+                            total_right_right -= &total_right_left;
+
+                            let cost_rl = total_right_left.cost();
+                            let cost_rr = total_right_right.cost();
+                            let cost = cost_rl + cost_rr;
+                            let branching_cost = context.task.branching_cost();
+                            let total_cost = cost + branching_cost;
+
+                            if total_cost < right_tracker.total_cost() {
+                                let current_threshold =
+                                    self.dataview.dataset.internal_to_original_feature_value
+                                        [feature_2]
+                                        [prev_right_feature_value as usize];
+                                let next_threshold =
+                                    self.dataview.dataset.internal_to_original_feature_value
+                                        [feature_2]
+                                        [feature2_value as usize];
+
+                                right_tracker = D1ScoreTracker {
+                                    cost,
+                                    branching_cost,
+                                    feature: Some(feature_2),
+                                    threshold: Some((current_threshold + next_threshold) / 2.0),
+                                    left_leaf: Some(LeafNode {
+                                        cost: cost_rl,
+                                        label: total_right_left.label(),
+                                    }),
+                                    right_leaf: Some(LeafNode {
+                                        cost: cost_rr,
+                                        label: total_right_right.label(),
+                                    }),
+                                }
+                            }
+                        }
+                    }
+                    total_right_left += &self.dataview.dataset.instances[instance];
+                    prev_right_feature_value = Some(feature2_value);
+                }
+            }
+            if left_tracker.is_optimal(context) && right_tracker.is_optimal(context) {
+                break;
+            }
+        }
+
+        let cost =
+            left_tracker.total_cost() + right_tracker.total_cost() + context.task.branching_cost();
+
+        ExpandedQueueItem::Solution(Arc::new(Tree::Branch(BranchNode {
+            cost,
+            split_feature: feature,
+            split_threshold: self.dataview.threshold_from_split(feature, split_index),
+            left_child: left_tracker.get_tree(total_left.label()),
+            right_child: right_tracker.get_tree(total_right.label()),
+        })))
     }
 
     /// Expand an item from the queue one level by selecting a concrete split and instantiating its children.
@@ -392,7 +606,50 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> Node<'a, OT, SS> {
             self.queue.push(right_item);
         }
 
-        let (left, right) = self.split(context, item.feature, x);
-        item.children = Some([left, right]);
+        let expanded = if self.remaining_depth_budget == 2 {
+            self.solve_left_right(context, item.feature, x)
+        } else {
+            self.split(context, item.feature, x)
+        };
+        item.expanded = Some(expanded);
+    }
+}
+
+struct D1ScoreTracker<OT: OptimizationTask> {
+    cost: OT::CostType,
+    branching_cost: OT::CostType,
+    feature: Option<usize>,
+    threshold: Option<f64>,
+    left_leaf: Option<LeafNode<OT>>,
+    right_leaf: Option<LeafNode<OT>>,
+}
+
+impl<OT: OptimizationTask> D1ScoreTracker<OT> {
+    fn is_optimal<SS: SearchStrategy>(&self, context: &SolveContext<'_, OT, SS>) -> bool {
+        self.cost == OT::ZERO_COST
+            || (self.branching_cost == OT::ZERO_COST && self.cost < context.task.branching_cost())
+    }
+
+    fn total_cost(&self) -> OT::CostType {
+        self.cost + self.branching_cost
+    }
+
+    fn get_tree(self, total_label: OT::LabelType) -> Arc<Tree<OT>> {
+        let tree = if self.feature.is_none() {
+            Tree::Leaf(LeafNode {
+                cost: self.total_cost(),
+                label: total_label,
+            })
+        } else {
+            Tree::Branch(BranchNode {
+                cost: self.total_cost(),
+                split_feature: self.feature.unwrap(),
+                split_threshold: self.threshold.unwrap(),
+                left_child: Arc::new(Tree::Leaf(self.left_leaf.unwrap())),
+                right_child: Arc::new(Tree::Leaf(self.right_leaf.unwrap())),
+            })
+        };
+
+        Arc::new(tree)
     }
 }

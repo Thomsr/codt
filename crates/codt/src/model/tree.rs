@@ -21,26 +21,6 @@ impl<OT: OptimizationTask> Display for Tree<OT> {
 }
 
 impl<OT: OptimizationTask> Tree<OT> {
-    pub fn new_leaf(label: OT::LabelType, cost: OT::CostType) -> Self {
-        Self::Leaf(LeafNode { label, cost })
-    }
-
-    pub fn new_branch(
-        split_feature: usize,
-        split_threshold: f64,
-        left_child: Arc<Tree<OT>>,
-        right_child: Arc<Tree<OT>>,
-        cost: OT::CostType,
-    ) -> Self {
-        Self::Branch(BranchNode {
-            split_feature,
-            split_threshold,
-            left_child,
-            right_child,
-            cost,
-        })
-    }
-
     pub fn cost(&self) -> OT::CostType {
         match self {
             Self::Branch(branch) => branch.cost,

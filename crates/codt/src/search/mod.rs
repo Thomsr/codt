@@ -1,4 +1,4 @@
 pub mod node;
-pub mod pruner;
+pub(crate) mod pruner;
 pub mod solver;
 pub mod strategy;

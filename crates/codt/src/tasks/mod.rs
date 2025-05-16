@@ -31,8 +31,8 @@ pub trait OptimizationTask {
     /// A type from which the cost is easily derivable. When a CostSum for disjoint datasets
     /// are summed, it results in the CostSum of their union.
     type CostSumType: CostSum<Self::LabelType, Self::InstanceType, Self::CostType>;
-    /// The minimum possible cost, to e.g. initialize lower bounds. Usually zero.
-    const MIN_COST: Self::CostType;
+    /// The minimum possible cost, to e.g. initialize lower bounds. Requires that ZERO_COST + ZERO_COST = ZERO_COST. For example 0 or 0.0
+    const ZERO_COST: Self::CostType;
 
     fn preprocess_dataset(dataset: &mut DataSet<Self::InstanceType>) {
         let _ = dataset;

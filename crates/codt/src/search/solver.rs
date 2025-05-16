@@ -61,7 +61,8 @@ impl<OT: OptimizationTask, SS: SearchStrategy> Solver<'_, OT, SS> {
 
         while !root.is_complete() {
             graph_expansions += 1;
-            root.select(&mut path);
+            // The initial source does not matter, since we always substitute the root manually.
+            root.select(&mut path, 0);
             trace!("Selected path: {:?}", path);
 
             let mut current = path.pop_front();
@@ -69,15 +70,16 @@ impl<OT: OptimizationTask, SS: SearchStrategy> Solver<'_, OT, SS> {
 
             let parent = parent_item
                 .as_mut()
-                .and_then(|p| p.current_node_mut())
+                .and_then(|(_, p)| p.child_by_idx(current.as_ref().unwrap().0))
                 .unwrap_or(&mut root);
-            parent.expand(&context, current.as_mut().unwrap());
+
+            parent.expand(&context, &mut current.as_mut().unwrap().1);
 
             // Return ownership of all the items in the selected path to their respective nodes.
-            while let Some(item) = current {
+            while let Some((parent_node_idx, item)) = current {
                 let parent = parent_item
                     .as_mut()
-                    .and_then(|p| p.current_node_mut())
+                    .and_then(|(_, p)| p.child_by_idx(parent_node_idx))
                     .unwrap_or(&mut root);
 
                 parent.backtrack_item(&context, item);

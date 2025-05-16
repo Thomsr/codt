@@ -73,7 +73,7 @@ impl<'a, OT: OptimizationTask> DataView<'a, OT> {
 
                 // TODO: this check may only be done at actual thresholds.
                 // E.g. for cost sequence 0 0 1 and feature values 0 1 1, only the 0 threshold is a zero-cost split.
-                if cost == OT::MIN_COST {
+                if cost == OT::ZERO_COST {
                     if biggest_left_min_cost_split.is_none() {
                         // Reserve a slot at the start for this.
                         possible_split_values_i.push(0);
@@ -160,7 +160,7 @@ impl<'a, OT: OptimizationTask> DataView<'a, OT> {
                     }
                     feature_values_right_i.push(value);
                     if value.feature_value != last_feature_value_right {
-                        // TODO: readd this guarantee when preprocessing here is as strict as in from_dataset
+                        // TODO: re-add this guarantee when preprocessing here is as strict as in from_dataset
                         // unsafe {
                         //     std::hint::assert_unchecked(
                         //         possible_split_values_right_i.len()
@@ -212,8 +212,11 @@ impl<'a, OT: OptimizationTask> DataView<'a, OT> {
         )
     }
 
-    pub fn instances_iter(&self) -> impl Iterator<Item = usize> {
-        self.feature_values_sorted[0].iter().map(|i| i.instance_id)
+    /// Iterate all instances, sorted by its feature value of a specific feature.
+    pub fn instances_iter(&self, feature: usize) -> impl Iterator<Item = usize> {
+        self.feature_values_sorted[feature]
+            .iter()
+            .map(|i| i.instance_id)
     }
 
     pub fn num_instances(&self) -> usize {

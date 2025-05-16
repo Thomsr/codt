@@ -30,7 +30,7 @@ impl<OT: OptimizationTask> Pruner<OT> {
     }
 
     pub fn insert_left_subtree(&mut self, feature: usize, threshold: usize, lb: OT::CostType) {
-        if lb == OT::MIN_COST {
+        if lb == OT::ZERO_COST {
             // Don't bother storing trivial lower bounds.
             return;
         }
@@ -76,7 +76,7 @@ impl<OT: OptimizationTask> Pruner<OT> {
     }
 
     pub fn insert_right_subtree(&mut self, feature: usize, threshold: usize, lb: OT::CostType) {
-        if lb == OT::MIN_COST {
+        if lb == OT::ZERO_COST {
             // Don't bother storing trivial lower bounds.
             return;
         }
@@ -130,7 +130,7 @@ impl<OT: OptimizationTask> Pruner<OT> {
             (Some((_, &l)), Some((_, &r))) => l + r,
             (Some((_, &l)), None) => l,
             (None, Some((_, &r))) => r,
-            (None, None) => OT::MIN_COST,
+            (None, None) => OT::ZERO_COST,
         }
     }
 }

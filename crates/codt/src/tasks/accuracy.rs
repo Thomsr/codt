@@ -101,7 +101,7 @@ impl OptimizationTask for AccuracyTask {
     type InstanceType = LabeledInstance<i32>;
     type CostType = f64;
     type CostSumType = AccuracyCostSum;
-    const MIN_COST: Self::CostType = 0.0;
+    const ZERO_COST: Self::CostType = 0.0;
 
     fn prepare_for_data(&mut self, dataview: &mut DataView<Self>) {
         self.dataset_size = dataview.num_instances();
