@@ -255,7 +255,7 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> Node<'a, OT, SS> {
 
         let mut queue = BinaryHeap::new();
 
-        if max_depth > 0 && context.task.branching_cost() < ub {
+        if max_depth > 0 && context.task.branching_cost() < ub && dataview.num_instances() > 1 {
             for feature in 0..dataview.num_features() {
                 let n_splitpoints = dataview.possible_split_values[feature].len();
                 if n_splitpoints > 0 {
@@ -269,7 +269,7 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> Node<'a, OT, SS> {
             }
         }
 
-        let lb = if max_depth == 0 || queue.is_empty() {
+        let lb = if queue.is_empty() {
             ub
         } else {
             context.task.branching_cost()
@@ -529,6 +529,10 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> Node<'a, OT, SS> {
             let mut prev_left_feature_value = None;
             let mut prev_right_feature_value = None;
 
+            // Keep costsums out of loop, so that we can .clone_from in the loop and avoid any allocations.
+            let mut total_left_right = total_left.clone();
+            let mut total_right_right = total_left.clone();
+
             for instance in self.dataview.instances_iter(feature_2) {
                 let feature1_value = self.dataview.dataset.feature_values[feature][instance];
                 let feature2_value = self.dataview.dataset.feature_values[feature_2][instance];
@@ -536,7 +540,7 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> Node<'a, OT, SS> {
                     // Check if this is a point we can split at
                     if let Some(prev_left_feature_value) = prev_left_feature_value {
                         if prev_left_feature_value != feature2_value {
-                            let mut total_left_right = total_left.clone();
+                            total_left_right.clone_from(&total_left);
                             total_left_right -= &total_left_left;
 
                             let cost_ll = total_left_left.cost();
@@ -578,7 +582,7 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> Node<'a, OT, SS> {
                     // Check if this is a point we can split at
                     if let Some(prev_right_feature_value) = prev_right_feature_value {
                         if prev_right_feature_value != feature2_value {
-                            let mut total_right_right = total_right.clone();
+                            total_right_right.clone_from(&total_right);
                             total_right_right -= &total_right_left;
 
                             let cost_rl = total_right_left.cost();

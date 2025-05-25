@@ -23,9 +23,26 @@ impl AccuracyTask {
     }
 }
 
-#[derive(Clone)]
 pub struct AccuracyCostSum {
     instance_count_per_class: Vec<i32>,
+}
+
+impl Clone for AccuracyCostSum {
+    fn clone(&self) -> Self {
+        Self {
+            instance_count_per_class: self.instance_count_per_class.clone(),
+        }
+    }
+
+    fn clone_from(&mut self, source: &Self) {
+        assert_eq!(
+            self.instance_count_per_class.len(),
+            source.instance_count_per_class.len()
+        );
+        for i in 0..self.instance_count_per_class.len() {
+            self.instance_count_per_class[i] = source.instance_count_per_class[i]
+        }
+    }
 }
 
 impl SubAssign<&AccuracyCostSum> for AccuracyCostSum {

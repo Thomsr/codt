@@ -9,6 +9,9 @@ edition = "2024"
 authors = ["Mim van den Bos"]
 license = "MIT"
 
+[profile.release]
+lto = true
+
 [profile.profiling]
 inherits = "release"
 debug = true
