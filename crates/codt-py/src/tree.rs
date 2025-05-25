@@ -1,9 +1,9 @@
-use std::{convert::Infallible, fmt::Debug, marker::PhantomData, str::FromStr};
+use std::{convert::Infallible, fmt::Debug, marker::PhantomData, str::FromStr, time::Duration};
 
 use codt::{
     model::{dataset::DataSet, dataview::DataView, instance::LabeledInstance, tree::Tree},
     search::{
-        solver::{SolveResult, Solver},
+        solver::{SolveResult, Solver, SolverOptions, TerminalSolver, UpperboundStrategy},
         strategy::{
             andor::AndOrSearchStrategy,
             bfs::{BfsSearchStrategy, CuriosityHeuristic, GOSDTHeuristic, LBHeuristic},
@@ -49,16 +49,20 @@ pub enum SearchStrategyEnum {
     DfsPrio,
 }
 
-#[pyfunction(signature = ())]
-pub fn all_search_strategies() -> Vec<String> {
-    vec![
-        "dfs".to_string(),
-        "dfs-prio".to_string(),
-        "and-or".to_string(),
-        "bfs-lb".to_string(),
-        "bfs-curiosity".to_string(),
-        "bfs-gosdt".to_string(),
-    ]
+#[pyclass(eq, eq_int)]
+#[derive(PartialEq, Eq, Clone, Copy)]
+pub enum UpperboundStrategyEnum {
+    SolutionsOnly,
+    TightFromSibling,
+    ForRemainingInterval,
+}
+
+#[pyclass(eq, eq_int)]
+#[derive(PartialEq, Eq, Clone, Copy)]
+pub enum TerminalSolverEnum {
+    Leaf,
+    LeftRight,
+    D2,
 }
 
 #[pyfunction(signature = (strategy=""))]
@@ -74,6 +78,26 @@ pub fn search_strategy_from_string(strategy: &str) -> Result<SearchStrategyEnum,
     }
 }
 
+#[pyfunction(signature = (strategy=""))]
+pub fn ub_from_string(strategy: &str) -> Result<UpperboundStrategyEnum, PyErr> {
+    match strategy {
+        "solutions-only" => Ok(UpperboundStrategyEnum::SolutionsOnly),
+        "tight-from-sibling" => Ok(UpperboundStrategyEnum::TightFromSibling),
+        "for-remaining-interval" => Ok(UpperboundStrategyEnum::ForRemainingInterval),
+        _ => Err(PyValueError::new_err("Not a valid upper bounding strategy")),
+    }
+}
+
+#[pyfunction(signature = (solver=""))]
+pub fn terminal_solver_from_string(solver: &str) -> Result<TerminalSolverEnum, PyErr> {
+    match solver {
+        "leaf" => Ok(TerminalSolverEnum::Leaf),
+        "left-right" => Ok(TerminalSolverEnum::LeftRight),
+        "d2" => Ok(TerminalSolverEnum::D2),
+        _ => Err(PyValueError::new_err("Not a valid terminal solver")),
+    }
+}
+
 #[pyclass]
 pub struct OptimalDecisionTreeClassifier(OptimalDecisionTree<AccuracyTask, i64>);
 
@@ -81,16 +105,24 @@ pub struct OptimalDecisionTreeClassifier(OptimalDecisionTree<AccuracyTask, i64>)
 #[allow(non_snake_case)]
 impl OptimalDecisionTreeClassifier {
     #[new]
-    #[pyo3(signature = (max_depth=2, strategy=SearchStrategyEnum::Dfs, complexity_cost=0.0))]
+    #[pyo3(signature = (max_depth=2, strategy=SearchStrategyEnum::Dfs, complexity_cost=0.0, timeout=None, upperbound=UpperboundStrategyEnum::ForRemainingInterval, terminal_solver=TerminalSolverEnum::LeftRight, intermediates=false))]
     fn new(
         max_depth: u32,
         strategy: SearchStrategyEnum,
         complexity_cost: f64,
+        timeout: Option<u64>,
+        upperbound: UpperboundStrategyEnum,
+        terminal_solver: TerminalSolverEnum,
+        intermediates: bool,
     ) -> OptimalDecisionTreeClassifier {
         OptimalDecisionTreeClassifier(OptimalDecisionTree::new(
-            max_depth,
-            strategy,
             AccuracyTask::new(complexity_cost),
+            max_depth,
+            upperbound,
+            terminal_solver,
+            strategy,
+            timeout,
+            intermediates,
         ))
     }
 
@@ -150,16 +182,24 @@ pub struct OptimalDecisionTreeRegressor(OptimalDecisionTree<SquaredErrorTask, f6
 #[allow(non_snake_case)]
 impl OptimalDecisionTreeRegressor {
     #[new]
-    #[pyo3(signature = (max_depth=2, strategy=SearchStrategyEnum::Dfs, complexity_cost=0.0))]
+    #[pyo3(signature = (max_depth=2, strategy=SearchStrategyEnum::Dfs, complexity_cost=0.0, timeout=None, upperbound=UpperboundStrategyEnum::ForRemainingInterval, terminal_solver=TerminalSolverEnum::LeftRight, intermediates=false))]
     fn new(
         max_depth: u32,
         strategy: SearchStrategyEnum,
         complexity_cost: f64,
+        timeout: Option<u64>,
+        upperbound: UpperboundStrategyEnum,
+        terminal_solver: TerminalSolverEnum,
+        intermediates: bool,
     ) -> OptimalDecisionTreeRegressor {
         OptimalDecisionTreeRegressor(OptimalDecisionTree::new(
-            max_depth,
-            strategy,
             SquaredErrorTask::new(complexity_cost),
+            max_depth,
+            upperbound,
+            terminal_solver,
+            strategy,
+            timeout,
+            intermediates,
         ))
     }
 
@@ -220,6 +260,10 @@ pub struct OptimalDecisionTree<
         + numpy::Element,
 > {
     max_depth: u32,
+    upperbound: UpperboundStrategyEnum,
+    terminal_solver: TerminalSolverEnum,
+    timeout: Option<Duration>,
+    intermediates: bool,
     strategy: SearchStrategyEnum,
     task: OT,
     result: Option<SolveResult<OT>>,
@@ -236,11 +280,23 @@ where
     <LabelType as FromStr>::Err: Debug,
     <LabelType as TryFrom<PyLabelType>>::Error: Debug,
 {
-    fn new(max_depth: u32, strategy: SearchStrategyEnum, task: OT) -> Self {
+    fn new(
+        task: OT,
+        max_depth: u32,
+        upperbound: UpperboundStrategyEnum,
+        terminal_solver: TerminalSolverEnum,
+        strategy: SearchStrategyEnum,
+        timeout: Option<u64>,
+        intermediates: bool,
+    ) -> Self {
         Self {
             max_depth,
+            upperbound,
+            terminal_solver,
             strategy,
             task,
+            intermediates,
+            timeout: timeout.map(Duration::from_secs),
             result: None,
             _phantom: PhantomData,
         }
@@ -262,36 +318,54 @@ where
         OT::preprocess_dataset(&mut dataset);
         let full_view = DataView::from_dataset(&dataset);
 
+        let options = SolverOptions {
+            max_depth: self.max_depth,
+            ub_strategy: match self.upperbound {
+                UpperboundStrategyEnum::SolutionsOnly => UpperboundStrategy::SolutionsOnly,
+                UpperboundStrategyEnum::TightFromSibling => UpperboundStrategy::TightFromSibling,
+                UpperboundStrategyEnum::ForRemainingInterval => {
+                    UpperboundStrategy::ForRemainingInterval
+                }
+            },
+            terminal_solver: match self.terminal_solver {
+                TerminalSolverEnum::Leaf => TerminalSolver::Leaf,
+                TerminalSolverEnum::LeftRight => TerminalSolver::LeftRight,
+                TerminalSolverEnum::D2 => TerminalSolver::D2,
+            },
+            timeout: self.timeout,
+            track_intermediates: self.intermediates,
+        };
+
         let result = match self.strategy {
             SearchStrategyEnum::Dfs => {
                 let mut solver: Solver<'_, OT, DfsSearchStrategy> =
                     Solver::new(self.task.clone(), full_view);
-                solver.solve(self.max_depth)
+                solver.solve(options)
             }
             SearchStrategyEnum::AndOr => {
                 let mut solver: Solver<'_, OT, AndOrSearchStrategy> =
                     Solver::new(self.task.clone(), full_view);
-                solver.solve(self.max_depth)
+                solver.solve(options)
             }
             SearchStrategyEnum::BfsLb => {
                 let mut solver: Solver<'_, OT, BfsSearchStrategy<LBHeuristic>> =
                     Solver::new(self.task.clone(), full_view);
-                solver.solve(self.max_depth)
+                solver.solve(options)
             }
             SearchStrategyEnum::BfsCuriosity => {
                 let mut solver: Solver<'_, OT, BfsSearchStrategy<CuriosityHeuristic>> =
                     Solver::new(self.task.clone(), full_view);
-                solver.solve(self.max_depth)
+                solver.solve(options)
             }
             SearchStrategyEnum::BfsGosdt => {
                 let mut solver: Solver<'_, OT, BfsSearchStrategy<GOSDTHeuristic>> =
                     Solver::new(self.task.clone(), full_view);
-                solver.solve(self.max_depth)
+                solver.solve(options)
             }
             SearchStrategyEnum::DfsPrio => {
                 let mut solver: Solver<'_, OT, DfsPrioSearchStrategy> =
                     Solver::new(self.task.clone(), full_view);
-                solver.solve(self.max_depth)
+                solver.solve(options)
             }
         };
 

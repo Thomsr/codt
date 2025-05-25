@@ -1,4 +1,4 @@
-# CODT: Continuous Optimal Decision Trees
+# CODTree: Continuous Optimal Decision Trees
 Finds optimal classification and regression trees for data sets with continuous features.
 
 ## Quickstart

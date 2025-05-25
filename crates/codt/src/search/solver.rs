@@ -1,4 +1,9 @@
-use std::{collections::VecDeque, marker::PhantomData, sync::Arc, time::Instant};
+use std::{
+    collections::VecDeque,
+    marker::PhantomData,
+    sync::Arc,
+    time::{Duration, Instant},
+};
 
 use log::trace;
 
@@ -40,12 +45,19 @@ pub struct SolveContext<'a, OT: OptimizationTask, SS: SearchStrategy> {
     pub task: &'a OT,
     pub ub_strategy: UpperboundStrategy,
     pub terminal_solver: TerminalSolver,
-    pub track_intermediates: bool,
     _ss: PhantomData<SS>,
 }
 
+pub struct SolverOptions {
+    pub ub_strategy: UpperboundStrategy,
+    pub terminal_solver: TerminalSolver,
+    pub track_intermediates: bool,
+    pub max_depth: u32,
+    pub timeout: Option<Duration>,
+}
+
 impl<OT: OptimizationTask, SS: SearchStrategy> Solver<'_, OT, SS> {
-    pub fn solve(&mut self, max_depth: u32) -> SolveResult<OT> {
+    pub fn solve(&mut self, options: SolverOptions) -> SolveResult<OT> {
         let mut dataview = self.dataview.take().unwrap();
 
         self.task.prepare_for_data(&mut dataview);
@@ -54,22 +66,22 @@ impl<OT: OptimizationTask, SS: SearchStrategy> Solver<'_, OT, SS> {
             task: &self.task,
             ub_strategy: UpperboundStrategy::SolutionsOnly,
             terminal_solver: TerminalSolver::LeftRight,
-            track_intermediates: true,
             _ss: PhantomData,
         };
 
-        let mut root: Node<'_, OT, SS> = Node::new(&context, dataview, max_depth);
+        let mut root: Node<'_, OT, SS> = Node::new(&context, dataview, options.max_depth);
 
         let mut graph_expansions = 0;
 
         let mut path = VecDeque::new();
 
         let start_time = Instant::now();
+        let mut elapsed = Duration::ZERO;
 
         let mut intermediate_lbs = vec![(root.cost_lower_bound, graph_expansions, 0.0)];
         let mut intermediate_ubs = vec![(root.best.cost(), graph_expansions, 0.0)];
 
-        while !root.is_complete() {
+        while !root.is_complete() && options.timeout.is_none_or(|timeout| elapsed < timeout) {
             graph_expansions += 1;
             // The initial source does not matter, since we always substitute the root manually.
             root.select(&mut path, 0);
@@ -98,7 +110,9 @@ impl<OT: OptimizationTask, SS: SearchStrategy> Solver<'_, OT, SS> {
                 parent_item = path.pop_front();
             }
 
-            if context.track_intermediates {
+            elapsed = start_time.elapsed();
+
+            if options.track_intermediates {
                 let lowest_remaining_lb = root.queue.iter().fold(None, |val, i| {
                     let mut lb = root.pruner.lb_for(i.feature, &i.split_points)
                         + context.task.branching_cost();
@@ -118,18 +132,14 @@ impl<OT: OptimizationTask, SS: SearchStrategy> Solver<'_, OT, SS> {
                 }
 
                 if actual_lb > intermediate_lbs.last().unwrap().0 {
-                    intermediate_lbs.push((
-                        actual_lb,
-                        graph_expansions,
-                        start_time.elapsed().as_secs_f64(),
-                    ))
+                    intermediate_lbs.push((actual_lb, graph_expansions, elapsed.as_secs_f64()))
                 }
 
                 if root.best.cost() < intermediate_ubs.last().unwrap().0 {
                     intermediate_ubs.push((
                         root.best.cost(),
                         graph_expansions,
-                        start_time.elapsed().as_secs_f64(),
+                        elapsed.as_secs_f64(),
                     ))
                 }
             }

@@ -3,10 +3,14 @@ from .codt_py import OptimalDecisionTreeClassifier as OCT, OptimalDecisionTreeRe
 import numpy as np
 
 class OptimalDecisionTreeClassifier(BaseEstimator, ClassifierMixin):
-    def __init__(self, max_depth=2, strategy="dfs", complexity_cost=0.0):
+    def __init__(self, max_depth=2, strategy="dfs-prio", complexity_cost=0.0, timeout=None, upperbound="for-remaining-interval", terminal_solver="left-right", intermediates=False):
         self.max_depth = max_depth
         self.strategy = strategy
         self.complexity_cost = complexity_cost
+        self.timeout = timeout
+        self.upperbound = upperbound
+        self.terminal_solver = terminal_solver
+        self.intermediates = intermediates
 
     def fit(self, X, y):
         X, y = validate_data(self, X, y, ensure_min_samples=2, dtype=np.float64)
@@ -33,10 +37,14 @@ class OptimalDecisionTreeClassifier(BaseEstimator, ClassifierMixin):
 
 
 class OptimalDecisionTreeRegressor(BaseEstimator, RegressorMixin):
-    def __init__(self, max_depth=2, strategy="dfs", complexity_cost=0.0):
+    def __init__(self, max_depth=2, strategy="dfs-prio", complexity_cost=0.0, timeout=None, upperbound="for-remaining-interval", terminal_solver="left-right", intermediates=False):
         self.max_depth = max_depth
         self.strategy = strategy
         self.complexity_cost = complexity_cost
+        self.timeout = timeout
+        self.upperbound = upperbound
+        self.terminal_solver = terminal_solver
+        self.intermediates = intermediates
 
     def fit(self, X, y):
         X, y = validate_data(self, X, y, ensure_min_samples=2, dtype=np.float64, y_numeric=True)

@@ -25,17 +25,31 @@ pub struct CliParams {
     #[arg(short, long)]
     pub file: PathBuf,
 
-    /// Maximum allowed depth of the tree, where the depth is defined as the largest number of *decision/feature nodes* from the root to any leaf. Depth greater than four is usually time consuming.
+    /// Maximum allowed depth of the tree, where the depth is defined as the largest number of *branching nodes* from the root to any leaf. Depth greater than four is usually time consuming.
     #[arg(short('d'), long, default_value_t=3, value_parser=value_parser!(u32).range(0..20))]
     pub max_depth: u32,
+
+    /// Optionally, the maximum amount of seconds to run, after which the best found solution is returned.
+    #[arg(short, long)]
+    pub timeout: Option<u64>,
+
+    #[arg(short, long, value_enum, default_value_t=UpperboundStrategy::SolutionsOnly)]
+    pub upperbound: UpperboundStrategy,
+
+    #[arg(long, value_enum, default_value_t=TerminalSolver::LeftRight)]
+    pub terminal_solver: TerminalSolver,
+
+    /// Determines if the solver should track intermediate solutions.
+    #[arg(long, action=ArgAction::Set, default_value_t=false)]
+    pub intermediates: bool,
+
+    /// The search strategy to use.
+    #[arg(short, long, value_enum)]
+    pub strategy: SearchStrategy,
 
     /// The task to optimize.
     #[command(subcommand)]
     pub task: OptimizationTaskEnum,
-
-    /// The search strategy to use.
-    #[arg(short, long)]
-    pub strategy: SearchStrategy,
 }
 
 #[derive(Subcommand)]
@@ -56,6 +70,26 @@ pub enum SearchStrategy {
     BfsLb,
     BfsCuriosity,
     BfsGosdt,
+}
+
+#[derive(ValueEnum, Clone, Debug)]
+pub enum UpperboundStrategy {
+    /// Only use actual solutions as upper bounds
+    SolutionsOnly,
+    /// Use bounds of parent and sibling to calculate an upper bound
+    TightFromSibling,
+    /// Similar to `TightFromSibling`, but also leave a margin so that when a solution is found the whole interval can be pruned.
+    ForRemainingInterval,
+}
+
+#[derive(ValueEnum, Clone, Debug)]
+pub enum TerminalSolver {
+    /// No exhaustive search, search terminates at leaf nodes
+    Leaf,
+    /// Start exhaustive search when only a left/right depth one tree remains
+    LeftRight,
+    /// Exhaustive search on subtrees of depth two
+    D2,
 }
 
 #[derive(Args)]
