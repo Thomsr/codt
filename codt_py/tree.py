@@ -1,5 +1,5 @@
 from sklearn.base import BaseEstimator, ClassifierMixin, RegressorMixin, check_is_fitted, validate_data
-from .codt_py import OptimalDecisionTreeClassifier as OCT, OptimalDecisionTreeRegressor as ORT, search_strategy_from_string
+from .codt_py import OptimalDecisionTreeClassifier as OCT, OptimalDecisionTreeRegressor as ORT, search_strategy_from_string, ub_from_string, terminal_solver_from_string
 import numpy as np
 
 class OptimalDecisionTreeClassifier(BaseEstimator, ClassifierMixin):
@@ -15,7 +15,7 @@ class OptimalDecisionTreeClassifier(BaseEstimator, ClassifierMixin):
     def fit(self, X, y):
         X, y = validate_data(self, X, y, ensure_min_samples=2, dtype=np.float64)
         self.classes_, y = np.unique(y, return_inverse=True)
-        self.tree_ = OCT(self.max_depth, search_strategy_from_string(self.strategy), self.complexity_cost)
+        self.tree_ = OCT(self.max_depth, search_strategy_from_string(self.strategy), self.complexity_cost, self.timeout, ub_from_string(self.upperbound), terminal_solver_from_string(self.terminal_solver), self.intermediates)
         self.tree_.fit(X, y)
 
     def predict(self, X):
@@ -48,7 +48,7 @@ class OptimalDecisionTreeRegressor(BaseEstimator, RegressorMixin):
 
     def fit(self, X, y):
         X, y = validate_data(self, X, y, ensure_min_samples=2, dtype=np.float64, y_numeric=True)
-        self.tree_ = ORT(self.max_depth, search_strategy_from_string(self.strategy), self.complexity_cost)
+        self.tree_ = ORT(self.max_depth, search_strategy_from_string(self.strategy), self.complexity_cost, self.timeout, ub_from_string(self.upperbound), terminal_solver_from_string(self.terminal_solver), self.intermediates)
         self.tree_.fit(X, y)
 
     def predict(self, X):
