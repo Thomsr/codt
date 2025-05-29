@@ -332,11 +332,26 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> Node<'a, OT, SS> {
     ) {
         let ub_new = match context.ub_strategy {
             UpperboundStrategy::SolutionsOnly => child.cost_upper_bound,
-            UpperboundStrategy::TightFromSibling => self.cost_upper_bound - sibling_lb,
-            UpperboundStrategy::ForRemainingInterval => self.cost_upper_bound - sibling_lb, // TODO + margin_of_interval,
+            UpperboundStrategy::TightFromSibling => {
+                self.cost_upper_bound - context.task.branching_cost() - sibling_lb
+            }
+            UpperboundStrategy::ForRemainingInterval => {
+                self.cost_upper_bound - context.task.branching_cost() - sibling_lb
+            } // TODO + margin_of_interval,
         };
 
         OT::update_upperbound(&mut child.cost_upper_bound, &ub_new);
+    }
+
+    fn compute_child_lower_bound(
+        &self,
+        context: &SolveContext<OT, SS>,
+        child: &mut Node<'a, OT, SS>,
+        sibling_ub: OT::CostType,
+    ) {
+        let lb_new = self.cost_lower_bound - sibling_ub - context.task.branching_cost();
+
+        OT::update_lowerbound(&mut child.cost_lower_bound, &lb_new);
     }
 
     fn recalculate_item_bounds(
@@ -346,9 +361,13 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> Node<'a, OT, SS> {
     ) {
         if let Some(ExpandedQueueItem::Children(children)) = &mut item.expanded {
             let child0_lb = children[0].cost_lower_bound;
+            let child0_ub = children[0].cost_upper_bound;
             let child1_lb = children[1].cost_lower_bound;
+            let child1_ub = children[1].cost_upper_bound;
             self.compute_child_upper_bound(context, &mut children[0], child1_lb);
             self.compute_child_upper_bound(context, &mut children[1], child0_lb);
+            self.compute_child_lower_bound(context, &mut children[0], child1_ub);
+            self.compute_child_lower_bound(context, &mut children[1], child0_ub);
         }
 
         let lb =

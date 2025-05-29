@@ -1,6 +1,9 @@
 use std::{cmp::Ordering, marker::PhantomData};
 
-use crate::{search::node::QueueItem, tasks::OptimizationTask};
+use crate::{
+    search::node::{Node, QueueItem},
+    tasks::OptimizationTask,
+};
 
 use super::SearchStrategy;
 
@@ -48,8 +51,8 @@ impl<H: BfsHeuristic> SearchStrategy for BfsSearchStrategy<H> {
     }
 
     fn child_priority<'a, OT: OptimizationTask, SS: SearchStrategy>(
-        a: &crate::search::node::Node<'a, OT, SS>,
-        b: &crate::search::node::Node<'a, OT, SS>,
+        a: &Node<'a, OT, SS>,
+        b: &Node<'a, OT, SS>,
     ) -> usize {
         if a.lowest_descendant_heuristic <= b.lowest_descendant_heuristic {
             0

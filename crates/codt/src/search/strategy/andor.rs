@@ -1,6 +1,9 @@
 use std::cmp::Ordering;
 
-use crate::{search::node::QueueItem, tasks::OptimizationTask};
+use crate::{
+    search::node::{Node, QueueItem},
+    tasks::OptimizationTask,
+};
 
 use super::SearchStrategy;
 
@@ -25,8 +28,8 @@ impl SearchStrategy for AndOrSearchStrategy {
     }
 
     fn child_priority<'a, OT: OptimizationTask, SS: SearchStrategy>(
-        a: &crate::search::node::Node<'a, OT, SS>,
-        b: &crate::search::node::Node<'a, OT, SS>,
+        a: &Node<'a, OT, SS>,
+        b: &Node<'a, OT, SS>,
     ) -> usize {
         // We choose the path in the graph as the most promising
         // solution (lowest lower bound), but when choosing which

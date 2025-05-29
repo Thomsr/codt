@@ -1,6 +1,9 @@
 use std::cmp::Ordering;
 
-use crate::{search::node::QueueItem, tasks::OptimizationTask};
+use crate::{
+    search::node::{Node, QueueItem},
+    tasks::{CostSum, OptimizationTask},
+};
 
 use super::SearchStrategy;
 
@@ -23,10 +26,16 @@ impl SearchStrategy for DfsSearchStrategy {
     }
 
     fn child_priority<'a, OT: OptimizationTask, SS: SearchStrategy>(
-        _a: &crate::search::node::Node<'a, OT, SS>,
-        _b: &crate::search::node::Node<'a, OT, SS>,
+        a: &Node<'a, OT, SS>,
+        b: &Node<'a, OT, SS>,
     ) -> usize {
-        0
+        // For DFS, only use information available when starting the search.
+        // This is a proxy for the upper bound.
+        if a.dataview.cost_summer.cost() >= b.dataview.cost_summer.cost() {
+            0
+        } else {
+            1
+        }
     }
 
     fn item_front_of_queue_is_lowest_lb<OT: OptimizationTask, SS: SearchStrategy>(
