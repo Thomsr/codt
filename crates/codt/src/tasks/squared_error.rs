@@ -1,5 +1,7 @@
 use std::ops::{AddAssign, SubAssign};
 
+use ckmeans::ckmeans_dynamic_stop;
+
 use crate::model::{dataset::DataSet, dataview::DataView, instance::LabeledInstance};
 
 use super::{CostSum, OptimizationTask};
@@ -102,5 +104,32 @@ impl OptimizationTask for SquaredErrorTask {
 
     fn branching_cost(&self) -> Self::CostType {
         self.branching_cost
+    }
+
+    fn initial_lowerbound(&self, dataview: &DataView<Self>, max_depth: u32) -> Self::CostType
+    where
+        Self: Sized,
+    {
+        if max_depth > 7 {
+            // Since clusters are u8, limit to max depth 7
+            OptimizationTask::initial_lowerbound(self, dataview, max_depth)
+        } else {
+            // The maximum number of clusters is the remaining leaf count or the number of instances remaining.
+            let clusters: u8 = dataview.num_instances().min(1 << max_depth) as u8;
+            let labels: Vec<f64> = dataview
+                .instances_iter(0)
+                .map(|i| dataview.dataset.instances[i].label)
+                .collect();
+            let kmeans_result = ckmeans_dynamic_stop(&labels, clusters, self.branching_cost);
+            let kmeans_matrix = kmeans_result.unwrap();
+            let nclusters = kmeans_matrix.len();
+            let branch_cost = self.branching_cost * (nclusters - 1) as f64;
+            let sse = kmeans_matrix
+                .last()
+                .expect("At least one cluster should be found")
+                .last()
+                .expect("At least one instance in dataview, so this should exist");
+            sse + branch_cost
+        }
     }
 }

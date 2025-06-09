@@ -272,7 +272,7 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> Node<'a, OT, SS> {
         let lb = if queue.is_empty() {
             ub
         } else {
-            context.task.branching_cost()
+            context.task.initial_lowerbound(&dataview, max_depth)
         };
 
         Node {

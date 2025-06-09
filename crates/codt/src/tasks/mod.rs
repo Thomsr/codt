@@ -63,4 +63,11 @@ pub trait OptimizationTask {
     }
 
     fn branching_cost(&self) -> Self::CostType;
+
+    fn initial_lowerbound(&self, _dataview: &DataView<Self>, _max_depth: u32) -> Self::CostType
+    where
+        Self: Sized,
+    {
+        self.branching_cost()
+    }
 }
