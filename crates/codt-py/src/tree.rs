@@ -1,4 +1,4 @@
-use std::{convert::Infallible, fmt::Debug, marker::PhantomData, str::FromStr, time::Duration};
+use std::{convert::Infallible, marker::PhantomData, time::Duration};
 
 use codt::{
     model::{dataset::DataSet, dataview::DataView, instance::LabeledInstance, tree::Tree},
@@ -98,294 +98,206 @@ pub fn terminal_solver_from_string(solver: &str) -> Result<TerminalSolverEnum, P
     }
 }
 
-#[pyclass]
-pub struct OptimalDecisionTreeClassifier(OptimalDecisionTree<AccuracyTask, i64>);
-
-#[pymethods]
-#[allow(non_snake_case)]
-impl OptimalDecisionTreeClassifier {
-    #[new]
-    #[pyo3(signature = (max_depth=2, strategy=SearchStrategyEnum::Dfs, complexity_cost=0.0, timeout=None, upperbound=UpperboundStrategyEnum::ForRemainingInterval, terminal_solver=TerminalSolverEnum::LeftRight, intermediates=false))]
-    fn new(
-        max_depth: u32,
-        strategy: SearchStrategyEnum,
-        complexity_cost: f64,
-        timeout: Option<u64>,
-        upperbound: UpperboundStrategyEnum,
-        terminal_solver: TerminalSolverEnum,
-        intermediates: bool,
-    ) -> OptimalDecisionTreeClassifier {
-        OptimalDecisionTreeClassifier(OptimalDecisionTree::new(
-            AccuracyTask::new(complexity_cost),
-            max_depth,
-            upperbound,
-            terminal_solver,
-            strategy,
-            timeout,
-            intermediates,
-        ))
-    }
-
-    #[pyo3(signature = (X, y))]
-    fn fit<'py>(&mut self, X: PyReadonlyArray2<'py, f64>, y: PyReadonlyArray1<'py, i64>) {
-        self.0.fit(X, y);
-    }
-
-    #[pyo3(signature = (X))]
-    fn predict<'py>(
-        &mut self,
-        py: Python<'py>,
-        X: PyReadonlyArray2<'py, f64>,
-    ) -> Bound<'py, PyArray1<i64>> {
-        self.0.predict(py, X)
-    }
-
-    #[pyo3(signature = ())]
-    fn tree<'py>(&mut self, py: Python<'py>) -> Result<Bound<'py, PyAny>, PyErr> {
-        let tree = &self
-            .0
-            .result
-            .as_ref()
-            .expect(".fit(X,y) should be called before this function and should be checked in the python wrapper")
-            .tree;
-
-        tree_to_py(tree, py)
-    }
-
-    #[pyo3(signature = ())]
-    fn intermediate_lbs<'py>(&mut self, py: Python<'py>) -> Result<Bound<'py, PyAny>, PyErr> {
-        let intermediates = &self
-            .0
-            .result
-            .as_ref()
-            .expect(".fit(X,y) should be called before this function and should be checked in the python wrapper")
-            .intermediate_lbs;
-        intermediates.into_pyobject(py)
-    }
-
-    #[pyo3(signature = ())]
-    fn intermediate_ubs<'py>(&mut self, py: Python<'py>) -> Result<Bound<'py, PyAny>, PyErr> {
-        let intermediates = &self
-            .0
-            .result
-            .as_ref()
-            .expect(".fit(X,y) should be called before this function and should be checked in the python wrapper")
-            .intermediate_ubs;
-        intermediates.into_pyobject(py)
-    }
-}
-
-#[pyclass]
-pub struct OptimalDecisionTreeRegressor(OptimalDecisionTree<SquaredErrorTask, f64>);
-
-#[pymethods]
-#[allow(non_snake_case)]
-impl OptimalDecisionTreeRegressor {
-    #[new]
-    #[pyo3(signature = (max_depth=2, strategy=SearchStrategyEnum::Dfs, complexity_cost=0.0, timeout=None, upperbound=UpperboundStrategyEnum::ForRemainingInterval, terminal_solver=TerminalSolverEnum::LeftRight, intermediates=false))]
-    fn new(
-        max_depth: u32,
-        strategy: SearchStrategyEnum,
-        complexity_cost: f64,
-        timeout: Option<u64>,
-        upperbound: UpperboundStrategyEnum,
-        terminal_solver: TerminalSolverEnum,
-        intermediates: bool,
-    ) -> OptimalDecisionTreeRegressor {
-        OptimalDecisionTreeRegressor(OptimalDecisionTree::new(
-            SquaredErrorTask::new(complexity_cost),
-            max_depth,
-            upperbound,
-            terminal_solver,
-            strategy,
-            timeout,
-            intermediates,
-        ))
-    }
-
-    #[pyo3(signature = (X, y))]
-    fn fit<'py>(&mut self, X: PyReadonlyArray2<'py, f64>, y: PyReadonlyArray1<'py, f64>) {
-        self.0.fit(X, y);
-    }
-
-    #[pyo3(signature = (X))]
-    fn predict<'py>(
-        &mut self,
-        py: Python<'py>,
-        X: PyReadonlyArray2<'py, f64>,
-    ) -> Bound<'py, PyArray1<f64>> {
-        self.0.predict(py, X)
-    }
-
-    #[pyo3(signature = ())]
-    fn tree<'py>(&mut self, py: Python<'py>) -> Result<Bound<'py, PyAny>, PyErr> {
-        let tree = &self
-            .0
-            .result
-            .as_ref()
-            .expect(".fit(X,y) should be called before this function and should be checked in the python wrapper")
-            .tree;
-
-        tree_to_py(tree, py)
-    }
-
-    #[pyo3(signature = ())]
-    fn intermediate_lbs<'py>(&mut self, py: Python<'py>) -> Result<Bound<'py, PyAny>, PyErr> {
-        let intermediates = &self
-            .0
-            .result
-            .as_ref()
-            .expect(".fit(X,y) should be called before this function and should be checked in the python wrapper")
-            .intermediate_lbs;
-        intermediates.into_pyobject(py)
-    }
-
-    #[pyo3(signature = ())]
-    fn intermediate_ubs<'py>(&mut self, py: Python<'py>) -> Result<Bound<'py, PyAny>, PyErr> {
-        let intermediates = &self
-            .0
-            .result
-            .as_ref()
-            .expect(".fit(X,y) should be called before this function and should be checked in the python wrapper")
-            .intermediate_ubs;
-        intermediates.into_pyobject(py)
-    }
-}
-
-pub struct OptimalDecisionTree<
-    OT: OptimizationTask,
-    PyLabelType: TryFrom<OT::LabelType, Error: Debug>
-        + TryInto<OT::LabelType, Error: Debug>
-        + Copy
-        + numpy::Element,
-> {
-    max_depth: u32,
-    upperbound: UpperboundStrategyEnum,
-    terminal_solver: TerminalSolverEnum,
-    timeout: Option<Duration>,
-    intermediates: bool,
-    strategy: SearchStrategyEnum,
-    task: OT,
-    result: Option<SolveResult<OT>>,
-    _phantom: PhantomData<PyLabelType>,
-}
-
-#[allow(non_snake_case)]
-impl<
-    LabelType: FromStr + Clone + Copy + Into<PyLabelType> + TryFrom<PyLabelType>,
-    OT: OptimizationTask<InstanceType = LabeledInstance<LabelType>, LabelType = LabelType> + Clone,
-    PyLabelType: Copy + numpy::Element,
-> OptimalDecisionTree<OT, PyLabelType>
-where
-    <LabelType as FromStr>::Err: Debug,
-    <LabelType as TryFrom<PyLabelType>>::Error: Debug,
-{
-    fn new(
-        task: OT,
-        max_depth: u32,
-        upperbound: UpperboundStrategyEnum,
-        terminal_solver: TerminalSolverEnum,
-        strategy: SearchStrategyEnum,
-        timeout: Option<u64>,
-        intermediates: bool,
-    ) -> Self {
-        Self {
-            max_depth,
-            upperbound,
-            terminal_solver,
-            strategy,
-            task,
-            intermediates,
-            timeout: timeout.map(Duration::from_secs),
-            result: None,
-            _phantom: PhantomData,
+macro_rules! impl_optimal_decision_tree_pyclass {
+    ($pyclass:ident, $task:ty, $label:ty, $array:ty) => {
+        #[pyclass]
+        pub struct $pyclass {
+            max_depth: u32,
+            upperbound: UpperboundStrategyEnum,
+            terminal_solver: TerminalSolverEnum,
+            node_lowerbound: bool,
+            timeout: Option<Duration>,
+            memory_limit: Option<u64>,
+            intermediates: bool,
+            strategy: SearchStrategyEnum,
+            task: $task,
+            result: Option<SolveResult<$task>>,
+            _phantom: PhantomData<$label>,
         }
-    }
 
-    fn fit<'py>(&mut self, X: PyReadonlyArray2<'py, f64>, y: PyReadonlyArray1<'py, PyLabelType>) {
-        let x_arr = X.as_array();
-        let y_arr = y.as_array();
-        let mut dataset = DataSet::<LabeledInstance<LabelType>>::default();
-        for i in 0..y_arr.dim() {
-            let features = x_arr.index_axis(Axis(0), i);
-            dataset.add_instance(
-                LabeledInstance::new(y_arr[i].try_into().unwrap()),
-                features.iter().copied(),
-            );
-        }
-        dataset.preprocess_after_adding_instances();
-
-        OT::preprocess_dataset(&mut dataset);
-        let full_view = DataView::from_dataset(&dataset);
-
-        let options = SolverOptions {
-            max_depth: self.max_depth,
-            ub_strategy: match self.upperbound {
-                UpperboundStrategyEnum::SolutionsOnly => UpperboundStrategy::SolutionsOnly,
-                UpperboundStrategyEnum::TightFromSibling => UpperboundStrategy::TightFromSibling,
-                UpperboundStrategyEnum::ForRemainingInterval => {
-                    UpperboundStrategy::ForRemainingInterval
+        #[pymethods]
+        #[allow(non_snake_case,clippy::too_many_arguments)]
+        impl $pyclass {
+            #[new]
+            #[pyo3(signature = (
+                max_depth=2,
+                strategy=SearchStrategyEnum::Dfs,
+                complexity_cost=0.0,
+                timeout=None,
+                upperbound=UpperboundStrategyEnum::ForRemainingInterval,
+                terminal_solver=TerminalSolverEnum::LeftRight,
+                intermediates=false,
+                node_lowerbound=true,
+                memory_limit=None
+            ))]
+            fn new(
+                max_depth: u32,
+                strategy: SearchStrategyEnum,
+                complexity_cost: f64,
+                timeout: Option<u64>,
+                upperbound: UpperboundStrategyEnum,
+                terminal_solver: TerminalSolverEnum,
+                intermediates: bool,
+                node_lowerbound: bool,
+                memory_limit: Option<u64>,
+            ) -> Self {
+                Self {
+                    max_depth,
+                    upperbound,
+                    terminal_solver,
+                    strategy,
+                    intermediates,
+                    timeout: timeout.map(Duration::from_secs),
+                    node_lowerbound,
+                    memory_limit,
+                    task: <$task>::new(complexity_cost),
+                    result: None,
+                    _phantom: PhantomData,
                 }
-            },
-            terminal_solver: match self.terminal_solver {
-                TerminalSolverEnum::Leaf => TerminalSolver::Leaf,
-                TerminalSolverEnum::LeftRight => TerminalSolver::LeftRight,
-                TerminalSolverEnum::D2 => TerminalSolver::D2,
-            },
-            timeout: self.timeout,
-            track_intermediates: self.intermediates,
-        };
+            }
 
-        let result = match self.strategy {
-            SearchStrategyEnum::Dfs => {
-                let mut solver: Solver<'_, OT, DfsSearchStrategy> =
-                    Solver::new(self.task.clone(), full_view);
-                solver.solve(options)
-            }
-            SearchStrategyEnum::AndOr => {
-                let mut solver: Solver<'_, OT, AndOrSearchStrategy> =
-                    Solver::new(self.task.clone(), full_view);
-                solver.solve(options)
-            }
-            SearchStrategyEnum::BfsLb => {
-                let mut solver: Solver<'_, OT, BfsSearchStrategy<LBHeuristic>> =
-                    Solver::new(self.task.clone(), full_view);
-                solver.solve(options)
-            }
-            SearchStrategyEnum::BfsCuriosity => {
-                let mut solver: Solver<'_, OT, BfsSearchStrategy<CuriosityHeuristic>> =
-                    Solver::new(self.task.clone(), full_view);
-                solver.solve(options)
-            }
-            SearchStrategyEnum::BfsGosdt => {
-                let mut solver: Solver<'_, OT, BfsSearchStrategy<GOSDTHeuristic>> =
-                    Solver::new(self.task.clone(), full_view);
-                solver.solve(options)
-            }
-            SearchStrategyEnum::DfsPrio => {
-                let mut solver: Solver<'_, OT, DfsPrioSearchStrategy> =
-                    Solver::new(self.task.clone(), full_view);
-                solver.solve(options)
-            }
-        };
+            #[pyo3(signature = (X, y))]
+            fn fit<'py>(&mut self, X: PyReadonlyArray2<'py, f64>, y: PyReadonlyArray1<'py, $label>) {
+                let x_arr = X.as_array();
+                let y_arr = y.as_array();
+                let mut dataset = DataSet::<LabeledInstance<<$task as OptimizationTask>::LabelType>>::default();
+                for i in 0..y_arr.dim() {
+                    let features = x_arr.index_axis(Axis(0), i);
+                    dataset.add_instance(
+                        LabeledInstance::new(y_arr[i].try_into().unwrap()),
+                        features.iter().copied(),
+                    );
+                }
+                dataset.preprocess_after_adding_instances();
 
-        self.result = Some(result);
-    }
+                <$task>::preprocess_dataset(&mut dataset);
+                let full_view = DataView::from_dataset(&dataset);
 
-    fn predict<'py>(
-        &self,
-        py: Python<'py>,
-        X: PyReadonlyArray2<'py, f64>,
-    ) -> Bound<'py, PyArray1<PyLabelType>> {
-        let tree = &self
-            .result
-            .as_ref()
-            .expect(".fit(X,y) before .predict(X) should be checked in the python wrapper")
-            .tree;
-        X.as_array()
-            .map_axis(Axis(1), |x| {
-                tree.predict(x.iter().copied().collect()).into()
-            })
-            .into_pyarray(py)
-    }
+                let options = SolverOptions {
+                    max_depth: self.max_depth,
+                    ub_strategy: match self.upperbound {
+                        UpperboundStrategyEnum::SolutionsOnly => UpperboundStrategy::SolutionsOnly,
+                        UpperboundStrategyEnum::TightFromSibling => UpperboundStrategy::TightFromSibling,
+                        UpperboundStrategyEnum::ForRemainingInterval => UpperboundStrategy::ForRemainingInterval,
+                    },
+                    terminal_solver: match self.terminal_solver {
+                        TerminalSolverEnum::Leaf => TerminalSolver::Leaf,
+                        TerminalSolverEnum::LeftRight => TerminalSolver::LeftRight,
+                        TerminalSolverEnum::D2 => TerminalSolver::D2,
+                    },
+                    node_lowerbound: self.node_lowerbound,
+                    timeout: self.timeout,
+                    track_intermediates: self.intermediates,
+                    memory_limit: self.memory_limit,
+                };
+
+                let result = match self.strategy {
+                    SearchStrategyEnum::Dfs => {
+                        let mut solver: Solver<'_, $task, DfsSearchStrategy> =
+                            Solver::new(self.task.clone(), full_view);
+                        solver.solve(options)
+                    }
+                    SearchStrategyEnum::AndOr => {
+                        let mut solver: Solver<'_, $task, AndOrSearchStrategy> =
+                            Solver::new(self.task.clone(), full_view);
+                        solver.solve(options)
+                    }
+                    SearchStrategyEnum::BfsLb => {
+                        let mut solver: Solver<'_, $task, BfsSearchStrategy<LBHeuristic>> =
+                            Solver::new(self.task.clone(), full_view);
+                        solver.solve(options)
+                    }
+                    SearchStrategyEnum::BfsCuriosity => {
+                        let mut solver: Solver<'_, $task, BfsSearchStrategy<CuriosityHeuristic>> =
+                            Solver::new(self.task.clone(), full_view);
+                        solver.solve(options)
+                    }
+                    SearchStrategyEnum::BfsGosdt => {
+                        let mut solver: Solver<'_, $task, BfsSearchStrategy<GOSDTHeuristic>> =
+                            Solver::new(self.task.clone(), full_view);
+                        solver.solve(options)
+                    }
+                    SearchStrategyEnum::DfsPrio => {
+                        let mut solver: Solver<'_, $task, DfsPrioSearchStrategy> =
+                            Solver::new(self.task.clone(), full_view);
+                        solver.solve(options)
+                    }
+                };
+
+                self.result = Some(result);
+            }
+
+            #[pyo3(signature = (X))]
+            fn predict<'py>(
+                &self,
+                py: Python<'py>,
+                X: PyReadonlyArray2<'py, f64>,
+            ) -> Bound<'py, $array> {
+                let tree = &self
+                    .result
+                    .as_ref()
+                    .expect(".fit(X,y) before .predict(X) should be checked in the python wrapper")
+                    .tree;
+                X.as_array()
+                    .map_axis(Axis(1), |x| {
+                        tree.predict(x.iter().copied().collect()).into()
+                    })
+                    .into_pyarray(py)
+            }
+
+            #[pyo3(signature = ())]
+            fn tree<'py>(&mut self, py: Python<'py>) -> Result<Bound<'py, PyAny>, PyErr> {
+                let tree = &self
+                    .result
+                    .as_ref()
+                    .expect(".fit(X,y) should be called before this function and should be checked in the python wrapper")
+                    .tree;
+
+                tree_to_py(tree, py)
+            }
+
+            #[pyo3(signature = ())]
+            fn intermediate_lbs<'py>(&mut self, py: Python<'py>) -> Result<Bound<'py, PyAny>, PyErr> {
+                let intermediates = &self
+                    .result
+                    .as_ref()
+                    .expect(".fit(X,y) should be called before this function and should be checked in the python wrapper")
+                    .intermediate_lbs;
+                intermediates.into_pyobject(py)
+            }
+
+            #[pyo3(signature = ())]
+            fn intermediate_ubs<'py>(&mut self, py: Python<'py>) -> Result<Bound<'py, PyAny>, PyErr> {
+                let intermediates = &self
+                    .result
+                    .as_ref()
+                    .expect(".fit(X,y) should be called before this function and should be checked in the python wrapper")
+                    .intermediate_ubs;
+                intermediates.into_pyobject(py)
+            }
+
+            #[pyo3(signature = ())]
+            fn expansions(&mut self) -> i64 {
+                self
+                    .result
+                    .as_ref()
+                    .expect(".fit(X,y) should be called before this function and should be checked in the python wrapper")
+                    .graph_expansions as i64
+            }
+        }
+    };
 }
+
+impl_optimal_decision_tree_pyclass!(
+    OptimalDecisionTreeClassifier,
+    AccuracyTask,
+    i64,
+    PyArray1<i64>
+);
+
+impl_optimal_decision_tree_pyclass!(
+    OptimalDecisionTreeRegressor,
+    SquaredErrorTask,
+    f64,
+    PyArray1<f64>
+);

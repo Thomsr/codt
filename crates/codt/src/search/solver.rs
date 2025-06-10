@@ -8,6 +8,7 @@ use std::{
 use log::trace;
 
 use crate::{
+    allocator::current_thread_memory_usage,
     model::{dataview::DataView, tree::Tree},
     tasks::OptimizationTask,
 };
@@ -52,8 +53,10 @@ pub struct SolverOptions {
     pub ub_strategy: UpperboundStrategy,
     pub terminal_solver: TerminalSolver,
     pub track_intermediates: bool,
+    pub node_lowerbound: bool,
     pub max_depth: u32,
     pub timeout: Option<Duration>,
+    pub memory_limit: Option<u64>,
 }
 
 impl<OT: OptimizationTask, SS: SearchStrategy> Solver<'_, OT, SS> {
@@ -81,7 +84,12 @@ impl<OT: OptimizationTask, SS: SearchStrategy> Solver<'_, OT, SS> {
         let mut intermediate_lbs = vec![(root.cost_lower_bound, graph_expansions, 0.0)];
         let mut intermediate_ubs = vec![(root.best.cost(), graph_expansions, 0.0)];
 
-        while !root.is_complete() && options.timeout.is_none_or(|timeout| elapsed < timeout) {
+        while !root.is_complete()
+            && options.timeout.is_none_or(|timeout| elapsed < timeout)
+            && options.memory_limit.is_none_or(|memory_limit| {
+                current_thread_memory_usage().bytes_current < memory_limit as i64
+            })
+        {
             graph_expansions += 1;
             // The initial source does not matter, since we always substitute the root manually.
             root.select(&mut path, 0);

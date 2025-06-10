@@ -1,12 +1,9 @@
-use std::{
-    path::PathBuf,
-    time::{Duration, Instant},
-};
+use std::{path::PathBuf, time::Instant};
 
 use codt::{
     model::{dataset::DataSet, dataview::DataView},
     search::{
-        solver::{Solver, SolverOptions, TerminalSolver, UpperboundStrategy},
+        solver::{Solver, SolverOptions},
         strategy::{
             SearchStrategy,
             andor::AndOrSearchStrategy,
@@ -89,23 +86,7 @@ fn main() {
     }
     log_builer.init();
 
-    let options = SolverOptions {
-        max_depth: args.max_depth,
-        ub_strategy: match args.upperbound {
-            params::UpperboundStrategy::SolutionsOnly => UpperboundStrategy::SolutionsOnly,
-            params::UpperboundStrategy::TightFromSibling => UpperboundStrategy::TightFromSibling,
-            params::UpperboundStrategy::ForRemainingInterval => {
-                UpperboundStrategy::ForRemainingInterval
-            }
-        },
-        terminal_solver: match args.terminal_solver {
-            params::TerminalSolver::Leaf => TerminalSolver::Leaf,
-            params::TerminalSolver::LeftRight => TerminalSolver::LeftRight,
-            params::TerminalSolver::D2 => TerminalSolver::D2,
-        },
-        timeout: args.timeout.map(Duration::from_secs),
-        track_intermediates: args.intermediates,
-    };
+    let options = args.solver_options();
 
     match args.task {
         OptimizationTaskEnum::Accuracy(params) => {

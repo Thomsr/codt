@@ -1,6 +1,7 @@
-use std::path::PathBuf;
+use std::{path::PathBuf, time::Duration};
 
 use clap::{ArgAction, Args, Parser, Subcommand, ValueEnum, value_parser};
+use codt::search::solver::{self, SolverOptions};
 
 use super::value_parser::RangedF64ValueParser;
 
@@ -33,11 +34,19 @@ pub struct CliParams {
     #[arg(short, long)]
     pub timeout: Option<u64>,
 
+    /// Optionally, the maximum memory used in bytes, if the limit is hit, the best found solution is returned.
+    #[arg(short, long)]
+    pub memory_limit: Option<u64>,
+
     #[arg(short, long, value_enum, default_value_t=UpperboundStrategy::SolutionsOnly)]
     pub upperbound: UpperboundStrategy,
 
     #[arg(long, value_enum, default_value_t=TerminalSolver::LeftRight)]
     pub terminal_solver: TerminalSolver,
+
+    /// Determines if the solver should use an immediate lowerbound for a node (e.g. kmeans for regression).
+    #[arg(long, action=ArgAction::Set, default_value_t=true)]
+    pub node_lowerbound: bool,
 
     /// Determines if the solver should track intermediate solutions.
     #[arg(long, action=ArgAction::Set, default_value_t=false)]
@@ -50,6 +59,32 @@ pub struct CliParams {
     /// The task to optimize.
     #[command(subcommand)]
     pub task: OptimizationTaskEnum,
+}
+
+impl CliParams {
+    pub fn solver_options(&self) -> SolverOptions {
+        SolverOptions {
+            max_depth: self.max_depth,
+            ub_strategy: match self.upperbound {
+                UpperboundStrategy::SolutionsOnly => solver::UpperboundStrategy::SolutionsOnly,
+                UpperboundStrategy::TightFromSibling => {
+                    solver::UpperboundStrategy::TightFromSibling
+                }
+                UpperboundStrategy::ForRemainingInterval => {
+                    solver::UpperboundStrategy::ForRemainingInterval
+                }
+            },
+            terminal_solver: match self.terminal_solver {
+                TerminalSolver::Leaf => solver::TerminalSolver::Leaf,
+                TerminalSolver::LeftRight => solver::TerminalSolver::LeftRight,
+                TerminalSolver::D2 => solver::TerminalSolver::D2,
+            },
+            node_lowerbound: self.node_lowerbound,
+            memory_limit: self.memory_limit,
+            timeout: self.timeout.map(Duration::from_secs),
+            track_intermediates: self.intermediates,
+        }
+    }
 }
 
 #[derive(Subcommand)]
