@@ -15,3 +15,5 @@ crate-type = ["cdylib"]
 pyo3 = { workspace = true }
 numpy = { workspace = true }
 codt = { workspace = true }
+strum = { workspace = true }
+strum_macros = { workspace = true }

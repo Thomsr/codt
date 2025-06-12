@@ -1,10 +1,5 @@
 use std::{
-    cmp::Ordering,
-    collections::{BinaryHeap, VecDeque},
-    fmt::Debug,
-    marker::PhantomData,
-    ops::Range,
-    sync::Arc,
+    cmp::Ordering, collections::VecDeque, fmt::Debug, marker::PhantomData, ops::Range, sync::Arc,
 };
 
 use crate::{
@@ -12,7 +7,10 @@ use crate::{
         dataview::DataView,
         tree::{BranchNode, LeafNode, Tree},
     },
-    search::solver::UpperboundStrategy,
+    search::{
+        queue::{BinaryHeapQueue, PQ},
+        solver::UpperboundStrategy,
+    },
     tasks::{CostSum, OptimizationTask},
 };
 
@@ -242,7 +240,7 @@ pub struct Node<'a, OT: OptimizationTask, SS: SearchStrategy> {
     /// The view of the dataset containing each remaining instance.
     pub dataview: DataView<'a, OT>,
     /// The remaining candidate children for an optimal solution.
-    pub queue: BinaryHeap<QueueItem<'a, OT, SS>>,
+    pub queue: BinaryHeapQueue<QueueItem<'a, OT, SS>>,
     /// Best tree found so far.
     pub best: Arc<Tree<OT>>,
     /// Keeps track of found lower bounds for pruning similar items
@@ -253,7 +251,7 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> Node<'a, OT, SS> {
     pub fn new(context: &SolveContext<OT, SS>, dataview: DataView<'a, OT>, max_depth: u32) -> Self {
         let ub = dataview.cost_summer.cost();
 
-        let mut queue = BinaryHeap::new();
+        let mut queue = BinaryHeapQueue::default();
 
         if max_depth > 0 && context.task.branching_cost() < ub && dataview.num_instances() > 1 {
             for feature in 0..dataview.num_features() {

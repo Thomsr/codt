@@ -10,6 +10,7 @@ use log::trace;
 use crate::{
     allocator::current_thread_memory_usage,
     model::{dataview::DataView, tree::Tree},
+    search::queue::PQ,
     tasks::OptimizationTask,
 };
 

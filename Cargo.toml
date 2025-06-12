@@ -28,3 +28,5 @@ pyo3 = "0.24.1"
 numpy = "0.24.0"
 rustc-hash = "2.1.1"
 ckmeans = { git = "https://github.com/mimvdb/ckmeans", rev = "ce54c86" }
+strum = "0.27.1"
+strum_macros = "0.27.1"

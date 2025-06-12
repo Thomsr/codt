@@ -15,6 +15,7 @@ use codt::{
 };
 use numpy::{IntoPyArray, PyArray1, PyReadonlyArray1, PyReadonlyArray2, ndarray::Axis};
 use pyo3::{exceptions::PyValueError, prelude::*, types::PyList};
+use strum_macros::EnumString;
 
 fn tree_to_py<'a, 'py, OT: OptimizationTask, X>(
     tree: &'a Tree<OT>,
@@ -39,7 +40,8 @@ where
 }
 
 #[pyclass(eq, eq_int)]
-#[derive(PartialEq, Eq, Clone, Copy)]
+#[derive(PartialEq, Eq, Clone, Copy, EnumString)]
+#[strum(serialize_all = "snake_case")]
 pub enum SearchStrategyEnum {
     Dfs,
     AndOr,
@@ -50,7 +52,8 @@ pub enum SearchStrategyEnum {
 }
 
 #[pyclass(eq, eq_int)]
-#[derive(PartialEq, Eq, Clone, Copy)]
+#[derive(PartialEq, Eq, Clone, Copy, EnumString)]
+#[strum(serialize_all = "snake_case")]
 pub enum UpperboundStrategyEnum {
     SolutionsOnly,
     TightFromSibling,
@@ -58,7 +61,8 @@ pub enum UpperboundStrategyEnum {
 }
 
 #[pyclass(eq, eq_int)]
-#[derive(PartialEq, Eq, Clone, Copy)]
+#[derive(PartialEq, Eq, Clone, Copy, EnumString)]
+#[strum(serialize_all = "snake_case")]
 pub enum TerminalSolverEnum {
     Leaf,
     LeftRight,
@@ -67,35 +71,23 @@ pub enum TerminalSolverEnum {
 
 #[pyfunction(signature = (strategy=""))]
 pub fn search_strategy_from_string(strategy: &str) -> Result<SearchStrategyEnum, PyErr> {
-    match strategy {
-        "dfs" => Ok(SearchStrategyEnum::Dfs),
-        "dfs-prio" => Ok(SearchStrategyEnum::DfsPrio),
-        "and-or" => Ok(SearchStrategyEnum::AndOr),
-        "bfs-lb" => Ok(SearchStrategyEnum::BfsLb),
-        "bfs-curiosity" => Ok(SearchStrategyEnum::BfsCuriosity),
-        "bfs-gosdt" => Ok(SearchStrategyEnum::BfsGosdt),
-        _ => Err(PyValueError::new_err("Not a valid search strategy")),
-    }
+    strategy
+        .parse()
+        .map_err(|_| PyValueError::new_err("Not a valid search strategy"))
 }
 
 #[pyfunction(signature = (strategy=""))]
 pub fn ub_from_string(strategy: &str) -> Result<UpperboundStrategyEnum, PyErr> {
-    match strategy {
-        "solutions-only" => Ok(UpperboundStrategyEnum::SolutionsOnly),
-        "tight-from-sibling" => Ok(UpperboundStrategyEnum::TightFromSibling),
-        "for-remaining-interval" => Ok(UpperboundStrategyEnum::ForRemainingInterval),
-        _ => Err(PyValueError::new_err("Not a valid upper bounding strategy")),
-    }
+    strategy
+        .parse()
+        .map_err(|_| PyValueError::new_err("Not a valid upper bounding strategy"))
 }
 
 #[pyfunction(signature = (solver=""))]
 pub fn terminal_solver_from_string(solver: &str) -> Result<TerminalSolverEnum, PyErr> {
-    match solver {
-        "leaf" => Ok(TerminalSolverEnum::Leaf),
-        "left-right" => Ok(TerminalSolverEnum::LeftRight),
-        "d2" => Ok(TerminalSolverEnum::D2),
-        _ => Err(PyValueError::new_err("Not a valid terminal solver")),
-    }
+    solver
+        .parse()
+        .map_err(|_| PyValueError::new_err("Not a valid terminal solver"))
 }
 
 macro_rules! impl_optimal_decision_tree_pyclass {
