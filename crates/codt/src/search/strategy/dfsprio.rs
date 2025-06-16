@@ -32,14 +32,14 @@ impl SearchStrategy for DfsPrioSearchStrategy {
     }
 
     fn child_priority<'a, OT: OptimizationTask, SS: SearchStrategy>(
-        a: &Node<'a, OT, SS>,
-        b: &Node<'a, OT, SS>,
+        _item: &QueueItem<'a, OT, SS>,
+        children: &[Node<'a, OT, SS>; 2],
     ) -> usize {
         // We choose the path in the graph as the most promising
         // solution (lowest lower bound), but when choosing which
         // 'and' node to expand, we choose the node most likely to
         // change the estimate (highest upper bound).
-        if a.cost_upper_bound >= b.cost_upper_bound {
+        if children[0].cost_upper_bound >= children[1].cost_upper_bound {
             0
         } else {
             1
@@ -52,12 +52,5 @@ impl SearchStrategy for DfsPrioSearchStrategy {
         // If the item front of queue is not expanded, then there are no other
         // expanded in queue, and the next ordering is by lower bound.
         !item.is_expanded()
-    }
-
-    fn heuristic_from_lb_and_support<OT: OptimizationTask>(
-        _lb: OT::CostType,
-        _support: usize,
-    ) -> f64 {
-        0.0 // Not used
     }
 }

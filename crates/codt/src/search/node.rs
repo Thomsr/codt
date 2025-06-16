@@ -69,15 +69,18 @@ pub struct QueueItem<'a, OT: OptimizationTask, SS: SearchStrategy> {
 
     /// The number of instances that reach this node.
     /// Used by some search heuristics.
-    support: usize,
+    pub support: usize,
 
     /// The branching test for this node is one of `feature <= possible_split_points[s]` where s in split_points.
     pub feature: usize,
     /// The branching test for this node is one of `feature <= possible_split_points[s]` where s in split_points.
     pub split_points: Range<usize>,
 
-    // Item can only be expanded once the size of the `split_points` range is one.
+    /// Item can only be expanded once the size of the `split_points` range is one.
     expanded: Option<ExpandedQueueItem<'a, OT, SS>>,
+
+    /// A pseudorandom value for the node, if the search strategy requires it
+    pub random_value: u64,
 
     _ss: PhantomData<SS>,
 }
@@ -129,6 +132,11 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> QueueItem<'a, OT, SS> {
             feature,
             split_points,
             expanded: None,
+            random_value: if SS::generate_random_value() {
+                rand::random()
+            } else {
+                0
+            },
             _ss: PhantomData,
         }
     }
@@ -146,6 +154,11 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> QueueItem<'a, OT, SS> {
                 feature: self.feature,
                 split_points: self.split_points.start..split,
                 expanded: None,
+                random_value: if SS::generate_random_value() {
+                    rand::random()
+                } else {
+                    0
+                },
                 _ss: PhantomData,
             })
         }
@@ -156,6 +169,11 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> QueueItem<'a, OT, SS> {
                 feature: self.feature,
                 split_points: (split + 1)..self.split_points.end,
                 expanded: None,
+                random_value: if SS::generate_random_value() {
+                    rand::random()
+                } else {
+                    0
+                },
                 _ss: PhantomData,
             })
         }
@@ -192,20 +210,20 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> QueueItem<'a, OT, SS> {
 
     /// If expanded, returns either the left or right child which should be explored next.
     pub fn current_node(&mut self) -> Option<usize> {
-        self.expanded.as_mut().and_then(|children| match children {
-            ExpandedQueueItem::Children(children) => {
-                let heuristic_child = SS::child_priority(&children[0], &children[1]);
+        return if let Some(ExpandedQueueItem::Children(children)) = self.expanded.take() {
+            let heuristic_child = SS::child_priority(self, &children);
 
-                let selected_child = if children[heuristic_child].is_complete() {
-                    1 - heuristic_child
-                } else {
-                    heuristic_child
-                };
+            let selected_child = if children[heuristic_child].is_complete() {
+                1 - heuristic_child
+            } else {
+                heuristic_child
+            };
 
-                Some(selected_child)
-            }
-            ExpandedQueueItem::Solution(_) => None,
-        })
+            self.expanded = Some(ExpandedQueueItem::Children(children));
+            Some(selected_child)
+        } else {
+            None
+        };
     }
 
     /// The lowest heuristic value of an unexpanded node descendant. Own lower bound if
@@ -220,7 +238,7 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> QueueItem<'a, OT, SS> {
                 ExpandedQueueItem::Solution(_) => f64::MAX,
             }
         } else {
-            SS::heuristic_from_lb_and_support::<OT>(self.cost_lower_bound, self.support)
+            SS::heuristic(self)
         }
     }
 }
@@ -276,10 +294,9 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> Node<'a, OT, SS> {
         Node {
             cost_upper_bound: ub,
             cost_lower_bound: lb,
-            lowest_descendant_heuristic: SS::heuristic_from_lb_and_support::<OT>(
-                lb,
-                dataview.num_instances(),
-            ),
+            lowest_descendant_heuristic: queue
+                .peek()
+                .map_or(f64::MAX, |item| item.lowest_descendant_heuristic()),
             remaining_depth_budget: max_depth,
             pruner: Pruner::new(dataview.num_features()),
             best: Arc::new(Tree::Leaf(LeafNode {
@@ -460,12 +477,9 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> Node<'a, OT, SS> {
             if SS::item_front_of_queue_is_lowest_lb(next) {
                 OT::update_lowerbound(&mut self.cost_lower_bound, &next.cost_lower_bound);
             }
-            // Self or front of queue, since for bfs the front of queue will contain the lowest heuristic value.
-            self.lowest_descendant_heuristic = SS::heuristic_from_lb_and_support::<OT>(
-                self.cost_lower_bound,
-                self.dataview.num_instances(),
-            )
-            .min(next.lowest_descendant_heuristic())
+            // For bfs the front of queue will contain the lowest heuristic value.
+            // Note that in this case we are always expanded, so we always want the lowest heuristic of the child, not of itself.
+            self.lowest_descendant_heuristic = next.lowest_descendant_heuristic();
         } else {
             // Queue empty, we are done.
             OT::update_lowerbound(&mut self.cost_lower_bound, &self.best.cost());

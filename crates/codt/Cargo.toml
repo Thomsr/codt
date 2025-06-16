@@ -11,3 +11,4 @@ repository = { workspace = true }
 log = { workspace = true }
 rustc-hash = { workspace = true }
 ckmeans = { workspace = true }
+rand = { workspace = true }

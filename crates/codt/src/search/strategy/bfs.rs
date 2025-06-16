@@ -51,10 +51,10 @@ impl<H: BfsHeuristic> SearchStrategy for BfsSearchStrategy<H> {
     }
 
     fn child_priority<'a, OT: OptimizationTask, SS: SearchStrategy>(
-        a: &Node<'a, OT, SS>,
-        b: &Node<'a, OT, SS>,
+        _item: &QueueItem<'a, OT, SS>,
+        children: &[Node<'a, OT, SS>; 2],
     ) -> usize {
-        if a.lowest_descendant_heuristic <= b.lowest_descendant_heuristic {
+        if children[0].lowest_descendant_heuristic <= children[1].lowest_descendant_heuristic {
             0
         } else {
             1
@@ -67,13 +67,11 @@ impl<H: BfsHeuristic> SearchStrategy for BfsSearchStrategy<H> {
         false
     }
 
-    fn heuristic_from_lb_and_support<OT: OptimizationTask>(
-        lb: OT::CostType,
-        support: usize,
-    ) -> f64 {
-        let lb_float: f64 = lb
+    fn heuristic<OT: OptimizationTask, SS: SearchStrategy>(item: &QueueItem<OT, SS>) -> f64 {
+        let lb_float: f64 = item
+            .cost_lower_bound
             .try_into()
             .expect("Global best first search only works for numeric costs");
-        H::heuristic_from_lb_and_support(lb_float, support)
+        H::heuristic_from_lb_and_support(lb_float, item.support)
     }
 }

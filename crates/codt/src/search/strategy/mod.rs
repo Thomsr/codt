@@ -14,6 +14,7 @@ pub mod andor;
 pub mod bfs;
 pub mod dfs;
 pub mod dfsprio;
+pub mod random;
 
 pub trait SearchStrategy {
     /// The order in which the items in the queue should be handled. Items are handled in asceding order.
@@ -24,8 +25,8 @@ pub trait SearchStrategy {
 
     /// After backtracking, decide which of the child nodes should be explored next.
     fn child_priority<'a, OT: OptimizationTask, SS: SearchStrategy>(
-        a: &Node<'a, OT, SS>,
-        b: &Node<'a, OT, SS>,
+        item: &QueueItem<'a, OT, SS>,
+        children: &[Node<'a, OT, SS>; 2],
     ) -> usize;
 
     /// In some search strategies, the front of the queue is the lowest possible
@@ -34,6 +35,11 @@ pub trait SearchStrategy {
         item: &QueueItem<OT, SS>,
     ) -> bool;
 
-    fn heuristic_from_lb_and_support<OT: OptimizationTask>(lb: OT::CostType, support: usize)
-    -> f64;
+    fn heuristic<OT: OptimizationTask, SS: SearchStrategy>(_item: &QueueItem<OT, SS>) -> f64 {
+        0.0 // Only used for global best first search strategy
+    }
+
+    fn generate_random_value() -> bool {
+        false // Only used for random search strategies. Generation of random values introduces small slowdown, so make it conditional.
+    }
 }

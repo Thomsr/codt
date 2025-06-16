@@ -1,0 +1,38 @@
+use std::cmp::Ordering;
+
+use crate::{
+    search::node::{Node, QueueItem},
+    tasks::OptimizationTask,
+};
+
+use super::{SearchStrategy, dfs::DfsSearchStrategy};
+
+pub struct RandomDfsSearchStrategy;
+
+impl SearchStrategy for RandomDfsSearchStrategy {
+    fn cmp_item<'a, OT: OptimizationTask, SS: SearchStrategy>(
+        a: &QueueItem<'a, OT, SS>,
+        b: &QueueItem<'a, OT, SS>,
+    ) -> Ordering {
+        // For dfs, use random ordering, but stick with the same node once picked.
+        a.random_value
+            .cmp(&b.random_value)
+            // Crucially, order by length of the range. This means any expanded
+            // node (which has a range of a single value) goes first.
+            .then(DfsSearchStrategy::cmp_item(a, b))
+    }
+
+    fn child_priority<'a, OT: OptimizationTask, SS: SearchStrategy>(
+        item: &QueueItem<'a, OT, SS>,
+        _children: &[Node<'a, OT, SS>; 2],
+    ) -> usize {
+        // Choose the left or right branch randomly
+        (item.random_value & 1).try_into().unwrap()
+    }
+
+    fn item_front_of_queue_is_lowest_lb<OT: OptimizationTask, SS: SearchStrategy>(
+        _item: &QueueItem<OT, SS>,
+    ) -> bool {
+        false
+    }
+}

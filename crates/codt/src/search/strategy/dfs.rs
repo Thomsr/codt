@@ -26,12 +26,12 @@ impl SearchStrategy for DfsSearchStrategy {
     }
 
     fn child_priority<'a, OT: OptimizationTask, SS: SearchStrategy>(
-        a: &Node<'a, OT, SS>,
-        b: &Node<'a, OT, SS>,
+        _item: &QueueItem<'a, OT, SS>,
+        children: &[Node<'a, OT, SS>; 2],
     ) -> usize {
         // For DFS, only use information available when starting the search.
         // This is a proxy for the upper bound.
-        if a.dataview.cost_summer.cost() >= b.dataview.cost_summer.cost() {
+        if children[0].dataview.cost_summer.cost() >= children[1].dataview.cost_summer.cost() {
             0
         } else {
             1
@@ -42,12 +42,5 @@ impl SearchStrategy for DfsSearchStrategy {
         _item: &QueueItem<OT, SS>,
     ) -> bool {
         false
-    }
-
-    fn heuristic_from_lb_and_support<OT: OptimizationTask>(
-        _lb: OT::CostType,
-        _support: usize,
-    ) -> f64 {
-        0.0 // Not used
     }
 }

@@ -30,3 +30,4 @@ rustc-hash = "2.1.1"
 ckmeans = { git = "https://github.com/mimvdb/ckmeans", rev = "ce54c86" }
 strum = "0.27.1"
 strum_macros = "0.27.1"
+rand = "0.9.1"
