@@ -7,9 +7,12 @@ use codt::{
         strategy::{
             SearchStrategy,
             andor::AndOrSearchStrategy,
-            bfs::{BfsSearchStrategy, CuriosityHeuristic, GOSDTHeuristic, LBHeuristic},
+            bfs::{
+                BfsSearchStrategy, CuriosityHeuristic, GOSDTHeuristic, LBHeuristic, RandomHeuristic,
+            },
             dfs::DfsSearchStrategy,
             dfsprio::DfsPrioSearchStrategy,
+            random::RandomDfsSearchStrategy,
         },
     },
     tasks::{OptimizationTask, accuracy::AccuracyTask, squared_error::SquaredErrorTask},
@@ -63,6 +66,9 @@ fn run_with_strategy<T: OptimizationTask>(
         params::SearchStrategy::DfsPrio => {
             run_solver_for_task::<_, DfsPrioSearchStrategy>(file, options, task)
         }
+        params::SearchStrategy::DfsRandom => {
+            run_solver_for_task::<_, RandomDfsSearchStrategy>(file, options, task)
+        }
         params::SearchStrategy::BfsLb => {
             run_solver_for_task::<_, BfsSearchStrategy<LBHeuristic>>(file, options, task)
         }
@@ -71,6 +77,9 @@ fn run_with_strategy<T: OptimizationTask>(
         }
         params::SearchStrategy::BfsGosdt => {
             run_solver_for_task::<_, BfsSearchStrategy<GOSDTHeuristic>>(file, options, task)
+        }
+        params::SearchStrategy::BfsRandom => {
+            run_solver_for_task::<_, BfsSearchStrategy<RandomHeuristic>>(file, options, task)
         }
     };
 }

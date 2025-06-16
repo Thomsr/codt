@@ -10,27 +10,48 @@ use super::SearchStrategy;
 pub struct LBHeuristic;
 pub struct CuriosityHeuristic;
 pub struct GOSDTHeuristic;
+pub struct RandomHeuristic;
+
+/// Info used for the heuristics, so that the heuristic struct does not need to be generic over the tasks.
+pub struct HeuristicInfo {
+    lb: f64,
+    support: usize,
+    random_value: u64,
+}
 
 pub trait BfsHeuristic {
-    fn heuristic_from_lb_and_support(lb: f64, support: usize) -> f64;
+    fn heuristic(info: HeuristicInfo) -> f64;
+    fn generate_random_value() -> bool {
+        false
+    }
 }
 
 impl BfsHeuristic for LBHeuristic {
-    fn heuristic_from_lb_and_support(lb: f64, _support: usize) -> f64 {
-        lb
+    fn heuristic(info: HeuristicInfo) -> f64 {
+        info.lb
     }
 }
 
 impl BfsHeuristic for CuriosityHeuristic {
-    fn heuristic_from_lb_and_support(lb: f64, support: usize) -> f64 {
-        lb / support as f64
+    fn heuristic(info: HeuristicInfo) -> f64 {
+        info.lb / info.support as f64
     }
 }
 
 impl BfsHeuristic for GOSDTHeuristic {
-    fn heuristic_from_lb_and_support(lb: f64, support: usize) -> f64 {
+    fn heuristic(info: HeuristicInfo) -> f64 {
         // TODO figure out why lb + support seems to work well. Maybe due to faster LB discovery
-        lb + support as f64
+        info.lb + info.support as f64
+    }
+}
+
+impl BfsHeuristic for RandomHeuristic {
+    fn heuristic(info: HeuristicInfo) -> f64 {
+        info.random_value as f64
+    }
+
+    fn generate_random_value() -> bool {
+        true
     }
 }
 
@@ -72,6 +93,14 @@ impl<H: BfsHeuristic> SearchStrategy for BfsSearchStrategy<H> {
             .cost_lower_bound
             .try_into()
             .expect("Global best first search only works for numeric costs");
-        H::heuristic_from_lb_and_support(lb_float, item.support)
+        H::heuristic(HeuristicInfo {
+            lb: lb_float,
+            support: item.support,
+            random_value: item.random_value,
+        })
+    }
+
+    fn generate_random_value() -> bool {
+        H::generate_random_value()
     }
 }

@@ -102,9 +102,11 @@ pub enum SearchStrategy {
     /// Use an and-or best-first search strategy
     AndOr,
     DfsPrio,
+    DfsRandom,
     BfsLb,
     BfsCuriosity,
     BfsGosdt,
+    BfsRandom,
 }
 
 #[derive(ValueEnum, Clone, Debug)]
