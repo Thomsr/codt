@@ -90,7 +90,9 @@ impl<'a, OT: OptimizationTask> DataView<'a, OT> {
     ) {
         let full_cost = costsum.cost();
 
-        if full_cost != *last_left_cost {
+        if full_cost == OT::ZERO_COST {
+            *keep_until = 0;
+        } else if full_cost != *last_left_cost {
             // For each feature, consider only useful splitting points. The last
             // feature value is not a useful splitting point because all instances
             // would go to the left. So only keep len - 1.
@@ -130,7 +132,7 @@ impl<'a, OT: OptimizationTask> DataView<'a, OT> {
                 Self::add_possible_split_value(
                     &mut possible_split_values_i,
                     &mut previous,
-                    &fv,
+                    fv,
                     &mut costsum,
                     &mut last_left_cost,
                     &mut keep_until,
@@ -208,7 +210,7 @@ impl<'a, OT: OptimizationTask> DataView<'a, OT> {
                         &mut left_costsum,
                         &mut last_left_left_cost,
                         &mut keep_until_left,
-                        &self.dataset,
+                        self.dataset,
                     );
                 } else {
                     Self::add_feature_value(&mut feature_values_right_i, value);
@@ -219,7 +221,7 @@ impl<'a, OT: OptimizationTask> DataView<'a, OT> {
                         &mut right_costsum,
                         &mut last_right_left_cost,
                         &mut keep_until_right,
-                        &self.dataset,
+                        self.dataset,
                     );
                 }
             }
@@ -237,11 +239,6 @@ impl<'a, OT: OptimizationTask> DataView<'a, OT> {
                 &mut last_right_left_cost,
                 &mut keep_until_right,
             );
-
-            // For each feature, consider only useful splitting points. The last feature value is
-            // not a useful splitting point because all instances would go to the left.
-            possible_split_values_left_i.pop();
-            possible_split_values_right_i.pop();
 
             assert!(!feature_values_left_i.is_empty());
             assert!(!feature_values_right_i.is_empty());
@@ -298,5 +295,78 @@ impl<'a, OT: OptimizationTask> DataView<'a, OT> {
         let next_threshold = self.dataset.internal_to_original_feature_value[split_feature]
             [next_split_value as usize];
         (current_threshold + next_threshold) / 2.0
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::model::instance::LabeledInstance;
+    use crate::tasks::accuracy::AccuracyTask;
+
+    /// Helper function to test `add_possible_split_value` and `post_process_possible_splits`.
+    fn test_possible_splits(feature_values: Vec<i32>, labels: Vec<i32>, expected_splits: Vec<i32>) {
+        // Create a dataset with the given labels and feature values.
+        let mut dataset = DataSet::default();
+        for label in labels {
+            dataset.instances.push(LabeledInstance::new(label));
+        }
+        dataset.feature_values.push(feature_values);
+
+        let view = DataView::<AccuracyTask>::from_dataset(&dataset);
+
+        // Assert that the resulting splits match the expected splits.
+        assert_eq!(view.possible_split_values[0], expected_splits);
+    }
+
+    #[test]
+    fn possible_splits_smoke_test() {
+        // For feature values:         00011112224444566
+        // And cumulative left cost:   00000000123456666
+        // And cumulative right cost:  66666666543210000
+        // We add possible splits:     0--1---2--4---56-
+        // - 0, 1 is a bigger zero split.
+        // + 1
+        // + 2
+        // - 3, feature value not in this range.
+        // + 4
+        // - 5, 4 is a bigger right zero split.
+        // - 6, 4 is a bigger right zero split.
+        let feature_values = vec![0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 4, 4, 4, 4, 5, 6, 6];
+        let labels = vec![0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 3, 4, 5, 6, 0, 0, 0];
+        let expected_splits = vec![1, 2, 4];
+        test_possible_splits(feature_values, labels, expected_splits);
+    }
+
+    #[test]
+    fn possible_splits_no_last() {
+        let feature_values = vec![0, 1, 2];
+        let labels = vec![0, 1, 2];
+        let expected_splits = vec![0, 1];
+        test_possible_splits(feature_values, labels, expected_splits);
+    }
+
+    #[test]
+    fn possible_splits_one() {
+        let feature_values = vec![0, 1];
+        let labels = vec![0, 1];
+        let expected_splits = vec![0];
+        test_possible_splits(feature_values, labels, expected_splits);
+    }
+
+    #[test]
+    fn possible_splits_none() {
+        let feature_values = vec![0, 1];
+        let labels = vec![0, 0];
+        let expected_splits = vec![];
+        test_possible_splits(feature_values, labels, expected_splits);
+    }
+
+    #[test]
+    fn possible_splits_largest_left() {
+        let feature_values = vec![0, 1, 2, 3, 4, 5];
+        let labels = vec![0, 0, 0, 0, 0, 1];
+        let expected_splits = vec![4];
+        test_possible_splits(feature_values, labels, expected_splits);
     }
 }

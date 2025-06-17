@@ -60,7 +60,8 @@ impl<I: Instance> DataSet<I> {
                 let this_original = self.original_feature_values[i][ids[idx]];
                 let last_feature_value = feature_values[ids[idx - 1]];
 
-                feature_values[ids[idx]] = if last_original == this_original {
+                // Use f32::EPSILON to avoid floating point precision issues with lesser precision input.
+                feature_values[ids[idx]] = if last_original + f32::EPSILON as f64 >= this_original {
                     last_feature_value
                 } else {
                     let new_id = last_feature_value + 1;
