@@ -111,6 +111,12 @@ impl CostSum<i32, LabeledInstance<i32>, f64> for AccuracyCostSum {
 
         (total - largest_class_size) as f64
     }
+
+    fn clear(&mut self) {
+        for count in &mut self.instance_count_per_class {
+            *count = 0;
+        }
+    }
 }
 
 impl OptimizationTask for AccuracyTask {

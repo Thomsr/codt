@@ -38,6 +38,68 @@ impl<OT: OptimizationTask> Debug for DataView<'_, OT> {
 }
 
 impl<'a, OT: OptimizationTask> DataView<'a, OT> {
+    fn add_possible_split_value(
+        possible_split_values: &mut Vec<i32>,
+        last_feature_value: &mut i32,
+        value: &FeatureValue,
+        costsum: &mut OT::CostSumType,
+        last_left_cost: &mut OT::CostType,
+        keep_until: &mut usize,
+        dataset: &'a DataSet<OT::InstanceType>,
+    ) {
+        if value.feature_value != *last_feature_value {
+            // Only allow max of one split (biggest) where left side is OT::MIN_COST
+            // For feature values:         00011112224444566
+            // And cumulative left cost:   00000000123456666
+            // And cumulative right cost:  66666666543210000
+            // We add possible splits:     0--1---2--4---56-
+            //
+            // When adding split 2, we see that the old_cost is 0, so
+            // split 1 is a bigger zero split than split 0./
+            //
+            // Similarly, split 4 is a bigger right zero split than 5 and 6.
+            // However, we do not know the cumulative right cost yet,
+            // so we decide to keep it if the left cost stays the same. (Max left cost = min right cost)
+
+            let old_cost: OT::CostType = costsum.cost();
+
+            // Keep track of the first split with the last left cost, so later we can
+            // remove all splits after that if the left cost doesn't change anymore.
+            if old_cost != *last_left_cost {
+                *keep_until = possible_split_values.len();
+                *last_left_cost = old_cost;
+            }
+
+            // Ensure we have at most one split with zero cost on the left side.
+            if old_cost == OT::ZERO_COST && possible_split_values.len() > 1 {
+                possible_split_values[0] = possible_split_values[1];
+                possible_split_values[1] = value.feature_value;
+            } else {
+                possible_split_values.push(value.feature_value);
+            }
+            *last_feature_value = value.feature_value;
+        }
+        *costsum += &dataset.instances[value.instance_id];
+    }
+
+    fn post_process_possible_splits(
+        costsum: &mut OT::CostSumType,
+        possible_split_values: &mut Vec<i32>,
+        last_left_cost: &mut OT::CostType,
+        keep_until: &mut usize,
+    ) {
+        let full_cost = costsum.cost();
+
+        if full_cost != *last_left_cost {
+            // For each feature, consider only useful splitting points. The last
+            // feature value is not a useful splitting point because all instances
+            // would go to the left. So only keep len - 1.
+            *keep_until = possible_split_values.len() - 1;
+        }
+
+        possible_split_values.truncate(*keep_until);
+    }
+
     /// Initialize a dataview from a dataset. The new dataview contains all instances of the dataset
     pub fn from_dataset(dataset: &'a DataSet<OT::InstanceType>) -> Self {
         // Copy over all the feature values from the dataset, and sort them by the feature values.
@@ -61,40 +123,27 @@ impl<'a, OT: OptimizationTask> DataView<'a, OT> {
 
             let mut costsum = OT::init_costsum(dataset);
             let mut previous = -1;
-
-            // Only allow max of one split (biggest) where left side is OT::MIN_COST
-            // TODO: also right side is OT::MIN_COST
-            let mut biggest_left_min_cost_split = None;
+            let mut last_left_cost = OT::ZERO_COST;
+            let mut keep_until = 1;
 
             for fv in &feature_values_sorted_i {
-                costsum += &dataset.instances[fv.instance_id];
-
-                let cost: OT::CostType = costsum.cost();
-
-                // TODO: this check may only be done at actual thresholds.
-                // E.g. for cost sequence 0 0 1 and feature values 0 1 1, only the 0 threshold is a zero-cost split.
-                if cost == OT::ZERO_COST {
-                    if biggest_left_min_cost_split.is_none() {
-                        // Reserve a slot at the start for this.
-                        possible_split_values_i.push(0);
-                    }
-                    biggest_left_min_cost_split = Some(fv.feature_value);
-                    continue;
-                }
-
-                if fv.feature_value != previous {
-                    possible_split_values_i.push(fv.feature_value);
-                    previous = fv.feature_value;
-                }
+                Self::add_possible_split_value(
+                    &mut possible_split_values_i,
+                    &mut previous,
+                    &fv,
+                    &mut costsum,
+                    &mut last_left_cost,
+                    &mut keep_until,
+                    dataset,
+                );
             }
 
-            if let Some(biggest_left_min_cost_split) = biggest_left_min_cost_split {
-                possible_split_values_i[0] = biggest_left_min_cost_split;
-            }
-
-            // For each feature, consider only useful splitting points. The last feature value is
-            // not a useful splitting point because all instances would go to the left.
-            possible_split_values_i.pop();
+            Self::post_process_possible_splits(
+                &mut costsum,
+                &mut possible_split_values_i,
+                &mut last_left_cost,
+                &mut keep_until,
+            );
 
             feature_values_sorted.push(feature_values_sorted_i);
             possible_split_values.push(possible_split_values_i);
@@ -109,6 +158,16 @@ impl<'a, OT: OptimizationTask> DataView<'a, OT> {
         }
     }
 
+    /// Helper function for left and right side.
+    #[inline]
+    fn add_feature_value(feature_values: &mut Vec<FeatureValue>, value: FeatureValue) {
+        // Assure the compiler that we do not need reallocation when pushing.
+        unsafe {
+            std::hint::assert_unchecked(feature_values.len() < feature_values.capacity());
+        }
+        feature_values.push(value);
+    }
+
     /// Split this dataview into two, the first containing only those instances where
     /// `split_feature <= threshold`, and the second where `split_feature > threshold`.
     pub fn split(&self, split_feature: usize, split_value: usize) -> (Self, Self) {
@@ -119,6 +178,8 @@ impl<'a, OT: OptimizationTask> DataView<'a, OT> {
         let mut possible_split_values_right = Vec::with_capacity(self.possible_split_values.len());
 
         let mut left_costsum = self.cost_summer.clone();
+        left_costsum.clear();
+        let mut right_costsum = left_costsum.clone();
 
         for (feature_idx, feature) in self.feature_values_sorted.iter().enumerate() {
             // Overestimate all of these capacities to the current length so that no reallocations are needed.
@@ -130,53 +191,52 @@ impl<'a, OT: OptimizationTask> DataView<'a, OT> {
                 Vec::with_capacity(self.possible_split_values[feature_idx].len());
             let mut last_feature_value_left = -1;
             let mut last_feature_value_right = -1;
+            let mut last_left_left_cost = OT::ZERO_COST;
+            let mut last_right_left_cost = OT::ZERO_COST;
+            let mut keep_until_left = 1;
+            let mut keep_until_right = 1;
+            left_costsum.clear();
+            right_costsum.clear();
 
             for &value in feature {
                 if self.dataset.feature_values[split_feature][value.instance_id] <= threshold {
-                    // Assure the compiler that we do not need reallocation when pushing.
-                    unsafe {
-                        std::hint::assert_unchecked(
-                            feature_values_left_i.len() < feature_values_left_i.capacity(),
-                        );
-                    }
-                    feature_values_left_i.push(value);
-                    if value.feature_value != last_feature_value_left {
-                        // TODO: readd this guarantee when preprocessing here is as strict as in from_dataset
-                        // unsafe {
-                        //     std::hint::assert_unchecked(
-                        //         possible_split_values_left_i.len()
-                        //             < possible_split_values_left_i.capacity(),
-                        //     )
-                        // }
-                        possible_split_values_left_i.push(value.feature_value);
-                    }
-                    last_feature_value_left = value.feature_value;
+                    Self::add_feature_value(&mut feature_values_left_i, value);
+                    Self::add_possible_split_value(
+                        &mut possible_split_values_left_i,
+                        &mut last_feature_value_left,
+                        &value,
+                        &mut left_costsum,
+                        &mut last_left_left_cost,
+                        &mut keep_until_left,
+                        &self.dataset,
+                    );
                 } else {
-                    // Assure the compiler that we do not need reallocation when pushing.
-                    unsafe {
-                        std::hint::assert_unchecked(
-                            feature_values_right_i.len() < feature_values_right_i.capacity(),
-                        );
-                    }
-                    feature_values_right_i.push(value);
-                    if value.feature_value != last_feature_value_right {
-                        // TODO: re-add this guarantee when preprocessing here is as strict as in from_dataset
-                        // unsafe {
-                        //     std::hint::assert_unchecked(
-                        //         possible_split_values_right_i.len()
-                        //             < possible_split_values_right_i.capacity(),
-                        //     )
-                        // }
-                        possible_split_values_right_i.push(value.feature_value);
-                    }
-                    last_feature_value_right = value.feature_value;
-
-                    // Only once, subtract all values to the right from the left costsum.
-                    if feature_idx == 0 {
-                        left_costsum -= &self.dataset.instances[value.instance_id]
-                    }
+                    Self::add_feature_value(&mut feature_values_right_i, value);
+                    Self::add_possible_split_value(
+                        &mut possible_split_values_right_i,
+                        &mut last_feature_value_right,
+                        &value,
+                        &mut right_costsum,
+                        &mut last_right_left_cost,
+                        &mut keep_until_right,
+                        &self.dataset,
+                    );
                 }
             }
+
+            Self::post_process_possible_splits(
+                &mut left_costsum,
+                &mut possible_split_values_left_i,
+                &mut last_left_left_cost,
+                &mut keep_until_left,
+            );
+
+            Self::post_process_possible_splits(
+                &mut right_costsum,
+                &mut possible_split_values_right_i,
+                &mut last_right_left_cost,
+                &mut keep_until_right,
+            );
 
             // For each feature, consider only useful splitting points. The last feature value is
             // not a useful splitting point because all instances would go to the left.
@@ -191,10 +251,6 @@ impl<'a, OT: OptimizationTask> DataView<'a, OT> {
             possible_split_values_left.push(possible_split_values_left_i);
             possible_split_values_right.push(possible_split_values_right_i);
         }
-
-        // Subtract left from the total to get the right costsum
-        let mut right_costsum = self.cost_summer.clone();
-        right_costsum -= &left_costsum;
 
         (
             Self {

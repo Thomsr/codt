@@ -72,6 +72,12 @@ impl CostSum<f64, LabeledInstance<f64>, f64> for SquaredErrorCostSum {
         // The sum of squared errors from the mean can be computed from (sum of (y^2)) - ((sum of y)^2 / N)
         self.y2 - (self.y * self.y) / (self.n as f64)
     }
+
+    fn clear(&mut self) {
+        self.y = 0.0;
+        self.y2 = 0.0;
+        self.n = 0;
+    }
 }
 
 impl OptimizationTask for SquaredErrorTask {

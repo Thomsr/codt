@@ -16,6 +16,7 @@ pub trait CostSum<LabelType, InstanceType, CostType>:
 {
     fn label(&self) -> LabelType;
     fn cost(&self) -> CostType;
+    fn clear(&mut self);
 }
 
 pub trait OptimizationTask {
