@@ -11,7 +11,7 @@ use crate::{
         queue::{BinaryHeapQueue, PQ},
         solver::UpperboundStrategy,
     },
-    tasks::{CostSum, OptimizationTask},
+    tasks::{Cost, CostSum, OptimizationTask},
 };
 
 use super::{pruner::Pruner, solver::SolveContext, strategy::SearchStrategy};
@@ -271,7 +271,10 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> Node<'a, OT, SS> {
 
         let mut queue = BinaryHeapQueue::default();
 
-        if max_depth > 0 && context.task.branching_cost() < ub && dataview.num_instances() > 1 {
+        if max_depth > 0
+            && context.task.branching_cost().strictly_less_than(&ub)
+            && dataview.num_instances() > 1
+        {
             for feature in 0..dataview.num_features() {
                 let n_splitpoints = dataview.possible_split_values[feature].len();
                 if n_splitpoints > 0 {
@@ -311,7 +314,11 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> Node<'a, OT, SS> {
     /// A search node is complete if it is guaranteed that it has expanded its best solution,
     /// or that this node is not part of the optimal solution (lower bound > upper bound).
     pub fn is_complete(&self) -> bool {
-        self.cost_lower_bound >= self.best.cost() || self.cost_lower_bound > self.cost_upper_bound
+        self.cost_lower_bound
+            .greater_or_not_much_less_than(&self.best.cost())
+            || self
+                .cost_lower_bound
+                .strictly_greater_than(&self.cost_upper_bound)
     }
 
     fn split(
@@ -411,14 +418,14 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> Node<'a, OT, SS> {
             // Update our upper bound if based on the upper bound of this item.
             let ub = expanded.upper_bound(context);
             OT::update_upperbound(&mut self.cost_upper_bound, &ub);
-            if ub == context.task.branching_cost() {
+            if ub.less_or_not_much_greater_than(&context.task.branching_cost()) {
                 // We cannot find a better solution from splitting: quickly clear the queue.
                 self.queue.clear();
             }
 
             // Update our current best item.
             let best_cost = expanded.best_cost(context);
-            if best_cost < self.best.cost() {
+            if best_cost.strictly_less_than(&self.best.cost()) {
                 let expanded = item
                     .expanded
                     .as_ref()
@@ -446,8 +453,12 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> Node<'a, OT, SS> {
             self.recalculate_item_bounds(context, &mut item);
 
             let update_needed = if item.is_complete()
-                || item.cost_lower_bound >= self.best.cost()
-                || item.cost_lower_bound > self.cost_upper_bound
+                || item
+                    .cost_lower_bound
+                    .greater_or_not_much_less_than(&self.best.cost())
+                || item
+                    .cost_lower_bound
+                    .strictly_greater_than(&self.cost_upper_bound)
             {
                 // Don't add it back to the queue if the item cannot further improve the solution.
                 // Should update the lower bounds of the next queue item.
@@ -517,9 +528,7 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> Node<'a, OT, SS> {
         feature: usize,
         split_index: usize,
     ) -> ExpandedQueueItem<'a, OT, SS> {
-        //let (left, right) = self.dataview.split(feature, split_index);
-
-        let split_value = self.dataview.possible_split_values[feature][split_index];
+        let split_value = self.dataview.possible_split_values[feature][split_index].feature_value;
         let mut total_right = self.dataview.cost_summer.clone();
 
         for instance in self.dataview.instances_iter(feature) {
@@ -535,7 +544,7 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> Node<'a, OT, SS> {
 
         let mut left_tracker = D1ScoreTracker {
             cost: total_left.cost(),
-            branching_cost: OT::ZERO_COST,
+            branching_cost: OT::CostType::ZERO,
             feature: None,
             threshold: None,
             left_leaf: None,
@@ -543,7 +552,7 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> Node<'a, OT, SS> {
         };
         let mut right_tracker = D1ScoreTracker {
             cost: total_right.cost(),
-            branching_cost: OT::ZERO_COST,
+            branching_cost: OT::CostType::ZERO,
             feature: None,
             threshold: None,
             left_leaf: None,
@@ -580,7 +589,7 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> Node<'a, OT, SS> {
                             let branching_cost = context.task.branching_cost();
                             let total_cost = cost + branching_cost;
 
-                            if total_cost < left_tracker.total_cost() {
+                            if total_cost.strictly_less_than(&left_tracker.total_cost()) {
                                 let current_threshold =
                                     self.dataview.dataset.internal_to_original_feature_value
                                         [feature_2]
@@ -622,7 +631,7 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> Node<'a, OT, SS> {
                             let branching_cost = context.task.branching_cost();
                             let total_cost = cost + branching_cost;
 
-                            if total_cost < right_tracker.total_cost() {
+                            if total_cost.strictly_less_than(&right_tracker.total_cost()) {
                                 let current_threshold =
                                     self.dataview.dataset.internal_to_original_feature_value
                                         [feature_2]
@@ -707,8 +716,10 @@ struct D1ScoreTracker<OT: OptimizationTask> {
 
 impl<OT: OptimizationTask> D1ScoreTracker<OT> {
     fn is_optimal<SS: SearchStrategy>(&self, context: &SolveContext<'_, OT, SS>) -> bool {
-        self.cost == OT::ZERO_COST
-            || (self.branching_cost == OT::ZERO_COST && self.cost < context.task.branching_cost())
+        // If we do branch, then it is optimal if the cost after branching is zero.
+        // If we do not branch (yet), this is optimal if branching cannot improve the cost.
+        self.cost.is_zero()
+            || (self.branching_cost.is_zero() && self.cost.less_or_not_much_greater_than(&context.task.branching_cost()))
     }
 
     fn total_cost(&self) -> OT::CostType {

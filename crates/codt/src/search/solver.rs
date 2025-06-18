@@ -11,7 +11,7 @@ use crate::{
     allocator::current_thread_memory_usage,
     model::{dataview::DataView, tree::Tree},
     search::queue::PQ,
-    tasks::OptimizationTask,
+    tasks::{Cost, OptimizationTask},
 };
 
 use super::{node::Node, strategy::SearchStrategy};
@@ -122,29 +122,36 @@ impl<OT: OptimizationTask, SS: SearchStrategy> Solver<'_, OT, SS> {
             elapsed = start_time.elapsed();
 
             if options.track_intermediates {
-                let lowest_remaining_lb = root.queue.iter().fold(None, |val, i| {
-                    let mut lb = root.pruner.lb_for(i.feature, &i.split_points)
-                        + context.task.branching_cost();
-                    OT::update_lowerbound(&mut lb, &i.cost_lower_bound);
-                    if val.is_none() || val > Some(lb) {
-                        Some(lb)
-                    } else {
-                        val
-                    }
-                });
+                let lowest_remaining_lb =
+                    root.queue
+                        .iter()
+                        .fold(None, |val: Option<OT::CostType>, i| {
+                            let mut lb = root.pruner.lb_for(i.feature, &i.split_points)
+                                + context.task.branching_cost();
+                            OT::update_lowerbound(&mut lb, &i.cost_lower_bound);
+                            if val.is_none() || val.unwrap().strictly_greater_than(&lb) {
+                                Some(lb)
+                            } else {
+                                val
+                            }
+                        });
 
                 let mut actual_lb = root.cost_lower_bound;
                 if let Some(lb) = lowest_remaining_lb {
-                    if lb > actual_lb {
+                    if lb.strictly_greater_than(&actual_lb) {
                         actual_lb = lb
                     }
                 }
 
-                if actual_lb > intermediate_lbs.last().unwrap().0 {
+                if actual_lb.strictly_greater_than(&intermediate_lbs.last().unwrap().0) {
                     intermediate_lbs.push((actual_lb, graph_expansions, elapsed.as_secs_f64()))
                 }
 
-                if root.best.cost() < intermediate_ubs.last().unwrap().0 {
+                if root
+                    .best
+                    .cost()
+                    .strictly_less_than(&intermediate_ubs.last().unwrap().0)
+                {
                     intermediate_ubs.push((
                         root.best.cost(),
                         graph_expansions,

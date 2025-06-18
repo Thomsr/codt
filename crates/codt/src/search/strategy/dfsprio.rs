@@ -2,7 +2,7 @@ use std::cmp::Ordering;
 
 use crate::{
     search::node::{Node, QueueItem},
-    tasks::OptimizationTask,
+    tasks::{Cost, OptimizationTask},
 };
 
 use super::SearchStrategy;
@@ -23,8 +23,8 @@ impl SearchStrategy for DfsPrioSearchStrategy {
             .reverse()
             .then(
                 a.cost_lower_bound
-                    .partial_cmp(&b.cost_lower_bound)
-                    .unwrap_or(Ordering::Equal),
+                    .to_order()
+                    .cmp(&b.cost_lower_bound.to_order()),
             )
             .then(a.split_points.len().cmp(&b.split_points.len())) // TODO reverse?
             .then(a.feature.cmp(&b.feature))
@@ -39,7 +39,10 @@ impl SearchStrategy for DfsPrioSearchStrategy {
         // solution (lowest lower bound), but when choosing which
         // 'and' node to expand, we choose the node most likely to
         // change the estimate (highest upper bound).
-        if children[0].cost_upper_bound >= children[1].cost_upper_bound {
+        if children[0]
+            .cost_upper_bound
+            .greater_or_not_much_less_than(&children[1].cost_upper_bound)
+        {
             0
         } else {
             1

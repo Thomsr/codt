@@ -1,4 +1,4 @@
-use crate::tasks::{CostSum, OptimizationTask};
+use crate::tasks::{Cost, CostSum, OptimizationTask};
 
 use super::dataset::DataSet;
 
@@ -15,6 +15,22 @@ pub struct FeatureValue {
     pub feature_value: i32,
 }
 
+#[derive(Clone, Copy)]
+pub struct SplitValue {
+    /// The feature value to split on.
+    pub feature_value: i32,
+    /// The score greedily assignd to this split value. E.g. gini or SSE.
+    pub greedy_value: f32,
+}
+
+#[derive(Clone, Copy)]
+pub struct BestGreedySplit {
+    /// The index of the split value in the `possible_split_values` vector.
+    pub split_value_index: usize,
+    /// The greedy value of this split.
+    pub greedy_value: f32,
+}
+
 pub struct DataView<'a, OT: OptimizationTask> {
     /// This struct is a view over this dataset.
     pub dataset: &'a DataSet<OT::InstanceType>,
@@ -23,8 +39,10 @@ pub struct DataView<'a, OT: OptimizationTask> {
     feature_values_sorted: Vec<Vec<FeatureValue>>,
     /// All of the feature values that are still possible to split on per feature.
     /// A reduced set of all unique values of `feature_values_sorted`.
-    pub possible_split_values: Vec<Vec<i32>>,
+    pub possible_split_values: Vec<Vec<SplitValue>>,
     pub cost_summer: OT::CostSumType,
+    /// The best greedy splits per feature for this dataview. Indexed by feature.
+    pub best_greedy_splits: Vec<BestGreedySplit>,
 }
 
 impl<OT: OptimizationTask> Debug for DataView<'_, OT> {
@@ -38,68 +56,79 @@ impl<OT: OptimizationTask> Debug for DataView<'_, OT> {
 }
 
 impl<'a, OT: OptimizationTask> DataView<'a, OT> {
+    /// Add a possible split value to the list of possible splits, if it is necessary.
+    ///
+    /// For feature values:         00011112224444566
+    /// And cumulative left cost:   00000000123456666
+    /// And cumulative right cost:  66666666543210000
+    /// Candidate splits:           0--1---2--4---56-
+    /// Possible splits:            1, 2, 4
+    ///
+    /// - 1 is a bigger zero split than 0, so exclude 0.
+    /// - 4 is a bigger right zero split than 5 and 6, so exclude 5 and 6.
+    /// - 6 is the final feature value, so another reason to exclude it. (All instances would go to the left.)
     fn add_possible_split_value(
-        possible_split_values: &mut Vec<i32>,
-        last_feature_value: &mut i32,
+        possible_split_values: &mut Vec<SplitValue>,
+        previous_feature_value: &mut i32,
         value: &FeatureValue,
-        costsum: &mut OT::CostSumType,
-        last_left_cost: &mut OT::CostType,
-        keep_until: &mut usize,
+        left_costsum: &mut OT::CostSumType,
+        right_costsum: &mut OT::CostSumType,
+        best_greedy_split: &mut BestGreedySplit,
         dataset: &'a DataSet<OT::InstanceType>,
     ) {
-        if value.feature_value != *last_feature_value {
-            // Only allow max of one split (biggest) where left side is OT::MIN_COST
-            // For feature values:         00011112224444566
-            // And cumulative left cost:   00000000123456666
-            // And cumulative right cost:  66666666543210000
-            // We add possible splits:     0--1---2--4---56-
-            //
-            // When adding split 2, we see that the old_cost is 0, so
-            // split 1 is a bigger zero split than split 0./
-            //
-            // Similarly, split 4 is a bigger right zero split than 5 and 6.
-            // However, we do not know the cumulative right cost yet,
-            // so we decide to keep it if the left cost stays the same. (Max left cost = min right cost)
+        let old_left_cost: OT::CostType = left_costsum.cost();
+        let old_right_cost: OT::CostType = right_costsum.cost();
+        *left_costsum += &dataset.instances[value.instance_id];
+        *right_costsum -= &dataset.instances[value.instance_id];
 
-            let old_cost: OT::CostType = costsum.cost();
+        if value.feature_value != *previous_feature_value {
+            // We now have all the instances with this feature value on the left side. So we can compute the greedy value.
+            // The final feature value is never encountered, but we never include it in any case.
+            if let Some(prev_split_value) = possible_split_values.last_mut() {
+                // If the previous split value was not added for some reason, then we do not need to update it.
+                // This can happen if the previous split value was not useful, e.g. a previous split had a zero cost on the right side.
+                if prev_split_value.feature_value == *previous_feature_value {
+                    let prev_greedy_value = OT::greedy_value(left_costsum, right_costsum);
+                    prev_split_value.greedy_value = prev_greedy_value;
 
-            // Keep track of the first split with the last left cost, so later we can
-            // remove all splits after that if the left cost doesn't change anymore.
-            if old_cost != *last_left_cost {
-                *keep_until = possible_split_values.len();
-                *last_left_cost = old_cost;
+                    if best_greedy_split.greedy_value > prev_greedy_value {
+                        best_greedy_split.split_value_index = possible_split_values.len() - 1;
+                        best_greedy_split.greedy_value = prev_greedy_value;
+                    }
+                }
             }
+
+            *previous_feature_value = value.feature_value;
 
             // Ensure we have at most one split with zero cost on the left side.
-            if old_cost == OT::ZERO_COST && possible_split_values.len() > 1 {
-                possible_split_values[0] = possible_split_values[1];
-                possible_split_values[1] = value.feature_value;
-            } else {
-                possible_split_values.push(value.feature_value);
+            if old_left_cost.is_zero() && possible_split_values.len() == 2 {
+                let better_split = possible_split_values.pop().unwrap();
+                possible_split_values[0] = better_split;
             }
-            *last_feature_value = value.feature_value;
+
+            // If the old right cost is zero, the previous split value had a zero cost on the right side and was bigger.
+            // So we do not need to add this split value, as it is not useful.
+            if old_right_cost.is_zero() {
+                return;
+            }
+
+            possible_split_values.push(SplitValue {
+                feature_value: value.feature_value,
+                greedy_value: 0.0, // This will be set later.
+            });
         }
-        *costsum += &dataset.instances[value.instance_id];
     }
 
     fn post_process_possible_splits(
-        costsum: &mut OT::CostSumType,
-        possible_split_values: &mut Vec<i32>,
-        last_left_cost: &mut OT::CostType,
-        keep_until: &mut usize,
+        possible_split_values: &mut Vec<SplitValue>,
+        final_feature_value: i32,
     ) {
-        let full_cost = costsum.cost();
-
-        if full_cost == OT::ZERO_COST {
-            *keep_until = 0;
-        } else if full_cost != *last_left_cost {
-            // For each feature, consider only useful splitting points. The last
-            // feature value is not a useful splitting point because all instances
-            // would go to the left. So only keep len - 1.
-            *keep_until = possible_split_values.len() - 1;
+        // If it is the final feature value, the right side is empty. So it is not useful.
+        if let Some(last) = possible_split_values.last() {
+            if last.feature_value == final_feature_value {
+                possible_split_values.pop();
+            }
         }
-
-        possible_split_values.truncate(*keep_until);
     }
 
     /// Initialize a dataview from a dataset. The new dataview contains all instances of the dataset
@@ -107,8 +136,14 @@ impl<'a, OT: OptimizationTask> DataView<'a, OT> {
         // Copy over all the feature values from the dataset, and sort them by the feature values.
         let mut feature_values_sorted = Vec::new();
         let mut possible_split_values = Vec::new();
+        let mut best_greedy_splits = Vec::new();
 
-        let mut total_cost = None;
+        let mut left_costsum = OT::init_costsum(dataset);
+        let mut right_costsum = left_costsum.clone();
+
+        for instance in &dataset.instances {
+            left_costsum += instance;
+        }
 
         for feature in &dataset.feature_values {
             let mut feature_values_sorted_i = Vec::new();
@@ -123,40 +158,42 @@ impl<'a, OT: OptimizationTask> DataView<'a, OT> {
 
             feature_values_sorted_i.sort_by_key(|fv| fv.feature_value);
 
-            let mut costsum = OT::init_costsum(dataset);
+            // Reset the cost sums by moving the total (now on the left) to the right.
+            right_costsum += &left_costsum;
+            left_costsum.clear();
+
             let mut previous = -1;
-            let mut last_left_cost = OT::ZERO_COST;
-            let mut keep_until = 1;
+            let mut best_greedy_split = BestGreedySplit {
+                split_value_index: 0,
+                greedy_value: f32::INFINITY,
+            };
 
             for fv in &feature_values_sorted_i {
                 Self::add_possible_split_value(
                     &mut possible_split_values_i,
                     &mut previous,
                     fv,
-                    &mut costsum,
-                    &mut last_left_cost,
-                    &mut keep_until,
+                    &mut left_costsum,
+                    &mut right_costsum,
+                    &mut best_greedy_split,
                     dataset,
                 );
             }
 
-            Self::post_process_possible_splits(
-                &mut costsum,
-                &mut possible_split_values_i,
-                &mut last_left_cost,
-                &mut keep_until,
-            );
+            assert!(previous != -1, "The dataset should not be empty.");
+            Self::post_process_possible_splits(&mut possible_split_values_i, previous);
 
             feature_values_sorted.push(feature_values_sorted_i);
             possible_split_values.push(possible_split_values_i);
-            total_cost = Some(costsum); // Any loop iteration works
+            best_greedy_splits.push(best_greedy_split);
         }
 
         Self {
             dataset,
             feature_values_sorted,
             possible_split_values,
-            cost_summer: total_cost.expect("No features in dataset"),
+            cost_summer: left_costsum,
+            best_greedy_splits,
         }
     }
 
@@ -173,16 +210,31 @@ impl<'a, OT: OptimizationTask> DataView<'a, OT> {
     /// Split this dataview into two, the first containing only those instances where
     /// `split_feature <= threshold`, and the second where `split_feature > threshold`.
     pub fn split(&self, split_feature: usize, split_value: usize) -> (Self, Self) {
-        let threshold = self.possible_split_values[split_feature][split_value];
+        let threshold = self.possible_split_values[split_feature][split_value].feature_value;
         let mut feature_values_left = Vec::with_capacity(self.feature_values_sorted.len());
         let mut feature_values_right = Vec::with_capacity(self.feature_values_sorted.len());
         let mut possible_split_values_left = Vec::with_capacity(self.possible_split_values.len());
         let mut possible_split_values_right = Vec::with_capacity(self.possible_split_values.len());
+        let mut best_greedy_splits_left = Vec::with_capacity(self.best_greedy_splits.len());
+        let mut best_greedy_splits_right = Vec::with_capacity(self.best_greedy_splits.len());
 
-        let mut left_costsum = self.cost_summer.clone();
-        left_costsum.clear();
-        let mut right_costsum = left_costsum.clone();
+        // Initialize the cost sums for the left and right side so the left side starts with all instances.
+        let mut costsum_ll = self.cost_summer.clone();
+        costsum_ll.clear();
+        let mut costsum_lr = costsum_ll.clone();
+        let mut costsum_rr = costsum_lr.clone();
 
+        for value in &self.feature_values_sorted[split_feature] {
+            if self.dataset.feature_values[split_feature][value.instance_id] <= threshold {
+                costsum_ll += &self.dataset.instances[value.instance_id];
+            } else {
+                break; // All further values will be larger than the threshold, so we can stop here.
+            }
+        }
+        let mut costsum_rl = self.cost_summer.clone();
+        costsum_rl -= &costsum_ll;
+
+        // Create the left and right sides of the dataview.
         for (feature_idx, feature) in self.feature_values_sorted.iter().enumerate() {
             // Overestimate all of these capacities to the current length so that no reallocations are needed.
             let mut feature_values_left_i = Vec::with_capacity(feature.len());
@@ -191,14 +243,24 @@ impl<'a, OT: OptimizationTask> DataView<'a, OT> {
                 Vec::with_capacity(self.possible_split_values[feature_idx].len());
             let mut possible_split_values_right_i =
                 Vec::with_capacity(self.possible_split_values[feature_idx].len());
+
+            // Initialize values for the loop
             let mut last_feature_value_left = -1;
             let mut last_feature_value_right = -1;
-            let mut last_left_left_cost = OT::ZERO_COST;
-            let mut last_right_left_cost = OT::ZERO_COST;
-            let mut keep_until_left = 1;
-            let mut keep_until_right = 1;
-            left_costsum.clear();
-            right_costsum.clear();
+            let mut best_greedy_split_left = BestGreedySplit {
+                split_value_index: 0,
+                greedy_value: f32::INFINITY,
+            };
+            let mut best_greedy_split_right = BestGreedySplit {
+                split_value_index: 0,
+                greedy_value: f32::INFINITY,
+            };
+
+            // Reset the cost sums by moving the total (now on the left) to the right.
+            costsum_lr += &costsum_ll;
+            costsum_ll.clear();
+            costsum_rr += &costsum_rl;
+            costsum_rl.clear();
 
             for &value in feature {
                 if self.dataset.feature_values[split_feature][value.instance_id] <= threshold {
@@ -207,9 +269,9 @@ impl<'a, OT: OptimizationTask> DataView<'a, OT> {
                         &mut possible_split_values_left_i,
                         &mut last_feature_value_left,
                         &value,
-                        &mut left_costsum,
-                        &mut last_left_left_cost,
-                        &mut keep_until_left,
+                        &mut costsum_ll,
+                        &mut costsum_lr,
+                        &mut best_greedy_split_left,
                         self.dataset,
                     );
                 } else {
@@ -218,26 +280,21 @@ impl<'a, OT: OptimizationTask> DataView<'a, OT> {
                         &mut possible_split_values_right_i,
                         &mut last_feature_value_right,
                         &value,
-                        &mut right_costsum,
-                        &mut last_right_left_cost,
-                        &mut keep_until_right,
+                        &mut costsum_rl,
+                        &mut costsum_rr,
+                        &mut best_greedy_split_right,
                         self.dataset,
                     );
                 }
             }
 
             Self::post_process_possible_splits(
-                &mut left_costsum,
                 &mut possible_split_values_left_i,
-                &mut last_left_left_cost,
-                &mut keep_until_left,
+                last_feature_value_left,
             );
-
             Self::post_process_possible_splits(
-                &mut right_costsum,
                 &mut possible_split_values_right_i,
-                &mut last_right_left_cost,
-                &mut keep_until_right,
+                last_feature_value_right,
             );
 
             assert!(!feature_values_left_i.is_empty());
@@ -247,6 +304,8 @@ impl<'a, OT: OptimizationTask> DataView<'a, OT> {
             feature_values_right.push(feature_values_right_i);
             possible_split_values_left.push(possible_split_values_left_i);
             possible_split_values_right.push(possible_split_values_right_i);
+            best_greedy_splits_left.push(best_greedy_split_left);
+            best_greedy_splits_right.push(best_greedy_split_right);
         }
 
         (
@@ -254,13 +313,15 @@ impl<'a, OT: OptimizationTask> DataView<'a, OT> {
                 dataset: self.dataset,
                 feature_values_sorted: feature_values_left,
                 possible_split_values: possible_split_values_left,
-                cost_summer: left_costsum,
+                cost_summer: costsum_ll,
+                best_greedy_splits: best_greedy_splits_left,
             },
             Self {
                 dataset: self.dataset,
                 feature_values_sorted: feature_values_right,
                 possible_split_values: possible_split_values_right,
-                cost_summer: right_costsum,
+                cost_summer: costsum_rl,
+                best_greedy_splits: best_greedy_splits_right,
             },
         )
     }
@@ -281,9 +342,10 @@ impl<'a, OT: OptimizationTask> DataView<'a, OT> {
     }
 
     pub fn threshold_from_split(&self, split_feature: usize, split_value: usize) -> f64 {
-        let current_split_value = self.possible_split_values[split_feature][split_value];
+        let current_split_value =
+            self.possible_split_values[split_feature][split_value].feature_value;
         let next_split_value = match self.possible_split_values[split_feature].get(split_value + 1) {
-            Some(&next_split_value) => next_split_value,
+            Some(&next_split_value) => next_split_value.feature_value,
             None => self.feature_values_sorted[split_feature]
                 .last()
                 .expect("There is at least one threshold remaining, otherwise there would be no useful values to split on, and this method would never be called.")
@@ -316,7 +378,13 @@ mod tests {
         let view = DataView::<AccuracyTask>::from_dataset(&dataset);
 
         // Assert that the resulting splits match the expected splits.
-        assert_eq!(view.possible_split_values[0], expected_splits);
+        assert_eq!(
+            view.possible_split_values[0]
+                .iter()
+                .map(|s| s.feature_value)
+                .collect::<Vec<i32>>(),
+            expected_splits
+        );
     }
 
     #[test]

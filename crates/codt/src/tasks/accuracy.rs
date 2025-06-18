@@ -1,6 +1,9 @@
 use std::ops::{AddAssign, SubAssign};
 
-use crate::model::{dataset::DataSet, dataview::DataView, instance::LabeledInstance};
+use crate::{
+    model::{dataset::DataSet, dataview::DataView, instance::LabeledInstance},
+    tasks::FloatCost,
+};
 
 use super::{CostSum, OptimizationTask};
 
@@ -91,7 +94,7 @@ impl AddAssign<&LabeledInstance<i32>> for AccuracyCostSum {
     }
 }
 
-impl CostSum<i32, LabeledInstance<i32>, f64> for AccuracyCostSum {
+impl CostSum<i32, LabeledInstance<i32>, FloatCost> for AccuracyCostSum {
     fn label(&self) -> i32 {
         self.instance_count_per_class
             .iter()
@@ -101,7 +104,7 @@ impl CostSum<i32, LabeledInstance<i32>, f64> for AccuracyCostSum {
             .expect("Expected at least one class") as i32
     }
 
-    fn cost(&self) -> f64 {
+    fn cost(&self) -> FloatCost {
         let (total, largest_class_size) = self
             .instance_count_per_class
             .iter()
@@ -109,7 +112,7 @@ impl CostSum<i32, LabeledInstance<i32>, f64> for AccuracyCostSum {
                 (acc_total + *e, acc_max.max(*e))
             });
 
-        (total - largest_class_size) as f64
+        FloatCost((total - largest_class_size) as f64)
     }
 
     fn clear(&mut self) {
@@ -122,9 +125,8 @@ impl CostSum<i32, LabeledInstance<i32>, f64> for AccuracyCostSum {
 impl OptimizationTask for AccuracyTask {
     type LabelType = i32;
     type InstanceType = LabeledInstance<i32>;
-    type CostType = f64;
+    type CostType = FloatCost;
     type CostSumType = AccuracyCostSum;
-    const ZERO_COST: Self::CostType = 0.0;
 
     fn prepare_for_data(&mut self, dataview: &mut DataView<Self>) {
         self.dataset_size = dataview.num_instances();
@@ -139,7 +141,7 @@ impl OptimizationTask for AccuracyTask {
         format!(
             "Misclassifications: {}. Accuracy: {}%. (Only accurate when complexity cost is zero)",
             cost,
-            (1.0 - *cost / self.dataset_size as f64) * 100.0
+            (1.0 - cost.0 / self.dataset_size as f64) * 100.0
         )
     }
 
@@ -155,6 +157,38 @@ impl OptimizationTask for AccuracyTask {
     }
 
     fn branching_cost(&self) -> Self::CostType {
-        self.branching_cost
+        self.branching_cost.into()
+    }
+
+    fn greedy_value(left_costsum: &Self::CostSumType, right_costsum: &Self::CostSumType) -> f32 {
+        let left_total: i32 = left_costsum.instance_count_per_class.iter().sum();
+        let right_total: i32 = right_costsum.instance_count_per_class.iter().sum();
+
+        let left_gini = if left_total > 0 {
+            left_costsum
+                .instance_count_per_class
+                .iter()
+                .fold(1.0, |gini, &count| {
+                    let probability = count as f32 / left_total as f32;
+                    gini - probability * probability
+                })
+        } else {
+            0.0
+        };
+
+        let right_gini = if right_total > 0 {
+            right_costsum
+                .instance_count_per_class
+                .iter()
+                .fold(1.0, |gini, &count| {
+                    let probability = count as f32 / right_total as f32;
+                    gini - probability * probability
+                })
+        } else {
+            0.0
+        };
+
+        (left_gini * left_total as f32 + right_gini * right_total as f32)
+            / (left_total + right_total) as f32
     }
 }

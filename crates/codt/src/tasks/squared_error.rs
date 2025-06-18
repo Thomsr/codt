@@ -2,7 +2,10 @@ use std::ops::{AddAssign, SubAssign};
 
 use ckmeans::ckmeans_dynamic_stop;
 
-use crate::model::{dataset::DataSet, dataview::DataView, instance::LabeledInstance};
+use crate::{
+    model::{dataset::DataSet, dataview::DataView, instance::LabeledInstance},
+    tasks::FloatCost,
+};
 
 use super::{CostSum, OptimizationTask};
 
@@ -62,15 +65,15 @@ impl SubAssign<&LabeledInstance<f64>> for SquaredErrorCostSum {
     }
 }
 
-impl CostSum<f64, LabeledInstance<f64>, f64> for SquaredErrorCostSum {
+impl CostSum<f64, LabeledInstance<f64>, FloatCost> for SquaredErrorCostSum {
     fn label(&self) -> f64 {
         // The mean gives the optimal SSE in a leaf.
         self.y / (self.n as f64)
     }
 
-    fn cost(&self) -> f64 {
+    fn cost(&self) -> FloatCost {
         // The sum of squared errors from the mean can be computed from (sum of (y^2)) - ((sum of y)^2 / N)
-        self.y2 - (self.y * self.y) / (self.n as f64)
+        (self.y2 - (self.y * self.y) / (self.n as f64)).into()
     }
 
     fn clear(&mut self) {
@@ -83,20 +86,19 @@ impl CostSum<f64, LabeledInstance<f64>, f64> for SquaredErrorCostSum {
 impl OptimizationTask for SquaredErrorTask {
     type LabelType = f64;
     type InstanceType = LabeledInstance<f64>;
-    type CostType = f64;
+    type CostType = FloatCost;
     type CostSumType = SquaredErrorCostSum;
-    const ZERO_COST: Self::CostType = 0.0;
 
     fn prepare_for_data(&mut self, dataview: &mut DataView<Self>) {
         self.dataset_size = dataview.num_instances();
-        self.branching_cost = dataview.cost_summer.cost() * self.complexity_cost;
+        self.branching_cost = dataview.cost_summer.cost().0 * self.complexity_cost;
     }
 
     fn print_cost(&mut self, cost: &Self::CostType) -> String {
         format!(
             "SSE: {}. MSE: {}. (Only accurate when complexity cost is zero)",
             cost,
-            *cost / self.dataset_size as f64
+            cost.0 / self.dataset_size as f64
         )
     }
 
@@ -109,7 +111,7 @@ impl OptimizationTask for SquaredErrorTask {
     }
 
     fn branching_cost(&self) -> Self::CostType {
-        self.branching_cost
+        self.branching_cost.into()
     }
 
     fn initial_lowerbound(&self, dataview: &DataView<Self>, max_depth: u32) -> Self::CostType
@@ -135,7 +137,11 @@ impl OptimizationTask for SquaredErrorTask {
                 .expect("At least one cluster should be found")
                 .last()
                 .expect("At least one instance in dataview, so this should exist");
-            sse + branch_cost
+            (sse + branch_cost).into()
         }
+    }
+
+    fn greedy_value(left_costsum: &Self::CostSumType, right_costsum: &Self::CostSumType) -> f32 {
+        left_costsum.cost().0 as f32 + right_costsum.cost().0 as f32
     }
 }

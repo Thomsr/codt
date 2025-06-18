@@ -254,7 +254,17 @@ macro_rules! impl_optimal_decision_tree_pyclass {
                     .result
                     .as_ref()
                     .expect(".fit(X,y) should be called before this function and should be checked in the python wrapper")
-                    .intermediate_lbs;
+                    .intermediate_lbs
+                    .iter()
+                    .map(|(lb, exp, time)| {
+                        let lb_float: f64 = (*lb).into();
+                        (
+                            lb_float,
+                            exp,
+                            time,
+                        )
+                    })
+                    .collect::<Vec<_>>();
                 intermediates.into_pyobject(py)
             }
 
@@ -264,7 +274,17 @@ macro_rules! impl_optimal_decision_tree_pyclass {
                     .result
                     .as_ref()
                     .expect(".fit(X,y) should be called before this function and should be checked in the python wrapper")
-                    .intermediate_ubs;
+                    .intermediate_ubs
+                    .iter()
+                    .map(|(ub, exp, time)| {
+                        let ub_float: f64 = (*ub).into();
+                        (
+                            ub_float,
+                            exp,
+                            time,
+                        )
+                    })
+                    .collect::<Vec<_>>();
                 intermediates.into_pyobject(py)
             }
 

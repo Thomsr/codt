@@ -2,7 +2,7 @@ use std::cmp::Ordering;
 
 use crate::{
     search::node::{Node, QueueItem},
-    tasks::{CostSum, OptimizationTask},
+    tasks::{Cost, CostSum, OptimizationTask},
 };
 
 use super::SearchStrategy;
@@ -31,7 +31,12 @@ impl SearchStrategy for DfsSearchStrategy {
     ) -> usize {
         // For DFS, only use information available when starting the search.
         // This is a proxy for the upper bound.
-        if children[0].dataview.cost_summer.cost() >= children[1].dataview.cost_summer.cost() {
+        if children[0]
+            .dataview
+            .cost_summer
+            .cost()
+            .greater_or_not_much_less_than(&children[1].dataview.cost_summer.cost())
+        {
             0
         } else {
             1

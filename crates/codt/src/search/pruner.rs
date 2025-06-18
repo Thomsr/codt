@@ -3,6 +3,7 @@ use std::{
     ops::{Bound, Range},
 };
 
+use crate::tasks::Cost;
 use crate::tasks::OptimizationTask;
 
 pub struct Pruner<OT: OptimizationTask> {
@@ -30,7 +31,7 @@ impl<OT: OptimizationTask> Pruner<OT> {
     }
 
     pub fn insert_left_subtree(&mut self, feature: usize, threshold: usize, lb: OT::CostType) {
-        if lb == OT::ZERO_COST {
+        if lb.is_zero() {
             // Don't bother storing trivial lower bounds.
             return;
         }
@@ -42,7 +43,7 @@ impl<OT: OptimizationTask> Pruner<OT> {
         // Update or insert the new lower bound.
         let needs_insert = match cursor.peek_prev() {
             Some((&k, v)) => {
-                if *v >= lb {
+                if v.greater_or_not_much_less_than(&lb) {
                     // There already exist a lower bound that is usable in strictly more scenarios that is better.
                     return;
                 } else if k == threshold {
@@ -66,7 +67,7 @@ impl<OT: OptimizationTask> Pruner<OT> {
 
         // Remove all thresholds after this that have a worse or equal lower bound.
         while let Some((_, v)) = cursor.next() {
-            if *v <= lb {
+            if v.less_or_not_much_greater_than(&lb) {
                 cursor.remove_prev();
             } else {
                 // If we see a better lower bound, all subsequent ones must also be better.
@@ -76,7 +77,7 @@ impl<OT: OptimizationTask> Pruner<OT> {
     }
 
     pub fn insert_right_subtree(&mut self, feature: usize, threshold: usize, lb: OT::CostType) {
-        if lb == OT::ZERO_COST {
+        if lb.is_zero() {
             // Don't bother storing trivial lower bounds.
             return;
         }
@@ -88,7 +89,7 @@ impl<OT: OptimizationTask> Pruner<OT> {
         // Update or insert the new lower bound.
         let needs_insert = match cursor.peek_next() {
             Some((&k, v)) => {
-                if *v >= lb {
+                if v.greater_or_not_much_less_than(&lb) {
                     return;
                 } else if k == threshold {
                     *v = lb;
@@ -108,7 +109,7 @@ impl<OT: OptimizationTask> Pruner<OT> {
 
         // Remove all thresholds after this that have a worse or equal lower bound.
         while let Some((_, v)) = cursor.prev() {
-            if *v <= lb {
+            if v.less_or_not_much_greater_than(&lb) {
                 cursor.remove_next();
             } else {
                 // If we see a better lower bound, all subsequent ones must also be better.
@@ -130,7 +131,7 @@ impl<OT: OptimizationTask> Pruner<OT> {
             (Some((_, &l)), Some((_, &r))) => l + r,
             (Some((_, &l)), None) => l,
             (None, Some((_, &r))) => r,
-            (None, None) => OT::ZERO_COST,
+            (None, None) => OT::CostType::ZERO,
         }
     }
 }
@@ -144,20 +145,20 @@ mod tests {
     #[test]
     fn test_correctness() {
         let mut pruner: Pruner<AccuracyTask> = Pruner::new(1);
-        assert_eq!(pruner.lb_for(0, &(10..11)), 0.0);
-        pruner.insert_left_subtree(0, 5, 4.0);
-        assert_eq!(pruner.lb_for(0, &(10..11)), 4.0);
-        pruner.insert_left_subtree(0, 10, 5.0);
-        assert_eq!(pruner.lb_for(0, &(10..11)), 5.0);
-        pruner.insert_left_subtree(0, 8, 6.0);
-        assert_eq!(pruner.lb_for(0, &(10..11)), 6.0);
-        pruner.insert_left_subtree(0, 11, 20.0);
-        assert_eq!(pruner.lb_for(0, &(10..11)), 6.0);
-        pruner.insert_right_subtree(0, 9, 6.0);
-        assert_eq!(pruner.lb_for(0, &(10..11)), 6.0);
-        pruner.insert_right_subtree(0, 10, 6.0);
-        assert_eq!(pruner.lb_for(0, &(10..11)), 12.0);
-        pruner.insert_right_subtree(0, 10, 8.0);
-        assert_eq!(pruner.lb_for(0, &(10..11)), 14.0);
+        assert_eq!(pruner.lb_for(0, &(10..11)), 0.0.into());
+        pruner.insert_left_subtree(0, 5, 4.0.into());
+        assert_eq!(pruner.lb_for(0, &(10..11)), 4.0.into());
+        pruner.insert_left_subtree(0, 10, 5.0.into());
+        assert_eq!(pruner.lb_for(0, &(10..11)), 5.0.into());
+        pruner.insert_left_subtree(0, 8, 6.0.into());
+        assert_eq!(pruner.lb_for(0, &(10..11)), 6.0.into());
+        pruner.insert_left_subtree(0, 11, 20.0.into());
+        assert_eq!(pruner.lb_for(0, &(10..11)), 6.0.into());
+        pruner.insert_right_subtree(0, 9, 6.0.into());
+        assert_eq!(pruner.lb_for(0, &(10..11)), 6.0.into());
+        pruner.insert_right_subtree(0, 10, 6.0.into());
+        assert_eq!(pruner.lb_for(0, &(10..11)), 12.0.into());
+        pruner.insert_right_subtree(0, 10, 8.0.into());
+        assert_eq!(pruner.lb_for(0, &(10..11)), 14.0.into());
     }
 }
