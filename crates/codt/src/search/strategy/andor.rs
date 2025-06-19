@@ -23,7 +23,7 @@ impl SearchStrategy for AndOrSearchStrategy {
             .cmp(&b.cost_lower_bound.to_order())
             .then(a.is_expanded().cmp(&b.is_expanded()).reverse())
             .then(a.split_points.len().cmp(&b.split_points.len())) // TODO: reverse?
-            .then(a.feature.cmp(&b.feature))
+            .then(a.feature_rank.cmp(&b.feature_rank))
             .then(a.split_points.start.cmp(&b.split_points.start))
     }
 

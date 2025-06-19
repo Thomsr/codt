@@ -82,6 +82,9 @@ pub struct QueueItem<'a, OT: OptimizationTask, SS: SearchStrategy> {
     /// A pseudorandom value for the node, if the search strategy requires it
     pub random_value: u64,
 
+    /// The rank of the feature based on the greedy heuristic value, used by some search strategies to prioritize items.
+    pub feature_rank: i32,
+
     _ss: PhantomData<SS>,
 }
 
@@ -125,6 +128,7 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> QueueItem<'a, OT, SS> {
         feature: usize,
         split_points: Range<usize>,
         support: usize,
+        feature_rank: i32,
     ) -> Self {
         Self {
             cost_lower_bound: context.task.branching_cost(),
@@ -137,6 +141,7 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> QueueItem<'a, OT, SS> {
             } else {
                 0
             },
+            feature_rank,
             _ss: PhantomData,
         }
     }
@@ -159,6 +164,7 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> QueueItem<'a, OT, SS> {
                 } else {
                     0
                 },
+                feature_rank: self.feature_rank,
                 _ss: PhantomData,
             })
         }
@@ -174,6 +180,7 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> QueueItem<'a, OT, SS> {
                 } else {
                     0
                 },
+                feature_rank: self.feature_rank,
                 _ss: PhantomData,
             })
         }
@@ -283,6 +290,7 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> Node<'a, OT, SS> {
                         feature,
                         0..n_splitpoints,
                         dataview.num_instances(),
+                        dataview.feature_ranking[feature],
                     ));
                 }
             }

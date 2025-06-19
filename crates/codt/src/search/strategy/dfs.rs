@@ -16,12 +16,16 @@ impl SearchStrategy for DfsSearchStrategy {
     ) -> Ordering {
         // For DFS, we want a consistent ordering that cannot change dynamically. The selected
         // search node should keep being selected until it is complete.
-        a.feature
-            .cmp(&b.feature)
-            // Crucially, order by length of the range. This means any expanded
-            // node (which has a range of a single value) goes first.
-            .then(a.split_points.len().cmp(&b.split_points.len()))
-            // Break ties deterministically by the unique start of the interval.
+        //
+        // First ordered by expanded, so we always continue with previously selected nodes.
+        // Then by feature, to prefer features with a better heuristic.
+        // Then by the size of the interval, so we get a good spread for bounds.
+        // Then by the unique start of the interval, to break ties deterministically.
+        a.is_expanded()
+            .cmp(&b.is_expanded())
+            .reverse()
+            .then(a.feature_rank.cmp(&b.feature_rank))
+            .then(a.split_points.len().cmp(&b.split_points.len()).reverse())
             .then(a.split_points.start.cmp(&b.split_points.start))
     }
 

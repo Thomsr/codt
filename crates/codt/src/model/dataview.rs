@@ -43,6 +43,8 @@ pub struct DataView<'a, OT: OptimizationTask> {
     pub cost_summer: OT::CostSumType,
     /// The best greedy splits per feature for this dataview. Indexed by feature.
     pub best_greedy_splits: Vec<BestGreedySplit>,
+    /// The ranking of each feature based on their best greedy split. Ties resolved arbitrarily. Indexed by the feature id.
+    pub feature_ranking: Vec<i32>,
 }
 
 impl<OT: OptimizationTask> Debug for DataView<'_, OT> {
@@ -119,6 +121,7 @@ impl<'a, OT: OptimizationTask> DataView<'a, OT> {
         }
     }
 
+    /// Post-process the possible split values to remove the last one if it is the final feature value.
     fn post_process_possible_splits(
         possible_split_values: &mut Vec<SplitValue>,
         final_feature_value: i32,
@@ -129,6 +132,19 @@ impl<'a, OT: OptimizationTask> DataView<'a, OT> {
                 possible_split_values.pop();
             }
         }
+    }
+
+    fn feature_rank_from_best_greedy_splits(
+        best_greedy_splits: &[BestGreedySplit],
+    ) -> Vec<i32> {
+        // Create a ranking of the features based on their best greedy split.
+        let mut feature_ranking: Vec<usize> = (0..best_greedy_splits.len()).collect();
+        feature_ranking.sort_by(|&a, &b| best_greedy_splits[a].greedy_value.total_cmp(&best_greedy_splits[b].greedy_value));
+        (0..best_greedy_splits.len() as i32).map(|i| {
+            // The feature ranking is the index of the feature in the sorted list.
+            // So we need to find the index of the feature in the original list.
+            feature_ranking.iter().position(|&x| x == i as usize).unwrap() as i32
+        }).collect()
     }
 
     /// Initialize a dataview from a dataset. The new dataview contains all instances of the dataset
@@ -188,12 +204,15 @@ impl<'a, OT: OptimizationTask> DataView<'a, OT> {
             best_greedy_splits.push(best_greedy_split);
         }
 
+        let feature_ranking = Self::feature_rank_from_best_greedy_splits(&best_greedy_splits);
+
         Self {
             dataset,
             feature_values_sorted,
             possible_split_values,
             cost_summer: left_costsum,
             best_greedy_splits,
+            feature_ranking,
         }
     }
 
@@ -308,6 +327,9 @@ impl<'a, OT: OptimizationTask> DataView<'a, OT> {
             best_greedy_splits_right.push(best_greedy_split_right);
         }
 
+        let feature_ranking_left = Self::feature_rank_from_best_greedy_splits(&best_greedy_splits_left);
+        let feature_ranking_right = Self::feature_rank_from_best_greedy_splits(&best_greedy_splits_right);
+
         (
             Self {
                 dataset: self.dataset,
@@ -315,6 +337,7 @@ impl<'a, OT: OptimizationTask> DataView<'a, OT> {
                 possible_split_values: possible_split_values_left,
                 cost_summer: costsum_ll,
                 best_greedy_splits: best_greedy_splits_left,
+                feature_ranking: feature_ranking_left,
             },
             Self {
                 dataset: self.dataset,
@@ -322,6 +345,7 @@ impl<'a, OT: OptimizationTask> DataView<'a, OT> {
                 possible_split_values: possible_split_values_right,
                 cost_summer: costsum_rl,
                 best_greedy_splits: best_greedy_splits_right,
+                feature_ranking: feature_ranking_right,
             },
         )
     }
