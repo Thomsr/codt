@@ -1,11 +1,12 @@
 use std::cmp::Ordering;
 
 use crate::{
-    search::node::{Node, QueueItem},
+    search::{
+        node::{Node, QueueItem},
+        strategy::{SearchStrategy, dfs::DfsSearchStrategy},
+    },
     tasks::OptimizationTask,
 };
-
-use super::{SearchStrategy, dfs::DfsSearchStrategy};
 
 pub struct RandomDfsSearchStrategy;
 

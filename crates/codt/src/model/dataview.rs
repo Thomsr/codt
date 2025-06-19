@@ -134,17 +134,24 @@ impl<'a, OT: OptimizationTask> DataView<'a, OT> {
         }
     }
 
-    fn feature_rank_from_best_greedy_splits(
-        best_greedy_splits: &[BestGreedySplit],
-    ) -> Vec<i32> {
+    fn feature_rank_from_best_greedy_splits(best_greedy_splits: &[BestGreedySplit]) -> Vec<i32> {
         // Create a ranking of the features based on their best greedy split.
         let mut feature_ranking: Vec<usize> = (0..best_greedy_splits.len()).collect();
-        feature_ranking.sort_by(|&a, &b| best_greedy_splits[a].greedy_value.total_cmp(&best_greedy_splits[b].greedy_value));
-        (0..best_greedy_splits.len() as i32).map(|i| {
-            // The feature ranking is the index of the feature in the sorted list.
-            // So we need to find the index of the feature in the original list.
-            feature_ranking.iter().position(|&x| x == i as usize).unwrap() as i32
-        }).collect()
+        feature_ranking.sort_by(|&a, &b| {
+            best_greedy_splits[a]
+                .greedy_value
+                .total_cmp(&best_greedy_splits[b].greedy_value)
+        });
+        (0..best_greedy_splits.len() as i32)
+            .map(|i| {
+                // The feature ranking is the index of the feature in the sorted list.
+                // So we need to find the index of the feature in the original list.
+                feature_ranking
+                    .iter()
+                    .position(|&x| x == i as usize)
+                    .unwrap() as i32
+            })
+            .collect()
     }
 
     /// Initialize a dataview from a dataset. The new dataview contains all instances of the dataset
@@ -327,8 +334,10 @@ impl<'a, OT: OptimizationTask> DataView<'a, OT> {
             best_greedy_splits_right.push(best_greedy_split_right);
         }
 
-        let feature_ranking_left = Self::feature_rank_from_best_greedy_splits(&best_greedy_splits_left);
-        let feature_ranking_right = Self::feature_rank_from_best_greedy_splits(&best_greedy_splits_right);
+        let feature_ranking_left =
+            Self::feature_rank_from_best_greedy_splits(&best_greedy_splits_left);
+        let feature_ranking_right =
+            Self::feature_rank_from_best_greedy_splits(&best_greedy_splits_right);
 
         (
             Self {

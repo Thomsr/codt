@@ -144,6 +144,8 @@ dependencies = [
  "log",
  "rand",
  "rustc-hash",
+ "strum",
+ "strum_macros",
 ]
 
 [[package]]
@@ -154,6 +156,7 @@ dependencies = [
  "codt",
  "env_logger",
  "log",
+ "strum",
 ]
 
 [[package]]
@@ -164,7 +167,6 @@ dependencies = [
  "numpy",
  "pyo3",
  "strum",
- "strum_macros",
 ]
 
 [[package]]

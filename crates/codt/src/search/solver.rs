@@ -1,20 +1,20 @@
-use std::{
-    collections::VecDeque,
-    marker::PhantomData,
-    sync::Arc,
-    time::{Duration, Instant},
-};
+use std::{sync::Arc, time::Duration};
 
-use log::trace;
+use strum_macros::{Display, EnumString, IntoStaticStr, VariantNames};
 
 use crate::{
-    allocator::current_thread_memory_usage,
     model::{dataview::DataView, tree::Tree},
-    search::queue::PQ,
-    tasks::{Cost, OptimizationTask},
+    search::{
+        solver_impl::SolverImpl,
+        strategy::{
+            self,
+            andor::AndOrSearchStrategy,
+            bfs::{BfsSearchStrategy, LBHeuristic},
+            dfs::DfsSearchStrategy,
+        },
+    },
+    tasks::OptimizationTask,
 };
-
-use super::{node::Node, strategy::SearchStrategy};
 
 pub struct SolveResult<OT: OptimizationTask> {
     pub tree: Arc<Tree<OT>>,
@@ -24,30 +24,80 @@ pub struct SolveResult<OT: OptimizationTask> {
     pub intermediate_ubs: Vec<(OT::CostType, i32, f64)>,
 }
 
-pub struct Solver<'a, OT: OptimizationTask, SS: SearchStrategy> {
-    task: OT,
-    /// Dataview for which the solver finds an optimal decision tree. None during search.
-    dataview: Option<DataView<'a, OT>>,
-    _ss: PhantomData<SS>,
+pub trait Solver<OT: OptimizationTask> {
+    fn solve(&mut self, options: SolverOptions) -> SolveResult<OT>;
 }
 
+pub fn solver_with_strategy<'a, OT: OptimizationTask + 'a>(
+    task: OT,
+    dataview: DataView<'a, OT>,
+    strategy: SearchStrategyEnum,
+) -> Box<dyn Solver<OT> + 'a> {
+    match strategy {
+        SearchStrategyEnum::Dfs => {
+            Box::new(SolverImpl::<OT, DfsSearchStrategy>::new(task, dataview))
+        }
+        SearchStrategyEnum::AndOr => {
+            Box::new(SolverImpl::<OT, AndOrSearchStrategy>::new(task, dataview))
+        }
+        SearchStrategyEnum::BfsLb => Box::new(
+            SolverImpl::<OT, BfsSearchStrategy<LBHeuristic>>::new(task, dataview),
+        ),
+        SearchStrategyEnum::BfsCuriosity => Box::new(SolverImpl::<
+            OT,
+            BfsSearchStrategy<strategy::bfs::CuriosityHeuristic>,
+        >::new(task, dataview)),
+        SearchStrategyEnum::BfsGosdt => Box::new(SolverImpl::<
+            OT,
+            BfsSearchStrategy<strategy::bfs::GOSDTHeuristic>,
+        >::new(task, dataview)),
+        SearchStrategyEnum::BfsRandom => Box::new(SolverImpl::<
+            OT,
+            BfsSearchStrategy<strategy::bfs::RandomHeuristic>,
+        >::new(task, dataview)),
+        SearchStrategyEnum::DfsPrio => {
+            Box::new(SolverImpl::<OT, DfsSearchStrategy>::new(task, dataview))
+        }
+        SearchStrategyEnum::DfsRandom => {
+            Box::new(SolverImpl::<OT, DfsSearchStrategy>::new(task, dataview))
+        }
+    }
+}
+
+/// The search strategy to use. This is used to select the appropriate search strategy at runtime.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, EnumString, VariantNames, IntoStaticStr, Display)]
+#[strum(serialize_all = "kebab-case")]
+pub enum SearchStrategyEnum {
+    Dfs,
+    AndOr,
+    BfsLb,
+    BfsCuriosity,
+    BfsGosdt,
+    BfsRandom,
+    DfsPrio,
+    DfsRandom,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, EnumString, VariantNames, IntoStaticStr, Display)]
+#[strum(serialize_all = "kebab-case")]
 pub enum UpperboundStrategy {
+    /// Only use actual solutions as upper bounds
     SolutionsOnly,
+    /// Use bounds of parent and sibling to calculate an upper bound
     TightFromSibling,
+    /// Similar to `TightFromSibling`, but also leave a margin so that when a solution is found the whole interval can be pruned.
     ForRemainingInterval,
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq, EnumString, VariantNames, IntoStaticStr, Display)]
+#[strum(serialize_all = "kebab-case")]
 pub enum TerminalSolver {
+    /// No exhaustive search, search terminates at leaf nodes
     Leaf,
+    /// Start exhaustive search when only a left/right depth one tree remains
     LeftRight,
+    /// Exhaustive search on subtrees of depth two
     D2,
-}
-
-pub struct SolveContext<'a, OT: OptimizationTask, SS: SearchStrategy> {
-    pub task: &'a OT,
-    pub ub_strategy: UpperboundStrategy,
-    pub terminal_solver: TerminalSolver,
-    _ss: PhantomData<SS>,
 }
 
 pub struct SolverOptions {
@@ -58,128 +108,4 @@ pub struct SolverOptions {
     pub max_depth: u32,
     pub timeout: Option<Duration>,
     pub memory_limit: Option<u64>,
-}
-
-impl<OT: OptimizationTask, SS: SearchStrategy> Solver<'_, OT, SS> {
-    pub fn solve(&mut self, options: SolverOptions) -> SolveResult<OT> {
-        let mut dataview = self.dataview.take().unwrap();
-
-        self.task.prepare_for_data(&mut dataview);
-
-        let context = SolveContext {
-            task: &self.task,
-            ub_strategy: UpperboundStrategy::SolutionsOnly,
-            terminal_solver: TerminalSolver::LeftRight,
-            _ss: PhantomData,
-        };
-
-        let mut root: Node<'_, OT, SS> = Node::new(&context, dataview, options.max_depth);
-
-        let mut graph_expansions = 0;
-
-        let mut path = VecDeque::new();
-
-        let start_time = Instant::now();
-        let mut elapsed = Duration::ZERO;
-
-        let mut intermediate_lbs = vec![(root.cost_lower_bound, graph_expansions, 0.0)];
-        let mut intermediate_ubs = vec![(root.best.cost(), graph_expansions, 0.0)];
-
-        while !root.is_complete()
-            && options.timeout.is_none_or(|timeout| elapsed < timeout)
-            && options.memory_limit.is_none_or(|memory_limit| {
-                current_thread_memory_usage().bytes_current < memory_limit as i64
-            })
-        {
-            graph_expansions += 1;
-            // The initial source does not matter, since we always substitute the root manually.
-            root.select(&mut path, 0);
-            trace!("Selected path: {:?}", path);
-
-            let mut current = path.pop_front();
-            let mut parent_item = path.pop_front();
-
-            let parent = parent_item
-                .as_mut()
-                .and_then(|(_, p)| p.child_by_idx(current.as_ref().unwrap().0))
-                .unwrap_or(&mut root);
-
-            parent.expand(&context, &mut current.as_mut().unwrap().1);
-
-            // Return ownership of all the items in the selected path to their respective nodes.
-            while let Some((parent_node_idx, item)) = current {
-                let parent = parent_item
-                    .as_mut()
-                    .and_then(|(_, p)| p.child_by_idx(parent_node_idx))
-                    .unwrap_or(&mut root);
-
-                parent.backtrack_item(&context, item);
-
-                current = parent_item;
-                parent_item = path.pop_front();
-            }
-
-            elapsed = start_time.elapsed();
-
-            if options.track_intermediates {
-                let lowest_remaining_lb =
-                    root.queue
-                        .iter()
-                        .fold(None, |val: Option<OT::CostType>, i| {
-                            let mut lb = root.pruner.lb_for(i.feature, &i.split_points)
-                                + context.task.branching_cost();
-                            OT::update_lowerbound(&mut lb, &i.cost_lower_bound);
-                            if val.is_none() || val.unwrap().strictly_greater_than(&lb) {
-                                Some(lb)
-                            } else {
-                                val
-                            }
-                        });
-
-                let mut actual_lb = root.cost_lower_bound;
-                if let Some(lb) = lowest_remaining_lb {
-                    if lb.strictly_greater_than(&actual_lb) {
-                        actual_lb = lb
-                    }
-                }
-
-                if actual_lb.strictly_greater_than(&intermediate_lbs.last().unwrap().0) {
-                    intermediate_lbs.push((actual_lb, graph_expansions, elapsed.as_secs_f64()))
-                }
-
-                if root
-                    .best
-                    .cost()
-                    .strictly_less_than(&intermediate_ubs.last().unwrap().0)
-                {
-                    intermediate_ubs.push((
-                        root.best.cost(),
-                        graph_expansions,
-                        elapsed.as_secs_f64(),
-                    ))
-                }
-            }
-        }
-
-        let solution = root.best;
-
-        // Take back ownership of the dataset.
-        self.dataview = Some(root.dataview);
-
-        SolveResult {
-            cost_str: self.task.print_cost(&solution.cost()),
-            tree: solution,
-            graph_expansions,
-            intermediate_lbs,
-            intermediate_ubs,
-        }
-    }
-
-    pub fn new(task: OT, dataview: DataView<'_, OT>) -> Solver<OT, SS> {
-        Solver::<'_, OT, SS> {
-            task,
-            dataview: Some(dataview),
-            _ss: PhantomData,
-        }
-    }
 }

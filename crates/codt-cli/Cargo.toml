@@ -12,3 +12,4 @@ clap = { workspace = true }
 env_logger = { workspace = true }
 log = { workspace = true }
 codt = { workspace = true }
+strum = { workspace = true }

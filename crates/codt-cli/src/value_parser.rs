@@ -1,6 +1,9 @@
-//! clap does not include a value parser for range bounded float parsing. This copies much of the integer `RangedI64ValueParser`, and adapts it to floats.
+//! This file contains some parsers for clap.
+//! - First, a parser for floats in a certain range.
+//!   This copies much of the integer `RangedI64ValueParser`, and adapts it to floats.
+//! - Second, a parser for strum enums.
 
-use std::ops::RangeBounds;
+use std::{fmt::Debug, ops::RangeBounds};
 
 use clap::{
     Arg, Command, Error,
@@ -15,11 +18,6 @@ pub struct RangedF64ValueParser<T: TryFrom<f64> + Clone + Send + Sync = f64> {
 }
 
 impl<T: TryFrom<f64> + Clone + Send + Sync> RangedF64ValueParser<T> {
-    /// Select full range of `f64`
-    pub fn new() -> Self {
-        Self::from(..)
-    }
-
     /// Set the supported range
     pub fn range<B: RangeBounds<f64>>(mut self, range: B) -> Self {
         // Consideration: when the user does `value_parser!(u8).range()`
@@ -105,6 +103,16 @@ impl<T: TryFrom<f64> + Clone + Send + Sync, B: RangeBounds<f64>> From<B>
 
 impl<T: TryFrom<f64> + Clone + Send + Sync> Default for RangedF64ValueParser<T> {
     fn default() -> Self {
-        Self::new()
+        Self::from(..) // Full range of f64
     }
+}
+
+/// See https://github.com/clap-rs/clap/discussions/4264
+#[macro_export]
+macro_rules! clap_enum_variants {
+    ($e: ty) => {{
+        use clap::builder::TypedValueParser;
+        use strum::VariantNames;
+        clap::builder::PossibleValuesParser::new(<$e>::VARIANTS).map(|s| s.parse::<$e>().unwrap())
+    }};
 }

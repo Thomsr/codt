@@ -8,13 +8,14 @@ use crate::{
         tree::{BranchNode, LeafNode, Tree},
     },
     search::{
+        pruner::Pruner,
         queue::{BinaryHeapQueue, PQ},
-        solver::UpperboundStrategy,
+        solver::{TerminalSolver, UpperboundStrategy},
+        solver_impl::SolveContext,
+        strategy::SearchStrategy,
     },
     tasks::{Cost, CostSum, OptimizationTask},
 };
-
-use super::{pruner::Pruner, solver::SolveContext, strategy::SearchStrategy};
 
 enum ExpandedQueueItem<'a, OT: OptimizationTask, SS: SearchStrategy> {
     Children([Node<'a, OT, SS>; 2]),
@@ -704,7 +705,9 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> Node<'a, OT, SS> {
             self.queue.push(right_item);
         }
 
-        let expanded = if self.remaining_depth_budget == 2 {
+        let expanded = if self.remaining_depth_budget == 2
+            && context.terminal_solver == TerminalSolver::LeftRight
+        {
             self.solve_left_right(context, item.feature, x)
         } else {
             self.split(context, item.feature, x)
@@ -727,7 +730,10 @@ impl<OT: OptimizationTask> D1ScoreTracker<OT> {
         // If we do branch, then it is optimal if the cost after branching is zero.
         // If we do not branch (yet), this is optimal if branching cannot improve the cost.
         self.cost.is_zero()
-            || (self.branching_cost.is_zero() && self.cost.less_or_not_much_greater_than(&context.task.branching_cost()))
+            || (self.branching_cost.is_zero()
+                && self
+                    .cost
+                    .less_or_not_much_greater_than(&context.task.branching_cost()))
     }
 
     fn total_cost(&self) -> OT::CostType {

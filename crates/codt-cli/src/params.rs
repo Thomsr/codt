@@ -1,7 +1,9 @@
-use std::{path::PathBuf, time::Duration};
+use std::path::PathBuf;
 
-use clap::{ArgAction, Args, Parser, Subcommand, ValueEnum, value_parser};
-use codt::search::solver::{self, SolverOptions};
+use clap::{ArgAction, Args, Parser, Subcommand, value_parser};
+use codt::search::solver::{SearchStrategyEnum, TerminalSolver, UpperboundStrategy};
+
+use crate::clap_enum_variants;
 
 use super::value_parser::RangedF64ValueParser;
 
@@ -38,10 +40,10 @@ pub struct CliParams {
     #[arg(short, long)]
     pub memory_limit: Option<u64>,
 
-    #[arg(short, long, value_enum, default_value_t=UpperboundStrategy::SolutionsOnly)]
+    #[arg(short, long, value_enum, default_value = "for-remaining-interval")]
     pub upperbound: UpperboundStrategy,
 
-    #[arg(long, value_enum, default_value_t=TerminalSolver::LeftRight)]
+    #[arg(long, value_enum, default_value = "left-right")]
     pub terminal_solver: TerminalSolver,
 
     /// Determines if the solver should use an immediate lowerbound for a node (e.g. kmeans for regression).
@@ -53,38 +55,12 @@ pub struct CliParams {
     pub intermediates: bool,
 
     /// The search strategy to use.
-    #[arg(short, long, value_enum)]
-    pub strategy: SearchStrategy,
+    #[arg(short, long, value_parser=clap_enum_variants!(SearchStrategyEnum), default_value_t=SearchStrategyEnum::BfsGosdt)]
+    pub strategy: SearchStrategyEnum,
 
     /// The task to optimize.
     #[command(subcommand)]
     pub task: OptimizationTaskEnum,
-}
-
-impl CliParams {
-    pub fn solver_options(&self) -> SolverOptions {
-        SolverOptions {
-            max_depth: self.max_depth,
-            ub_strategy: match self.upperbound {
-                UpperboundStrategy::SolutionsOnly => solver::UpperboundStrategy::SolutionsOnly,
-                UpperboundStrategy::TightFromSibling => {
-                    solver::UpperboundStrategy::TightFromSibling
-                }
-                UpperboundStrategy::ForRemainingInterval => {
-                    solver::UpperboundStrategy::ForRemainingInterval
-                }
-            },
-            terminal_solver: match self.terminal_solver {
-                TerminalSolver::Leaf => solver::TerminalSolver::Leaf,
-                TerminalSolver::LeftRight => solver::TerminalSolver::LeftRight,
-                TerminalSolver::D2 => solver::TerminalSolver::D2,
-            },
-            node_lowerbound: self.node_lowerbound,
-            memory_limit: self.memory_limit,
-            timeout: self.timeout.map(Duration::from_secs),
-            track_intermediates: self.intermediates,
-        }
-    }
 }
 
 #[derive(Subcommand)]
@@ -95,45 +71,11 @@ pub enum OptimizationTaskEnum {
     SquaredError(SquaredErrorParams),
 }
 
-#[derive(ValueEnum, Clone, Debug)]
-pub enum SearchStrategy {
-    /// Use a depth-first search strategy
-    Dfs,
-    /// Use an and-or best-first search strategy
-    AndOr,
-    DfsPrio,
-    DfsRandom,
-    BfsLb,
-    BfsCuriosity,
-    BfsGosdt,
-    BfsRandom,
-}
-
-#[derive(ValueEnum, Clone, Debug)]
-pub enum UpperboundStrategy {
-    /// Only use actual solutions as upper bounds
-    SolutionsOnly,
-    /// Use bounds of parent and sibling to calculate an upper bound
-    TightFromSibling,
-    /// Similar to `TightFromSibling`, but also leave a margin so that when a solution is found the whole interval can be pruned.
-    ForRemainingInterval,
-}
-
-#[derive(ValueEnum, Clone, Debug)]
-pub enum TerminalSolver {
-    /// No exhaustive search, search terminates at leaf nodes
-    Leaf,
-    /// Start exhaustive search when only a left/right depth one tree remains
-    LeftRight,
-    /// Exhaustive search on subtrees of depth two
-    D2,
-}
-
 #[derive(Args)]
 #[command(next_help_heading = "Task Parameters")]
 pub struct AccuracyParams {
     /// The cost for adding an extra node to the tree. 0.01 means one extra node is only jusitified if it results in at least one percent better training score.
-    #[arg(long, value_parser=RangedF64ValueParser::<f64>::new().range(0.0..=1.0), default_value_t=0.0)]
+    #[arg(long, value_parser=RangedF64ValueParser::<f64>::default().range(0.0..=1.0), default_value_t=0.0)]
     pub complexity_cost: f64,
 }
 
@@ -141,6 +83,6 @@ pub struct AccuracyParams {
 #[command(next_help_heading = "Task Parameters")]
 pub struct SquaredErrorParams {
     /// The cost for adding an extra node to the tree. 0.01 means one extra node is only jusitified if it results in at least one percent better training score.
-    #[arg(long, value_parser=RangedF64ValueParser::<f64>::new().range(0.0..=1.0), default_value_t=0.0)]
+    #[arg(long, value_parser=RangedF64ValueParser::<f64>::default().range(0.0..=1.0), default_value_t=0.0)]
     pub complexity_cost: f64,
 }

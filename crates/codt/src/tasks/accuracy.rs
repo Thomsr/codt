@@ -2,10 +2,8 @@ use std::ops::{AddAssign, SubAssign};
 
 use crate::{
     model::{dataset::DataSet, dataview::DataView, instance::LabeledInstance},
-    tasks::FloatCost,
+    tasks::{CostSum, FloatCost, OptimizationTask},
 };
-
-use super::{CostSum, OptimizationTask};
 
 #[derive(Clone)]
 pub struct AccuracyTask {

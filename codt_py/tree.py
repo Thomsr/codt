@@ -3,9 +3,6 @@ from sklearn.base import BaseEstimator, ClassifierMixin, RegressorMixin, check_i
 from .codt_py import (
     OptimalDecisionTreeClassifier as OCT,
     OptimalDecisionTreeRegressor as ORT,
-    search_strategy_from_string,
-    ub_from_string,
-    terminal_solver_from_string,
 )
 import numpy as np
 
@@ -37,11 +34,11 @@ class _BaseOptimalDecisionTree(BaseEstimator, ABC):
     def _init_rust_class(self):
         return self._rust_class(
             self.max_depth,
-            search_strategy_from_string(self.strategy),
+            self.strategy,
             self.complexity_cost,
             self.timeout,
-            ub_from_string(self.upperbound),
-            terminal_solver_from_string(self.terminal_solver),
+            self.upperbound,
+            self.terminal_solver,
             self.intermediates,
             self.node_lowerbound,
             self.memory_limit,

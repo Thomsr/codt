@@ -1,11 +1,12 @@
 use std::{cmp::Ordering, marker::PhantomData};
 
 use crate::{
-    search::node::{Node, QueueItem},
+    search::{
+        node::{Node, QueueItem},
+        strategy::SearchStrategy,
+    },
     tasks::OptimizationTask,
 };
-
-use super::SearchStrategy;
 
 pub struct LBHeuristic;
 pub struct CuriosityHeuristic;

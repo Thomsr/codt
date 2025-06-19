@@ -1,5 +1,6 @@
-pub mod node;
+pub(crate) mod node;
 pub(crate) mod pruner;
 pub(crate) mod queue;
 pub mod solver;
-pub mod strategy;
+pub(crate) mod solver_impl;
+pub(crate) mod strategy;
