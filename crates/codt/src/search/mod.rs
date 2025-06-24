@@ -1,3 +1,4 @@
+pub(crate) mod exhaustive;
 pub(crate) mod node;
 pub(crate) mod pruner;
 pub(crate) mod queue;

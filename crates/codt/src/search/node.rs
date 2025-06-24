@@ -8,6 +8,7 @@ use crate::{
         tree::{BranchNode, LeafNode, Tree},
     },
     search::{
+        exhaustive::solve_left_right,
         pruner::Pruner,
         queue::{BinaryHeapQueue, PQ},
         solver::{TerminalSolver, UpperboundStrategy},
@@ -17,7 +18,7 @@ use crate::{
     tasks::{Cost, CostSum, OptimizationTask},
 };
 
-enum ExpandedQueueItem<'a, OT: OptimizationTask, SS: SearchStrategy> {
+pub enum ExpandedQueueItem<'a, OT: OptimizationTask, SS: SearchStrategy> {
     Children([Node<'a, OT, SS>; 2]),
     Solution(Arc<Tree<OT>>),
 }
@@ -530,164 +531,6 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> Node<'a, OT, SS> {
         path_buffer.push_back((source, next));
     }
 
-    /// Exhaustive search for a node with depth two, given a fixed feature split.
-    fn solve_left_right(
-        &self,
-        context: &SolveContext<OT, SS>,
-        feature: usize,
-        split_index: usize,
-    ) -> ExpandedQueueItem<'a, OT, SS> {
-        let split_value = self.dataview.possible_split_values[feature][split_index].feature_value;
-        let mut total_right = self.dataview.cost_summer.clone();
-
-        for instance in self.dataview.instances_iter(feature) {
-            if self.dataview.dataset.feature_values[feature][instance] > split_value {
-                break;
-            } else {
-                total_right -= &self.dataview.dataset.instances[instance];
-            }
-        }
-
-        let mut total_left = self.dataview.cost_summer.clone();
-        total_left -= &total_right;
-
-        let mut left_tracker = D1ScoreTracker {
-            cost: total_left.cost(),
-            branching_cost: OT::CostType::ZERO,
-            feature: None,
-            threshold: None,
-            left_leaf: None,
-            right_leaf: None,
-        };
-        let mut right_tracker = D1ScoreTracker {
-            cost: total_right.cost(),
-            branching_cost: OT::CostType::ZERO,
-            feature: None,
-            threshold: None,
-            left_leaf: None,
-            right_leaf: None,
-        };
-
-        for feature_2 in 0..self.dataview.num_features() {
-            // init totals of the left left node and right left node to zero.
-            let mut total_left_left = total_left.clone();
-            total_left_left -= &total_left;
-            let mut total_right_left = total_left.clone();
-            total_right_left -= &total_left;
-
-            let mut prev_left_feature_value = None;
-            let mut prev_right_feature_value = None;
-
-            // Keep costsums out of loop, so that we can .clone_from in the loop and avoid any allocations.
-            let mut total_left_right = total_left.clone();
-            let mut total_right_right = total_left.clone();
-
-            for instance in self.dataview.instances_iter(feature_2) {
-                let feature1_value = self.dataview.dataset.feature_values[feature][instance];
-                let feature2_value = self.dataview.dataset.feature_values[feature_2][instance];
-                if feature1_value <= split_value {
-                    // Check if this is a point we can split at
-                    if let Some(prev_left_feature_value) = prev_left_feature_value {
-                        if prev_left_feature_value != feature2_value {
-                            total_left_right.clone_from(&total_left);
-                            total_left_right -= &total_left_left;
-
-                            let cost_ll = total_left_left.cost();
-                            let cost_lr = total_left_right.cost();
-                            let cost = cost_ll + cost_lr;
-                            let branching_cost = context.task.branching_cost();
-                            let total_cost = cost + branching_cost;
-
-                            if total_cost.strictly_less_than(&left_tracker.total_cost()) {
-                                let current_threshold =
-                                    self.dataview.dataset.internal_to_original_feature_value
-                                        [feature_2]
-                                        [prev_left_feature_value as usize];
-                                let next_threshold =
-                                    self.dataview.dataset.internal_to_original_feature_value
-                                        [feature_2]
-                                        [feature2_value as usize];
-
-                                left_tracker = D1ScoreTracker {
-                                    cost,
-                                    branching_cost,
-                                    feature: Some(feature_2),
-                                    threshold: Some((current_threshold + next_threshold) / 2.0),
-                                    left_leaf: Some(LeafNode {
-                                        cost: cost_ll,
-                                        label: total_left_left.label(),
-                                    }),
-                                    right_leaf: Some(LeafNode {
-                                        cost: cost_lr,
-                                        label: total_left_right.label(),
-                                    }),
-                                }
-                            }
-                        }
-                    }
-                    total_left_left += &self.dataview.dataset.instances[instance];
-                    prev_left_feature_value = Some(feature2_value);
-                } else {
-                    // Check if this is a point we can split at
-                    if let Some(prev_right_feature_value) = prev_right_feature_value {
-                        if prev_right_feature_value != feature2_value {
-                            total_right_right.clone_from(&total_right);
-                            total_right_right -= &total_right_left;
-
-                            let cost_rl = total_right_left.cost();
-                            let cost_rr = total_right_right.cost();
-                            let cost = cost_rl + cost_rr;
-                            let branching_cost = context.task.branching_cost();
-                            let total_cost = cost + branching_cost;
-
-                            if total_cost.strictly_less_than(&right_tracker.total_cost()) {
-                                let current_threshold =
-                                    self.dataview.dataset.internal_to_original_feature_value
-                                        [feature_2]
-                                        [prev_right_feature_value as usize];
-                                let next_threshold =
-                                    self.dataview.dataset.internal_to_original_feature_value
-                                        [feature_2]
-                                        [feature2_value as usize];
-
-                                right_tracker = D1ScoreTracker {
-                                    cost,
-                                    branching_cost,
-                                    feature: Some(feature_2),
-                                    threshold: Some((current_threshold + next_threshold) / 2.0),
-                                    left_leaf: Some(LeafNode {
-                                        cost: cost_rl,
-                                        label: total_right_left.label(),
-                                    }),
-                                    right_leaf: Some(LeafNode {
-                                        cost: cost_rr,
-                                        label: total_right_right.label(),
-                                    }),
-                                }
-                            }
-                        }
-                    }
-                    total_right_left += &self.dataview.dataset.instances[instance];
-                    prev_right_feature_value = Some(feature2_value);
-                }
-            }
-            if left_tracker.is_optimal(context) && right_tracker.is_optimal(context) {
-                break;
-            }
-        }
-
-        let cost =
-            left_tracker.total_cost() + right_tracker.total_cost() + context.task.branching_cost();
-
-        ExpandedQueueItem::Solution(Arc::new(Tree::Branch(BranchNode {
-            cost,
-            split_feature: feature,
-            split_threshold: self.dataview.threshold_from_split(feature, split_index),
-            left_child: left_tracker.get_tree(total_left.label()),
-            right_child: right_tracker.get_tree(total_right.label()),
-        })))
-    }
-
     /// Expand an item from the queue one level by selecting a concrete split and instantiating its children.
     pub fn expand(&mut self, context: &SolveContext<OT, SS>, item: &mut QueueItem<'a, OT, SS>) {
         assert!(!item.is_expanded());
@@ -708,54 +551,10 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> Node<'a, OT, SS> {
         let expanded = if self.remaining_depth_budget == 2
             && context.terminal_solver == TerminalSolver::LeftRight
         {
-            self.solve_left_right(context, item.feature, x)
+            solve_left_right(&self.dataview, context, item.feature, x)
         } else {
             self.split(context, item.feature, x)
         };
         item.expanded = Some(expanded);
-    }
-}
-
-struct D1ScoreTracker<OT: OptimizationTask> {
-    cost: OT::CostType,
-    branching_cost: OT::CostType,
-    feature: Option<usize>,
-    threshold: Option<f64>,
-    left_leaf: Option<LeafNode<OT>>,
-    right_leaf: Option<LeafNode<OT>>,
-}
-
-impl<OT: OptimizationTask> D1ScoreTracker<OT> {
-    fn is_optimal<SS: SearchStrategy>(&self, context: &SolveContext<'_, OT, SS>) -> bool {
-        // If we do branch, then it is optimal if the cost after branching is zero.
-        // If we do not branch (yet), this is optimal if branching cannot improve the cost.
-        self.cost.is_zero()
-            || (self.branching_cost.is_zero()
-                && self
-                    .cost
-                    .less_or_not_much_greater_than(&context.task.branching_cost()))
-    }
-
-    fn total_cost(&self) -> OT::CostType {
-        self.cost + self.branching_cost
-    }
-
-    fn get_tree(self, total_label: OT::LabelType) -> Arc<Tree<OT>> {
-        let tree = if self.feature.is_none() {
-            Tree::Leaf(LeafNode {
-                cost: self.total_cost(),
-                label: total_label,
-            })
-        } else {
-            Tree::Branch(BranchNode {
-                cost: self.total_cost(),
-                split_feature: self.feature.unwrap(),
-                split_threshold: self.threshold.unwrap(),
-                left_child: Arc::new(Tree::Leaf(self.left_leaf.unwrap())),
-                right_child: Arc::new(Tree::Leaf(self.right_leaf.unwrap())),
-            })
-        };
-
-        Arc::new(tree)
     }
 }
