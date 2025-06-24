@@ -141,6 +141,7 @@ name = "codt"
 version = "0.1.0"
 dependencies = [
  "ckmeans",
+ "fenwick",
  "log",
  "rand",
  "rustc-hash",
@@ -197,6 +198,12 @@ dependencies = [
  "humantime",
  "log",
 ]
+
+[[package]]
+name = "fenwick"
+version = "2.0.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "8da8259e81fd417a39d43d803d72458fcfac27206470d303e85be455e3361030"
 
 [[package]]
 name = "getrandom"

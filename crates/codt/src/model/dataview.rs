@@ -360,10 +360,8 @@ impl<'a, OT: OptimizationTask> DataView<'a, OT> {
     }
 
     /// Iterate all instances, sorted by its feature value of a specific feature.
-    pub fn instances_iter(&self, feature: usize) -> impl Iterator<Item = usize> {
-        self.feature_values_sorted[feature]
-            .iter()
-            .map(|i| i.instance_id)
+    pub fn instances_iter(&self, feature: usize) -> impl Iterator<Item = &FeatureValue> {
+        self.feature_values_sorted[feature].iter()
     }
 
     pub fn num_instances(&self) -> usize {

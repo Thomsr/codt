@@ -100,6 +100,7 @@ pub enum TerminalSolver {
     D2,
 }
 
+#[derive(Debug)]
 pub struct SolverOptions {
     pub ub_strategy: UpperboundStrategy,
     pub terminal_solver: TerminalSolver,

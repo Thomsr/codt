@@ -40,8 +40,8 @@ impl<OT: OptimizationTask, SS: SearchStrategy> Solver<OT> for SolverImpl<'_, OT,
 
         let context = SolveContext {
             task: &self.task,
-            ub_strategy: UpperboundStrategy::SolutionsOnly,
-            terminal_solver: TerminalSolver::LeftRight,
+            ub_strategy: options.ub_strategy,
+            terminal_solver: options.terminal_solver,
             _ss: PhantomData,
         };
 

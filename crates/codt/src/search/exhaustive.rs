@@ -1,4 +1,10 @@
-use std::sync::Arc;
+use std::{
+    collections::HashMap,
+    ops::{AddAssign, Range},
+    sync::Arc,
+};
+
+use fenwick::index::zero_based;
 
 use crate::{
     model::{
@@ -8,6 +14,275 @@ use crate::{
     search::{node::ExpandedQueueItem, solver_impl::SolveContext, strategy::SearchStrategy},
     tasks::{Cost, CostSum, OptimizationTask},
 };
+
+/// Conceptually performs `a[i] += delta` on the original array `a`.
+/// See `fenwick::array::update`. Equivalent but with looser type constraints
+fn fenwick_update<T, U>(fenwick: &mut [T], i: usize, delta: U)
+where
+    T: AddAssign<U>,
+    U: Copy,
+{
+    for ii in zero_based::up(i, fenwick.len()) {
+        fenwick[ii] += delta;
+    }
+}
+
+/// Conceptually calculates `a[0] + ... + a[i]` on the original array `a`.
+/// See `fenwick::array::prefix_sum`. Equivalent but with looser type constraints
+fn fenwick_prefix_sum<T>(fenwick: &[T], i: usize, accumulator: &mut T)
+where
+    T: for<'a> AddAssign<&'a T>,
+{
+    for ii in zero_based::down(i) {
+        *accumulator += &fenwick[ii];
+    }
+}
+
+#[allow(clippy::too_many_arguments)]
+fn update_lowest_cost<OT: OptimizationTask, SS: SearchStrategy>(
+    context: &SolveContext<OT, SS>,  // Search context
+    best: &mut [D1ScoreTracker<OT>], // Current bests
+    range: Range<usize>,             // The range to update
+    totals: &[OT::CostSumType],      // Normal vector of total costs
+    totals_left: &[OT::CostSumType], // Fenwick tree of left costs
+    reverse_fenwick: bool, // True if the fenwick tree indexing is inverted due to it being a suffix tree
+    feature: usize,
+    current_feature_value: i32,
+    next_feature_value: i32,
+    dataview: &dataview::DataView<OT>,
+    total_left: &mut OT::CostSumType, // Can be any costsum, for preventing allocations
+    total_right: &mut OT::CostSumType, // Can be any costsum, for preventing allocations
+) {
+    for i in range {
+        total_left.clear();
+        let fenwick_idx = if reverse_fenwick {
+            totals_left.len() - 1 - i
+        } else {
+            i
+        };
+        fenwick_prefix_sum(totals_left, fenwick_idx, total_left);
+
+        total_right.clone_from(&totals[i]);
+        *total_right -= &*total_left;
+        best[i].add_candidate(
+            context,
+            total_left,
+            total_right,
+            feature,
+            current_feature_value,
+            next_feature_value,
+            &dataview.dataset.internal_to_original_feature_value[feature],
+        );
+    }
+}
+
+pub fn solve_d2<OT: OptimizationTask, SS: SearchStrategy>(
+    dataview: &dataview::DataView<OT>,
+    context: &SolveContext<OT, SS>,
+) -> Arc<Tree<OT>> {
+    let n_features = dataview.num_features();
+
+    // Reuse memory
+    let mut feature_value_to_possible_split_idx: HashMap<i32, usize> = HashMap::with_capacity(0);
+    let mut totals_left_i = Vec::with_capacity(0);
+    let mut temp_total = dataview.cost_summer.clone();
+    let mut temp_total2 = temp_total.clone();
+
+    let mut best = Arc::new(Tree::Leaf(LeafNode {
+        cost: dataview.cost_summer.cost(),
+        label: dataview.cost_summer.label(),
+    }));
+
+    for f1 in 0..n_features {
+        let n_splits = dataview.possible_split_values[f1].len();
+        if n_splits == 0 {
+            // No splits available for this feature, skip it.
+            continue;
+        }
+
+        // Reset and reserve reused structs
+        feature_value_to_possible_split_idx.clear();
+        feature_value_to_possible_split_idx.reserve(n_splits);
+        totals_left_i.clear();
+        totals_left_i.reserve(n_splits);
+        temp_total.clear();
+
+        // Calculate the total cost on the left and right side when splitting at each possible split value.
+        // Additionally create a lookup from feature_value to the last split that includes it. This may be > len
+        let mut cur_threshold = Some(dataview.possible_split_values[f1][0].feature_value);
+        let mut cur_i = 0;
+
+        for &instance in dataview.instances_iter(f1) {
+            if cur_threshold.is_some() && Some(instance.feature_value) > cur_threshold {
+                // Note: this is not skipped at the end, because it is guaranteed that there will be one more instance
+                // that is to the right of any possible split, otherwise the split is useless and would be excluded.
+                totals_left_i.push(temp_total.clone());
+                cur_i += 1;
+                cur_threshold = dataview.possible_split_values[f1]
+                    .get(cur_i)
+                    .map(|x| x.feature_value);
+            }
+
+            // Update cumulative total
+            temp_total += &dataview.dataset.instances[instance.instance_id];
+            // If corresponding idx wasn't known yet, set it.
+            feature_value_to_possible_split_idx.insert(instance.feature_value, cur_i);
+        }
+
+        let mut totals_right_i = Vec::with_capacity(n_splits);
+        for total_left in &totals_left_i {
+            let mut total_right = dataview.cost_summer.clone();
+            total_right -= total_left;
+            totals_right_i.push(total_right);
+        }
+
+        // TODO also account for not branching at all, i.e. just returning a leaf node.
+
+        let mut best_left = Vec::with_capacity(n_splits);
+        let mut best_right = Vec::with_capacity(n_splits);
+
+        for i in 0..n_splits {
+            best_left.push(D1ScoreTracker {
+                leaf_cost: totals_left_i[i].cost(),
+                feature: None,
+                threshold: None,
+                left_leaf: LeafNode {
+                    cost: totals_left_i[i].cost(),
+                    label: totals_left_i[i].label(),
+                },
+                right_leaf: None,
+            });
+            best_right.push(D1ScoreTracker {
+                leaf_cost: totals_right_i[i].cost(),
+                feature: None,
+                threshold: None,
+                left_leaf: LeafNode {
+                    cost: totals_right_i[i].cost(),
+                    label: totals_right_i[i].label(),
+                },
+                right_leaf: None,
+            });
+        }
+
+        for f2 in 0..dataview.num_features() {
+            if dataview.possible_split_values[f2].is_empty() {
+                // No splits available for this feature, skip it.
+                continue;
+            }
+
+            // These array do not directly contain the totals at the ith, but are instead fenwick trees.
+            // Because of this, totals_right_left_i is indexed reversed.
+            temp_total.clear(); // Used to clone zeros
+            let mut totals_left_left_i = vec![temp_total.clone(); n_splits];
+            let mut totals_right_left_i = vec![temp_total.clone(); n_splits];
+
+            // It is possible that the for the left and the right side and different i's the previous is different.
+            // The splits are still optimal, but possibly have less spacing between the features.
+            // TODO: we could maintain a structure prev_left_feature_value_i and prev_right_feature_value_i to fix this.
+            let mut previous = None;
+            for &fv in dataview.instances_iter(f2) {
+                // Check if we can split here.
+                if let Some((prev_feature_value_1, prev_feature_value_2)) = previous {
+                    if prev_feature_value_2 != fv.feature_value {
+                        let first_split_idx_that_includes_it =
+                            feature_value_to_possible_split_idx[&prev_feature_value_1];
+
+                        // Check if any updated value results in the best tree.
+                        // We do this before adding the value of the current instance so that we can check if this is a valid splitting point.
+                        // TODO, if f1 == f2, we can be smarter.
+                        // TODO, can we avoid doing this in some cases? E.g. similarity bound.
+                        // Minimum difference is last best - UB, however it might be that the best solution on the left is
+                        // improved by one, and the right by ten, so the next left still needs to be checked for a min improvement of 10.
+                        // Maybe we can keep information from the previous cost update: If best_left[10] had min improvement of 10
+                        // then in this iteration it will have a min improvement of at least 9. E.g. shrink the range.
+                        update_lowest_cost(
+                            context,
+                            &mut best_left,
+                            first_split_idx_that_includes_it..n_splits,
+                            &totals_left_i,
+                            &totals_left_left_i,
+                            true,
+                            f2,
+                            prev_feature_value_2, // This may not be the previous in the current split, see TODO above
+                            fv.feature_value,
+                            dataview,
+                            &mut temp_total,
+                            &mut temp_total2,
+                        );
+                        update_lowest_cost(
+                            context,
+                            &mut best_right,
+                            0..first_split_idx_that_includes_it,
+                            &totals_right_i,
+                            &totals_right_left_i,
+                            false,
+                            f2,
+                            prev_feature_value_2, // This may not be the previous in the current split, see TODO above
+                            fv.feature_value,
+                            dataview,
+                            &mut temp_total,
+                            &mut temp_total2,
+                        );
+                    }
+                }
+
+                let feature_value_1 = dataview.dataset.feature_values[f1][fv.instance_id];
+                previous = Some((feature_value_1, fv.feature_value));
+
+                let instance = &dataview.dataset.instances[fv.instance_id];
+                let first_split_idx_that_includes_it =
+                    feature_value_to_possible_split_idx[&feature_value_1];
+
+                // Update all possible feature splits in the root with this instance.
+                // Take for example the first instance in f2 order. Say f1 = 3 for this instance.
+                // Now this instance will fall on the left-left side for all feature tests greater or equal than 3.
+                // And it will fall on the right-left side for all feature tests smaller than 3.
+                //
+                // If n_splits = 5, then totals_left_left_i should be updated at the last two splits 3 and 4 (index 0 and 1).
+                // While totals_right_left will be updated at 0, 1 and 2 (same indices).
+
+                // If it is n_splits, it is never on the left side.
+                if first_split_idx_that_includes_it < n_splits {
+                    // Add this instance value to all left-left totals of possible splits f1 <= x where feature_value_1 <= x (x >= feature_value_1)
+                    // We index reversed, because we want the suffix sum. Fenwick trees store the prefix sum.
+                    let reversed_idx = (n_splits - 1) - (first_split_idx_that_includes_it);
+                    fenwick_update(&mut totals_left_left_i, reversed_idx, instance);
+                }
+
+                // If it is 0, it is never on the right side.
+                if first_split_idx_that_includes_it > 0 {
+                    // Add this instance value to all right-left totals of possible splits f1 <= x where feature_value_1 > x (x < feature_value_1)
+                    fenwick_update(
+                        &mut totals_right_left_i,
+                        first_split_idx_that_includes_it - 1,
+                        instance,
+                    );
+                }
+            }
+        }
+
+        for (i, (left, right)) in best_left
+            .into_iter()
+            .zip(best_right.into_iter())
+            .enumerate()
+        {
+            let ith_cost = left.total_cost(context)
+                + right.total_cost(context)
+                + context.task.branching_cost();
+            if ith_cost.strictly_less_than(&best.cost()) {
+                best = Arc::new(Tree::Branch(BranchNode {
+                    cost: ith_cost,
+                    split_feature: f1,
+                    split_threshold: dataview.threshold_from_split(f1, i),
+                    left_child: left.get_tree(context),
+                    right_child: right.get_tree(context),
+                }));
+            }
+        }
+    }
+
+    best
+}
 
 /// Exhaustive search for a node with depth two, given a fixed feature split.
 pub fn solve_left_right<'a, OT: OptimizationTask, SS: SearchStrategy>(
@@ -20,10 +295,10 @@ pub fn solve_left_right<'a, OT: OptimizationTask, SS: SearchStrategy>(
     let mut total_right = dataview.cost_summer.clone();
 
     for instance in dataview.instances_iter(feature) {
-        if dataview.dataset.feature_values[feature][instance] > split_value {
+        if dataview.dataset.feature_values[feature][instance.instance_id] > split_value {
             break;
         } else {
-            total_right -= &dataview.dataset.instances[instance];
+            total_right -= &dataview.dataset.instances[instance.instance_id];
         }
     }
 
@@ -31,23 +306,34 @@ pub fn solve_left_right<'a, OT: OptimizationTask, SS: SearchStrategy>(
     total_left -= &total_right;
 
     let mut left_tracker = D1ScoreTracker {
-        cost: total_left.cost(),
-        branching_cost: OT::CostType::ZERO,
+        leaf_cost: total_left.cost(),
         feature: None,
         threshold: None,
-        left_leaf: None,
+        left_leaf: LeafNode {
+            cost: total_left.cost(),
+            label: total_left.label(),
+        },
         right_leaf: None,
     };
     let mut right_tracker = D1ScoreTracker {
-        cost: total_right.cost(),
-        branching_cost: OT::CostType::ZERO,
+        leaf_cost: total_right.cost(),
         feature: None,
         threshold: None,
-        left_leaf: None,
+        left_leaf: LeafNode {
+            cost: total_right.cost(),
+            label: total_right.label(),
+        },
         right_leaf: None,
     };
 
+    let mut left_done = left_tracker.is_optimal(context);
+    let mut right_done = right_tracker.is_optimal(context);
+
     for feature_2 in 0..dataview.num_features() {
+        if left_done && right_done {
+            break;
+        }
+
         // init totals of the left left node and right left node to zero.
         let mut total_left_left = total_left.clone();
         total_left_left -= &total_left;
@@ -62,143 +348,145 @@ pub fn solve_left_right<'a, OT: OptimizationTask, SS: SearchStrategy>(
         let mut total_right_right = total_left.clone();
 
         for instance in dataview.instances_iter(feature_2) {
-            let feature1_value = dataview.dataset.feature_values[feature][instance];
-            let feature2_value = dataview.dataset.feature_values[feature_2][instance];
+            if left_done && right_done {
+                break;
+            }
+
+            let feature1_value = dataview.dataset.feature_values[feature][instance.instance_id];
+            let feature2_value = instance.feature_value;
             if feature1_value <= split_value {
                 // Check if this is a point we can split at
                 if let Some(prev_left_feature_value) = prev_left_feature_value {
-                    if prev_left_feature_value != feature2_value {
+                    if !left_done && prev_left_feature_value != feature2_value {
                         total_left_right.clone_from(&total_left);
                         total_left_right -= &total_left_left;
 
-                        let cost_ll = total_left_left.cost();
-                        let cost_lr = total_left_right.cost();
-                        let cost = cost_ll + cost_lr;
-                        let branching_cost = context.task.branching_cost();
-                        let total_cost = cost + branching_cost;
-
-                        if total_cost.strictly_less_than(&left_tracker.total_cost()) {
-                            let current_threshold =
-                                dataview.dataset.internal_to_original_feature_value[feature_2]
-                                    [prev_left_feature_value as usize];
-                            let next_threshold =
-                                dataview.dataset.internal_to_original_feature_value[feature_2]
-                                    [feature2_value as usize];
-
-                            left_tracker = D1ScoreTracker {
-                                cost,
-                                branching_cost,
-                                feature: Some(feature_2),
-                                threshold: Some((current_threshold + next_threshold) / 2.0),
-                                left_leaf: Some(LeafNode {
-                                    cost: cost_ll,
-                                    label: total_left_left.label(),
-                                }),
-                                right_leaf: Some(LeafNode {
-                                    cost: cost_lr,
-                                    label: total_left_right.label(),
-                                }),
-                            }
-                        }
+                        left_tracker.add_candidate(
+                            context,
+                            &total_left_left,
+                            &total_left_right,
+                            feature_2,
+                            prev_left_feature_value,
+                            feature2_value,
+                            &dataview.dataset.internal_to_original_feature_value[feature_2],
+                        );
+                        left_done |= left_tracker.is_optimal(context);
                     }
                 }
-                total_left_left += &dataview.dataset.instances[instance];
+                total_left_left += &dataview.dataset.instances[instance.instance_id];
                 prev_left_feature_value = Some(feature2_value);
             } else {
                 // Check if this is a point we can split at
                 if let Some(prev_right_feature_value) = prev_right_feature_value {
-                    if prev_right_feature_value != feature2_value {
+                    if !right_done && prev_right_feature_value != feature2_value {
                         total_right_right.clone_from(&total_right);
                         total_right_right -= &total_right_left;
 
-                        let cost_rl = total_right_left.cost();
-                        let cost_rr = total_right_right.cost();
-                        let cost = cost_rl + cost_rr;
-                        let branching_cost = context.task.branching_cost();
-                        let total_cost = cost + branching_cost;
-
-                        if total_cost.strictly_less_than(&right_tracker.total_cost()) {
-                            let current_threshold =
-                                dataview.dataset.internal_to_original_feature_value[feature_2]
-                                    [prev_right_feature_value as usize];
-                            let next_threshold =
-                                dataview.dataset.internal_to_original_feature_value[feature_2]
-                                    [feature2_value as usize];
-
-                            right_tracker = D1ScoreTracker {
-                                cost,
-                                branching_cost,
-                                feature: Some(feature_2),
-                                threshold: Some((current_threshold + next_threshold) / 2.0),
-                                left_leaf: Some(LeafNode {
-                                    cost: cost_rl,
-                                    label: total_right_left.label(),
-                                }),
-                                right_leaf: Some(LeafNode {
-                                    cost: cost_rr,
-                                    label: total_right_right.label(),
-                                }),
-                            }
-                        }
+                        right_tracker.add_candidate(
+                            context,
+                            &total_right_left,
+                            &total_right_right,
+                            feature_2,
+                            prev_right_feature_value,
+                            feature2_value,
+                            &dataview.dataset.internal_to_original_feature_value[feature_2],
+                        );
+                        right_done |= right_tracker.is_optimal(context);
                     }
                 }
-                total_right_left += &dataview.dataset.instances[instance];
+                total_right_left += &dataview.dataset.instances[instance.instance_id];
                 prev_right_feature_value = Some(feature2_value);
             }
         }
-        if left_tracker.is_optimal(context) && right_tracker.is_optimal(context) {
-            break;
-        }
     }
 
-    let cost =
-        left_tracker.total_cost() + right_tracker.total_cost() + context.task.branching_cost();
+    let cost = left_tracker.total_cost(context)
+        + right_tracker.total_cost(context)
+        + context.task.branching_cost();
 
     ExpandedQueueItem::Solution(Arc::new(Tree::Branch(BranchNode {
         cost,
         split_feature: feature,
         split_threshold: dataview.threshold_from_split(feature, split_index),
-        left_child: left_tracker.get_tree(total_left.label()),
-        right_child: right_tracker.get_tree(total_right.label()),
+        left_child: left_tracker.get_tree(context),
+        right_child: right_tracker.get_tree(context),
     })))
 }
 
 struct D1ScoreTracker<OT: OptimizationTask> {
-    cost: OT::CostType,
-    branching_cost: OT::CostType,
+    leaf_cost: OT::CostType,
     feature: Option<usize>,
     threshold: Option<f64>,
-    left_leaf: Option<LeafNode<OT>>,
+    /// The left leaf is not an option as it is used to store the label in case there is no split.
+    left_leaf: LeafNode<OT>,
     right_leaf: Option<LeafNode<OT>>,
 }
 
 impl<OT: OptimizationTask> D1ScoreTracker<OT> {
     fn is_optimal<SS: SearchStrategy>(&self, context: &SolveContext<'_, OT, SS>) -> bool {
-        // If we do branch, then it is optimal if the cost after branching is zero.
+        // If we do branch, then it is optimal if the cost after branching is zero. (Since we have already excluded not branching)
         // If we do not branch (yet), this is optimal if branching cannot improve the cost.
-        self.cost.is_zero()
-            || (self.branching_cost.is_zero()
+        self.leaf_cost.is_zero()
+            || (self.feature.is_none()
                 && self
-                    .cost
+                    .leaf_cost
                     .less_or_not_much_greater_than(&context.task.branching_cost()))
     }
 
-    fn total_cost(&self) -> OT::CostType {
-        self.cost + self.branching_cost
+    fn total_cost<SS: SearchStrategy>(&self, context: &SolveContext<'_, OT, SS>) -> OT::CostType {
+        if self.feature.is_some() {
+            self.leaf_cost + context.task.branching_cost()
+        } else {
+            self.leaf_cost
+        }
     }
 
-    fn get_tree(self, total_label: OT::LabelType) -> Arc<Tree<OT>> {
+    #[allow(clippy::too_many_arguments)]
+    fn add_candidate<SS: SearchStrategy>(
+        &mut self,
+        context: &SolveContext<'_, OT, SS>,
+        costsum_left: &OT::CostSumType,
+        costsum_right: &OT::CostSumType,
+        feature: usize,
+        current_feature_value: i32,
+        next_feature_value: i32,
+        feature_value_to_threshold: &[f64],
+    ) {
+        let cost_left = costsum_left.cost();
+        let cost_right = costsum_right.cost();
+        let leaf_cost = cost_left + cost_right;
+        let total_cost = leaf_cost + context.task.branching_cost();
+
+        if total_cost.strictly_less_than(&self.total_cost(context)) {
+            let current_threshold = feature_value_to_threshold[current_feature_value as usize];
+            let next_threshold = feature_value_to_threshold[next_feature_value as usize];
+
+            self.leaf_cost = leaf_cost;
+            self.feature = Some(feature);
+            self.threshold = Some((current_threshold + next_threshold) / 2.0);
+            self.left_leaf = LeafNode {
+                cost: cost_left,
+                label: costsum_left.label(),
+            };
+            self.right_leaf = Some(LeafNode {
+                cost: cost_right,
+                label: costsum_right.label(),
+            });
+        }
+    }
+
+    fn get_tree<SS: SearchStrategy>(self, context: &SolveContext<'_, OT, SS>) -> Arc<Tree<OT>> {
         let tree = if self.feature.is_none() {
             Tree::Leaf(LeafNode {
-                cost: self.total_cost(),
-                label: total_label,
+                cost: self.total_cost(context),
+                label: self.left_leaf.label,
             })
         } else {
             Tree::Branch(BranchNode {
-                cost: self.total_cost(),
+                cost: self.total_cost(context),
                 split_feature: self.feature.unwrap(),
                 split_threshold: self.threshold.unwrap(),
-                left_child: Arc::new(Tree::Leaf(self.left_leaf.unwrap())),
+                left_child: Arc::new(Tree::Leaf(self.left_leaf)),
                 right_child: Arc::new(Tree::Leaf(self.right_leaf.unwrap())),
             })
         };

@@ -124,7 +124,7 @@ impl OptimizationTask for SquaredErrorTask {
             let clusters: u8 = dataview.num_instances().min(1 << max_depth) as u8;
             let labels: Vec<f64> = dataview
                 .instances_iter(0)
-                .map(|i| dataview.dataset.instances[i].label)
+                .map(|i| dataview.dataset.instances[i.instance_id].label)
                 .collect();
             let kmeans_result = ckmeans_dynamic_stop(&labels, clusters, self.branching_cost);
             let kmeans_matrix = kmeans_result.unwrap();

@@ -22,6 +22,8 @@ fn run_solver_for_task<T: OptimizationTask>(
     task: T,
     strategy: SearchStrategyEnum,
 ) {
+    info!("Starting solve with options:\n{:?}\n", options);
+
     let before_read = Instant::now();
     let mut dataset = DataSet::<T::InstanceType>::default();
     read_from_file(&mut dataset, file).unwrap();
