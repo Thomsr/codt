@@ -201,7 +201,7 @@ pub fn solve_d2<OT: OptimizationTask, SS: SearchStrategy>(
                             first_split_idx_that_includes_it..n_splits,
                             &totals_left_i,
                             &totals_left_left_i,
-                            true,
+                            false,
                             f2,
                             prev_feature_value_2, // This may not be the previous in the current split, see TODO above
                             fv.feature_value,
@@ -215,7 +215,7 @@ pub fn solve_d2<OT: OptimizationTask, SS: SearchStrategy>(
                             0..first_split_idx_that_includes_it,
                             &totals_right_i,
                             &totals_right_left_i,
-                            false,
+                            true,
                             f2,
                             prev_feature_value_2, // This may not be the previous in the current split, see TODO above
                             fv.feature_value,
@@ -244,19 +244,19 @@ pub fn solve_d2<OT: OptimizationTask, SS: SearchStrategy>(
                 // If it is n_splits, it is never on the left side.
                 if first_split_idx_that_includes_it < n_splits {
                     // Add this instance value to all left-left totals of possible splits f1 <= x where feature_value_1 <= x (x >= feature_value_1)
-                    // We index reversed, because we want the suffix sum. Fenwick trees store the prefix sum.
-                    let reversed_idx = (n_splits - 1) - (first_split_idx_that_includes_it);
-                    fenwick_update(&mut totals_left_left_i, reversed_idx, instance);
+                    fenwick_update(
+                        &mut totals_left_left_i,
+                        first_split_idx_that_includes_it,
+                        instance,
+                    );
                 }
 
                 // If it is 0, it is never on the right side.
                 if first_split_idx_that_includes_it > 0 {
                     // Add this instance value to all right-left totals of possible splits f1 <= x where feature_value_1 > x (x < feature_value_1)
-                    fenwick_update(
-                        &mut totals_right_left_i,
-                        first_split_idx_that_includes_it - 1,
-                        instance,
-                    );
+                    // We index reversed, because we want the suffix sum. Fenwick trees store the prefix sum.
+                    let reversed_idx = (n_splits - 1) - (first_split_idx_that_includes_it - 1);
+                    fenwick_update(&mut totals_right_left_i, reversed_idx, instance);
                 }
             }
         }
