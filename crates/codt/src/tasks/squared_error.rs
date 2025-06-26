@@ -65,11 +65,13 @@ impl SubAssign<&LabeledInstance<f64>> for SquaredErrorCostSum {
 
 impl CostSum<f64, LabeledInstance<f64>, FloatCost> for SquaredErrorCostSum {
     fn label(&self) -> f64 {
+        debug_assert!(self.n > 0, "Getting a label from 0 instances is undefined. This should be excluded by disallowing empty splits.");
         // The mean gives the optimal SSE in a leaf.
         self.y / (self.n as f64)
     }
 
     fn cost(&self) -> FloatCost {
+        debug_assert!(self.n > 0, "Getting a cost from 0 instances is undefined. This should be excluded by disallowing empty splits.");
         // The sum of squared errors from the mean can be computed from (sum of (y^2)) - ((sum of y)^2 / N)
         (self.y2 - (self.y * self.y) / (self.n as f64)).into()
     }

@@ -76,6 +76,10 @@ fn update_lowest_cost<OT: OptimizationTask, SS: SearchStrategy>(
     }
 }
 
+/// TODO: this is a work in progress. Multiple things are broken.
+/// Non-optimal results and crashes are expected.
+/// For example, empty splits should not be allowed, but they are.
+
 pub fn solve_d2<OT: OptimizationTask, SS: SearchStrategy>(
     dataview: &dataview::DataView<OT>,
     context: &SolveContext<OT, SS>,
