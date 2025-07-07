@@ -65,13 +65,19 @@ impl SubAssign<&LabeledInstance<f64>> for SquaredErrorCostSum {
 
 impl CostSum<f64, LabeledInstance<f64>, FloatCost> for SquaredErrorCostSum {
     fn label(&self) -> f64 {
-        debug_assert!(self.n > 0, "Getting a label from 0 instances is undefined. This should be excluded by disallowing empty splits.");
+        debug_assert!(
+            self.n > 0,
+            "Getting a label from 0 instances is undefined. This should be excluded by disallowing empty splits."
+        );
         // The mean gives the optimal SSE in a leaf.
         self.y / (self.n as f64)
     }
 
     fn cost(&self) -> FloatCost {
-        debug_assert!(self.n > 0, "Getting a cost from 0 instances is undefined. This should be excluded by disallowing empty splits.");
+        debug_assert!(
+            self.n > 0,
+            "Getting a cost from 0 instances is undefined. This should be excluded by disallowing empty splits."
+        );
         // The sum of squared errors from the mean can be computed from (sum of (y^2)) - ((sum of y)^2 / N)
         (self.y2 - (self.y * self.y) / (self.n as f64)).into()
     }
@@ -114,13 +120,13 @@ impl OptimizationTask for SquaredErrorTask {
         self.branching_cost.into()
     }
 
-    fn initial_lowerbound(&self, dataview: &DataView<Self>, max_depth: u32) -> Self::CostType
+    fn branch_relaxation(&self, dataview: &DataView<Self>, max_depth: u32) -> Self::CostType
     where
         Self: Sized,
     {
         if max_depth > 7 {
             // Since clusters are u8, limit to max depth 7
-            OptimizationTask::initial_lowerbound(self, dataview, max_depth)
+            FloatCost(0.0)
         } else {
             // The maximum number of clusters is the remaining leaf count or the number of instances remaining.
             let clusters: u8 = dataview.num_instances().min(1 << max_depth) as u8;

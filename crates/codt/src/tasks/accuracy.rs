@@ -189,4 +189,38 @@ impl OptimizationTask for AccuracyTask {
         (left_gini * left_total as f32 + right_gini * right_total as f32)
             / (left_total + right_total) as f32
     }
+
+    fn branch_relaxation(&self, dataview: &DataView<Self>, max_depth: u32) -> Self::CostType
+    where
+        Self: Sized,
+    {
+        if max_depth > 7 {
+            FloatCost(0.0)
+        } else {
+            let mut counts = dataview.cost_summer.instance_count_per_class.clone();
+            counts.sort_unstable();
+
+            // The maximum number of clusters is the remaining leaf count or the number of instances remaining.
+            let max_clusters = dataview.num_instances().min(1 << max_depth);
+
+            // We try all cluster counts, and see how many misclassifications there are.
+            let mut total_misclassifications = 0;
+            let mut min_cost = f64::MAX;
+
+            for i in 0..counts.len() {
+                let clusters = counts.len() - i;
+                if clusters < max_clusters {
+                    min_cost = min_cost.min(
+                        (clusters - 1) as f64 * self.branching_cost
+                            + total_misclassifications as f64,
+                    );
+                }
+
+                // Note that the last (largest) count is never included, as that is the label.
+                total_misclassifications += counts[i];
+            }
+
+            FloatCost(min_cost)
+        }
+    }
 }

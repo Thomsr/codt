@@ -154,12 +154,7 @@ pub trait OptimizationTask {
 
     fn greedy_value(left_costsum: &Self::CostSumType, right_costsum: &Self::CostSumType) -> f32;
 
-    fn initial_lowerbound(&self, dataview: &DataView<Self>, max_depth: u32) -> Self::CostType
+    fn branch_relaxation(&self, dataview: &DataView<Self>, max_depth: u32) -> Self::CostType
     where
-        Self: Sized,
-    {
-        let _ = dataview;
-        let _ = max_depth;
-        self.branching_cost()
-    }
+        Self: Sized;
 }
