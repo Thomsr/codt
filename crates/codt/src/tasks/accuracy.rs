@@ -208,8 +208,8 @@ impl OptimizationTask for AccuracyTask {
             let mut min_cost = f64::MAX;
 
             for i in 0..counts.len() {
-                let clusters = counts.len() - i;
-                if clusters < max_clusters {
+                let clusters = counts.len() - i; // Always at least one
+                if clusters <= max_clusters {
                     min_cost = min_cost.min(
                         (clusters - 1) as f64 * self.branching_cost
                             + total_misclassifications as f64,
@@ -222,5 +222,61 @@ impl OptimizationTask for AccuracyTask {
 
             FloatCost(min_cost)
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::model::{dataset::DataSet, dataview::DataView, instance::LabeledInstance};
+
+    #[test]
+    fn test_branch_relaxation_basic() {
+        let mut dataset = DataSet::default();
+        dataset.add_instance(LabeledInstance { label: 0 }, [0.0, 1.0]);
+        dataset.add_instance(LabeledInstance { label: 1 }, [0.0, 1.0]);
+        dataset.add_instance(LabeledInstance { label: 1 }, [0.0, 1.0]);
+        dataset.preprocess_after_adding_instances();
+        let mut dataview = DataView::from_dataset(&dataset);
+
+        let mut task = AccuracyTask::new(0.0);
+        task.prepare_for_data(&mut dataview);
+
+        let cost = task.branch_relaxation(&dataview, 0);
+        assert!(cost.0 == 1.0);
+    }
+
+    #[test]
+    fn test_branch_relaxation_basic2() {
+        let mut dataset = DataSet::default();
+        dataset.add_instance(LabeledInstance { label: 0 }, [0.0, 1.0]);
+        dataset.add_instance(LabeledInstance { label: 1 }, [0.0, 1.0]);
+        dataset.add_instance(LabeledInstance { label: 1 }, [0.0, 1.0]);
+        dataset.add_instance(LabeledInstance { label: 2 }, [0.0, 1.0]);
+        dataset.preprocess_after_adding_instances();
+        let mut dataview = DataView::from_dataset(&dataset);
+
+        let mut task = AccuracyTask::new(0.0);
+        task.prepare_for_data(&mut dataview);
+
+        let cost = task.branch_relaxation(&dataview, 1);
+        assert_eq!(cost.0, 1.0);
+    }
+
+    #[test]
+    fn test_branch_relaxation_branch_cost() {
+        let mut dataset = DataSet::default();
+        dataset.add_instance(LabeledInstance { label: 0 }, [0.0, 1.0]);
+        dataset.add_instance(LabeledInstance { label: 1 }, [0.0, 1.0]);
+        dataset.add_instance(LabeledInstance { label: 1 }, [0.0, 1.0]);
+        dataset.add_instance(LabeledInstance { label: 2 }, [0.0, 1.0]);
+        dataset.preprocess_after_adding_instances();
+        let mut dataview = DataView::from_dataset(&dataset);
+
+        let mut task = AccuracyTask::new(0.25);
+        task.prepare_for_data(&mut dataview);
+
+        let cost = task.branch_relaxation(&dataview, 5);
+        assert_eq!(cost.0, 2.0);
     }
 }
