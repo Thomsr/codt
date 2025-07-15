@@ -12,7 +12,10 @@ use crate::{
     search::{
         node::Node,
         queue::PQ,
-        solver::{SolveResult, Solver, SolverOptions, TerminalSolver, UpperboundStrategy},
+        solver::{
+            BranchRelaxation, SolveResult, Solver, SolverOptions, TerminalSolver,
+            UpperboundStrategy,
+        },
         strategy::SearchStrategy,
     },
     tasks::{Cost, OptimizationTask},
@@ -29,6 +32,7 @@ pub struct SolveContext<'a, OT: OptimizationTask, SS: SearchStrategy> {
     pub task: &'a OT,
     pub ub_strategy: UpperboundStrategy,
     pub terminal_solver: TerminalSolver,
+    pub branch_relaxation: BranchRelaxation,
     _ss: PhantomData<SS>,
 }
 
@@ -42,6 +46,7 @@ impl<OT: OptimizationTask, SS: SearchStrategy> Solver<OT> for SolverImpl<'_, OT,
             task: &self.task,
             ub_strategy: options.ub_strategy,
             terminal_solver: options.terminal_solver,
+            branch_relaxation: options.branch_relaxation,
             _ss: PhantomData,
         };
 

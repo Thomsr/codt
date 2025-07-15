@@ -3,8 +3,8 @@ use std::{convert::Infallible, marker::PhantomData, time::Duration};
 use codt::{
     model::{dataset::DataSet, dataview::DataView, instance::LabeledInstance, tree::Tree},
     search::solver::{
-        SearchStrategyEnum, SolveResult, SolverOptions, TerminalSolver, UpperboundStrategy,
-        solver_with_strategy,
+        BranchRelaxation, SearchStrategyEnum, SolveResult, SolverOptions, TerminalSolver,
+        UpperboundStrategy, solver_with_strategy,
     },
     tasks::{OptimizationTask, accuracy::AccuracyTask, squared_error::SquaredErrorTask},
 };
@@ -40,7 +40,7 @@ macro_rules! impl_optimal_decision_tree_pyclass {
             max_depth: u32,
             upperbound: UpperboundStrategy,
             terminal_solver: TerminalSolver,
-            node_lowerbound: bool,
+            branch_relaxation: BranchRelaxation,
             timeout: Option<Duration>,
             memory_limit: Option<u64>,
             intermediates: bool,
@@ -62,7 +62,7 @@ macro_rules! impl_optimal_decision_tree_pyclass {
                 upperbound="for-remaining-interval",
                 terminal_solver="left-right",
                 intermediates=false,
-                node_lowerbound=true,
+                branch_relaxation="lowerbound",
                 memory_limit=None
             ))]
             fn new(
@@ -73,7 +73,7 @@ macro_rules! impl_optimal_decision_tree_pyclass {
                 upperbound: &str,
                 terminal_solver: &str,
                 intermediates: bool,
-                node_lowerbound: bool,
+                branch_relaxation: &str,
                 memory_limit: Option<u64>,
             ) -> Result<Self, PyErr> {
                 let strategy = strategy.parse().map_err(|_| {
@@ -88,6 +88,10 @@ macro_rules! impl_optimal_decision_tree_pyclass {
                     PyValueError::new_err("Not a valid terminal solver")
                 })?;
 
+                let branch_relaxation = branch_relaxation.parse().map_err(|_| {
+                    PyValueError::new_err("Not a valid branch relaxation strategy")
+                })?;
+
                 Ok(Self {
                     max_depth,
                     upperbound,
@@ -95,7 +99,7 @@ macro_rules! impl_optimal_decision_tree_pyclass {
                     strategy,
                     intermediates,
                     timeout: timeout.map(Duration::from_secs),
-                    node_lowerbound,
+                    branch_relaxation,
                     memory_limit,
                     task: <$task>::new(complexity_cost),
                     result: None,
@@ -124,7 +128,7 @@ macro_rules! impl_optimal_decision_tree_pyclass {
                     max_depth: self.max_depth,
                     ub_strategy: self.upperbound,
                     terminal_solver: self.terminal_solver,
-                    node_lowerbound: self.node_lowerbound,
+                    branch_relaxation: self.branch_relaxation,
                     timeout: self.timeout,
                     track_intermediates: self.intermediates,
                     memory_limit: self.memory_limit,

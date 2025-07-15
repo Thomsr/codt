@@ -18,7 +18,7 @@ class _BaseOptimalDecisionTree(BaseEstimator, ABC):
         upperbound="for-remaining-interval",
         terminal_solver="left-right",
         intermediates=False,
-        node_lowerbound=True,
+        branch_relaxation="lowerbound",
         memory_limit=None,
     ):
         self.max_depth = max_depth
@@ -28,7 +28,7 @@ class _BaseOptimalDecisionTree(BaseEstimator, ABC):
         self.upperbound = upperbound
         self.terminal_solver = terminal_solver
         self.intermediates = intermediates
-        self.node_lowerbound = node_lowerbound
+        self.branch_relaxation = branch_relaxation
         self.memory_limit = memory_limit
 
     def _init_rust_class(self):
@@ -40,7 +40,7 @@ class _BaseOptimalDecisionTree(BaseEstimator, ABC):
             self.upperbound,
             self.terminal_solver,
             self.intermediates,
-            self.node_lowerbound,
+            self.branch_relaxation,
             self.memory_limit,
         )
 

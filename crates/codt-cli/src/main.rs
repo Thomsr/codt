@@ -59,10 +59,10 @@ fn main() {
         max_depth: args.max_depth,
         ub_strategy: args.upperbound,
         terminal_solver: args.terminal_solver,
-        node_lowerbound: args.node_lowerbound,
         memory_limit: args.memory_limit,
         timeout: args.timeout.map(Duration::from_secs),
         track_intermediates: args.intermediates,
+        branch_relaxation: args.branch_relaxation,
     };
 
     match args.task {

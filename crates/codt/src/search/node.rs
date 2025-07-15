@@ -331,9 +331,15 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> Node<'a, OT, SS> {
         let lb = if queue.is_empty() {
             ub
         } else {
-            let mut lb = context.task.branch_relaxation(&dataview, max_depth);
             // We know that the cost is at least the branching cost (otherwise the queue is empty).
-            OT::update_lowerbound(&mut lb, &context.task.branching_cost());
+            let mut lb = context.task.branching_cost();
+
+            if context.branch_relaxation.should_compute() {
+                OT::update_lowerbound(
+                    &mut lb,
+                    &context.task.branch_relaxation(&dataview, max_depth),
+                );
+            }
             lb
         };
 

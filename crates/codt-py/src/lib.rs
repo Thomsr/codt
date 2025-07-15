@@ -1,6 +1,8 @@
 mod tree;
 
-use codt::search::solver::{SearchStrategyEnum, TerminalSolver, UpperboundStrategy};
+use codt::search::solver::{
+    BranchRelaxation, SearchStrategyEnum, TerminalSolver, UpperboundStrategy,
+};
 use pyo3::prelude::*;
 use strum::VariantNames;
 use tree::{OptimalDecisionTreeClassifier, OptimalDecisionTreeRegressor};
@@ -20,6 +22,11 @@ pub fn all_terminal_solvers() -> &'static [&'static str] {
     TerminalSolver::VARIANTS
 }
 
+#[pyfunction(signature = ())]
+pub fn all_branch_relaxations() -> &'static [&'static str] {
+    BranchRelaxation::VARIANTS
+}
+
 #[pymodule]
 fn codt_py(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<OptimalDecisionTreeClassifier>()?;
@@ -28,6 +35,7 @@ fn codt_py(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(all_search_strategies, m)?)?;
     m.add_function(wrap_pyfunction!(all_upperbounds, m)?)?;
     m.add_function(wrap_pyfunction!(all_terminal_solvers, m)?)?;
+    m.add_function(wrap_pyfunction!(all_branch_relaxations, m)?)?;
 
     Ok(())
 }

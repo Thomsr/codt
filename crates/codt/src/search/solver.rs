@@ -102,12 +102,29 @@ pub enum TerminalSolver {
     D2,
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq, EnumString, VariantNames, IntoStaticStr, Display)]
+#[strum(serialize_all = "kebab-case")]
+pub enum BranchRelaxation {
+    /// Do not use branch relaxation
+    None,
+    /// Use branch relaxation to get a lower bound on the cost of the remaining instances
+    Lowerbound,
+    /// Also check if the splits for branch relaxation can be made, so it is an exact cost
+    Exact,
+}
+
+impl BranchRelaxation {
+    pub fn should_compute(&self) -> bool {
+        matches!(self, BranchRelaxation::Lowerbound | BranchRelaxation::Exact)
+    }
+}
+
 #[derive(Debug)]
 pub struct SolverOptions {
     pub ub_strategy: UpperboundStrategy,
     pub terminal_solver: TerminalSolver,
+    pub branch_relaxation: BranchRelaxation,
     pub track_intermediates: bool,
-    pub node_lowerbound: bool,
     pub max_depth: u32,
     pub timeout: Option<Duration>,
     pub memory_limit: Option<u64>,
