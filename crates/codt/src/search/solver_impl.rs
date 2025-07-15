@@ -143,12 +143,15 @@ impl<OT: OptimizationTask, SS: SearchStrategy> Solver<OT> for SolverImpl<'_, OT,
         // Take back ownership of the dataset.
         self.dataview = Some(root.dataview);
 
+        let memory_usage_bytes = current_thread_memory_usage().bytes_max;
+
         SolveResult {
             cost_str: self.task.print_cost(&solution.cost()),
             tree: solution,
             graph_expansions,
             intermediate_lbs,
             intermediate_ubs,
+            memory_usage_bytes,
         }
     }
 }

@@ -20,6 +20,7 @@ pub struct SolveResult<OT: OptimizationTask> {
     pub tree: Arc<Tree<OT>>,
     pub cost_str: String,
     pub graph_expansions: i32,
+    pub memory_usage_bytes: i64,
     pub intermediate_lbs: Vec<(OT::CostType, i32, f64)>,
     pub intermediate_ubs: Vec<(OT::CostType, i32, f64)>,
 }

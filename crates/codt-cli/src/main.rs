@@ -39,6 +39,10 @@ fn run_solver_for_task<T: OptimizationTask>(
 
     info!("Read time (s): {}", read_time);
     info!("Solve time (s): {}", solve_time);
+    info!(
+        "Max memory usage (MB): {:.2}",
+        result.memory_usage_bytes as f64 / 1024.0 / 1024.0
+    );
     info!("Graph expansions: {}", result.graph_expansions);
     info!("Tree: {}", result.tree);
     println!("{}", result.cost_str);

@@ -72,6 +72,10 @@ class _BaseOptimalDecisionTree(BaseEstimator, ABC):
         check_is_fitted(self)
         return self.tree_.expansions()
 
+    def memory_usage_bytes(self):
+        check_is_fitted(self)
+        return self.tree_.memory_usage_bytes()
+
 
 class OptimalDecisionTreeClassifier(_BaseOptimalDecisionTree, ClassifierMixin):
     _rust_class = OCT

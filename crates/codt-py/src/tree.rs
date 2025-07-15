@@ -11,6 +11,9 @@ use codt::{
 use numpy::{IntoPyArray, PyArray1, PyReadonlyArray1, PyReadonlyArray2, ndarray::Axis};
 use pyo3::{exceptions::PyValueError, prelude::*, types::PyList};
 
+const ERROR_FIT_NOT_CALLED: &str =
+    ".fit(X,y) should be called before this function and should be checked in the python wrapper";
+
 fn tree_to_py<'a, 'py, OT: OptimizationTask, X>(
     tree: &'a Tree<OT>,
     py: Python<'py>,
@@ -51,20 +54,20 @@ macro_rules! impl_optimal_decision_tree_pyclass {
         }
 
         #[pymethods]
-        #[allow(non_snake_case,clippy::too_many_arguments)]
+        #[allow(non_snake_case, clippy::too_many_arguments)]
         impl $pyclass {
             #[new]
             #[pyo3(signature = (
-                max_depth=2,
-                strategy="bfs-gosdt",
-                complexity_cost=0.0,
-                timeout=None,
-                upperbound="for-remaining-interval",
-                terminal_solver="left-right",
-                intermediates=false,
-                branch_relaxation="lowerbound",
-                memory_limit=None
-            ))]
+                                max_depth=2,
+                                strategy="bfs-gosdt",
+                                complexity_cost=0.0,
+                                timeout=None,
+                                upperbound="for-remaining-interval",
+                                terminal_solver="left-right",
+                                intermediates=false,
+                                branch_relaxation="lowerbound",
+                                memory_limit=None
+                            ))]
             fn new(
                 max_depth: u32,
                 strategy: &str,
@@ -76,21 +79,21 @@ macro_rules! impl_optimal_decision_tree_pyclass {
                 branch_relaxation: &str,
                 memory_limit: Option<u64>,
             ) -> Result<Self, PyErr> {
-                let strategy = strategy.parse().map_err(|_| {
-                    PyValueError::new_err("Not a valid search strategy")
-                })?;
+                let strategy = strategy
+                    .parse()
+                    .map_err(|_| PyValueError::new_err("Not a valid search strategy"))?;
 
-                let upperbound = upperbound.parse().map_err(|_| {
-                    PyValueError::new_err("Not a valid upper bounding strategy")
-                })?;
+                let upperbound = upperbound
+                    .parse()
+                    .map_err(|_| PyValueError::new_err("Not a valid upper bounding strategy"))?;
 
-                let terminal_solver = terminal_solver.parse().map_err(|_| {
-                    PyValueError::new_err("Not a valid terminal solver")
-                })?;
+                let terminal_solver = terminal_solver
+                    .parse()
+                    .map_err(|_| PyValueError::new_err("Not a valid terminal solver"))?;
 
-                let branch_relaxation = branch_relaxation.parse().map_err(|_| {
-                    PyValueError::new_err("Not a valid branch relaxation strategy")
-                })?;
+                let branch_relaxation = branch_relaxation
+                    .parse()
+                    .map_err(|_| PyValueError::new_err("Not a valid branch relaxation strategy"))?;
 
                 Ok(Self {
                     max_depth,
@@ -108,10 +111,15 @@ macro_rules! impl_optimal_decision_tree_pyclass {
             }
 
             #[pyo3(signature = (X, y))]
-            fn fit<'py>(&mut self, X: PyReadonlyArray2<'py, f64>, y: PyReadonlyArray1<'py, $label>) {
+            fn fit<'py>(
+                &mut self,
+                X: PyReadonlyArray2<'py, f64>,
+                y: PyReadonlyArray1<'py, $label>,
+            ) {
                 let x_arr = X.as_array();
                 let y_arr = y.as_array();
-                let mut dataset = DataSet::<LabeledInstance<<$task as OptimizationTask>::LabelType>>::default();
+                let mut dataset =
+                    DataSet::<LabeledInstance<<$task as OptimizationTask>::LabelType>>::default();
                 for i in 0..y_arr.dim() {
                     let features = x_arr.index_axis(Axis(0), i);
                     dataset.add_instance(
@@ -134,11 +142,7 @@ macro_rules! impl_optimal_decision_tree_pyclass {
                     memory_limit: self.memory_limit,
                 };
 
-                let mut solver = solver_with_strategy(
-                    self.task.clone(),
-                    full_view,
-                    self.strategy,
-                );
+                let mut solver = solver_with_strategy(self.task.clone(), full_view, self.strategy);
 
                 self.result = Some(solver.solve(options));
             }
@@ -149,11 +153,7 @@ macro_rules! impl_optimal_decision_tree_pyclass {
                 py: Python<'py>,
                 X: PyReadonlyArray2<'py, f64>,
             ) -> Bound<'py, $array> {
-                let tree = &self
-                    .result
-                    .as_ref()
-                    .expect(".fit(X,y) before .predict(X) should be checked in the python wrapper")
-                    .tree;
+                let tree = &self.result.as_ref().expect(ERROR_FIT_NOT_CALLED).tree;
                 X.as_array()
                     .map_axis(Axis(1), |x| {
                         tree.predict(x.iter().copied().collect()).into()
@@ -163,50 +163,44 @@ macro_rules! impl_optimal_decision_tree_pyclass {
 
             #[pyo3(signature = ())]
             fn tree<'py>(&mut self, py: Python<'py>) -> Result<Bound<'py, PyAny>, PyErr> {
-                let tree = &self
-                    .result
-                    .as_ref()
-                    .expect(".fit(X,y) should be called before this function and should be checked in the python wrapper")
-                    .tree;
+                let tree = &self.result.as_ref().expect(ERROR_FIT_NOT_CALLED).tree;
 
                 tree_to_py(tree, py)
             }
 
             #[pyo3(signature = ())]
-            fn intermediate_lbs<'py>(&mut self, py: Python<'py>) -> Result<Bound<'py, PyAny>, PyErr> {
+            fn intermediate_lbs<'py>(
+                &mut self,
+                py: Python<'py>,
+            ) -> Result<Bound<'py, PyAny>, PyErr> {
                 let intermediates = &self
                     .result
                     .as_ref()
-                    .expect(".fit(X,y) should be called before this function and should be checked in the python wrapper")
+                    .expect(ERROR_FIT_NOT_CALLED)
                     .intermediate_lbs
                     .iter()
                     .map(|(lb, exp, time)| {
                         let lb_float: f64 = (*lb).into();
-                        (
-                            lb_float,
-                            exp,
-                            time,
-                        )
+                        (lb_float, exp, time)
                     })
                     .collect::<Vec<_>>();
                 intermediates.into_pyobject(py)
             }
 
             #[pyo3(signature = ())]
-            fn intermediate_ubs<'py>(&mut self, py: Python<'py>) -> Result<Bound<'py, PyAny>, PyErr> {
+            fn intermediate_ubs<'py>(
+                &mut self,
+                py: Python<'py>,
+            ) -> Result<Bound<'py, PyAny>, PyErr> {
                 let intermediates = &self
                     .result
                     .as_ref()
-                    .expect(".fit(X,y) should be called before this function and should be checked in the python wrapper")
+                    .expect(ERROR_FIT_NOT_CALLED)
                     .intermediate_ubs
                     .iter()
                     .map(|(ub, exp, time)| {
                         let ub_float: f64 = (*ub).into();
-                        (
-                            ub_float,
-                            exp,
-                            time,
-                        )
+                        (ub_float, exp, time)
                     })
                     .collect::<Vec<_>>();
                 intermediates.into_pyobject(py)
@@ -214,11 +208,18 @@ macro_rules! impl_optimal_decision_tree_pyclass {
 
             #[pyo3(signature = ())]
             fn expansions(&mut self) -> i64 {
-                self
-                    .result
+                self.result
                     .as_ref()
-                    .expect(".fit(X,y) should be called before this function and should be checked in the python wrapper")
+                    .expect(ERROR_FIT_NOT_CALLED)
                     .graph_expansions as i64
+            }
+
+            #[pyo3(signature = ())]
+            fn memory_usage_bytes(&mut self) -> i64 {
+                self.result
+                    .as_ref()
+                    .expect(ERROR_FIT_NOT_CALLED)
+                    .memory_usage_bytes
             }
         }
     };
