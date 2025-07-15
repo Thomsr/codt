@@ -94,6 +94,8 @@ pub enum UpperboundStrategy {
 pub enum TerminalSolver {
     /// No exhaustive search, search terminates at leaf nodes
     Leaf,
+    /// Exhaustive search on subtrees of depth one
+    D1,
     /// Start exhaustive search when only a left/right depth one tree remains
     LeftRight,
     /// Exhaustive search on subtrees of depth two

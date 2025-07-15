@@ -416,6 +416,67 @@ pub fn solve_left_right<'a, OT: OptimizationTask, SS: SearchStrategy>(
     })))
 }
 
+/// Exhaustive search for a node with depth one.
+pub fn solve_d1<OT: OptimizationTask, SS: SearchStrategy>(
+    dataview: &dataview::DataView<OT>,
+    context: &SolveContext<OT, SS>,
+) -> Arc<Tree<OT>> {
+    let mut tracker = D1ScoreTracker {
+        leaf_cost: dataview.cost_summer.cost(),
+        feature: None,
+        threshold: None,
+        left_leaf: LeafNode {
+            cost: dataview.cost_summer.cost(),
+            label: dataview.cost_summer.label(),
+        },
+        right_leaf: None,
+    };
+
+    if tracker.is_optimal(context) {
+        return tracker.get_tree(context);
+    }
+
+    // Keep costsums out of loop, so that we can .clone_from in the loop and avoid any allocations.
+    let mut total_left = dataview.cost_summer.clone();
+    let mut total_right = dataview.cost_summer.clone();
+
+    for feature in 0..dataview.num_features() {
+        // init total of the left node to zero.
+        total_left.clone_from(&dataview.cost_summer);
+        total_left -= &dataview.cost_summer;
+
+        let mut prev_feature_value = None;
+
+        for instance in dataview.instances_iter(feature) {
+            let feature_value = instance.feature_value;
+            // Check if this is a point we can split at
+            if let Some(prev_feature_value) = prev_feature_value {
+                if prev_feature_value != feature_value {
+                    total_right.clone_from(&dataview.cost_summer);
+                    total_right -= &total_left;
+
+                    tracker.add_candidate(
+                        context,
+                        &total_left,
+                        &total_right,
+                        feature,
+                        prev_feature_value,
+                        feature_value,
+                        &dataview.dataset.internal_to_original_feature_value[feature],
+                    );
+                    if tracker.is_optimal(context) {
+                        return tracker.get_tree(context);
+                    }
+                }
+            }
+            total_left += &dataview.dataset.instances[instance.instance_id];
+            prev_feature_value = Some(feature_value);
+        }
+    }
+
+    tracker.get_tree(context)
+}
+
 struct D1ScoreTracker<OT: OptimizationTask> {
     leaf_cost: OT::CostType,
     feature: Option<usize>,

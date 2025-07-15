@@ -8,7 +8,7 @@ use crate::{
         tree::{BranchNode, LeafNode, Tree},
     },
     search::{
-        exhaustive::{solve_d2, solve_left_right},
+        exhaustive::{solve_d1, solve_d2, solve_left_right},
         pruner::Pruner,
         queue::{BinaryHeapQueue, PQ},
         solver::{TerminalSolver, UpperboundStrategy},
@@ -277,8 +277,22 @@ pub struct Node<'a, OT: OptimizationTask, SS: SearchStrategy> {
 impl<'a, OT: OptimizationTask, SS: SearchStrategy> Node<'a, OT, SS> {
     pub fn new(context: &SolveContext<OT, SS>, dataview: DataView<'a, OT>, max_depth: u32) -> Self {
         if max_depth == 2 && context.terminal_solver == TerminalSolver::D2 {
-            // If we are at depth 2, we can solve the node immediately.
+            // If we are at depth 2, we can solve the node exhaustively.
             let tree = solve_d2(&dataview, context);
+            let cost = tree.cost();
+            return Node {
+                cost_upper_bound: cost,
+                cost_lower_bound: cost,
+                lowest_descendant_heuristic: f64::MAX,
+                remaining_depth_budget: max_depth,
+                pruner: Pruner::new(dataview.num_features()),
+                dataview,
+                queue: BinaryHeapQueue::default(),
+                best: tree,
+            };
+        } else if max_depth == 1 && context.terminal_solver == TerminalSolver::D1 {
+            // If we are at depth 1, we can solve the node exhaustively.
+            let tree = solve_d1(&dataview, context);
             let cost = tree.cost();
             return Node {
                 cost_upper_bound: cost,
