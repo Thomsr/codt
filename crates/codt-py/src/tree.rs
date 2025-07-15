@@ -58,16 +58,16 @@ macro_rules! impl_optimal_decision_tree_pyclass {
         impl $pyclass {
             #[new]
             #[pyo3(signature = (
-                                max_depth=2,
-                                strategy="bfs-gosdt",
-                                complexity_cost=0.0,
-                                timeout=None,
-                                upperbound="for-remaining-interval",
-                                terminal_solver="left-right",
-                                intermediates=false,
-                                branch_relaxation="lowerbound",
-                                memory_limit=None
-                            ))]
+                                                                max_depth=2,
+                                                                strategy="bfs-gosdt",
+                                                                complexity_cost=0.0,
+                                                                timeout=None,
+                                                                upperbound="for-remaining-interval",
+                                                                terminal_solver="left-right",
+                                                                intermediates=false,
+                                                                branch_relaxation="lowerbound",
+                                                                memory_limit=None
+                                                            ))]
             fn new(
                 max_depth: u32,
                 strategy: &str,
