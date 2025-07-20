@@ -7,7 +7,7 @@ use std::{
 use log::trace;
 
 use crate::{
-    allocator::current_thread_memory_usage,
+    allocator::{current_thread_memory_usage, reset_current_thread_max_memory_usage},
     model::dataview::DataView,
     search::{
         node::Node,
@@ -61,6 +61,9 @@ impl<OT: OptimizationTask, SS: SearchStrategy> Solver<OT> for SolverImpl<'_, OT,
 
         let mut intermediate_lbs = vec![(root.cost_lower_bound, graph_expansions, 0.0)];
         let mut intermediate_ubs = vec![(root.best.cost(), graph_expansions, 0.0)];
+
+        // Ignore memory usage of previous invocations.
+        reset_current_thread_max_memory_usage();
 
         while !root.is_complete()
             && options.timeout.is_none_or(|timeout| elapsed < timeout)

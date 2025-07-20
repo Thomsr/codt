@@ -21,6 +21,13 @@ pub fn current_thread_memory_usage() -> MemoryUsage {
     USAGE.with(|usage| *usage.borrow())
 }
 
+pub fn reset_current_thread_max_memory_usage() {
+    USAGE.with(|usage| {
+        let cur = usage.borrow().bytes_current;
+        usage.borrow_mut().bytes_max = cur;
+    })
+}
+
 struct CountingAllocator;
 
 unsafe impl GlobalAlloc for CountingAllocator {
