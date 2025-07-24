@@ -467,10 +467,6 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> Node<'a, OT, SS> {
             // Update our upper bound if based on the upper bound of this item.
             let ub = expanded.upper_bound(context);
             OT::update_upperbound(&mut self.cost_upper_bound, &ub);
-            if ub.less_or_not_much_greater_than(&context.task.branching_cost()) {
-                // We cannot find a better solution from splitting: quickly clear the queue.
-                self.queue.clear();
-            }
 
             // Update our current best item.
             let best_cost = expanded.best_cost(context);
@@ -492,6 +488,15 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> Node<'a, OT, SS> {
                     })),
                     ExpandedQueueItem::Solution(tree) => tree.clone(),
                 }
+            }
+
+            assert!(
+                self.cost_upper_bound
+                    .less_or_not_much_greater_than(&self.best.cost())
+            );
+            if best_cost.less_or_not_much_greater_than(&context.task.branching_cost()) {
+                // We cannot find a better solution from splitting: quickly clear the queue.
+                self.queue.clear();
             }
         }
 
