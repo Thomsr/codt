@@ -62,7 +62,7 @@ macro_rules! impl_optimal_decision_tree_pyclass {
                                                                 strategy="bfs-gosdt",
                                                                 complexity_cost=0.0,
                                                                 timeout=None,
-                                                                upperbound="for-remaining-interval",
+                                                                upperbound="solutions-only",
                                                                 terminal_solver="left-right",
                                                                 intermediates=false,
                                                                 branch_relaxation="lowerbound",

@@ -15,7 +15,7 @@ class _BaseOptimalDecisionTree(BaseEstimator, ABC):
         strategy="dfs-prio",
         complexity_cost=0.0,
         timeout=None,
-        upperbound="for-remaining-interval",
+        upperbound="solutions-only",
         terminal_solver="left-right",
         intermediates=False,
         branch_relaxation="lowerbound",
