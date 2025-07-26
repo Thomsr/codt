@@ -368,6 +368,7 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> Node<'a, OT, SS> {
             || self
                 .cost_lower_bound
                 .strictly_greater_than(&self.cost_upper_bound)
+            || self.queue.is_empty() // When the queue is empty before best == lower, then lower == upper and lower < best.
     }
 
     fn split(
@@ -546,8 +547,13 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> Node<'a, OT, SS> {
             // Note that in this case we are always expanded, so we always want the lowest heuristic of the child, not of itself.
             self.lowest_descendant_heuristic = next.lowest_descendant_heuristic();
         } else {
-            // Queue empty, we are done.
-            OT::update_lowerbound(&mut self.cost_lower_bound, &self.best.cost());
+            // Queue empty, we are done. No lower error solution than the upper bound could be found.
+            assert!(
+                self.cost_upper_bound
+                    .less_or_not_much_greater_than(&self.best.cost())
+            );
+            OT::update_lowerbound(&mut self.cost_lower_bound, &self.cost_upper_bound);
+
             // Set heuristic to max, so partially unfinished queue items take the lower bound from its sibling, and not from a completed node.
             self.lowest_descendant_heuristic = f64::MAX;
         }
