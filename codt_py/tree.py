@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
-from sklearn.base import BaseEstimator, ClassifierMixin, RegressorMixin, check_is_fitted, validate_data
+from sklearn.base import BaseEstimator, ClassifierMixin, RegressorMixin
+from sklearn.utils.validation import check_is_fitted, validate_data
 from .codt_py import (
     OptimalDecisionTreeClassifier as OCT,
     OptimalDecisionTreeRegressor as ORT,
