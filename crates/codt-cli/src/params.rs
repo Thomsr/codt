@@ -35,12 +35,12 @@ pub struct CliParams {
     pub max_depth: u32,
 
     /// Optionally, the maximum amount of seconds to run, after which the best found solution is returned.
-    #[arg(short, long)]
-    pub timeout: Option<u64>,
+    #[arg(short, long, default_value_t = 60)]
+    pub timeout: u64,
 
     /// Optionally, the maximum memory used in bytes, if the limit is hit, the best found solution is returned.
-    #[arg(short, long)]
-    pub memory_limit: Option<u64>,
+    #[arg(short, long, default_value_t=4 * 1024 * 1024 * 1024)]
+    pub memory_limit: u64,
 
     #[arg(short, long, value_enum, default_value = "solutions-only")]
     pub upperbound: UpperboundStrategy,
@@ -57,7 +57,7 @@ pub struct CliParams {
     pub intermediates: bool,
 
     /// The search strategy to use.
-    #[arg(short, long, value_parser=clap_enum_variants!(SearchStrategyEnum), default_value_t=SearchStrategyEnum::BfsGosdt)]
+    #[arg(short, long, value_parser=clap_enum_variants!(SearchStrategyEnum), default_value_t=SearchStrategyEnum::BfsBalanceSmallLb)]
     pub strategy: SearchStrategyEnum,
 
     /// The task to optimize.

@@ -9,7 +9,7 @@ use crate::{
         strategy::{
             self,
             andor::AndOrSearchStrategy,
-            bfs::{BfsSearchStrategy, LBHeuristic},
+            bfs::{BfsSearchStrategy, CuriosityHeuristic, LBSupportHeuristic},
             dfs::DfsSearchStrategy,
         },
     },
@@ -35,33 +35,61 @@ pub fn solver_with_strategy<'a, OT: OptimizationTask + 'a>(
     strategy: SearchStrategyEnum,
 ) -> Box<dyn Solver<OT> + 'a> {
     match strategy {
-        SearchStrategyEnum::Dfs => {
-            Box::new(SolverImpl::<OT, DfsSearchStrategy>::new(task, dataview))
-        }
         SearchStrategyEnum::AndOr => {
             Box::new(SolverImpl::<OT, AndOrSearchStrategy>::new(task, dataview))
         }
-        SearchStrategyEnum::BfsLb => Box::new(
-            SolverImpl::<OT, BfsSearchStrategy<LBHeuristic>>::new(task, dataview),
-        ),
-        SearchStrategyEnum::BfsCuriosity => Box::new(SolverImpl::<
-            OT,
-            BfsSearchStrategy<strategy::bfs::CuriosityHeuristic>,
-        >::new(task, dataview)),
-        SearchStrategyEnum::BfsGosdt => Box::new(SolverImpl::<
-            OT,
-            BfsSearchStrategy<strategy::bfs::GOSDTHeuristic>,
-        >::new(task, dataview)),
-        SearchStrategyEnum::BfsRandom => Box::new(SolverImpl::<
-            OT,
-            BfsSearchStrategy<strategy::bfs::RandomHeuristic>,
-        >::new(task, dataview)),
+        SearchStrategyEnum::Dfs => {
+            Box::new(SolverImpl::<OT, DfsSearchStrategy>::new(task, dataview))
+        }
         SearchStrategyEnum::DfsPrio => {
             Box::new(SolverImpl::<OT, DfsSearchStrategy>::new(task, dataview))
         }
         SearchStrategyEnum::DfsRandom => {
             Box::new(SolverImpl::<OT, DfsSearchStrategy>::new(task, dataview))
         }
+        SearchStrategyEnum::BfsLb => Box::new(SolverImpl::<
+            OT,
+            BfsSearchStrategy<LBSupportHeuristic<1, 0>>,
+        >::new(task, dataview)),
+        SearchStrategyEnum::BfsCuriosity => {
+            Box::new(SolverImpl::<OT, BfsSearchStrategy<CuriosityHeuristic>>::new(task, dataview))
+        }
+        SearchStrategyEnum::BfsLbTiebreakSmall => Box::new(SolverImpl::<
+            OT,
+            BfsSearchStrategy<LBSupportHeuristic<100000, 1>>,
+        >::new(task, dataview)),
+        SearchStrategyEnum::BfsLbTiebreakBig => Box::new(SolverImpl::<
+            OT,
+            BfsSearchStrategy<LBSupportHeuristic<100000, -1>>,
+        >::new(task, dataview)),
+        SearchStrategyEnum::BfsSmall => Box::new(SolverImpl::<
+            OT,
+            BfsSearchStrategy<LBSupportHeuristic<0, 1>>,
+        >::new(task, dataview)),
+        SearchStrategyEnum::BfsBig => Box::new(SolverImpl::<
+            OT,
+            BfsSearchStrategy<LBSupportHeuristic<0, -1>>,
+        >::new(task, dataview)),
+        SearchStrategyEnum::BfsSmallTiebreakLb => Box::new(SolverImpl::<
+            OT,
+            BfsSearchStrategy<LBSupportHeuristic<1, 100000>>,
+        >::new(task, dataview)),
+        SearchStrategyEnum::BfsBigTiebreakLb => Box::new(SolverImpl::<
+            OT,
+            BfsSearchStrategy<LBSupportHeuristic<1, -100000>>,
+        >::new(task, dataview)),
+        SearchStrategyEnum::BfsBalanceSmallLb => Box::new(SolverImpl::<
+            OT,
+            BfsSearchStrategy<LBSupportHeuristic<1, 1>>,
+        >::new(task, dataview)),
+        SearchStrategyEnum::BfsBalanceBigLb => Box::new(SolverImpl::<
+            OT,
+            BfsSearchStrategy<LBSupportHeuristic<1, -1>>,
+        >::new(task, dataview)),
+        SearchStrategyEnum::BfsRandom => Box::new(SolverImpl::<
+            OT,
+            BfsSearchStrategy<strategy::bfs::RandomHeuristic>,
+        >::new(task, dataview)),
     }
 }
 
@@ -69,14 +97,21 @@ pub fn solver_with_strategy<'a, OT: OptimizationTask + 'a>(
 #[derive(Debug, Clone, Copy, PartialEq, Eq, EnumString, VariantNames, IntoStaticStr, Display)]
 #[strum(serialize_all = "kebab-case")]
 pub enum SearchStrategyEnum {
-    Dfs,
     AndOr,
-    BfsLb,
-    BfsCuriosity,
-    BfsGosdt,
-    BfsRandom,
+    Dfs,
     DfsPrio,
     DfsRandom,
+    BfsLb,
+    BfsCuriosity,
+    BfsLbTiebreakSmall,
+    BfsLbTiebreakBig,
+    BfsSmall,
+    BfsBig,
+    BfsSmallTiebreakLb,
+    BfsBigTiebreakLb,
+    BfsBalanceSmallLb,
+    BfsBalanceBigLb, // This is the same heuristic as GOSDT
+    BfsRandom,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, EnumString, VariantNames, IntoStaticStr, Display)]

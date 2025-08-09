@@ -59,7 +59,7 @@ macro_rules! impl_optimal_decision_tree_pyclass {
             #[new]
             #[pyo3(signature = (
                                                                 max_depth=2,
-                                                                strategy="bfs-gosdt",
+                                                                strategy="bfs-balance-small-lb",
                                                                 complexity_cost=0.0,
                                                                 timeout=None,
                                                                 upperbound="solutions-only",

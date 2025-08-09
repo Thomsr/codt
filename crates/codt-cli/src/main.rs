@@ -63,8 +63,8 @@ fn main() {
         max_depth: args.max_depth,
         ub_strategy: args.upperbound,
         terminal_solver: args.terminal_solver,
-        memory_limit: args.memory_limit,
-        timeout: args.timeout.map(Duration::from_secs),
+        memory_limit: Some(args.memory_limit),
+        timeout: Some(Duration::from_secs(args.timeout)),
         track_intermediates: args.intermediates,
         branch_relaxation: args.branch_relaxation,
     };

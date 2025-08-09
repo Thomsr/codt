@@ -14,7 +14,7 @@ pub mod dfsprio;
 pub mod random;
 
 pub trait SearchStrategy {
-    /// The order in which the items in the queue should be handled. Items are handled in asceding order.
+    /// The order in which the items in the queue should be handled. Items are handled in ascending order.
     fn cmp_item<'a, OT: OptimizationTask, SS: SearchStrategy>(
         a: &QueueItem<'a, OT, SS>,
         b: &QueueItem<'a, OT, SS>,

@@ -119,7 +119,7 @@ impl<OT: OptimizationTask, SS: SearchStrategy> PartialOrd for QueueItem<'_, OT, 
 
 impl<OT: OptimizationTask, SS: SearchStrategy> Ord for QueueItem<'_, OT, SS> {
     fn cmp(&self, other: &Self) -> Ordering {
-        // BinaryHeap is a max-heap. But we want the minumum, so reverse.
+        // BinaryHeap is a max-heap. But we want the minimum, so reverse.
         SS::cmp_item(self, other).reverse()
     }
 }

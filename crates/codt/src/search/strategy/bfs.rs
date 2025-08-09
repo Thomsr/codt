@@ -8,10 +8,9 @@ use crate::{
     tasks::OptimizationTask,
 };
 
-pub struct LBHeuristic;
 pub struct CuriosityHeuristic;
-pub struct GOSDTHeuristic;
 pub struct RandomHeuristic;
+pub struct LBSupportHeuristic<const LB: i64 = 1, const SUPPORT: i64 = 1>;
 
 /// Info used for the heuristics, so that the heuristic struct does not need to be generic over the tasks.
 pub struct HeuristicInfo {
@@ -27,22 +26,15 @@ pub trait BfsHeuristic {
     }
 }
 
-impl BfsHeuristic for LBHeuristic {
-    fn heuristic(info: HeuristicInfo) -> f64 {
-        info.lb
-    }
-}
-
 impl BfsHeuristic for CuriosityHeuristic {
     fn heuristic(info: HeuristicInfo) -> f64 {
         info.lb / info.support as f64
     }
 }
 
-impl BfsHeuristic for GOSDTHeuristic {
+impl<const LB: i64, const SUPPORT: i64> BfsHeuristic for LBSupportHeuristic<LB, SUPPORT> {
     fn heuristic(info: HeuristicInfo) -> f64 {
-        // TODO figure out why lb + support seems to work well. Maybe due to faster LB discovery
-        info.lb + info.support as f64
+        LB as f64 * info.lb + SUPPORT as f64 * info.support as f64
     }
 }
 
