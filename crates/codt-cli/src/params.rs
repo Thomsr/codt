@@ -42,7 +42,7 @@ pub struct CliParams {
     #[arg(short, long, default_value_t=4 * 1024 * 1024 * 1024)]
     pub memory_limit: u64,
 
-    #[arg(short, long, value_enum, default_value = "solutions-only")]
+    #[arg(short, long, value_enum, default_value = "for-remaining-interval")]
     pub upperbound: UpperboundStrategy,
 
     #[arg(long, value_enum, default_value = "left-right")]

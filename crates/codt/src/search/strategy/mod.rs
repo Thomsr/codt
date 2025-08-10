@@ -1,7 +1,7 @@
 use std::cmp::Ordering;
 
 use crate::{
-    search::node::{Node, QueueItem},
+    search::node::{FeatureTest, Node},
     tasks::OptimizationTask,
 };
 
@@ -16,23 +16,23 @@ pub mod random;
 pub trait SearchStrategy {
     /// The order in which the items in the queue should be handled. Items are handled in ascending order.
     fn cmp_item<'a, OT: OptimizationTask, SS: SearchStrategy>(
-        a: &QueueItem<'a, OT, SS>,
-        b: &QueueItem<'a, OT, SS>,
+        a: &FeatureTest<'a, OT, SS>,
+        b: &FeatureTest<'a, OT, SS>,
     ) -> Ordering;
 
     /// After backtracking, decide which of the child nodes should be explored next.
     fn child_priority<'a, OT: OptimizationTask, SS: SearchStrategy>(
-        item: &QueueItem<'a, OT, SS>,
+        item: &FeatureTest<'a, OT, SS>,
         children: &[Node<'a, OT, SS>; 2],
     ) -> usize;
 
     /// In some search strategies, the front of the queue is the lowest possible
     /// lowest bound, and can be used as a lower bound for the node.
     fn item_front_of_queue_is_lowest_lb<OT: OptimizationTask, SS: SearchStrategy>(
-        item: &QueueItem<OT, SS>,
+        item: &FeatureTest<OT, SS>,
     ) -> bool;
 
-    fn heuristic<OT: OptimizationTask, SS: SearchStrategy>(_item: &QueueItem<OT, SS>) -> f64 {
+    fn heuristic<OT: OptimizationTask, SS: SearchStrategy>(_item: &FeatureTest<OT, SS>) -> f64 {
         0.0 // Only used for global best first search strategy
     }
 

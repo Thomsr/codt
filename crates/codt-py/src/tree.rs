@@ -62,7 +62,7 @@ macro_rules! impl_optimal_decision_tree_pyclass {
                                                                 strategy="bfs-balance-small-lb",
                                                                 complexity_cost=0.0,
                                                                 timeout=None,
-                                                                upperbound="solutions-only",
+                                                                upperbound="for-remaining-interval",
                                                                 terminal_solver="left-right",
                                                                 intermediates=false,
                                                                 branch_relaxation="lowerbound",

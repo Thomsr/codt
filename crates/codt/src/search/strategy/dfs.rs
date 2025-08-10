@@ -2,7 +2,7 @@ use std::cmp::Ordering;
 
 use crate::{
     search::{
-        node::{Node, QueueItem},
+        node::{FeatureTest, Node},
         strategy::SearchStrategy,
     },
     tasks::{Cost, CostSum, OptimizationTask},
@@ -12,8 +12,8 @@ pub struct DfsSearchStrategy;
 
 impl SearchStrategy for DfsSearchStrategy {
     fn cmp_item<'a, OT: OptimizationTask, SS: SearchStrategy>(
-        a: &QueueItem<'a, OT, SS>,
-        b: &QueueItem<'a, OT, SS>,
+        a: &FeatureTest<'a, OT, SS>,
+        b: &FeatureTest<'a, OT, SS>,
     ) -> Ordering {
         // For DFS, we want a consistent ordering that cannot change dynamically. The selected
         // search node should keep being selected until it is complete.
@@ -27,11 +27,11 @@ impl SearchStrategy for DfsSearchStrategy {
             .reverse()
             .then(a.feature_rank.cmp(&b.feature_rank))
             .then(a.split_points.len().cmp(&b.split_points.len()).reverse())
-            .then(a.split_points.start.cmp(&b.split_points.start))
+            .then(a.split_point.cmp(&b.split_point))
     }
 
     fn child_priority<'a, OT: OptimizationTask, SS: SearchStrategy>(
-        _item: &QueueItem<'a, OT, SS>,
+        _item: &FeatureTest<'a, OT, SS>,
         children: &[Node<'a, OT, SS>; 2],
     ) -> usize {
         // For DFS, only use information available when starting the search.
@@ -49,7 +49,7 @@ impl SearchStrategy for DfsSearchStrategy {
     }
 
     fn item_front_of_queue_is_lowest_lb<OT: OptimizationTask, SS: SearchStrategy>(
-        _item: &QueueItem<OT, SS>,
+        _item: &FeatureTest<OT, SS>,
     ) -> bool {
         false
     }

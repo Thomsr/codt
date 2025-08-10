@@ -106,8 +106,7 @@ impl<OT: OptimizationTask, SS: SearchStrategy> Solver<OT> for SolverImpl<'_, OT,
                     root.queue
                         .iter()
                         .fold(None, |val: Option<OT::CostType>, i| {
-                            let mut lb = root.pruner.lb_for(i.feature, &i.split_points)
-                                + context.task.branching_cost();
+                            let mut lb = root.lb_for(i) + context.task.branching_cost();
                             OT::update_lowerbound(&mut lb, &i.cost_lower_bound);
                             if val.is_none() || val.unwrap().strictly_greater_than(&lb) {
                                 Some(lb)

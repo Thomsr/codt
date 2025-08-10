@@ -2,7 +2,7 @@ use crate::tasks::{Cost, CostSum, OptimizationTask};
 
 use super::dataset::DataSet;
 
-use std::fmt::Debug;
+use std::{fmt::Debug, ops::Range};
 
 #[derive(Clone, Copy, PartialEq, Eq)]
 pub struct FeatureValue {
@@ -45,6 +45,7 @@ pub struct DataView<'a, OT: OptimizationTask> {
     pub best_greedy_splits: Vec<BestGreedySplit>,
     /// The ranking of each feature based on their best greedy split. Ties resolved arbitrarily. Indexed by the feature id.
     pub feature_ranking: Vec<i32>,
+    pub extra_data: OT::ExtraDataviewData,
 }
 
 impl<OT: OptimizationTask> Debug for DataView<'_, OT> {
@@ -212,6 +213,7 @@ impl<'a, OT: OptimizationTask> DataView<'a, OT> {
         }
 
         let feature_ranking = Self::feature_rank_from_best_greedy_splits(&best_greedy_splits);
+        let extra_data = OT::init_extra_dataview_data(dataset, &feature_values_sorted);
 
         Self {
             dataset,
@@ -220,6 +222,7 @@ impl<'a, OT: OptimizationTask> DataView<'a, OT> {
             cost_summer: left_costsum,
             best_greedy_splits,
             feature_ranking,
+            extra_data,
         }
     }
 
@@ -339,6 +342,9 @@ impl<'a, OT: OptimizationTask> DataView<'a, OT> {
         let feature_ranking_right =
             Self::feature_rank_from_best_greedy_splits(&best_greedy_splits_right);
 
+        let extra_data_left = OT::init_extra_dataview_data(self.dataset, &feature_values_left);
+        let extra_data_right = OT::init_extra_dataview_data(self.dataset, &feature_values_right);
+
         (
             Self {
                 dataset: self.dataset,
@@ -347,6 +353,7 @@ impl<'a, OT: OptimizationTask> DataView<'a, OT> {
                 cost_summer: costsum_ll,
                 best_greedy_splits: best_greedy_splits_left,
                 feature_ranking: feature_ranking_left,
+                extra_data: extra_data_left,
             },
             Self {
                 dataset: self.dataset,
@@ -355,6 +362,7 @@ impl<'a, OT: OptimizationTask> DataView<'a, OT> {
                 cost_summer: costsum_rl,
                 best_greedy_splits: best_greedy_splits_right,
                 feature_ranking: feature_ranking_right,
+                extra_data: extra_data_right,
             },
         )
     }
@@ -388,6 +396,22 @@ impl<'a, OT: OptimizationTask> DataView<'a, OT> {
         let next_threshold = self.dataset.internal_to_original_feature_value[split_feature]
             [next_split_value as usize];
         (current_threshold + next_threshold) / 2.0
+    }
+
+    pub fn instance_range_from_split_range(
+        &self,
+        split_feature: usize,
+        split_values: Range<usize>,
+    ) -> Range<usize> {
+        let start = self.feature_values_sorted[split_feature].partition_point(|fv| {
+            fv.feature_value
+                <= self.possible_split_values[split_feature][split_values.start].feature_value
+        });
+        let end = self.feature_values_sorted[split_feature].partition_point(|fv| {
+            fv.feature_value
+                <= self.possible_split_values[split_feature][split_values.end - 1].feature_value
+        });
+        start..end
     }
 }
 

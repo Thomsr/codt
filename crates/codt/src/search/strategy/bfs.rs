@@ -2,7 +2,7 @@ use std::{cmp::Ordering, marker::PhantomData};
 
 use crate::{
     search::{
-        node::{Node, QueueItem},
+        node::{FeatureTest, Node},
         strategy::SearchStrategy,
     },
     tasks::OptimizationTask,
@@ -54,18 +54,18 @@ pub struct BfsSearchStrategy<H: BfsHeuristic> {
 
 impl<H: BfsHeuristic> SearchStrategy for BfsSearchStrategy<H> {
     fn cmp_item<'a, OT: OptimizationTask, SS: SearchStrategy>(
-        a: &QueueItem<'a, OT, SS>,
-        b: &QueueItem<'a, OT, SS>,
+        a: &FeatureTest<'a, OT, SS>,
+        b: &FeatureTest<'a, OT, SS>,
     ) -> Ordering {
         a.lowest_descendant_heuristic()
             .partial_cmp(&b.lowest_descendant_heuristic())
             .expect("No NaN allowed in heuristic value")
             .then(a.feature_rank.cmp(&b.feature_rank))
-            .then(a.split_points.start.cmp(&b.split_points.start))
+            .then(a.split_point.cmp(&b.split_point))
     }
 
     fn child_priority<'a, OT: OptimizationTask, SS: SearchStrategy>(
-        _item: &QueueItem<'a, OT, SS>,
+        _item: &FeatureTest<'a, OT, SS>,
         children: &[Node<'a, OT, SS>; 2],
     ) -> usize {
         if children[0].lowest_descendant_heuristic <= children[1].lowest_descendant_heuristic {
@@ -76,12 +76,12 @@ impl<H: BfsHeuristic> SearchStrategy for BfsSearchStrategy<H> {
     }
 
     fn item_front_of_queue_is_lowest_lb<OT: OptimizationTask, SS: SearchStrategy>(
-        _item: &QueueItem<OT, SS>,
+        _item: &FeatureTest<OT, SS>,
     ) -> bool {
         false
     }
 
-    fn heuristic<OT: OptimizationTask, SS: SearchStrategy>(item: &QueueItem<OT, SS>) -> f64 {
+    fn heuristic<OT: OptimizationTask, SS: SearchStrategy>(item: &FeatureTest<OT, SS>) -> f64 {
         let lb_float: f64 = item
             .cost_lower_bound
             .try_into()

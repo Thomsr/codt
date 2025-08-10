@@ -2,7 +2,7 @@ use std::cmp::Ordering;
 
 use crate::{
     search::{
-        node::{Node, QueueItem},
+        node::{FeatureTest, Node},
         strategy::{SearchStrategy, dfs::DfsSearchStrategy},
     },
     tasks::OptimizationTask,
@@ -12,8 +12,8 @@ pub struct RandomDfsSearchStrategy;
 
 impl SearchStrategy for RandomDfsSearchStrategy {
     fn cmp_item<'a, OT: OptimizationTask, SS: SearchStrategy>(
-        a: &QueueItem<'a, OT, SS>,
-        b: &QueueItem<'a, OT, SS>,
+        a: &FeatureTest<'a, OT, SS>,
+        b: &FeatureTest<'a, OT, SS>,
     ) -> Ordering {
         // For dfs, use random ordering, but stick with the same node once picked.
         a.random_value
@@ -24,7 +24,7 @@ impl SearchStrategy for RandomDfsSearchStrategy {
     }
 
     fn child_priority<'a, OT: OptimizationTask, SS: SearchStrategy>(
-        item: &QueueItem<'a, OT, SS>,
+        item: &FeatureTest<'a, OT, SS>,
         _children: &[Node<'a, OT, SS>; 2],
     ) -> usize {
         // Choose the left or right branch randomly
@@ -32,7 +32,7 @@ impl SearchStrategy for RandomDfsSearchStrategy {
     }
 
     fn item_front_of_queue_is_lowest_lb<OT: OptimizationTask, SS: SearchStrategy>(
-        _item: &QueueItem<OT, SS>,
+        _item: &FeatureTest<OT, SS>,
     ) -> bool {
         false
     }

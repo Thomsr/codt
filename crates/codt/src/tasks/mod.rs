@@ -1,8 +1,9 @@
 use crate::model::dataset::DataSet;
+use crate::model::dataview::FeatureValue;
 use crate::model::{dataview::DataView, instance::Instance};
 
 use std::fmt::{Debug, Display};
-use std::ops::{Add, AddAssign, Sub, SubAssign};
+use std::ops::{Add, AddAssign, Range, Sub, SubAssign};
 
 pub mod accuracy;
 pub mod squared_error;
@@ -122,6 +123,7 @@ pub trait OptimizationTask {
     /// A type from which the cost is easily derivable. When a CostSum for disjoint datasets
     /// are summed, it results in the CostSum of their union.
     type CostSumType: CostSum<Self::LabelType, Self::InstanceType, Self::CostType>;
+    type ExtraDataviewData;
 
     fn preprocess_dataset(dataset: &mut DataSet<Self::InstanceType>) {
         let _ = dataset;
@@ -155,6 +157,19 @@ pub trait OptimizationTask {
     fn greedy_value(left_costsum: &Self::CostSumType, right_costsum: &Self::CostSumType) -> f32;
 
     fn branch_relaxation(&self, dataview: &DataView<Self>, max_depth: u32) -> Self::CostType
+    where
+        Self: Sized;
+
+    fn init_extra_dataview_data(
+        dataset: &DataSet<Self::InstanceType>,
+        feature_values: &[Vec<FeatureValue>],
+    ) -> Self::ExtraDataviewData;
+
+    fn worst_cost_in_range(
+        dataview: &DataView<Self>,
+        feature: usize,
+        range: Range<usize>,
+    ) -> Self::CostType
     where
         Self: Sized;
 }

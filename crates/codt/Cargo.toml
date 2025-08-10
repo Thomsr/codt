@@ -15,3 +15,4 @@ rand = { workspace = true }
 strum = { workspace = true }
 strum_macros = { workspace = true }
 fenwick = { workspace = true }
+segment-tree = { workspace = true }

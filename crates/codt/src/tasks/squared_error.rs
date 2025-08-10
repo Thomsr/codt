@@ -1,9 +1,14 @@
 use std::ops::{AddAssign, SubAssign};
 
 use ckmeans::ckmeans_dynamic_stop;
+use segment_tree::SegmentPoint;
 
 use crate::{
-    model::{dataset::DataSet, dataview::DataView, instance::LabeledInstance},
+    model::{
+        dataset::DataSet,
+        dataview::{DataView, FeatureValue},
+        instance::LabeledInstance,
+    },
     tasks::{CostSum, FloatCost, OptimizationTask},
 };
 
@@ -89,11 +94,17 @@ impl CostSum<f64, LabeledInstance<f64>, FloatCost> for SquaredErrorCostSum {
     }
 }
 
+pub struct ExtraDataviewData {
+    /// The maximum of the distance to the minimum or maximum label squared. For each datapoint. With range queries of the sum.
+    dist2_tree: Vec<SegmentPoint<f64, segment_tree::ops::Add>>,
+}
+
 impl OptimizationTask for SquaredErrorTask {
     type LabelType = f64;
     type InstanceType = LabeledInstance<f64>;
     type CostType = FloatCost;
     type CostSumType = SquaredErrorCostSum;
+    type ExtraDataviewData = ExtraDataviewData;
 
     fn prepare_for_data(&mut self, dataview: &mut DataView<Self>) {
         self.dataset_size = dataview.num_instances();
@@ -149,5 +160,47 @@ impl OptimizationTask for SquaredErrorTask {
 
     fn greedy_value(left_costsum: &Self::CostSumType, right_costsum: &Self::CostSumType) -> f32 {
         left_costsum.cost().0 as f32 + right_costsum.cost().0 as f32
+    }
+
+    fn worst_cost_in_range(
+        dataview: &DataView<Self>,
+        feature: usize,
+        range: std::ops::Range<usize>,
+    ) -> Self::CostType
+    where
+        Self: Sized,
+    {
+        FloatCost(dataview.extra_data.dist2_tree[feature].query(range.start, range.end))
+    }
+
+    fn init_extra_dataview_data(
+        dataset: &DataSet<Self::InstanceType>,
+        feature_values: &[Vec<FeatureValue>],
+    ) -> Self::ExtraDataviewData {
+        let mut label_min = dataset.instances[feature_values[0][0].instance_id].label;
+        let mut label_max = label_min;
+
+        for value in &feature_values[0] {
+            label_max = label_max.max(dataset.instances[value.instance_id].label);
+            label_min = label_min.min(dataset.instances[value.instance_id].label);
+        }
+
+        let mut dist2_tree = Vec::with_capacity(feature_values.len());
+
+        let n = feature_values[0].len();
+        for values in feature_values {
+            let mut dist2_values = vec![0.0_f64; n * 2];
+            for i in 0..n {
+                let y = dataset.instances[values[i].instance_id].label;
+                let dist = (y - label_min).max(label_max - y);
+                dist2_values[n + i] = dist * dist;
+            }
+            dist2_tree.push(SegmentPoint::build_noalloc(
+                dist2_values,
+                segment_tree::ops::Add,
+            ));
+        }
+
+        ExtraDataviewData { dist2_tree }
     }
 }

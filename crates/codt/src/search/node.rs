@@ -65,7 +65,7 @@ impl<OT: OptimizationTask, SS: SearchStrategy> ExpandedQueueItem<'_, OT, SS> {
     }
 }
 
-pub struct QueueItem<'a, OT: OptimizationTask, SS: SearchStrategy> {
+pub struct FeatureTest<'a, OT: OptimizationTask, SS: SearchStrategy> {
     /// The current lower bound on the error for this item in the queue. This is including possible branching costs
     pub cost_lower_bound: OT::CostType,
 
@@ -73,12 +73,15 @@ pub struct QueueItem<'a, OT: OptimizationTask, SS: SearchStrategy> {
     /// Used by some search heuristics.
     pub support: usize,
 
-    /// The branching test for this node is one of `feature <= possible_split_points[s]` where s in split_points.
+    /// The feature index of this feature test.
     pub feature: usize,
-    /// The branching test for this node is one of `feature <= possible_split_points[s]` where s in split_points.
+    /// The range of threshold indices that are ideally pruned by searching for this feature test.
     pub split_points: Range<usize>,
 
-    /// Item can only be expanded once the size of the `split_points` range is one.
+    /// The exact point at which to split the feature. May change until expanded.
+    pub split_point: usize,
+
+    /// Either a left and right node for this feature test, or an optimal tree. Set once the search expands this feature test.
     expanded: Option<ExpandedQueueItem<'a, OT, SS>>,
 
     /// A pseudorandom value for the node, if the search strategy requires it
@@ -90,7 +93,7 @@ pub struct QueueItem<'a, OT: OptimizationTask, SS: SearchStrategy> {
     _ss: PhantomData<SS>,
 }
 
-impl<OT: OptimizationTask, SS: SearchStrategy> Debug for QueueItem<'_, OT, SS> {
+impl<OT: OptimizationTask, SS: SearchStrategy> Debug for FeatureTest<'_, OT, SS> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.debug_struct("QueueItem")
             .field("cost_lower_bound", &self.cost_lower_bound)
@@ -101,34 +104,35 @@ impl<OT: OptimizationTask, SS: SearchStrategy> Debug for QueueItem<'_, OT, SS> {
     }
 }
 
-impl<OT: OptimizationTask, SS: SearchStrategy> PartialEq for QueueItem<'_, OT, SS> {
+impl<OT: OptimizationTask, SS: SearchStrategy> PartialEq for FeatureTest<'_, OT, SS> {
     fn eq(&self, other: &Self) -> bool {
         // While the Ord checks many more attributes, there should never be an item in
-        // the queue for the same feature and an overlapping interval.
-        self.feature == other.feature && self.split_points.start == other.split_points.start
+        // the queue for the same feature test.
+        self.feature == other.feature && self.split_point == other.split_point
     }
 }
 
-impl<OT: OptimizationTask, SS: SearchStrategy> Eq for QueueItem<'_, OT, SS> {}
+impl<OT: OptimizationTask, SS: SearchStrategy> Eq for FeatureTest<'_, OT, SS> {}
 
-impl<OT: OptimizationTask, SS: SearchStrategy> PartialOrd for QueueItem<'_, OT, SS> {
+impl<OT: OptimizationTask, SS: SearchStrategy> PartialOrd for FeatureTest<'_, OT, SS> {
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
         Some(self.cmp(other))
     }
 }
 
-impl<OT: OptimizationTask, SS: SearchStrategy> Ord for QueueItem<'_, OT, SS> {
+impl<OT: OptimizationTask, SS: SearchStrategy> Ord for FeatureTest<'_, OT, SS> {
     fn cmp(&self, other: &Self) -> Ordering {
         // BinaryHeap is a max-heap. But we want the minimum, so reverse.
         SS::cmp_item(self, other).reverse()
     }
 }
 
-impl<'a, OT: OptimizationTask, SS: SearchStrategy> QueueItem<'a, OT, SS> {
+impl<'a, OT: OptimizationTask, SS: SearchStrategy> FeatureTest<'a, OT, SS> {
     fn new(
         context: &SolveContext<OT, SS>,
         feature: usize,
         split_points: Range<usize>,
+        split_point: usize,
         support: usize,
         feature_rank: i32,
     ) -> Self {
@@ -137,6 +141,7 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> QueueItem<'a, OT, SS> {
             support,
             feature,
             split_points,
+            split_point,
             expanded: None,
             random_value: if SS::generate_random_value() {
                 rand::random()
@@ -151,15 +156,17 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> QueueItem<'a, OT, SS> {
     /// Sets this item to split at an exact point. Returns the QueueItems left
     /// after splitting at this concrete splitting point. Only returns an item
     /// if there are remaining splits in that interval.
-    fn split_at(&mut self, split: usize) -> (Option<Self>, Option<Self>) {
+    fn split_off(&self) -> (Option<Self>, Option<Self>) {
         let mut left = None;
         let mut right = None;
+        let split = self.split_point;
         if split - self.split_points.start > 0 {
             left = Some(Self {
                 cost_lower_bound: self.cost_lower_bound,
                 support: self.support,
                 feature: self.feature,
                 split_points: self.split_points.start..split,
+                split_point: (self.split_points.start + split) / 2,
                 expanded: None,
                 random_value: if SS::generate_random_value() {
                     rand::random()
@@ -176,6 +183,7 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> QueueItem<'a, OT, SS> {
                 support: self.support,
                 feature: self.feature,
                 split_points: (split + 1)..self.split_points.end,
+                split_point: (split + 1 + self.split_points.end) / 2,
                 expanded: None,
                 random_value: if SS::generate_random_value() {
                     rand::random()
@@ -186,7 +194,6 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> QueueItem<'a, OT, SS> {
                 _ss: PhantomData,
             })
         }
-        self.split_points = split..(split + 1);
 
         (left, right)
     }
@@ -267,11 +274,11 @@ pub struct Node<'a, OT: OptimizationTask, SS: SearchStrategy> {
     /// The view of the dataset containing each remaining instance.
     pub dataview: DataView<'a, OT>,
     /// The remaining candidate children for an optimal solution.
-    pub queue: BinaryHeapQueue<QueueItem<'a, OT, SS>>,
+    pub queue: BinaryHeapQueue<FeatureTest<'a, OT, SS>>,
     /// Best tree found so far.
     pub best: Arc<Tree<OT>>,
     /// Keeps track of found lower bounds for pruning similar items
-    pub pruner: Pruner<OT>,
+    pruner: Pruner<OT>,
 }
 
 impl<'a, OT: OptimizationTask, SS: SearchStrategy> Node<'a, OT, SS> {
@@ -317,10 +324,11 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> Node<'a, OT, SS> {
             for feature in 0..dataview.num_features() {
                 let n_splitpoints = dataview.possible_split_values[feature].len();
                 if n_splitpoints > 0 {
-                    queue.push(QueueItem::new(
+                    queue.push(FeatureTest::new(
                         context,
                         feature,
                         0..n_splitpoints,
+                        n_splitpoints / 2,
                         dataview.num_instances(),
                         dataview.feature_ranking[feature],
                     ));
@@ -385,15 +393,13 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> Node<'a, OT, SS> {
         ExpandedQueueItem::Children([left, right])
     }
 
-    fn find_lowest_cost_split(&self, _feature: usize, range: &Range<usize>) -> usize {
-        // get rs = right solution
-        // get ls = left solution
-        // for x = distance from a solution:
-        // lower bound for left = max(ls.left, rs.left-worst*x)
-        // lower bound for right = max(rs.right, ls.right-worst*x)
-        // find minimum index of left_lb + right_lb. If in a flat area, pick the center of that area.
-        assert!(range.start < range.end);
-        (range.start + range.end) / 2
+    fn worst_cost_in_range(&self, feature: usize, range: Range<usize>) -> OT::CostType {
+        OT::worst_cost_in_range(
+            &self.dataview,
+            feature,
+            self.dataview
+                .instance_range_from_split_range(feature, range),
+        )
     }
 
     fn compute_child_upper_bound(
@@ -401,6 +407,7 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> Node<'a, OT, SS> {
         context: &SolveContext<OT, SS>,
         child: &mut Node<'a, OT, SS>,
         sibling_lb: OT::CostType,
+        interval_margin: OT::CostType,
     ) {
         let ub_new = match context.ub_strategy {
             UpperboundStrategy::SolutionsOnly => child.cost_upper_bound,
@@ -408,8 +415,8 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> Node<'a, OT, SS> {
                 self.cost_upper_bound - context.task.branching_cost() - sibling_lb
             }
             UpperboundStrategy::ForRemainingInterval => {
-                self.cost_upper_bound - context.task.branching_cost() - sibling_lb
-            } // TODO + margin_of_interval,
+                self.cost_upper_bound - context.task.branching_cost() - sibling_lb + interval_margin
+            }
         };
 
         OT::update_upperbound(&mut child.cost_upper_bound, &ub_new);
@@ -426,79 +433,91 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> Node<'a, OT, SS> {
         OT::update_lowerbound(&mut child.cost_lower_bound, &lb_new);
     }
 
+    pub fn lb_for(&self, item: &FeatureTest<'a, OT, SS>) -> OT::CostType {
+        if item.is_expanded() {
+            // If the item is expanded, it can be pruned as soon as its split point is infeasible.
+            self.pruner
+                .lb_for(item.feature, &(item.split_point..(item.split_point + 1)))
+        } else {
+            // If the item is not expanded, we need to consider the full range before it is pruned.
+            self.pruner.lb_for(item.feature, &item.split_points)
+        }
+    }
+
     fn recalculate_item_bounds(
         &mut self,
         context: &SolveContext<OT, SS>,
-        item: &mut QueueItem<'a, OT, SS>,
+        item: &mut FeatureTest<'a, OT, SS>,
     ) {
         if let Some(ExpandedQueueItem::Children(children)) = &mut item.expanded {
             let child0_lb = children[0].cost_lower_bound;
             let child0_ub = children[0].cost_upper_bound;
             let child1_lb = children[1].cost_lower_bound;
             let child1_ub = children[1].cost_upper_bound;
-            self.compute_child_upper_bound(context, &mut children[0], child1_lb);
-            self.compute_child_upper_bound(context, &mut children[1], child0_lb);
+
+            let margin = self
+                .worst_cost_in_range(item.feature, item.split_points.start..item.split_points.end);
+
+            self.compute_child_upper_bound(context, &mut children[0], child1_lb, margin);
+            self.compute_child_upper_bound(context, &mut children[1], child0_lb, margin);
             self.compute_child_lower_bound(context, &mut children[0], child1_ub);
             self.compute_child_lower_bound(context, &mut children[1], child0_ub);
         }
 
-        let lb =
-            self.pruner.lb_for(item.feature, &item.split_points) + context.task.branching_cost();
+        let lb = self.lb_for(item) + context.task.branching_cost();
         OT::update_lowerbound(&mut item.cost_lower_bound, &lb);
     }
 
     /// Reinsert an updated item in the queue after expanding a descendant.
-    pub fn backtrack_item(&mut self, context: &SolveContext<OT, SS>, item: QueueItem<'a, OT, SS>) {
-        // Logic below depends on only expanded nodes being backtracked.
-        assert!(item.split_points.start == item.split_points.end - 1);
+    pub fn backtrack_item(
+        &mut self,
+        context: &SolveContext<OT, SS>,
+        item: FeatureTest<'a, OT, SS>,
+    ) {
+        let expanded = item
+            .expanded
+            .as_ref()
+            .expect("An item can only be backtracked if it has been expanded.");
+        // No actual LB update here, add the solution to the pruner. The LB of the item will be updated by the pruner later.
+        self.pruner.insert_left_subtree(
+            item.feature,
+            item.split_point,
+            expanded.lower_bound_left(),
+        );
+        self.pruner.insert_right_subtree(
+            item.feature,
+            item.split_point,
+            expanded.lower_bound_right(),
+        );
 
-        if let Some(expanded) = &item.expanded {
-            // No actual LB update here, add the solution to the pruner. The LB of the item will be updated by the pruner later.
-            self.pruner.insert_left_subtree(
-                item.feature,
-                item.split_points.start,
-                expanded.lower_bound_left(),
-            );
-            self.pruner.insert_right_subtree(
-                item.feature,
-                item.split_points.end - 1,
-                expanded.lower_bound_right(),
-            );
+        // Update our upper bound based on the upper bound of this item.
+        let ub = expanded.upper_bound(context);
+        OT::update_upperbound(&mut self.cost_upper_bound, &ub);
 
-            // Update our upper bound if based on the upper bound of this item.
-            let ub = expanded.upper_bound(context);
-            OT::update_upperbound(&mut self.cost_upper_bound, &ub);
-
-            // Update our current best item.
-            let best_cost = expanded.best_cost(context);
-            if best_cost.strictly_less_than(&self.best.cost()) {
-                let expanded = item
-                    .expanded
-                    .as_ref()
-                    .expect("An item can only be backtracked once it is expanded.");
-
-                self.best = match expanded {
-                    ExpandedQueueItem::Children(children) => Arc::new(Tree::Branch(BranchNode {
-                        cost: best_cost,
-                        split_feature: item.feature,
-                        split_threshold: self
-                            .dataview
-                            .threshold_from_split(item.feature, item.split_points.start),
-                        left_child: children[0].best.clone(),
-                        right_child: children[1].best.clone(),
-                    })),
-                    ExpandedQueueItem::Solution(tree) => tree.clone(),
-                }
+        // Update our current best item.
+        let best_cost = expanded.best_cost(context);
+        if best_cost.strictly_less_than(&self.best.cost()) {
+            self.best = match expanded {
+                ExpandedQueueItem::Children(children) => Arc::new(Tree::Branch(BranchNode {
+                    cost: best_cost,
+                    split_feature: item.feature,
+                    split_threshold: self
+                        .dataview
+                        .threshold_from_split(item.feature, item.split_point),
+                    left_child: children[0].best.clone(),
+                    right_child: children[1].best.clone(),
+                })),
+                ExpandedQueueItem::Solution(tree) => tree.clone(),
             }
+        }
 
-            assert!(
-                self.cost_upper_bound
-                    .less_or_not_much_greater_than(&self.best.cost())
-            );
-            if best_cost.less_or_not_much_greater_than(&context.task.branching_cost()) {
-                // We cannot find a better solution from splitting: quickly clear the queue.
-                self.queue.clear();
-            }
+        assert!(
+            self.cost_upper_bound
+                .less_or_not_much_greater_than(&self.best.cost())
+        );
+        if best_cost.less_or_not_much_greater_than(&context.task.branching_cost()) {
+            // We cannot find a better solution from splitting: quickly clear the queue.
+            self.queue.clear();
         }
 
         // Reinsert the item in the queue, and ensure the item in the front
@@ -562,7 +581,7 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> Node<'a, OT, SS> {
     /// Select the path to the item to expand next. The deepest item is first in the path.
     pub fn select(
         &mut self,
-        path_buffer: &mut VecDeque<(usize, QueueItem<'a, OT, SS>)>,
+        path_buffer: &mut VecDeque<(usize, FeatureTest<'a, OT, SS>)>,
         source: usize,
     ) {
         assert!(path_buffer.is_empty());
@@ -582,14 +601,23 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> Node<'a, OT, SS> {
     }
 
     /// Expand an item from the queue one level by selecting a concrete split and instantiating its children.
-    pub fn expand(&mut self, context: &SolveContext<OT, SS>, item: &mut QueueItem<'a, OT, SS>) {
+    pub fn expand(&mut self, context: &SolveContext<OT, SS>, item: &mut FeatureTest<'a, OT, SS>) {
         assert!(!item.is_expanded());
         assert!(self.remaining_depth_budget > 0);
 
-        let x = self.find_lowest_cost_split(item.feature, &item.split_points);
-        assert!(item.split_points.start <= x && x < item.split_points.end);
+        // TODO: could find better split point here?
+        // get rs = right solution
+        // get ls = left solution
+        // for x = distance from a solution:
+        // lower bound for left = max(ls.left, rs.left-worst*x)
+        // lower bound for right = max(rs.right, ls.right-worst*x)
+        // find minimum index of left_lb + right_lb. If in a flat area, pick the center of that area.
+        // item.split_point = self.find_lowest_cost_split(item.feature, &item.split_points);
+        assert!(
+            item.split_points.start <= item.split_point && item.split_point < item.split_points.end
+        );
 
-        let (left_item, right_item) = item.split_at(x);
+        let (left_item, right_item) = item.split_off();
 
         if let Some(left_item) = left_item {
             self.queue.push(left_item);
@@ -601,9 +629,9 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> Node<'a, OT, SS> {
         let expanded = if self.remaining_depth_budget == 2
             && context.terminal_solver == TerminalSolver::LeftRight
         {
-            solve_left_right(&self.dataview, context, item.feature, x)
+            solve_left_right(&self.dataview, context, item.feature, item.split_point)
         } else {
-            self.split(context, item.feature, x)
+            self.split(context, item.feature, item.split_point)
         };
         item.expanded = Some(expanded);
     }

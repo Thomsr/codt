@@ -2,7 +2,7 @@ use std::cmp::Ordering;
 
 use crate::{
     search::{
-        node::{Node, QueueItem},
+        node::{FeatureTest, Node},
         strategy::SearchStrategy,
     },
     tasks::{Cost, OptimizationTask},
@@ -12,8 +12,8 @@ pub struct AndOrSearchStrategy;
 
 impl SearchStrategy for AndOrSearchStrategy {
     fn cmp_item<'a, OT: OptimizationTask, SS: SearchStrategy>(
-        a: &QueueItem<'a, OT, SS>,
-        b: &QueueItem<'a, OT, SS>,
+        a: &FeatureTest<'a, OT, SS>,
+        b: &FeatureTest<'a, OT, SS>,
     ) -> Ordering {
         // First ordered by the objective value, so more promising nodes are explored first.
         // Then by expanded, so we expand the least number of nodes possible.
@@ -25,11 +25,11 @@ impl SearchStrategy for AndOrSearchStrategy {
             .then(a.is_expanded().cmp(&b.is_expanded()).reverse())
             .then(a.split_points.len().cmp(&b.split_points.len())) // TODO: reverse?
             .then(a.feature_rank.cmp(&b.feature_rank))
-            .then(a.split_points.start.cmp(&b.split_points.start))
+            .then(a.split_point.cmp(&b.split_point))
     }
 
     fn child_priority<'a, OT: OptimizationTask, SS: SearchStrategy>(
-        _item: &QueueItem<'a, OT, SS>,
+        _item: &FeatureTest<'a, OT, SS>,
         children: &[Node<'a, OT, SS>; 2],
     ) -> usize {
         // We choose the path in the graph as the most promising
@@ -47,7 +47,7 @@ impl SearchStrategy for AndOrSearchStrategy {
     }
 
     fn item_front_of_queue_is_lowest_lb<OT: OptimizationTask, SS: SearchStrategy>(
-        _item: &QueueItem<OT, SS>,
+        _item: &FeatureTest<OT, SS>,
     ) -> bool {
         true
     }

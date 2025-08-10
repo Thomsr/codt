@@ -1,7 +1,11 @@
-use std::ops::{AddAssign, SubAssign};
+use std::ops::{AddAssign, Range, SubAssign};
 
 use crate::{
-    model::{dataset::DataSet, dataview::DataView, instance::LabeledInstance},
+    model::{
+        dataset::DataSet,
+        dataview::{DataView, FeatureValue},
+        instance::LabeledInstance,
+    },
     tasks::{CostSum, FloatCost, OptimizationTask},
 };
 
@@ -125,6 +129,7 @@ impl OptimizationTask for AccuracyTask {
     type InstanceType = LabeledInstance<i32>;
     type CostType = FloatCost;
     type CostSumType = AccuracyCostSum;
+    type ExtraDataviewData = ();
 
     fn prepare_for_data(&mut self, dataview: &mut DataView<Self>) {
         self.dataset_size = dataview.num_instances();
@@ -222,6 +227,23 @@ impl OptimizationTask for AccuracyTask {
 
             FloatCost(min_cost)
         }
+    }
+
+    fn worst_cost_in_range(
+        _dataview: &DataView<Self>,
+        _feature: usize,
+        range: Range<usize>,
+    ) -> Self::CostType
+    where
+        Self: Sized,
+    {
+        FloatCost(range.len() as f64)
+    }
+
+    fn init_extra_dataview_data(
+        _dataset: &DataSet<Self::InstanceType>,
+        _feature_values: &[Vec<FeatureValue>],
+    ) -> Self::ExtraDataviewData {
     }
 }
 
