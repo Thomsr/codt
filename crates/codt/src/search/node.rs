@@ -435,17 +435,6 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> Node<'a, OT, SS> {
         OT::update_upperbound(&mut child.cost_upper_bound, &ub_new);
     }
 
-    fn compute_child_lower_bound(
-        &self,
-        context: &SolveContext<OT, SS>,
-        child: &mut Node<'a, OT, SS>,
-        sibling_ub: OT::CostType,
-    ) {
-        let lb_new = self.cost_lower_bound - sibling_ub - context.task.branching_cost();
-
-        OT::update_lowerbound(&mut child.cost_lower_bound, &lb_new);
-    }
-
     pub fn lb_for(&self, item: &FeatureTest<'a, OT, SS>) -> OT::CostType {
         if item.is_expanded() {
             // If the item is expanded, it can be pruned as soon as its split point is infeasible.
@@ -464,9 +453,7 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> Node<'a, OT, SS> {
     ) {
         if let Some(ExpandedQueueItem::Children(children)) = &mut item.expanded {
             let child0_lb = children[0].cost_lower_bound;
-            let child0_ub = children[0].cost_upper_bound;
             let child1_lb = children[1].cost_lower_bound;
-            let child1_ub = children[1].cost_upper_bound;
 
             let margin_left =
                 self.worst_cost_in_range(item.feature, item.split_points.start..item.split_point);
@@ -480,8 +467,8 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> Node<'a, OT, SS> {
 
             self.compute_child_upper_bound(context, &mut children[0], child1_lb, margin);
             self.compute_child_upper_bound(context, &mut children[1], child0_lb, margin);
-            self.compute_child_lower_bound(context, &mut children[0], child1_ub);
-            self.compute_child_lower_bound(context, &mut children[1], child0_ub);
+            // Child lower bounds could be computed in a similar way, but are useless.
+            // Initial lower bounds are better for children, and other lower bounds for the parent are gained by backtracking the child.
         }
 
         let lb = self.lb_for(item) + context.task.branching_cost();
