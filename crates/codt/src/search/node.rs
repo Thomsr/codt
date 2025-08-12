@@ -394,6 +394,9 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> Node<'a, OT, SS> {
     }
 
     fn worst_cost_in_range(&self, feature: usize, range: Range<usize>) -> OT::CostType {
+        if range.is_empty() {
+            return OT::CostType::ZERO;
+        }
         OT::worst_cost_in_range(
             &self.dataview,
             feature,
@@ -410,12 +413,22 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> Node<'a, OT, SS> {
         interval_margin: OT::CostType,
     ) {
         let ub_new = match context.ub_strategy {
-            UpperboundStrategy::SolutionsOnly => child.cost_upper_bound,
+            UpperboundStrategy::SolutionsOnly => self.best.cost(),
             UpperboundStrategy::TightFromSibling => {
                 self.cost_upper_bound - context.task.branching_cost() - sibling_lb
             }
             UpperboundStrategy::ForRemainingInterval => {
-                self.cost_upper_bound - context.task.branching_cost() - sibling_lb + interval_margin
+                // Best solution is never worse than this
+                let best = self.best.cost();
+                // Optimal solution is never worse than the upper bound, but we are interested in a better solution for pruning the remaining interval.
+                let remaining_interval =
+                    self.cost_upper_bound - context.task.branching_cost() - sibling_lb
+                        + interval_margin;
+                if best.less_or_not_much_greater_than(&remaining_interval) {
+                    best
+                } else {
+                    remaining_interval
+                }
             }
         };
 
@@ -455,8 +468,15 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> Node<'a, OT, SS> {
             let child1_lb = children[1].cost_lower_bound;
             let child1_ub = children[1].cost_upper_bound;
 
-            let margin = self
-                .worst_cost_in_range(item.feature, item.split_points.start..item.split_points.end);
+            let margin_left =
+                self.worst_cost_in_range(item.feature, item.split_points.start..item.split_point);
+            let margin_right =
+                self.worst_cost_in_range(item.feature, item.split_point + 1..item.split_points.end);
+            let margin = if margin_left.greater_or_not_much_less_than(&margin_right) {
+                margin_left
+            } else {
+                margin_right
+            };
 
             self.compute_child_upper_bound(context, &mut children[0], child1_lb, margin);
             self.compute_child_upper_bound(context, &mut children[1], child0_lb, margin);

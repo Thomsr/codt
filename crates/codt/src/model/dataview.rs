@@ -403,6 +403,9 @@ impl<'a, OT: OptimizationTask> DataView<'a, OT> {
         split_feature: usize,
         split_values: Range<usize>,
     ) -> Range<usize> {
+        if split_values.is_empty() {
+            return 0..0; // No instances in this range. Prevents out-of-bounds when start >= end.
+        }
         let start = self.feature_values_sorted[split_feature].partition_point(|fv| {
             fv.feature_value
                 <= self.possible_split_values[split_feature][split_values.start].feature_value
