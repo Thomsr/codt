@@ -398,6 +398,7 @@ impl<'a, OT: OptimizationTask> DataView<'a, OT> {
         (current_threshold + next_threshold) / 2.0
     }
 
+    /// Get the range of all instances that have feature value in the range [split_values.start, split_values.end)
     pub fn instance_range_from_split_range(
         &self,
         split_feature: usize,
@@ -406,14 +407,14 @@ impl<'a, OT: OptimizationTask> DataView<'a, OT> {
         if split_values.is_empty() {
             return 0..0; // No instances in this range. Prevents out-of-bounds when start >= end.
         }
-        let start = self.feature_values_sorted[split_feature].partition_point(|fv| {
-            fv.feature_value
-                <= self.possible_split_values[split_feature][split_values.start].feature_value
-        });
-        let end = self.feature_values_sorted[split_feature].partition_point(|fv| {
-            fv.feature_value
-                <= self.possible_split_values[split_feature][split_values.end - 1].feature_value
-        });
+        let start_fv = self.possible_split_values[split_feature][split_values.start].feature_value;
+        let end_fv = self.possible_split_values[split_feature][split_values.end - 1].feature_value;
+
+        // Partition point returns the first index of the second partition.
+        let start = self.feature_values_sorted[split_feature]
+            .partition_point(|fv| fv.feature_value < start_fv);
+        let end = self.feature_values_sorted[split_feature]
+            .partition_point(|fv| fv.feature_value <= end_fv);
         start..end
     }
 }
@@ -424,15 +425,19 @@ mod tests {
     use crate::model::instance::LabeledInstance;
     use crate::tasks::accuracy::AccuracyTask;
 
-    /// Helper function to test `add_possible_split_value` and `post_process_possible_splits`.
-    fn test_possible_splits(feature_values: Vec<i32>, labels: Vec<i32>, expected_splits: Vec<i32>) {
-        // Create a dataset with the given labels and feature values.
+    // Create a dataset with the given labels and a single feature with given feature values.
+    fn create_dataset(feature_values: Vec<i32>, labels: Vec<i32>) -> DataSet<LabeledInstance<i32>> {
         let mut dataset = DataSet::default();
         for label in labels {
             dataset.instances.push(LabeledInstance::new(label));
         }
         dataset.feature_values.push(feature_values);
+        dataset
+    }
 
+    /// Helper function to test `add_possible_split_value` and `post_process_possible_splits`.
+    fn test_possible_splits(feature_values: Vec<i32>, labels: Vec<i32>, expected_splits: Vec<i32>) {
+        let dataset = create_dataset(feature_values, labels);
         let view = DataView::<AccuracyTask>::from_dataset(&dataset);
 
         // Assert that the resulting splits match the expected splits.
@@ -494,5 +499,16 @@ mod tests {
         let labels = vec![0, 0, 0, 0, 0, 1];
         let expected_splits = vec![4];
         test_possible_splits(feature_values, labels, expected_splits);
+    }
+
+    #[test]
+    fn instance_range_from_split_range_test() {
+        let feature_values = vec![0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 4, 4, 4, 4, 5, 6, 6];
+        let labels = vec![0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 3, 4, 5, 6, 0, 0, 0];
+        let dataset = create_dataset(feature_values, labels);
+        let view = DataView::<AccuracyTask>::from_dataset(&dataset);
+        assert_eq!(view.possible_split_values[0][0].feature_value, 1);
+        assert_eq!(view.possible_split_values[0][2].feature_value, 4);
+        assert_eq!(view.instance_range_from_split_range(0, 0..2), 3..10);
     }
 }

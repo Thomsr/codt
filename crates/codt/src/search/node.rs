@@ -257,6 +257,16 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> FeatureTest<'a, OT, SS> {
             SS::heuristic(self)
         }
     }
+
+    /// If the item is expanded, it can be pruned as soon as its split point is infeasible.
+    /// If the item is not expanded, we need to consider the full range before it is pruned.
+    pub fn lb_range(&self) -> Range<usize> {
+        if self.is_expanded() {
+            self.split_point..self.split_point + 1
+        } else {
+            self.split_points.clone()
+        }
+    }
 }
 
 /// Represents a search node for a concrete feature test.
@@ -393,6 +403,7 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> Node<'a, OT, SS> {
         ExpandedQueueItem::Children([left, right])
     }
 
+    // Get the worst cost of the instances with feature value in the range.
     fn worst_cost_in_range(&self, feature: usize, range: Range<usize>) -> OT::CostType {
         if range.is_empty() {
             return OT::CostType::ZERO;
@@ -436,14 +447,40 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> Node<'a, OT, SS> {
     }
 
     pub fn lb_for(&self, item: &FeatureTest<'a, OT, SS>) -> OT::CostType {
-        if item.is_expanded() {
-            // If the item is expanded, it can be pruned as soon as its split point is infeasible.
-            self.pruner
-                .lb_for(item.feature, &(item.split_point..(item.split_point + 1)))
-        } else {
-            // If the item is not expanded, we need to consider the full range before it is pruned.
-            self.pruner.lb_for(item.feature, &item.split_points)
+        let lb_range = item.lb_range();
+
+        let (closest_left, closest_left_lb) =
+            self.pruner.closest_left_lb(item.feature, lb_range.start);
+
+        let (closest_right, closest_right_lb) =
+            self.pruner.closest_right_lb(item.feature, lb_range.end - 1);
+
+        let mut lb = self.pruner.lb_for(item.feature, &lb_range);
+
+        let neighbour_lb_left = closest_left_lb
+            - self.worst_cost_in_range(item.feature, (closest_left + 1)..lb_range.end);
+        let neighbour_lb_right = closest_right_lb
+            - self.worst_cost_in_range(item.feature, lb_range.start..closest_right);
+        OT::update_lowerbound(&mut lb, &neighbour_lb_left);
+        OT::update_lowerbound(&mut lb, &neighbour_lb_right);
+        lb
+    }
+
+    fn partition_point<P>(range: &Range<usize>, mut pred: P) -> usize
+    where
+        P: FnMut(usize) -> bool,
+    {
+        let mut lo = range.start;
+        let mut hi = range.end;
+        while lo < hi {
+            let mid = (lo + hi) / 2;
+            if pred(mid) {
+                lo = mid + 1;
+            } else {
+                hi = mid;
+            }
         }
+        lo
     }
 
     fn recalculate_item_bounds(
@@ -451,6 +488,39 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> Node<'a, OT, SS> {
         context: &SolveContext<OT, SS>,
         item: &mut FeatureTest<'a, OT, SS>,
     ) {
+        // Shrink the range we need to prune first, as this impacts the upper bound computation
+        let (closest_left, closest_left_lb) = self
+            .pruner
+            .closest_left_lb(item.feature, item.split_points.start);
+        let (closest_right, closest_right_lb) = self
+            .pruner
+            .closest_right_lb(item.feature, item.split_points.end - 1);
+
+        let leeway_left = closest_left_lb - self.cost_upper_bound;
+        let leeway_right = closest_right_lb - self.cost_upper_bound;
+
+        item.split_points.start = Self::partition_point(&item.split_points, |x| {
+            leeway_left.strictly_greater_than(
+                &self.worst_cost_in_range(item.feature, (closest_left + 1)..(x + 1)),
+            )
+        });
+        item.split_points.end = Self::partition_point(&item.split_points, |x| {
+            !leeway_right
+                .strictly_greater_than(&self.worst_cost_in_range(item.feature, x..closest_right))
+        });
+
+        // Prune if interval is empty or expanded and split_point is no longer included in split_points.
+        if item.split_points.is_empty()
+            || item.is_expanded() && !item.split_points.contains(&item.split_point)
+        {
+            // NOTE: this is not an actual lower bound, but immediately after this function is called, the item is pruned.
+            item.cost_lower_bound = self.best.cost();
+            return;
+        }
+
+        let lb = self.lb_for(item) + context.task.branching_cost();
+        OT::update_lowerbound(&mut item.cost_lower_bound, &lb);
+
         if let Some(ExpandedQueueItem::Children(children)) = &mut item.expanded {
             let child0_lb = children[0].cost_lower_bound;
             let child1_lb = children[1].cost_lower_bound;
@@ -459,6 +529,7 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> Node<'a, OT, SS> {
                 self.worst_cost_in_range(item.feature, item.split_points.start..item.split_point);
             let margin_right =
                 self.worst_cost_in_range(item.feature, item.split_point + 1..item.split_points.end);
+
             let margin = if margin_left.greater_or_not_much_less_than(&margin_right) {
                 margin_left
             } else {
@@ -470,9 +541,6 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> Node<'a, OT, SS> {
             // Child lower bounds could be computed in a similar way, but are useless.
             // Initial lower bounds are better for children, and other lower bounds for the parent are gained by backtracking the child.
         }
-
-        let lb = self.lb_for(item) + context.task.branching_cost();
-        OT::update_lowerbound(&mut item.cost_lower_bound, &lb);
     }
 
     /// Reinsert an updated item in the queue after expanding a descendant.
@@ -620,6 +688,9 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> Node<'a, OT, SS> {
         // lower bound for right = max(rs.right, ls.right-worst*x)
         // find minimum index of left_lb + right_lb. If in a flat area, pick the center of that area.
         // item.split_point = self.find_lowest_cost_split(item.feature, &item.split_points);
+
+        // Because of interval shrinking the split point may be out of the range
+        item.split_point = (item.split_points.start + item.split_points.end) / 2;
         assert!(
             item.split_points.start <= item.split_point && item.split_point < item.split_points.end
         );
