@@ -221,6 +221,37 @@ macro_rules! impl_optimal_decision_tree_pyclass {
                     .expect(ERROR_FIT_NOT_CALLED)
                     .memory_usage_bytes
             }
+
+            #[pyo3(signature = (X, y))]
+            fn d0d1_lowerbound<'py>(
+                &mut self,
+                X: PyReadonlyArray2<'py, f64>,
+                y: PyReadonlyArray1<'py, $label>,
+            ) -> (f64, f64) {
+                let x_arr = X.as_array();
+                let y_arr = y.as_array();
+                let mut dataset =
+                    DataSet::<LabeledInstance<<$task as OptimizationTask>::LabelType>>::default();
+                for i in 0..y_arr.dim() {
+                    let features = x_arr.index_axis(Axis(0), i);
+                    dataset.add_instance(
+                        LabeledInstance::new(y_arr[i].try_into().unwrap()),
+                        features.iter().copied(),
+                    );
+                }
+                dataset.preprocess_after_adding_instances();
+
+                <$task>::preprocess_dataset(&mut dataset);
+                let full_view = DataView::from_dataset(&dataset);
+
+                let mut solver = solver_with_strategy(self.task.clone(), full_view, self.strategy);
+
+                let (d0lb, d1lb) = solver.d0d1_lowerbound(self.max_depth);
+                return (
+                    d0lb.into(),
+                    d1lb.into(),
+                );
+            }
         }
     };
 }

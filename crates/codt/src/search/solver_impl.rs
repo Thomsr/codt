@@ -156,6 +156,41 @@ impl<OT: OptimizationTask, SS: SearchStrategy> Solver<OT> for SolverImpl<'_, OT,
             memory_usage_bytes,
         }
     }
+
+    fn d0d1_lowerbound(&mut self, max_depth: u32) -> (OT::CostType, OT::CostType) {
+        let mut dataview = self.dataview.take().unwrap();
+
+        self.task.prepare_for_data(&mut dataview);
+
+        let context = SolveContext {
+            task: &self.task,
+            ub_strategy: UpperboundStrategy::ForRemainingInterval,
+            terminal_solver: TerminalSolver::Leaf,
+            branch_relaxation: BranchRelaxation::Lowerbound,
+            _ss: PhantomData,
+        };
+
+        let root: Node<'_, OT, SS> = Node::new(&context, dataview, max_depth);
+        let d0lb = root.cost_lower_bound;
+        
+        let mut d1lb = None;
+        for feature_test in root.queue.iter() {
+            for split_value in feature_test.split_points.clone() {
+                let (left, right) = root.dataview.split(feature_test.feature, split_value);
+                let left = Node::new(&context, left, max_depth - 1);
+                let right = Node::new(&context, right, max_depth - 1);
+                let lb = left.cost_lower_bound + right.cost_lower_bound;
+                if d1lb.map_or(true, |x| lb.strictly_less_than(&x)) {
+                    d1lb = Some(lb);
+                }
+            }
+        }
+
+        // Take back ownership of the dataset.
+        self.dataview = Some(root.dataview);
+
+        (d0lb, d1lb.unwrap())
+    }
 }
 
 impl<'a, OT: OptimizationTask, SS: SearchStrategy> SolverImpl<'a, OT, SS> {

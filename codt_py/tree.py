@@ -45,8 +45,14 @@ class _BaseOptimalDecisionTree(BaseEstimator, ABC):
             self.memory_limit,
         )
 
-    @abstractmethod
     def fit(self, X, y):
+        X, y = self._validate_data_odt(X, y)
+        self.tree_ = self._init_rust_class()
+        self.tree_.fit(X, y)
+        return self
+
+    @abstractmethod
+    def _validate_data_odt(self, X, y):
         pass
 
     def predict(self, X):
@@ -76,17 +82,19 @@ class _BaseOptimalDecisionTree(BaseEstimator, ABC):
     def memory_usage_bytes(self):
         check_is_fitted(self)
         return self.tree_.memory_usage_bytes()
+    
+    def d0d1_lowerbound(self, X, y):
+        X, y = self._validate_data_odt(X, y)
+        return self._init_rust_class().d0d1_lowerbound(X, y)
 
 
 class OptimalDecisionTreeClassifier(_BaseOptimalDecisionTree, ClassifierMixin):
     _rust_class = OCT
 
-    def fit(self, X, y):
+    def _validate_data_odt(self, X, y):
         X, y = validate_data(self, X, y, ensure_min_samples=2, dtype=np.float64)
         self.classes_, y = np.unique(y, return_inverse=True)
-        self.tree_ = self._init_rust_class()
-        self.tree_.fit(X, y)
-        return self
+        return X, y
 
     def _predict_impl(self, X):
         return np.take(self.classes_, self.tree_.predict(X))
@@ -95,8 +103,5 @@ class OptimalDecisionTreeClassifier(_BaseOptimalDecisionTree, ClassifierMixin):
 class OptimalDecisionTreeRegressor(_BaseOptimalDecisionTree, RegressorMixin):
     _rust_class = ORT
 
-    def fit(self, X, y):
-        X, y = validate_data(self, X, y, ensure_min_samples=2, dtype=np.float64, y_numeric=True)
-        self.tree_ = self._init_rust_class()
-        self.tree_.fit(X, y)
-        return self
+    def _validate_data_odt(self, X, y):
+        return validate_data(self, X, y, ensure_min_samples=2, dtype=np.float64, y_numeric=True)
