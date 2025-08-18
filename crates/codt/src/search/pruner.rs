@@ -62,7 +62,7 @@ impl<OT: OptimizationTask, const LEFT_SUBTREE: bool, const LEFT_OF: bool>
 
         let needs_insert = match peek {
             Some((&k, v)) => {
-                if only_keep_best && v.greater_or_not_much_less_than(&lb) {
+                if (only_keep_best || k == threshold) && v.greater_or_not_much_less_than(&lb) {
                     // There already exist a lower bound that is usable in strictly more scenarios that is better.
                     return;
                 } else if k == threshold {
@@ -160,7 +160,7 @@ impl<OT: OptimizationTask> Pruner<OT> {
         let lb_right = self.best_right_subtree_right_of[feature].find(threshold + 1);
 
         match (lb_left, lb_right) {
-            (Some((_, &l)), Some((&t, &r))) => (t, l + r),
+            (Some((&t, &l)), Some((_, &r))) => (t, l + r),
             _ => (threshold, OT::CostType::ZERO),
         }
     }
@@ -205,4 +205,134 @@ mod tests {
         pruner.insert_right_subtree(0, 10, 8.0.into());
         assert_eq!(pruner.lb_for(0, &(10..11)), 14.0.into());
     }
+
+    #[test]
+    fn test_bound_storage_left_leftof() {
+        // LEFT_SUBTREE = true, LEFT_OF = true
+        let mut bs: BoundStorage<AccuracyTask, true, true> = BoundStorage::new();
+        // Insert a non-zero lower bound
+        bs.insert(5, 4.0.into());
+        assert_eq!(bs.find(5), Some((&5, &4.0.into())));
+        // Insert a better lower bound at same threshold (should update)
+        bs.insert(5, 6.0.into());
+        assert_eq!(bs.find(5), Some((&5, &6.0.into())));
+        // Insert a worse lower bound at same threshold (should not update)
+        bs.insert(5, 2.0.into());
+        assert_eq!(bs.find(5), Some((&5, &6.0.into())));
+        // Insert a worse lower bound that reaches more
+        bs.insert(3, 5.0.into());
+        assert_eq!(bs.find(3), Some((&3, &5.0.into())));
+        assert_eq!(bs.find(5), Some((&5, &6.0.into())));
+        // Insert a equal lower bound that reaches less
+        bs.insert(10, 6.0.into());
+        assert_eq!(bs.find(10), Some((&5, &6.0.into())));
+        // Insert a better lower bound that reaches more
+        bs.insert(2, 7.0.into());
+        assert_eq!(bs.find(10), Some((&2, &7.0.into())));
+        // Insert a zero lower bound (should not store)
+        bs.insert(1, 0.0.into());
+        assert_eq!(bs.find(1), None);
+    }
+
+    #[test]
+    fn test_bound_storage_left_rightof() {
+        // LEFT_SUBTREE = true, LEFT_OF = false
+        let mut bs: BoundStorage<AccuracyTask, true, false> = BoundStorage::new();
+        bs.insert(5, 4.0.into());
+        assert_eq!(bs.find(5), Some((&5, &4.0.into())));
+        // Insert a better lower bound at same threshold (should update)
+        bs.insert(5, 8.0.into());
+        assert_eq!(bs.find(5), Some((&5, &8.0.into())));
+        // Insert a zero lower bound (should not store)
+        bs.insert(20, 0.0.into());
+        assert_eq!(bs.find(20), None);
+        // Insert a worse lower bound that reaches less (should update only closest)
+        bs.insert(2, 2.0.into());
+        assert_eq!(bs.find(2), Some((&2, &2.0.into())));
+        assert_eq!(bs.find(4), Some((&5, &8.0.into())));
+    }
+
+    #[test]
+    fn test_bound_storage_right_leftof() {
+        // LEFT_SUBTREE = false, LEFT_OF = true
+        let mut bs: BoundStorage<AccuracyTask, false, true> = BoundStorage::new();
+        bs.insert(3, 2.0.into());
+        assert_eq!(bs.find(3), Some((&3, &2.0.into())));
+        // Insert a better lower bound at same threshold (should update)
+        bs.insert(3, 5.0.into());
+        assert_eq!(bs.find(3), Some((&3, &5.0.into())));
+        // Insert a worse lower bound at same threshold (should not update)
+        bs.insert(3, 1.0.into());
+        assert_eq!(bs.find(3), Some((&3, &5.0.into())));
+        // Insert a zero lower bound (should not store)
+        bs.insert(2, 0.0.into());
+        assert_eq!(bs.find(2), None);
+    }
+
+    #[test]
+    fn test_bound_storage_right_rightof() {
+        // LEFT_SUBTREE = false, LEFT_OF = false
+        let mut bs: BoundStorage<AccuracyTask, false, false> = BoundStorage::new();
+        bs.insert(2, 1.0.into());
+        assert_eq!(bs.find(2), Some((&2, &1.0.into())));
+        // Insert a better lower bound at same threshold (should update)
+        bs.insert(2, 3.0.into());
+        assert_eq!(bs.find(2), Some((&2, &3.0.into())));
+        // Insert a worse lower bound at same threshold (should not update)
+        bs.insert(2, 2.0.into());
+        assert_eq!(bs.find(2), Some((&2, &3.0.into())));
+        // Insert a zero lower bound (should not store)
+        bs.insert(5, 0.0.into());
+        assert_eq!(bs.find(5), None);
+    }
+
+    #[test]
+fn test_pruner_closest_left_lb_threshold() {
+    let mut pruner: Pruner<AccuracyTask> = Pruner::new(1);
+    // Insert left and right subtree bounds at different thresholds
+    pruner.insert_left_subtree(0, 3, 2.0.into());
+    pruner.insert_right_subtree(0, 5, 3.0.into());
+    pruner.insert_left_subtree(0, 7, 4.0.into());
+    pruner.insert_right_subtree(0, 8, 5.0.into());
+
+    // Query for threshold 6: should find left at 3, right at 5, so threshold returned is 5
+    let (thresh, cost) = pruner.closest_left_lb(0, 6);
+    assert_eq!(thresh, 5);
+    assert_eq!(cost, (2.0 + 3.0).into());
+
+    // Query for threshold 7: should find left at 7, right at 5, so threshold returned is 5
+    let (thresh, cost) = pruner.closest_left_lb(0, 8);
+    assert_eq!(thresh, 5);
+    assert_eq!(cost, (4.0 + 3.0).into());
+
+    // Query for threshold 2: no left or right, should return threshold and zero
+    let (thresh, cost) = pruner.closest_left_lb(0, 2);
+    assert_eq!(thresh, 2);
+    assert_eq!(cost, 0.0.into());
+}
+
+#[test]
+fn test_pruner_closest_right_lb_threshold() {
+    let mut pruner: Pruner<AccuracyTask> = Pruner::new(1);
+    // Insert left and right subtree bounds at different thresholds
+    pruner.insert_left_subtree(0, 2, 2.0.into());
+    pruner.insert_right_subtree(0, 4, 3.0.into());
+    pruner.insert_left_subtree(0, 6, 4.0.into());
+    pruner.insert_right_subtree(0, 9, 5.0.into());
+
+    // Query for threshold 3: should find closest left at 6, best right at 9, so threshold returned is 6
+    let (thresh, cost) = pruner.closest_right_lb(0, 2);
+    assert_eq!(thresh, 6);
+    assert_eq!(cost, (4.0 + 5.0).into());
+
+    // Query for threshold 8: should find closest left at 6, best right at 9, so threshold returned is 6
+    let (thresh, cost) = pruner.closest_right_lb(0, 5);
+    assert_eq!(thresh, 6);
+    assert_eq!(cost, (4.0 + 5.0).into());
+
+    // Query for threshold 20: no left, should return threshold and zero
+    let (thresh, cost) = pruner.closest_right_lb(0, 8);
+    assert_eq!(thresh, 8);
+    assert_eq!(cost, 0.0.into());
+}
 }

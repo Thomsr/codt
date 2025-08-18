@@ -483,12 +483,8 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> Node<'a, OT, SS> {
         lo
     }
 
-    fn recalculate_item_bounds(
-        &mut self,
-        context: &SolveContext<OT, SS>,
-        item: &mut FeatureTest<'a, OT, SS>,
-    ) {
-        // Shrink the range we need to prune first, as this impacts the upper bound computation
+    fn shrink_interval(&mut self, item: &mut FeatureTest<'a, OT, SS>) {
+        // Find the closest left and right lower bound.
         let (closest_left, closest_left_lb) = self
             .pruner
             .closest_left_lb(item.feature, item.split_points.start);
@@ -496,9 +492,11 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> Node<'a, OT, SS> {
             .pruner
             .closest_right_lb(item.feature, item.split_points.end - 1);
 
+        // Calculate the minimum divergence from those lower bounds for them to be interesting.
         let leeway_left = closest_left_lb - self.cost_upper_bound;
         let leeway_right = closest_right_lb - self.cost_upper_bound;
 
+        // Shrink the interval based on the leeway.
         item.split_points.start = Self::partition_point(&item.split_points, |x| {
             leeway_left.strictly_greater_than(
                 &self.worst_cost_in_range(item.feature, (closest_left + 1)..(x + 1)),
@@ -508,16 +506,13 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> Node<'a, OT, SS> {
             !leeway_right
                 .strictly_greater_than(&self.worst_cost_in_range(item.feature, x..closest_right))
         });
+    }
 
-        // Prune if interval is empty or expanded and split_point is no longer included in split_points.
-        if item.split_points.is_empty()
-            || item.is_expanded() && !item.split_points.contains(&item.split_point)
-        {
-            // NOTE: this is not an actual lower bound, but immediately after this function is called, the item is pruned.
-            item.cost_lower_bound = self.best.cost();
-            return;
-        }
-
+    fn recalculate_item_bounds(
+        &mut self,
+        context: &SolveContext<OT, SS>,
+        item: &mut FeatureTest<'a, OT, SS>,
+    ) {
         let lb = self.lb_for(item) + context.task.branching_cost();
         OT::update_lowerbound(&mut item.cost_lower_bound, &lb);
 
@@ -525,6 +520,7 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> Node<'a, OT, SS> {
             let child0_lb = children[0].cost_lower_bound;
             let child1_lb = children[1].cost_lower_bound;
 
+            // Calculate the worst of the margins on the left and right sides.
             let margin_left =
                 self.worst_cost_in_range(item.feature, item.split_points.start..item.split_point);
             let margin_right =
@@ -599,7 +595,18 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> Node<'a, OT, SS> {
         // of the queue has updated lower bounds for the next iteration.
         let mut maybe_item = Some(item);
         while let Some(mut item) = maybe_item.take() {
-            self.recalculate_item_bounds(context, &mut item);
+            // Shrink the range we need to prune first, as this impacts the upper bound computation
+            self.shrink_interval(&mut item);
+            // Prune if interval is empty after shrinking or expanded and the range we care about does not include the split_point.
+            if item.split_points.is_empty()
+                || item.is_expanded() && !item.split_points.contains(&item.split_point)
+            {
+                // NOTE: this is not an actual lower bound, but immediately after this the item is pruned.
+                // This lower bound cannot be and is not used for similarity bounds.
+                item.cost_lower_bound = self.best.cost();
+            } else {
+                self.recalculate_item_bounds(context, &mut item);
+            }
 
             let update_needed = if item.is_complete()
                 || item
