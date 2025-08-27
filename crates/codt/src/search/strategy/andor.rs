@@ -17,13 +17,13 @@ impl SearchStrategy for AndOrSearchStrategy {
     ) -> Ordering {
         // First ordered by the objective value, so more promising nodes are explored first.
         // Then by expanded, so we expand the least number of nodes possible.
-        // Then by interval size, so we get a good spread for bounds.
+        // Then by interval size, so lowest lower bound where more search has taken place is explored first.
         // Then by feature and interval start, for a deterministic ordering.
         a.cost_lower_bound
             .to_order()
             .cmp(&b.cost_lower_bound.to_order())
             .then(a.is_expanded().cmp(&b.is_expanded()).reverse())
-            .then(a.split_points.len().cmp(&b.split_points.len())) // TODO: reverse?
+            .then(a.split_points.len().cmp(&b.split_points.len()))
             .then(a.feature_rank.cmp(&b.feature_rank))
             .then(a.split_point.cmp(&b.split_point))
     }

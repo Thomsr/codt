@@ -7,10 +7,14 @@ use crate::{
     search::{
         solver_impl::SolverImpl,
         strategy::{
-            self,
             andor::AndOrSearchStrategy,
-            bfs::{BfsSearchStrategy, CuriosityHeuristic, LBSupportHeuristic},
+            bfs::{
+                BfsSearchStrategy, CuriosityHeuristic, LBSupportHeuristic,
+                LeastDiscrepancyHeuristic, RandomHeuristic,
+            },
             dfs::DfsSearchStrategy,
+            dfsprio::DfsPrioSearchStrategy,
+            random::RandomDfsSearchStrategy,
         },
     },
     tasks::OptimizationTask,
@@ -30,6 +34,12 @@ pub trait Solver<OT: OptimizationTask> {
     fn d0d1_lowerbound(&mut self, max_depth: u32) -> (OT::CostType, OT::CostType);
 }
 
+macro_rules! solver_impl_for {
+    ($task:ident, $dataview:ident, $strat:ty) => {
+        Box::new(SolverImpl::<OT, $strat>::new($task, $dataview))
+    };
+}
+
 pub fn solver_with_strategy<'a, OT: OptimizationTask + 'a>(
     task: OT,
     dataview: DataView<'a, OT>,
@@ -37,60 +47,61 @@ pub fn solver_with_strategy<'a, OT: OptimizationTask + 'a>(
 ) -> Box<dyn Solver<OT> + 'a> {
     match strategy {
         SearchStrategyEnum::AndOr => {
-            Box::new(SolverImpl::<OT, AndOrSearchStrategy>::new(task, dataview))
+            solver_impl_for!(task, dataview, AndOrSearchStrategy)
         }
         SearchStrategyEnum::Dfs => {
-            Box::new(SolverImpl::<OT, DfsSearchStrategy>::new(task, dataview))
+            solver_impl_for!(task, dataview, DfsSearchStrategy)
         }
         SearchStrategyEnum::DfsPrio => {
-            Box::new(SolverImpl::<OT, DfsSearchStrategy>::new(task, dataview))
+            solver_impl_for!(task, dataview, DfsPrioSearchStrategy)
         }
         SearchStrategyEnum::DfsRandom => {
-            Box::new(SolverImpl::<OT, DfsSearchStrategy>::new(task, dataview))
+            solver_impl_for!(task, dataview, RandomDfsSearchStrategy)
         }
-        SearchStrategyEnum::BfsLb => Box::new(SolverImpl::<
-            OT,
-            BfsSearchStrategy<LBSupportHeuristic<1, 0>>,
-        >::new(task, dataview)),
+        SearchStrategyEnum::BfsLb => {
+            solver_impl_for!(task, dataview, BfsSearchStrategy<LBSupportHeuristic<1, 0>>)
+        }
         SearchStrategyEnum::BfsCuriosity => {
-            Box::new(SolverImpl::<OT, BfsSearchStrategy<CuriosityHeuristic>>::new(task, dataview))
+            solver_impl_for!(task, dataview, BfsSearchStrategy<CuriosityHeuristic>)
         }
-        SearchStrategyEnum::BfsLbTiebreakSmall => Box::new(SolverImpl::<
-            OT,
-            BfsSearchStrategy<LBSupportHeuristic<100000, 1>>,
-        >::new(task, dataview)),
-        SearchStrategyEnum::BfsLbTiebreakBig => Box::new(SolverImpl::<
-            OT,
-            BfsSearchStrategy<LBSupportHeuristic<100000, -1>>,
-        >::new(task, dataview)),
-        SearchStrategyEnum::BfsSmall => Box::new(SolverImpl::<
-            OT,
-            BfsSearchStrategy<LBSupportHeuristic<0, 1>>,
-        >::new(task, dataview)),
-        SearchStrategyEnum::BfsBig => Box::new(SolverImpl::<
-            OT,
-            BfsSearchStrategy<LBSupportHeuristic<0, -1>>,
-        >::new(task, dataview)),
-        SearchStrategyEnum::BfsSmallTiebreakLb => Box::new(SolverImpl::<
-            OT,
-            BfsSearchStrategy<LBSupportHeuristic<1, 100000>>,
-        >::new(task, dataview)),
-        SearchStrategyEnum::BfsBigTiebreakLb => Box::new(SolverImpl::<
-            OT,
-            BfsSearchStrategy<LBSupportHeuristic<1, -100000>>,
-        >::new(task, dataview)),
-        SearchStrategyEnum::BfsBalanceSmallLb => Box::new(SolverImpl::<
-            OT,
-            BfsSearchStrategy<LBSupportHeuristic<1, 1>>,
-        >::new(task, dataview)),
-        SearchStrategyEnum::BfsBalanceBigLb => Box::new(SolverImpl::<
-            OT,
-            BfsSearchStrategy<LBSupportHeuristic<1, -1>>,
-        >::new(task, dataview)),
-        SearchStrategyEnum::BfsRandom => Box::new(SolverImpl::<
-            OT,
-            BfsSearchStrategy<strategy::bfs::RandomHeuristic>,
-        >::new(task, dataview)),
+        SearchStrategyEnum::BfsLbTiebreakSmall => solver_impl_for!(
+            task,
+            dataview,
+            BfsSearchStrategy<LBSupportHeuristic<100000, 1>>
+        ),
+        SearchStrategyEnum::BfsLbTiebreakBig => solver_impl_for!(
+            task,
+            dataview,
+            BfsSearchStrategy<LBSupportHeuristic<100000, -1>>
+        ),
+        SearchStrategyEnum::BfsSmall => {
+            solver_impl_for!(task, dataview, BfsSearchStrategy<LBSupportHeuristic<0, 1>>)
+        }
+        SearchStrategyEnum::BfsBig => {
+            solver_impl_for!(task, dataview, BfsSearchStrategy<LBSupportHeuristic<0, -1>>)
+        }
+        SearchStrategyEnum::BfsSmallTiebreakLb => solver_impl_for!(
+            task,
+            dataview,
+            BfsSearchStrategy<LBSupportHeuristic<1, 100000>>
+        ),
+        SearchStrategyEnum::BfsBigTiebreakLb => solver_impl_for!(
+            task,
+            dataview,
+            BfsSearchStrategy<LBSupportHeuristic<1, -100000>>
+        ),
+        SearchStrategyEnum::BfsBalanceSmallLb => {
+            solver_impl_for!(task, dataview, BfsSearchStrategy<LBSupportHeuristic<1, 1>>)
+        }
+        SearchStrategyEnum::BfsBalanceBigLb => {
+            solver_impl_for!(task, dataview, BfsSearchStrategy<LBSupportHeuristic<1, -1>>)
+        }
+        SearchStrategyEnum::BfsRandom => {
+            solver_impl_for!(task, dataview, BfsSearchStrategy<RandomHeuristic>)
+        }
+        SearchStrategyEnum::BfsLds => {
+            solver_impl_for!(task, dataview, BfsSearchStrategy<LeastDiscrepancyHeuristic>)
+        }
     }
 }
 
@@ -113,6 +124,7 @@ pub enum SearchStrategyEnum {
     BfsBalanceSmallLb,
     BfsBalanceBigLb, // This is the same heuristic as GOSDT
     BfsRandom,
+    BfsLds,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, EnumString, VariantNames, IntoStaticStr, Display)]

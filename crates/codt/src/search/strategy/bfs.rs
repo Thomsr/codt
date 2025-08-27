@@ -8,6 +8,7 @@ use crate::{
     tasks::OptimizationTask,
 };
 
+pub struct LeastDiscrepancyHeuristic;
 pub struct CuriosityHeuristic;
 pub struct RandomHeuristic;
 pub struct LBSupportHeuristic<const LB: i64 = 1, const SUPPORT: i64 = 1>;
@@ -17,12 +18,26 @@ pub struct HeuristicInfo {
     lb: f64,
     support: usize,
     random_value: u64,
+    discrepancies: i32,
 }
 
 pub trait BfsHeuristic {
     fn heuristic(info: HeuristicInfo) -> f64;
     fn generate_random_value() -> bool {
         false
+    }
+    fn should_greedily_split() -> bool {
+        false
+    }
+}
+
+impl BfsHeuristic for LeastDiscrepancyHeuristic {
+    fn heuristic(info: HeuristicInfo) -> f64 {
+        info.discrepancies as f64
+    }
+
+    fn should_greedily_split() -> bool {
+        true
     }
 }
 
@@ -60,6 +75,7 @@ impl<H: BfsHeuristic> SearchStrategy for BfsSearchStrategy<H> {
         a.lowest_descendant_heuristic()
             .partial_cmp(&b.lowest_descendant_heuristic())
             .expect("No NaN allowed in heuristic value")
+            .then(a.is_expanded().cmp(&b.is_expanded()).reverse())
             .then(a.feature_rank.cmp(&b.feature_rank))
             .then(a.split_point.cmp(&b.split_point))
     }
@@ -90,10 +106,15 @@ impl<H: BfsHeuristic> SearchStrategy for BfsSearchStrategy<H> {
             lb: lb_float,
             support: item.support,
             random_value: item.random_value,
+            discrepancies: item.discrepancies,
         })
     }
 
     fn generate_random_value() -> bool {
         H::generate_random_value()
+    }
+
+    fn should_greedily_split() -> bool {
+        H::should_greedily_split()
     }
 }

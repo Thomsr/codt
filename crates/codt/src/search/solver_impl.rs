@@ -50,7 +50,7 @@ impl<OT: OptimizationTask, SS: SearchStrategy> Solver<OT> for SolverImpl<'_, OT,
             _ss: PhantomData,
         };
 
-        let mut root: Node<'_, OT, SS> = Node::new(&context, dataview, options.max_depth);
+        let mut root: Node<'_, OT, SS> = Node::new(&context, dataview, options.max_depth, 0);
 
         let mut graph_expansions = 0;
 
@@ -170,15 +170,15 @@ impl<OT: OptimizationTask, SS: SearchStrategy> Solver<OT> for SolverImpl<'_, OT,
             _ss: PhantomData,
         };
 
-        let root: Node<'_, OT, SS> = Node::new(&context, dataview, max_depth);
+        let root: Node<'_, OT, SS> = Node::new(&context, dataview, max_depth, 0);
         let d0lb = root.cost_lower_bound;
 
         let mut d1lb = None;
         for feature_test in root.queue.iter() {
             for split_value in feature_test.split_points.clone() {
                 let (left, right) = root.dataview.split(feature_test.feature, split_value);
-                let left = Node::new(&context, left, max_depth - 1);
-                let right = Node::new(&context, right, max_depth - 1);
+                let left = Node::new(&context, left, max_depth - 1, 0);
+                let right = Node::new(&context, right, max_depth - 1, 0);
                 let lb = left.cost_lower_bound + right.cost_lower_bound;
                 if d1lb.is_none_or(|x| lb.strictly_less_than(&x)) {
                     d1lb = Some(lb);

@@ -146,6 +146,11 @@ impl<OT: OptimizationTask> Pruner<OT> {
     }
 
     pub fn closest_left_lb(&self, feature: usize, threshold: usize) -> (usize, OT::CostType) {
+        // We cannot compute threshold - 1 when it is zero since it is usize.
+        if threshold == 0 {
+            return (threshold, OT::CostType::ZERO);
+        }
+
         let lb_left = self.best_left_subtree_left_of[feature].find(threshold - 1);
         let lb_right = self.closest_right_subtree_left_of[feature].find(threshold - 1);
 
@@ -287,52 +292,52 @@ mod tests {
     }
 
     #[test]
-fn test_pruner_closest_left_lb_threshold() {
-    let mut pruner: Pruner<AccuracyTask> = Pruner::new(1);
-    // Insert left and right subtree bounds at different thresholds
-    pruner.insert_left_subtree(0, 3, 2.0.into());
-    pruner.insert_right_subtree(0, 5, 3.0.into());
-    pruner.insert_left_subtree(0, 7, 4.0.into());
-    pruner.insert_right_subtree(0, 8, 5.0.into());
+    fn test_pruner_closest_left_lb_threshold() {
+        let mut pruner: Pruner<AccuracyTask> = Pruner::new(1);
+        // Insert left and right subtree bounds at different thresholds
+        pruner.insert_left_subtree(0, 3, 2.0.into());
+        pruner.insert_right_subtree(0, 5, 3.0.into());
+        pruner.insert_left_subtree(0, 7, 4.0.into());
+        pruner.insert_right_subtree(0, 8, 5.0.into());
 
-    // Query for threshold 6: should find left at 3, right at 5, so threshold returned is 5
-    let (thresh, cost) = pruner.closest_left_lb(0, 6);
-    assert_eq!(thresh, 5);
-    assert_eq!(cost, (2.0 + 3.0).into());
+        // Query for threshold 6: should find left at 3, right at 5, so threshold returned is 5
+        let (thresh, cost) = pruner.closest_left_lb(0, 6);
+        assert_eq!(thresh, 5);
+        assert_eq!(cost, (2.0 + 3.0).into());
 
-    // Query for threshold 7: should find left at 7, right at 5, so threshold returned is 5
-    let (thresh, cost) = pruner.closest_left_lb(0, 8);
-    assert_eq!(thresh, 5);
-    assert_eq!(cost, (4.0 + 3.0).into());
+        // Query for threshold 7: should find left at 7, right at 5, so threshold returned is 5
+        let (thresh, cost) = pruner.closest_left_lb(0, 8);
+        assert_eq!(thresh, 5);
+        assert_eq!(cost, (4.0 + 3.0).into());
 
-    // Query for threshold 2: no left or right, should return threshold and zero
-    let (thresh, cost) = pruner.closest_left_lb(0, 2);
-    assert_eq!(thresh, 2);
-    assert_eq!(cost, 0.0.into());
-}
+        // Query for threshold 2: no left or right, should return threshold and zero
+        let (thresh, cost) = pruner.closest_left_lb(0, 2);
+        assert_eq!(thresh, 2);
+        assert_eq!(cost, 0.0.into());
+    }
 
-#[test]
-fn test_pruner_closest_right_lb_threshold() {
-    let mut pruner: Pruner<AccuracyTask> = Pruner::new(1);
-    // Insert left and right subtree bounds at different thresholds
-    pruner.insert_left_subtree(0, 2, 2.0.into());
-    pruner.insert_right_subtree(0, 4, 3.0.into());
-    pruner.insert_left_subtree(0, 6, 4.0.into());
-    pruner.insert_right_subtree(0, 9, 5.0.into());
+    #[test]
+    fn test_pruner_closest_right_lb_threshold() {
+        let mut pruner: Pruner<AccuracyTask> = Pruner::new(1);
+        // Insert left and right subtree bounds at different thresholds
+        pruner.insert_left_subtree(0, 2, 2.0.into());
+        pruner.insert_right_subtree(0, 4, 3.0.into());
+        pruner.insert_left_subtree(0, 6, 4.0.into());
+        pruner.insert_right_subtree(0, 9, 5.0.into());
 
-    // Query for threshold 3: should find closest left at 6, best right at 9, so threshold returned is 6
-    let (thresh, cost) = pruner.closest_right_lb(0, 2);
-    assert_eq!(thresh, 6);
-    assert_eq!(cost, (4.0 + 5.0).into());
+        // Query for threshold 3: should find closest left at 6, best right at 9, so threshold returned is 6
+        let (thresh, cost) = pruner.closest_right_lb(0, 2);
+        assert_eq!(thresh, 6);
+        assert_eq!(cost, (4.0 + 5.0).into());
 
-    // Query for threshold 8: should find closest left at 6, best right at 9, so threshold returned is 6
-    let (thresh, cost) = pruner.closest_right_lb(0, 5);
-    assert_eq!(thresh, 6);
-    assert_eq!(cost, (4.0 + 5.0).into());
+        // Query for threshold 8: should find closest left at 6, best right at 9, so threshold returned is 6
+        let (thresh, cost) = pruner.closest_right_lb(0, 5);
+        assert_eq!(thresh, 6);
+        assert_eq!(cost, (4.0 + 5.0).into());
 
-    // Query for threshold 20: no left, should return threshold and zero
-    let (thresh, cost) = pruner.closest_right_lb(0, 8);
-    assert_eq!(thresh, 8);
-    assert_eq!(cost, 0.0.into());
-}
+        // Query for threshold 20: no left, should return threshold and zero
+        let (thresh, cost) = pruner.closest_right_lb(0, 8);
+        assert_eq!(thresh, 8);
+        assert_eq!(cost, 0.0.into());
+    }
 }

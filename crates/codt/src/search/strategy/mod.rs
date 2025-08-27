@@ -39,4 +39,8 @@ pub trait SearchStrategy {
     fn generate_random_value() -> bool {
         false // Only used for random search strategies. Generation of random values introduces small slowdown, so make it conditional.
     }
+
+    fn should_greedily_split() -> bool {
+        false // Only used for least discrepancy search, where we want to do the first spit at the heuristically best point.
+    }
 }

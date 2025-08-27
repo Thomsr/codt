@@ -44,6 +44,26 @@ impl<OT: OptimizationTask, SS: SearchStrategy> ExpandedQueueItem<'_, OT, SS> {
         }
     }
 
+    fn upper_bound_left(&self) -> OT::CostType {
+        match self {
+            Self::Children(children) => children[0].cost_upper_bound,
+            Self::Solution(tree) => match (*tree).as_ref() {
+                Tree::Branch(branch) => branch.left_child.cost(),
+                _ => unreachable!(),
+            },
+        }
+    }
+
+    fn upper_bound_right(&self) -> OT::CostType {
+        match self {
+            Self::Children(children) => children[1].cost_upper_bound,
+            Self::Solution(tree) => match (*tree).as_ref() {
+                Tree::Branch(branch) => branch.right_child.cost(),
+                _ => unreachable!(),
+            },
+        }
+    }
+
     fn upper_bound(&self, context: &SolveContext<'_, OT, SS>) -> OT::CostType {
         match self {
             Self::Children(children) => {
@@ -90,6 +110,10 @@ pub struct FeatureTest<'a, OT: OptimizationTask, SS: SearchStrategy> {
     /// The rank of the feature based on the greedy heuristic value, used by some search strategies to prioritize items.
     pub feature_rank: i32,
 
+    /// The number of discrepancies from the heuristically best solution.
+    /// This is the discrepancies of the parent + feature_rank + the number of subdivisions this interval has gone through.
+    pub discrepancies: i32,
+
     _ss: PhantomData<SS>,
 }
 
@@ -135,6 +159,7 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> FeatureTest<'a, OT, SS> {
         split_point: usize,
         support: usize,
         feature_rank: i32,
+        discrepancies: i32,
     ) -> Self {
         Self {
             cost_lower_bound: context.task.branching_cost(),
@@ -149,6 +174,7 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> FeatureTest<'a, OT, SS> {
                 0
             },
             feature_rank,
+            discrepancies: discrepancies + feature_rank,
             _ss: PhantomData,
         }
     }
@@ -174,6 +200,7 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> FeatureTest<'a, OT, SS> {
                     0
                 },
                 feature_rank: self.feature_rank,
+                discrepancies: self.discrepancies + 1,
                 _ss: PhantomData,
             })
         }
@@ -191,6 +218,7 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> FeatureTest<'a, OT, SS> {
                     0
                 },
                 feature_rank: self.feature_rank,
+                discrepancies: self.discrepancies + 1,
                 _ss: PhantomData,
             })
         }
@@ -289,10 +317,20 @@ pub struct Node<'a, OT: OptimizationTask, SS: SearchStrategy> {
     pub best: Arc<Tree<OT>>,
     /// Keeps track of found lower bounds for pruning similar items
     pruner: Pruner<OT>,
+    /// The threshold range we are still interested in per feature. Initially the full range, but shrunk when a zero solution is found.
+    pub interesting_solutions_range: Vec<Range<usize>>,
 }
 
 impl<'a, OT: OptimizationTask, SS: SearchStrategy> Node<'a, OT, SS> {
-    pub fn new(context: &SolveContext<OT, SS>, dataview: DataView<'a, OT>, max_depth: u32) -> Self {
+    pub fn new(
+        context: &SolveContext<OT, SS>,
+        dataview: DataView<'a, OT>,
+        max_depth: u32,
+        discrepancies: i32,
+    ) -> Self {
+        // Replaced by full range if we are actually searching
+        let mut interesting_solutions_range = vec![0..0; dataview.num_features()];
+
         if max_depth == 2 && context.terminal_solver == TerminalSolver::D2 {
             // If we are at depth 2, we can solve the node exhaustively.
             let tree = solve_d2(&dataview, context);
@@ -306,6 +344,7 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> Node<'a, OT, SS> {
                 dataview,
                 queue: BinaryHeapQueue::default(),
                 best: tree,
+                interesting_solutions_range,
             };
         } else if max_depth == 1 && context.terminal_solver == TerminalSolver::D1 {
             // If we are at depth 1, we can solve the node exhaustively.
@@ -320,6 +359,7 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> Node<'a, OT, SS> {
                 dataview,
                 queue: BinaryHeapQueue::default(),
                 best: tree,
+                interesting_solutions_range,
             };
         }
 
@@ -331,17 +371,33 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> Node<'a, OT, SS> {
             && context.task.branching_cost().strictly_less_than(&ub)
             && dataview.num_instances() > 1
         {
-            for feature in 0..dataview.num_features() {
+            for (feature, interesting_solutions_range) in
+                interesting_solutions_range.iter_mut().enumerate()
+            {
                 let n_splitpoints = dataview.possible_split_values[feature].len();
+                *interesting_solutions_range = 0..n_splitpoints;
                 if n_splitpoints > 0 {
-                    queue.push(FeatureTest::new(
+                    let mut feature_test = FeatureTest::new(
                         context,
                         feature,
                         0..n_splitpoints,
                         n_splitpoints / 2,
                         dataview.num_instances(),
                         dataview.feature_ranking[feature],
-                    ));
+                        discrepancies,
+                    );
+                    if SS::should_greedily_split() {
+                        feature_test.split_point =
+                            dataview.best_greedy_splits[feature].split_value_index;
+                        let (left, right) = feature_test.split_off();
+                        if let Some(left) = left {
+                            queue.push(left);
+                        }
+                        if let Some(right) = right {
+                            queue.push(right);
+                        }
+                    }
+                    queue.push(feature_test);
                 }
             }
         }
@@ -375,6 +431,7 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> Node<'a, OT, SS> {
             })),
             dataview,
             queue,
+            interesting_solutions_range,
         }
     }
 
@@ -387,20 +444,6 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> Node<'a, OT, SS> {
                 .cost_lower_bound
                 .strictly_greater_than(&self.cost_upper_bound)
             || self.queue.is_empty() // When the queue is empty before best == lower, then lower == upper and lower < best.
-    }
-
-    fn split(
-        &self,
-        context: &SolveContext<OT, SS>,
-        feature: usize,
-        split: usize,
-    ) -> ExpandedQueueItem<'a, OT, SS> {
-        let (left_view, right_view) = self.dataview.split(feature, split);
-
-        let left = Self::new(context, left_view, self.remaining_depth_budget - 1);
-        let right = Self::new(context, right_view, self.remaining_depth_budget - 1);
-
-        ExpandedQueueItem::Children([left, right])
     }
 
     // Get the worst cost of the instances with feature value in the range.
@@ -506,6 +549,16 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> Node<'a, OT, SS> {
             !leeway_right
                 .strictly_greater_than(&self.worst_cost_in_range(item.feature, x..closest_right))
         });
+
+        // Shrink the interval based on the interesting points
+        item.split_points.start = item
+            .split_points
+            .start
+            .max(self.interesting_solutions_range[item.feature].start);
+        item.split_points.end = item
+            .split_points
+            .end
+            .min(self.interesting_solutions_range[item.feature].end);
     }
 
     fn recalculate_item_bounds(
@@ -560,6 +613,25 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> Node<'a, OT, SS> {
             item.split_point,
             expanded.lower_bound_right(),
         );
+
+        if expanded
+            .upper_bound_left()
+            .less_or_not_much_greater_than(&OT::CostType::ZERO)
+        {
+            self.interesting_solutions_range[item.feature].start = self.interesting_solutions_range
+                [item.feature]
+                .start
+                .max(item.split_point);
+        }
+        if expanded
+            .upper_bound_right()
+            .less_or_not_much_greater_than(&OT::CostType::ZERO)
+        {
+            self.interesting_solutions_range[item.feature].end = self.interesting_solutions_range
+                [item.feature]
+                .end
+                .min(item.split_point + 1);
+        }
 
         // Update our upper bound based on the upper bound of this item.
         let ub = expanded.upper_bound(context);
@@ -716,7 +788,22 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> Node<'a, OT, SS> {
         {
             solve_left_right(&self.dataview, context, item.feature, item.split_point)
         } else {
-            self.split(context, item.feature, item.split_point)
+            let (left_view, right_view) = self.dataview.split(item.feature, item.split_point);
+
+            let left = Self::new(
+                context,
+                left_view,
+                self.remaining_depth_budget - 1,
+                item.discrepancies,
+            );
+            let right = Self::new(
+                context,
+                right_view,
+                self.remaining_depth_budget - 1,
+                item.discrepancies,
+            );
+
+            ExpandedQueueItem::Children([left, right])
         };
         item.expanded = Some(expanded);
     }
