@@ -24,8 +24,8 @@ codt-py = { path = "crates/codt-py" }
 clap = { version = "4.5.23", features = ["derive"] }
 env_logger = "0.11.6"
 log = "0.4.22"
-pyo3 = "0.24.1"
-numpy = "0.24.0"
+pyo3 = "0.27.2"
+numpy = "0.27.1"
 rustc-hash = "2.1.1"
 ckmeans = { git = "https://github.com/mimvdb/ckmeans", rev = "ce54c86" }
 strum = "0.27.1"
