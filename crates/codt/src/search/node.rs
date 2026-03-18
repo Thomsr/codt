@@ -307,8 +307,6 @@ pub struct Node<'a, OT: OptimizationTask, SS: SearchStrategy> {
     /// descendant of this node (including the node itself). This value
     /// is used to emulate a global queue for some heuristic selection methods.
     pub lowest_descendant_heuristic: f64,
-    /// The remaining depth for the tree rooted at this node.
-    pub remaining_depth_budget: u32,
     /// The view of the dataset containing each remaining instance.
     pub dataview: DataView<'a, OT>,
     /// The remaining candidate children for an optimal solution.
@@ -319,56 +317,26 @@ pub struct Node<'a, OT: OptimizationTask, SS: SearchStrategy> {
     pruner: Pruner<OT>,
     /// The threshold range we are still interested in per feature. Initially the full range, but shrunk when a zero solution is found.
     pub interesting_solutions_range: Vec<Range<usize>>,
+
+    /// The current number of decision nodes we have used.
+    pub size: u32,
 }
 
 impl<'a, OT: OptimizationTask, SS: SearchStrategy> Node<'a, OT, SS> {
     pub fn new(
         context: &SolveContext<OT, SS>,
         dataview: DataView<'a, OT>,
-        max_depth: u32,
+        size: u32,
         discrepancies: i32,
     ) -> Self {
         // Replaced by full range if we are actually searching
         let mut interesting_solutions_range = vec![0..0; dataview.num_features()];
 
-        if max_depth == 2 && context.terminal_solver == TerminalSolver::D2 {
-            // If we are at depth 2, we can solve the node exhaustively.
-            let tree = solve_d2(&dataview, context);
-            let cost = tree.cost();
-            return Node {
-                cost_upper_bound: cost,
-                cost_lower_bound: cost,
-                lowest_descendant_heuristic: f64::MAX,
-                remaining_depth_budget: max_depth,
-                pruner: Pruner::new(dataview.num_features()),
-                dataview,
-                queue: BinaryHeapQueue::default(),
-                best: tree,
-                interesting_solutions_range,
-            };
-        } else if max_depth == 1 && context.terminal_solver == TerminalSolver::D1 {
-            // If we are at depth 1, we can solve the node exhaustively.
-            let tree = solve_d1(&dataview, context);
-            let cost = tree.cost();
-            return Node {
-                cost_upper_bound: cost,
-                cost_lower_bound: cost,
-                lowest_descendant_heuristic: f64::MAX,
-                remaining_depth_budget: max_depth,
-                pruner: Pruner::new(dataview.num_features()),
-                dataview,
-                queue: BinaryHeapQueue::default(),
-                best: tree,
-                interesting_solutions_range,
-            };
-        }
-
         let ub = dataview.cost_summer.cost();
 
         let mut queue = BinaryHeapQueue::default();
 
-        if max_depth > 0
-            && context.task.branching_cost().strictly_less_than(&ub)
+        if  context.task.branching_cost().strictly_less_than(&ub)
             && dataview.num_instances() > 1
         {
             for (feature, interesting_solutions_range) in
@@ -402,20 +370,7 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> Node<'a, OT, SS> {
             }
         }
 
-        let lb = if queue.is_empty() {
-            ub
-        } else {
-            // We know that the cost is at least the branching cost (otherwise the queue is empty).
-            let mut lb = context.task.branching_cost();
-
-            if context.branch_relaxation.should_compute() {
-                OT::update_lowerbound(
-                    &mut lb,
-                    &context.task.branch_relaxation(&dataview, max_depth),
-                );
-            }
-            lb
-        };
+        let lb = ub;
 
         Node {
             cost_upper_bound: ub,
@@ -423,7 +378,6 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> Node<'a, OT, SS> {
             lowest_descendant_heuristic: queue
                 .peek()
                 .map_or(f64::MAX, |item| item.lowest_descendant_heuristic()),
-            remaining_depth_budget: max_depth,
             pruner: Pruner::new(dataview.num_features()),
             best: Arc::new(Tree::Leaf(LeafNode {
                 cost: ub,
@@ -432,6 +386,7 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> Node<'a, OT, SS> {
             dataview,
             queue,
             interesting_solutions_range,
+            size: size,
         }
     }
 
@@ -757,7 +712,6 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> Node<'a, OT, SS> {
     /// Expand an item from the queue one level by selecting a concrete split and instantiating its children.
     pub fn expand(&mut self, context: &SolveContext<OT, SS>, item: &mut FeatureTest<'a, OT, SS>) {
         assert!(!item.is_expanded());
-        assert!(self.remaining_depth_budget > 0);
 
         // TODO: could find better split point here?
         // get rs = right solution
@@ -782,29 +736,23 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> Node<'a, OT, SS> {
         if let Some(right_item) = right_item {
             self.queue.push(right_item);
         }
+    
+        let (left_view, right_view) = self.dataview.split(item.feature, item.split_point);
 
-        let expanded = if self.remaining_depth_budget == 2
-            && context.terminal_solver == TerminalSolver::LeftRight
-        {
-            solve_left_right(&self.dataview, context, item.feature, item.split_point)
-        } else {
-            let (left_view, right_view) = self.dataview.split(item.feature, item.split_point);
+        let left = Self::new(
+            context,
+            left_view,
+            self.size + 1,
+            item.discrepancies,
+        );
+        let right = Self::new(
+            context,
+            right_view,
+            self.size + 1,
+            item.discrepancies,
+        );
 
-            let left = Self::new(
-                context,
-                left_view,
-                self.remaining_depth_budget - 1,
-                item.discrepancies,
-            );
-            let right = Self::new(
-                context,
-                right_view,
-                self.remaining_depth_budget - 1,
-                item.discrepancies,
-            );
-
-            ExpandedQueueItem::Children([left, right])
-        };
+        let expanded = ExpandedQueueItem::Children([left, right]);
         item.expanded = Some(expanded);
     }
 }

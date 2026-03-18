@@ -40,6 +40,39 @@ impl<OT: OptimizationTask> Tree<OT> {
             Self::Leaf(leaf) => leaf.label,
         }
     }
+
+    /// Returns an ASCII tree view that is easier to read than the compact bracket format.
+    pub fn pretty(&self) -> String {
+        fn render<OT: OptimizationTask>(node: &Tree<OT>, prefix: &str, out: &mut String) {
+            match node {
+                Tree::Leaf(leaf) => {
+                    out.push_str(prefix);
+                    out.push_str(&format!("leaf: {}\n", leaf.label));
+                }
+                Tree::Branch(branch) => {
+                    out.push_str(prefix);
+                    out.push_str(&format!(
+                        "[x{} <= {}]\n",
+                        branch.split_feature, branch.split_threshold
+                    ));
+
+                    out.push_str(prefix);
+                    out.push_str("|- yes\n");
+                    let left_prefix = format!("{}|  ", prefix);
+                    render(branch.left_child.as_ref(), &left_prefix, out);
+
+                    out.push_str(prefix);
+                    out.push_str("'- no\n");
+                    let right_prefix = format!("{}   ", prefix);
+                    render(branch.right_child.as_ref(), &right_prefix, out);
+                }
+            }
+        }
+
+        let mut out = String::new();
+        render(self, "", &mut out);
+        out
+    }
 }
 
 pub struct BranchNode<OT: OptimizationTask> {

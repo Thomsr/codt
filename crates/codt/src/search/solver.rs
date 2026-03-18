@@ -5,6 +5,7 @@ use strum_macros::{Display, EnumString, IntoStaticStr, VariantNames};
 use crate::{
     model::{dataview::DataView, tree::Tree},
     search::{
+        perfect_solver::PerfectSolverImpl,
         solver_impl::SolverImpl,
         strategy::{
             andor::AndOrSearchStrategy,
@@ -46,6 +47,7 @@ pub fn solver_with_strategy<'a, OT: OptimizationTask + 'a>(
     strategy: SearchStrategyEnum,
 ) -> Box<dyn Solver<OT> + 'a> {
     match strategy {
+        SearchStrategyEnum::Perfect => Box::new(PerfectSolverImpl::<OT>::new(task, dataview)),
         SearchStrategyEnum::AndOr => {
             solver_impl_for!(task, dataview, AndOrSearchStrategy)
         }
@@ -109,6 +111,8 @@ pub fn solver_with_strategy<'a, OT: OptimizationTask + 'a>(
 #[derive(Debug, Clone, Copy, PartialEq, Eq, EnumString, VariantNames, IntoStaticStr, Display)]
 #[strum(serialize_all = "kebab-case")]
 pub enum SearchStrategyEnum {
+    /// Exhaustive exact solver without pruning bounds.
+    Perfect,
     AndOr,
     Dfs,
     DfsPrio,

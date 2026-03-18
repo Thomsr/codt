@@ -45,6 +45,7 @@ fn run_solver_for_task<T: OptimizationTask>(
     );
     info!("Graph expansions: {}", result.graph_expansions);
     info!("Tree: {}", result.tree);
+    info!("Tree (visual):\n{}", result.tree.pretty());
     println!("{}", result.cost_str);
 }
 
