@@ -5,7 +5,7 @@ use std::{
 
 use codt::{
     model::{dataset::DataSet, dataview::DataView},
-    search::solver::{SearchStrategyEnum, SolverOptions, solver_with_strategy},
+    search::solver::{SearchStrategyEnum, SolverOptions, SolverEnum, solver_with_strategy},
     tasks::{OptimizationTask, accuracy::AccuracyTask, squared_error::SquaredErrorTask},
 };
 use file_reader::read_from_file;
@@ -21,6 +21,7 @@ fn run_solver_for_task<T: OptimizationTask>(
     options: SolverOptions,
     task: T,
     strategy: SearchStrategyEnum,
+    solver: SolverEnum,
 ) {
     info!("Starting solve with options:\n{:?}\n", options);
 
@@ -32,7 +33,7 @@ fn run_solver_for_task<T: OptimizationTask>(
     let before_solve = Instant::now();
     T::preprocess_dataset(&mut dataset);
     let full_view = DataView::from_dataset(&dataset);
-    let mut solver = solver_with_strategy(task, full_view, strategy);
+    let mut solver = solver_with_strategy(task, full_view, strategy, solver);
     let result = solver.solve(options);
 
     let solve_time = before_solve.elapsed().as_secs_f64();
@@ -73,11 +74,11 @@ fn main() {
     match args.task {
         OptimizationTaskEnum::Accuracy(params) => {
             let task = AccuracyTask::new(params.complexity_cost);
-            run_solver_for_task(&args.file, options, task, args.strategy);
+            run_solver_for_task(&args.file, options, task, args.strategy, args.solver);
         }
         OptimizationTaskEnum::SquaredError(params) => {
             let task = SquaredErrorTask::new(params.complexity_cost);
-            run_solver_for_task(&args.file, options, task, args.strategy);
+            run_solver_for_task(&args.file, options, task, args.strategy, args.solver);
         }
     }
 }

@@ -11,7 +11,7 @@ use crate::{
         dataview,
         tree::{BranchNode, LeafNode, Tree},
     },
-    search::{node::ExpandedQueueItem, solver_impl::SolveContext, strategy::SearchStrategy},
+    search::{node::ExpandedQueueItem, solvers::{optimal_solver::SolveContext}, strategy::SearchStrategy},
     tasks::{Cost, CostSum, OptimizationTask},
 };
 

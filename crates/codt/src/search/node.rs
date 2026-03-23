@@ -12,7 +12,7 @@ use crate::{
         pruner::Pruner,
         queue::{BinaryHeapQueue, PQ},
         solver::{TerminalSolver, UpperboundStrategy},
-        solver_impl::SolveContext,
+        solver::optimal_solver::SolveContext,
         strategy::SearchStrategy,
     },
     tasks::{Cost, CostSum, OptimizationTask},
@@ -318,8 +318,6 @@ pub struct Node<'a, OT: OptimizationTask, SS: SearchStrategy> {
     /// The threshold range we are still interested in per feature. Initially the full range, but shrunk when a zero solution is found.
     pub interesting_solutions_range: Vec<Range<usize>>,
 
-    /// The current number of decision nodes we have used.
-    pub size: u32,
 }
 
 impl<'a, OT: OptimizationTask, SS: SearchStrategy> Node<'a, OT, SS> {
@@ -386,7 +384,6 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> Node<'a, OT, SS> {
             dataview,
             queue,
             interesting_solutions_range,
-            size: size,
         }
     }
 
@@ -394,7 +391,7 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> Node<'a, OT, SS> {
     /// or that this node is not part of the optimal solution (lower bound > upper bound).
     pub fn is_complete(&self) -> bool {
         self.cost_lower_bound
-            .greater_or_not_much_less_than(&self.best.cost())
+            .is_zero()
             || self
                 .cost_lower_bound
                 .strictly_greater_than(&self.cost_upper_bound)

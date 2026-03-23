@@ -2,7 +2,7 @@ use std::path::PathBuf;
 
 use clap::{ArgAction, Args, Parser, Subcommand, value_parser};
 use codt::search::solver::{
-    BranchRelaxation, SearchStrategyEnum, TerminalSolver, UpperboundStrategy,
+    BranchRelaxation, SearchStrategyEnum, SolverEnum, TerminalSolver, UpperboundStrategy
 };
 
 use crate::clap_enum_variants;
@@ -59,6 +59,10 @@ pub struct CliParams {
     /// The search strategy to use.
     #[arg(short, long, value_parser=clap_enum_variants!(SearchStrategyEnum), default_value_t=SearchStrategyEnum::BfsBalanceSmallLb)]
     pub strategy: SearchStrategyEnum,
+
+    /// The solver strategy to use.
+    #[arg(long, value_parser=clap_enum_variants!(SolverEnum), default_value_t=SolverEnum::Optimal)]
+    pub solver: SolverEnum,
 
     /// The task to optimize.
     #[command(subcommand)]

@@ -21,7 +21,7 @@ use crate::{
     tasks::{Cost, OptimizationTask},
 };
 
-pub struct SolverImpl<'a, OT: OptimizationTask, SS: SearchStrategy> {
+pub struct OptimalSolverImpl<'a, OT: OptimizationTask, SS: SearchStrategy> {
     task: OT,
     /// Dataview for which the solver finds an optimal decision tree. None during search.
     dataview: Option<DataView<'a, OT>>,
@@ -36,7 +36,7 @@ pub struct SolveContext<'a, OT: OptimizationTask, SS: SearchStrategy> {
     _ss: PhantomData<SS>,
 }
 
-impl<OT: OptimizationTask, SS: SearchStrategy> Solver<OT> for SolverImpl<'_, OT, SS> {
+impl<OT: OptimizationTask, SS: SearchStrategy> Solver<OT> for OptimalSolverImpl<'_, OT, SS> {
     fn solve(&mut self, options: SolverOptions) -> SolveResult<OT> {
         let mut dataview = self.dataview.take().unwrap();
 
@@ -156,44 +156,9 @@ impl<OT: OptimizationTask, SS: SearchStrategy> Solver<OT> for SolverImpl<'_, OT,
             memory_usage_bytes,
         }
     }
-
-    fn d0d1_lowerbound(&mut self, max_depth: u32) -> (OT::CostType, OT::CostType) {
-        let mut dataview = self.dataview.take().unwrap();
-
-        self.task.prepare_for_data(&mut dataview);
-
-        let context = SolveContext {
-            task: &self.task,
-            ub_strategy: UpperboundStrategy::ForRemainingInterval,
-            terminal_solver: TerminalSolver::Leaf,
-            branch_relaxation: BranchRelaxation::Lowerbound,
-            _ss: PhantomData,
-        };
-
-        let root: Node<'_, OT, SS> = Node::new(&context, dataview, max_depth, 0);
-        let d0lb = root.cost_lower_bound;
-
-        let mut d1lb = None;
-        for feature_test in root.queue.iter() {
-            for split_value in feature_test.split_points.clone() {
-                let (left, right) = root.dataview.split(feature_test.feature, split_value);
-                let left = Node::new(&context, left, max_depth - 1, 0);
-                let right = Node::new(&context, right, max_depth - 1, 0);
-                let lb = left.cost_lower_bound + right.cost_lower_bound;
-                if d1lb.is_none_or(|x| lb.strictly_less_than(&x)) {
-                    d1lb = Some(lb);
-                }
-            }
-        }
-
-        // Take back ownership of the dataset.
-        self.dataview = Some(root.dataview);
-
-        (d0lb, d1lb.unwrap())
-    }
 }
 
-impl<'a, OT: OptimizationTask, SS: SearchStrategy> SolverImpl<'a, OT, SS> {
+impl<'a, OT: OptimizationTask, SS: SearchStrategy> OptimalSolverImpl<'a, OT, SS> {
     pub fn new(task: OT, dataview: DataView<'a, OT>) -> Self {
         Self {
             task,
