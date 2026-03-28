@@ -66,7 +66,6 @@ fn main() {
         memory_limit: Some(args.memory_limit),
         timeout: Some(Duration::from_secs(args.timeout)),
         track_intermediates: args.intermediates,
-        branch_relaxation: args.branch_relaxation,
     };
 
     match args.task {

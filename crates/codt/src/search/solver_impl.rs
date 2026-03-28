@@ -13,7 +13,7 @@ use crate::{
         node::Node,
         queue::PQ,
         solver::{
-            BranchRelaxation, SolveResult, Solver, SolverOptions, TerminalSolver,
+         SolveResult, Solver, SolverOptions,
             UpperboundStrategy,
         },
         strategy::SearchStrategy,
@@ -31,8 +31,6 @@ pub struct SolverImpl<'a, OT: OptimizationTask, SS: SearchStrategy> {
 pub struct SolveContext<'a, OT: OptimizationTask, SS: SearchStrategy> {
     pub task: &'a OT,
     pub ub_strategy: UpperboundStrategy,
-    pub terminal_solver: TerminalSolver,
-    pub branch_relaxation: BranchRelaxation,
     _ss: PhantomData<SS>,
 }
 
@@ -45,12 +43,10 @@ impl<OT: OptimizationTask, SS: SearchStrategy> Solver<OT> for SolverImpl<'_, OT,
         let context = SolveContext {
             task: &self.task,
             ub_strategy: options.ub_strategy,
-            terminal_solver: options.terminal_solver,
-            branch_relaxation: options.branch_relaxation,
             _ss: PhantomData,
         };
 
-        let mut root: Node<'_, OT, SS> = Node::new(&context, dataview, options.max_depth, 0);
+        let mut root: Node<'_, OT, SS> = Node::new(&context, dataview, 0);
 
         let mut graph_expansions = 0;
 
@@ -157,7 +153,7 @@ impl<OT: OptimizationTask, SS: SearchStrategy> Solver<OT> for SolverImpl<'_, OT,
         }
     }
 
-    fn d0d1_lowerbound(&mut self, max_depth: u32) -> (OT::CostType, OT::CostType) {
+    fn d0d1_lowerbound(&mut self) -> (OT::CostType, OT::CostType) {
         let mut dataview = self.dataview.take().unwrap();
 
         self.task.prepare_for_data(&mut dataview);
@@ -165,20 +161,18 @@ impl<OT: OptimizationTask, SS: SearchStrategy> Solver<OT> for SolverImpl<'_, OT,
         let context = SolveContext {
             task: &self.task,
             ub_strategy: UpperboundStrategy::ForRemainingInterval,
-            terminal_solver: TerminalSolver::Leaf,
-            branch_relaxation: BranchRelaxation::Lowerbound,
             _ss: PhantomData,
         };
 
-        let root: Node<'_, OT, SS> = Node::new(&context, dataview, max_depth, 0);
+        let root: Node<'_, OT, SS> = Node::new(&context, dataview, 0);
         let d0lb = root.cost_lower_bound;
 
         let mut d1lb = None;
         for feature_test in root.queue.iter() {
             for split_value in feature_test.split_points.clone() {
                 let (left, right) = root.dataview.split(feature_test.feature, split_value);
-                let left = Node::new(&context, left, max_depth - 1, 0);
-                let right = Node::new(&context, right, max_depth - 1, 0);
+                let left = Node::new(&context, left, 0);
+                let right = Node::new(&context, right, 0);
                 let lb = left.cost_lower_bound + right.cost_lower_bound;
                 if d1lb.is_none_or(|x| lb.strictly_less_than(&x)) {
                     d1lb = Some(lb);

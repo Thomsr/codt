@@ -2,7 +2,7 @@ use std::path::PathBuf;
 
 use clap::{ArgAction, Args, Parser, Subcommand, value_parser};
 use codt::search::solver::{
-    BranchRelaxation, SearchStrategyEnum, TerminalSolver, UpperboundStrategy,
+    SearchStrategyEnum, TerminalSolver, UpperboundStrategy,
 };
 
 use crate::clap_enum_variants;
@@ -47,10 +47,6 @@ pub struct CliParams {
 
     #[arg(long, value_enum, default_value = "left-right")]
     pub terminal_solver: TerminalSolver,
-
-    /// Determines if the solver should use an immediate lowerbound for a node (e.g. kmeans for regression).
-    #[arg(long, value_enum, default_value = "lowerbound")]
-    pub branch_relaxation: BranchRelaxation,
 
     /// Determines if the solver should track intermediate solutions.
     #[arg(long, action=ArgAction::Set, default_value_t=false)]
