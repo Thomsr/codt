@@ -6,24 +6,18 @@ use crate::{
         dataview::{DataView, FeatureValue},
         instance::LabeledInstance,
     },
-    tasks::{CostSum, FloatCost, OptimizationTask},
+    tasks::{CostSum, LexicographicCost, OptimizationTask},
 };
 
 #[derive(Clone)]
 pub struct AccuracyTask {
     dataset_size: usize,
-    num_labels: i32,
-    branching_cost: f64,
-    complexity_cost: f64,
 }
 
 impl AccuracyTask {
-    pub fn new(complexity_cost: f64) -> Self {
+    pub fn new() -> Self {
         Self {
             dataset_size: 0,
-            num_labels: 0,
-            branching_cost: 0.0,
-            complexity_cost,
         }
     }
 }
@@ -96,7 +90,7 @@ impl AddAssign<&LabeledInstance<i32>> for AccuracyCostSum {
     }
 }
 
-impl CostSum<i32, LabeledInstance<i32>, FloatCost> for AccuracyCostSum {
+impl CostSum<i32, LabeledInstance<i32>, LexicographicCost> for AccuracyCostSum {
     fn label(&self) -> i32 {
         self.instance_count_per_class
             .iter()
@@ -106,7 +100,7 @@ impl CostSum<i32, LabeledInstance<i32>, FloatCost> for AccuracyCostSum {
             .expect("Expected at least one class") as i32
     }
 
-    fn cost(&self) -> FloatCost {
+    fn cost(&self) -> LexicographicCost {
         let (total, largest_class_size) = self
             .instance_count_per_class
             .iter()
@@ -114,7 +108,7 @@ impl CostSum<i32, LabeledInstance<i32>, FloatCost> for AccuracyCostSum {
                 (acc_total + *e, acc_max.max(*e))
             });
 
-        FloatCost((total - largest_class_size) as f64)
+        LexicographicCost::new((total - largest_class_size) as i64, 0)
     }
 
     fn clear(&mut self) {
@@ -127,24 +121,19 @@ impl CostSum<i32, LabeledInstance<i32>, FloatCost> for AccuracyCostSum {
 impl OptimizationTask for AccuracyTask {
     type LabelType = i32;
     type InstanceType = LabeledInstance<i32>;
-    type CostType = FloatCost;
+    type CostType = LexicographicCost;
     type CostSumType = AccuracyCostSum;
     type ExtraDataviewData = ();
 
     fn prepare_for_data(&mut self, dataview: &mut DataView<Self>) {
         self.dataset_size = dataview.num_instances();
-        self.num_labels = 0;
-        for instance in &dataview.dataset.instances {
-            self.num_labels = self.num_labels.max(instance.label + 1);
-        }
-        self.branching_cost = self.complexity_cost * dataview.num_instances() as f64
     }
 
     fn print_cost(&mut self, cost: &Self::CostType) -> String {
+        let accuracy = (1.0 - cost.primary as f64 / self.dataset_size as f64) * 100.0;
         format!(
-            "Misclassifications: {}. Accuracy: {}%. (Only accurate when complexity cost is zero)",
-            cost,
-            (1.0 - cost.0 / self.dataset_size as f64) * 100.0
+            "Misclassifications: {}. Branch nodes: {}. Accuracy: {}%.",
+            cost.primary, cost.secondary, accuracy
         )
     }
 
@@ -160,7 +149,14 @@ impl OptimizationTask for AccuracyTask {
     }
 
     fn branching_cost(&self) -> Self::CostType {
-        self.branching_cost.into()
+        LexicographicCost::new(0, 1)
+    }
+
+    fn is_perfect_solution_cost(cost: &Self::CostType) -> bool
+    where
+        Self: Sized,
+    {
+        cost.primary == 0
     }
 
     fn greedy_value(left_costsum: &Self::CostSumType, right_costsum: &Self::CostSumType) -> f32 {
@@ -195,40 +191,6 @@ impl OptimizationTask for AccuracyTask {
             / (left_total + right_total) as f32
     }
 
-    fn branch_relaxation(&self, dataview: &DataView<Self>, max_depth: u32) -> Self::CostType
-    where
-        Self: Sized,
-    {
-        if max_depth > 7 {
-            FloatCost(0.0)
-        } else {
-            let mut counts = dataview.cost_summer.instance_count_per_class.clone();
-            counts.sort_unstable();
-
-            // The maximum number of clusters is the remaining leaf count or the number of instances remaining.
-            let max_clusters = dataview.num_instances().min(1 << max_depth);
-
-            // We try all cluster counts, and see how many misclassifications there are.
-            let mut total_misclassifications = 0;
-            let mut min_cost = f64::MAX;
-
-            for i in 0..counts.len() {
-                let clusters = counts.len() - i; // Always at least one
-                if clusters <= max_clusters {
-                    min_cost = min_cost.min(
-                        (clusters - 1) as f64 * self.branching_cost
-                            + total_misclassifications as f64,
-                    );
-                }
-
-                // Note that the last (largest) count is never included, as that is the label.
-                total_misclassifications += counts[i];
-            }
-
-            FloatCost(min_cost)
-        }
-    }
-
     fn worst_cost_in_range(
         _dataview: &DataView<Self>,
         _feature: usize,
@@ -237,68 +199,12 @@ impl OptimizationTask for AccuracyTask {
     where
         Self: Sized,
     {
-        FloatCost(range.len() as f64)
+        LexicographicCost::new(range.len() as i64, 0)
     }
 
     fn init_extra_dataview_data(
         _dataset: &DataSet<Self::InstanceType>,
         _feature_values: &[Vec<FeatureValue>],
     ) -> Self::ExtraDataviewData {
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-    use crate::model::{dataset::DataSet, dataview::DataView, instance::LabeledInstance};
-
-    #[test]
-    fn test_branch_relaxation_basic() {
-        let mut dataset = DataSet::default();
-        dataset.add_instance(LabeledInstance { label: 0 }, [0.0, 1.0]);
-        dataset.add_instance(LabeledInstance { label: 1 }, [0.0, 1.0]);
-        dataset.add_instance(LabeledInstance { label: 1 }, [0.0, 1.0]);
-        dataset.preprocess_after_adding_instances();
-        let mut dataview = DataView::from_dataset(&dataset);
-
-        let mut task = AccuracyTask::new(0.0);
-        task.prepare_for_data(&mut dataview);
-
-        let cost = task.branch_relaxation(&dataview, 0);
-        assert!(cost.0 == 1.0);
-    }
-
-    #[test]
-    fn test_branch_relaxation_basic2() {
-        let mut dataset = DataSet::default();
-        dataset.add_instance(LabeledInstance { label: 0 }, [0.0, 1.0]);
-        dataset.add_instance(LabeledInstance { label: 1 }, [0.0, 1.0]);
-        dataset.add_instance(LabeledInstance { label: 1 }, [0.0, 1.0]);
-        dataset.add_instance(LabeledInstance { label: 2 }, [0.0, 1.0]);
-        dataset.preprocess_after_adding_instances();
-        let mut dataview = DataView::from_dataset(&dataset);
-
-        let mut task = AccuracyTask::new(0.0);
-        task.prepare_for_data(&mut dataview);
-
-        let cost = task.branch_relaxation(&dataview, 1);
-        assert_eq!(cost.0, 1.0);
-    }
-
-    #[test]
-    fn test_branch_relaxation_branch_cost() {
-        let mut dataset = DataSet::default();
-        dataset.add_instance(LabeledInstance { label: 0 }, [0.0, 1.0]);
-        dataset.add_instance(LabeledInstance { label: 1 }, [0.0, 1.0]);
-        dataset.add_instance(LabeledInstance { label: 1 }, [0.0, 1.0]);
-        dataset.add_instance(LabeledInstance { label: 2 }, [0.0, 1.0]);
-        dataset.preprocess_after_adding_instances();
-        let mut dataview = DataView::from_dataset(&dataset);
-
-        let mut task = AccuracyTask::new(0.25);
-        task.prepare_for_data(&mut dataview);
-
-        let cost = task.branch_relaxation(&dataview, 5);
-        assert_eq!(cost.0, 2.0);
     }
 }

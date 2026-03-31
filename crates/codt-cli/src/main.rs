@@ -5,8 +5,8 @@ use std::{
 
 use codt::{
     model::{dataset::DataSet, dataview::DataView},
-    search::solver::{SearchStrategyEnum, SolverOptions, solver_with_strategy},
-    tasks::{OptimizationTask, accuracy::AccuracyTask, squared_error::SquaredErrorTask},
+    search::solver::{SearchStrategyEnum, SolveStatus, SolverOptions, solver_with_strategy},
+    tasks::{OptimizationTask, accuracy::AccuracyTask},
 };
 use file_reader::read_from_file;
 use log::info;
@@ -44,8 +44,19 @@ fn run_solver_for_task<T: OptimizationTask>(
         result.memory_usage_bytes as f64 / 1024.0 / 1024.0
     );
     info!("Graph expansions: {}", result.graph_expansions);
-    info!("Tree: {}", result.tree);
-    println!("{}", result.cost_str);
+    match result.status {
+        SolveStatus::PerfectTreeFound => {
+            if let Some(tree) = result.tree {
+                info!("Tree: {}", tree);
+            }
+            if let Some(cost) = result.cost_str {
+                println!("{}", cost);
+            }
+        }
+        SolveStatus::NoPerfectTree => {
+            println!("No perfect tree exists for the given data and constraints.");
+        }
+    }
 }
 
 fn main() {
@@ -60,22 +71,12 @@ fn main() {
     log_builer.init();
 
     let options = SolverOptions {
-        max_depth: args.max_depth,
         ub_strategy: args.upperbound,
-        terminal_solver: args.terminal_solver,
         memory_limit: Some(args.memory_limit),
         timeout: Some(Duration::from_secs(args.timeout)),
         track_intermediates: args.intermediates,
     };
 
-    match args.task {
-        OptimizationTaskEnum::Accuracy(params) => {
-            let task = AccuracyTask::new(params.complexity_cost);
-            run_solver_for_task(&args.file, options, task, args.strategy);
-        }
-        OptimizationTaskEnum::SquaredError(params) => {
-            let task = SquaredErrorTask::new(params.complexity_cost);
-            run_solver_for_task(&args.file, options, task, args.strategy);
-        }
-    }
+    let task = AccuracyTask::new();
+    run_solver_for_task(&args.file, options, task, args.strategy);
 }

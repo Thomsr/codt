@@ -1,8 +1,8 @@
 use std::path::PathBuf;
 
-use clap::{ArgAction, Args, Parser, Subcommand, value_parser};
+use clap::{ArgAction, Args, Parser, Subcommand};
 use codt::search::solver::{
-    SearchStrategyEnum, TerminalSolver, UpperboundStrategy,
+    SearchStrategyEnum, UpperboundStrategy,
 };
 
 use crate::clap_enum_variants;
@@ -30,10 +30,6 @@ pub struct CliParams {
     #[arg(short, long)]
     pub file: PathBuf,
 
-    /// Maximum allowed depth of the tree, where the depth is defined as the largest number of *branching nodes* from the root to any leaf. Depth greater than four is usually time consuming.
-    #[arg(short('d'), long, default_value_t=3, value_parser=value_parser!(u32).range(0..20))]
-    pub max_depth: u32,
-
     /// Optionally, the maximum amount of seconds to run, after which the best found solution is returned.
     #[arg(short, long, default_value_t = 60)]
     pub timeout: u64,
@@ -45,9 +41,6 @@ pub struct CliParams {
     #[arg(short, long, value_enum, default_value = "for-remaining-interval")]
     pub upperbound: UpperboundStrategy,
 
-    #[arg(long, value_enum, default_value = "left-right")]
-    pub terminal_solver: TerminalSolver,
-
     /// Determines if the solver should track intermediate solutions.
     #[arg(long, action=ArgAction::Set, default_value_t=false)]
     pub intermediates: bool,
@@ -55,18 +48,12 @@ pub struct CliParams {
     /// The search strategy to use.
     #[arg(short, long, value_parser=clap_enum_variants!(SearchStrategyEnum), default_value_t=SearchStrategyEnum::BfsBalanceSmallLb)]
     pub strategy: SearchStrategyEnum,
-
-    /// The task to optimize.
-    #[command(subcommand)]
-    pub task: OptimizationTaskEnum,
 }
 
 #[derive(Subcommand)]
 pub enum OptimizationTaskEnum {
     /// Optimizes classification accuracy
     Accuracy(AccuracyParams),
-    /// Optimizes squared error
-    SquaredError(SquaredErrorParams),
 }
 
 #[derive(Args)]

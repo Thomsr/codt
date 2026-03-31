@@ -40,6 +40,15 @@ impl<OT: OptimizationTask> Tree<OT> {
             Self::Leaf(leaf) => leaf.label,
         }
     }
+
+    pub fn branch_count(&self) -> usize {
+        match self {
+            Self::Branch(branch) => {
+                1 + branch.left_child.branch_count() + branch.right_child.branch_count()
+            }
+            Self::Leaf(_) => 0,
+        }
+    }
 }
 
 pub struct BranchNode<OT: OptimizationTask> {

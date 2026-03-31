@@ -6,7 +6,6 @@ use std::fmt::{Debug, Display};
 use std::ops::{Add, AddAssign, Range, Sub, SubAssign};
 
 pub mod accuracy;
-pub mod squared_error;
 
 pub trait CostSum<LabelType, InstanceType, CostType>:
     for<'a> AddAssign<&'a Self>
@@ -46,71 +45,115 @@ pub trait Cost:
     fn to_order(&self) -> impl Ord;
 }
 
-/// f64::EPSILON is too small, due to error accumulation in floating point arithmetic.
-const EPSILON: f64 = 1e-7;
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub struct LexicographicCost {
+    pub primary: i64,
+    pub secondary: i64,
+}
 
-#[derive(Clone, Copy, Debug, PartialEq)]
-pub struct FloatCost(pub f64);
+impl LexicographicCost {
+    pub fn new(primary: i64, secondary: i64) -> Self {
+        Self { primary, secondary }
+    }
+}
 
-impl From<f64> for FloatCost {
+impl From<f64> for LexicographicCost {
     fn from(value: f64) -> Self {
-        FloatCost(value)
+        Self {
+            primary: value.round() as i64,
+            secondary: 0,
+        }
     }
 }
 
-impl From<FloatCost> for f64 {
-    fn from(value: FloatCost) -> Self {
-        value.0
+impl From<i64> for LexicographicCost {
+    fn from(value: i64) -> Self {
+        Self {
+            primary: value,
+            secondary: 0,
+        }
     }
 }
 
-impl Display for FloatCost {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}", self.0)
+impl From<usize> for LexicographicCost {
+    fn from(value: usize) -> Self {
+        Self {
+            primary: value as i64,
+            secondary: 0,
+        }
     }
 }
 
-impl Add for FloatCost {
+impl Add for LexicographicCost {
     type Output = Self;
 
     fn add(self, other: Self) -> Self::Output {
-        FloatCost(self.0 + other.0)
+        Self {
+            primary: self.primary + other.primary,
+            secondary: self.secondary + other.secondary,
+        }
     }
 }
 
-impl Sub for FloatCost {
+impl Sub for LexicographicCost {
     type Output = Self;
 
     fn sub(self, other: Self) -> Self::Output {
-        FloatCost(self.0 - other.0)
+        Self {
+            primary: self.primary - other.primary,
+            secondary: self.secondary - other.secondary,
+        }
     }
 }
 
-impl Cost for FloatCost {
-    const ZERO: Self = FloatCost(0.0);
+impl Display for LexicographicCost {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "(primary: {}, secondary: {})",
+            self.primary, self.secondary
+        )
+    }
+}
+
+impl TryInto<f64> for LexicographicCost {
+    type Error = &'static str;
+
+    fn try_into(self) -> Result<f64, Self::Error> {
+        Ok(self.primary as f64)
+    }
+}
+
+impl Cost for LexicographicCost {
+    const ZERO: Self = Self {
+        primary: 0,
+        secondary: 0,
+    };
 
     fn is_zero(&self) -> bool {
-        self.0 < EPSILON
+        self.primary == 0 && self.secondary == 0
     }
 
     fn strictly_greater_than(&self, other: &Self) -> bool {
-        self.0 > other.0 + EPSILON
+        self.primary > other.primary
+            || (self.primary == other.primary && self.secondary > other.secondary)
     }
 
     fn strictly_less_than(&self, other: &Self) -> bool {
-        self.0 < other.0 - EPSILON
-    }
-
-    fn to_order(&self) -> impl Ord {
-        (self.0 / EPSILON) as i64
+        self.primary < other.primary
+            || (self.primary == other.primary && self.secondary < other.secondary)
     }
 
     fn greater_or_not_much_less_than(&self, other: &Self) -> bool {
-        self.0 >= other.0 - EPSILON
+        !self.strictly_less_than(other)
     }
 
     fn less_or_not_much_greater_than(&self, other: &Self) -> bool {
-        self.0 <= other.0 + EPSILON
+        !self.strictly_greater_than(other)
+    }
+
+    fn to_order(&self) -> impl Ord {
+        (self.primary, self.secondary)
     }
 }
 
@@ -140,6 +183,13 @@ pub trait OptimizationTask {
     }
     fn print_cost(&mut self, cost: &Self::CostType) -> String;
 
+    fn is_perfect_solution_cost(cost: &Self::CostType) -> bool
+    where
+        Self: Sized,
+    {
+        cost.is_zero()
+    }
+
     fn update_lowerbound(lb: &mut Self::CostType, candidate: &Self::CostType) {
         if candidate.strictly_greater_than(lb) {
             *lb = *candidate;
@@ -155,10 +205,6 @@ pub trait OptimizationTask {
     fn branching_cost(&self) -> Self::CostType;
 
     fn greedy_value(left_costsum: &Self::CostSumType, right_costsum: &Self::CostSumType) -> f32;
-
-    fn branch_relaxation(&self, dataview: &DataView<Self>, max_depth: u32) -> Self::CostType
-    where
-        Self: Sized;
 
     fn init_extra_dataview_data(
         dataset: &DataSet<Self::InstanceType>,

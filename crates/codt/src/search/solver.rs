@@ -20,9 +20,16 @@ use crate::{
     tasks::OptimizationTask,
 };
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum SolveStatus {
+    PerfectTreeFound,
+    NoPerfectTree,
+}
+
 pub struct SolveResult<OT: OptimizationTask> {
-    pub tree: Arc<Tree<OT>>,
-    pub cost_str: String,
+    pub status: SolveStatus,
+    pub tree: Option<Arc<Tree<OT>>>,
+    pub cost_str: Option<String>,
     pub graph_expansions: i32,
     pub memory_usage_bytes: i64,
     pub intermediate_lbs: Vec<(OT::CostType, i32, f64)>,
@@ -138,25 +145,10 @@ pub enum UpperboundStrategy {
     ForRemainingInterval,
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, EnumString, VariantNames, IntoStaticStr, Display)]
-#[strum(serialize_all = "kebab-case")]
-pub enum TerminalSolver {
-    /// No exhaustive search, search terminates at leaf nodes
-    Leaf,
-    /// Exhaustive search on subtrees of depth one
-    D1,
-    /// Start exhaustive search when only a left/right depth one tree remains
-    LeftRight,
-    /// Exhaustive search on subtrees of depth two
-    D2,
-}
-
 #[derive(Debug)]
 pub struct SolverOptions {
     pub ub_strategy: UpperboundStrategy,
-    pub terminal_solver: TerminalSolver,
     pub track_intermediates: bool,
-    pub max_depth: u32,
     pub timeout: Option<Duration>,
     pub memory_limit: Option<u64>,
 }
