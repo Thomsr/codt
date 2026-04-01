@@ -12,10 +12,7 @@ use crate::{
     search::{
         node::Node,
         queue::PQ,
-        solver::{
-            SolveResult, SolveStatus, Solver, SolverOptions,
-            UpperboundStrategy,
-        },
+        solver::{SolveResult, SolveStatus, Solver, SolverOptions, UpperboundStrategy},
         strategy::SearchStrategy,
     },
     tasks::{Cost, OptimizationTask},
@@ -66,10 +63,7 @@ impl<OT: OptimizationTask, SS: SearchStrategy> Solver<OT> for SolverImpl<'_, OT,
             current_thread_memory_usage().bytes_current >= memory_limit as i64
         });
 
-        while !root.is_complete()
-            && !timeout_reached
-            && !memory_limit_reached
-        {
+        while !root.is_complete() && !timeout_reached && !memory_limit_reached {
             graph_expansions += 1;
             // The initial source does not matter, since we always substitute the root manually.
             root.select(&mut path, 0);
@@ -214,22 +208,16 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> SolverImpl<'a, OT, SS> {
 
 #[cfg(test)]
 mod tests {
-    use std::fs;
-    use std::path::PathBuf;
     use std::time::Duration;
 
     use crate::{
-        model::{
-            dataset::DataSet,
-            dataview::DataView,
-            instance::LabeledInstance,
-            tree::Tree,
-        },
+        model::{dataset::DataSet, dataview::DataView, instance::LabeledInstance, tree::Tree},
         search::solver::{
             SearchStrategyEnum, SolveStatus, SolverOptions, UpperboundStrategy,
             solver_with_strategy,
         },
         tasks::{LexicographicCost, accuracy::AccuracyTask},
+        test_support::{read_from_file, repo_root},
     };
 
     fn default_options() -> SolverOptions {
@@ -239,35 +227,6 @@ mod tests {
             timeout: Some(Duration::from_secs(5)),
             memory_limit: None,
         }
-    }
-
-    fn load_sampled_csv_dataset(relative_path: &str) -> DataSet<LabeledInstance<i32>> {
-        let root = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
-        let path = root.join("../../").join(relative_path);
-        let content = fs::read_to_string(&path)
-            .unwrap_or_else(|e| panic!("Failed to read dataset {}: {}", path.display(), e));
-
-        let mut dataset = DataSet::<LabeledInstance<i32>>::default();
-        for (line_idx, line) in content.lines().enumerate() {
-            if line_idx == 0 || line.trim().is_empty() {
-                continue;
-            }
-
-            let cols: Vec<&str> = line.split(',').collect();
-            assert!(cols.len() >= 2, "Expected at least one feature and one label");
-
-            let features = cols[..cols.len() - 1]
-                .iter()
-                .map(|v| v.parse::<f64>().expect("Feature should be a float"));
-            let label = cols[cols.len() - 1]
-                .parse::<i32>()
-                .expect("Label should be an integer class");
-
-            dataset.add_instance(LabeledInstance::new(label), features);
-        }
-
-        dataset.preprocess_after_adding_instances();
-        dataset
     }
 
     #[test]
@@ -297,8 +256,6 @@ mod tests {
         for x in [0.0, 1.5, 10.0] {
             assert_eq!(tree.predict(vec![x]), 0);
         }
-
-        
     }
 
     #[test]
@@ -331,8 +288,14 @@ mod tests {
 
     #[test]
     fn sampled_dataset_runs_and_reports_status() {
-        let dataset = load_sampled_csv_dataset("data/normal/sampled/cloud_0.2_1.csv");
-        assert!(dataset.instances.len() > 10, "Expected a larger-than-toy sampled dataset");
+        let mut dataset = DataSet::<LabeledInstance<i32>>::default();
+        let file = repo_root().join("data/sampled/appendicitis_0.2_0.txt");
+        read_from_file(&mut dataset, &file).unwrap();
+
+        assert!(
+            dataset.instances.len() > 10,
+            "Expected a larger-than-toy sampled dataset"
+        );
 
         let full_view = DataView::from_dataset(&dataset);
         let mut solver = solver_with_strategy(

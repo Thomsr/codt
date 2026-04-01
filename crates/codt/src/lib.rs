@@ -5,3 +5,5 @@ pub mod allocator;
 pub mod model;
 pub mod search;
 pub mod tasks;
+
+pub(crate) mod test_support;

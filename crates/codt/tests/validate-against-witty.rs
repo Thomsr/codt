@@ -4,7 +4,7 @@ use std::{fs, path::PathBuf, time::Duration};
 mod dataset_by_difficulty;
 
 use codt::{
-    model::{dataset::DataSet, dataview::DataView, instance::LabeledInstance},
+    model::{dataset::DataSet, dataview::DataView},
     search::solver::{
         SearchStrategyEnum, SolveStatus, SolverOptions, UpperboundStrategy, solver_with_strategy,
     },
@@ -30,38 +30,6 @@ fn default_options() -> SolverOptions {
 
 fn repo_root() -> PathBuf {
     PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../")
-}
-
-fn load_sampled_csv_dataset(name: &str) -> DataSet<LabeledInstance<i32>> {
-    let path = repo_root().join("data/normal/sampled").join(name);
-    let content = fs::read_to_string(&path)
-        .unwrap_or_else(|e| panic!("Failed to read dataset {}: {}", path.display(), e));
-
-    let mut dataset = DataSet::<LabeledInstance<i32>>::default();
-    for (line_idx, line) in content.lines().enumerate() {
-        if line_idx == 0 || line.trim().is_empty() {
-            continue;
-        }
-
-        let cols: Vec<&str> = line.split(',').collect();
-        assert!(
-            cols.len() >= 2,
-            "Expected at least one feature and one label in {}",
-            path.display()
-        );
-
-        let features = cols[..cols.len() - 1]
-            .iter()
-            .map(|v| v.parse::<f64>().expect("Feature should be a float"));
-        let label = cols[cols.len() - 1]
-            .parse::<i32>()
-            .expect("Label should be an integer class");
-
-        dataset.add_instance(LabeledInstance::new(label), features);
-    }
-
-    dataset.preprocess_after_adding_instances();
-    dataset
 }
 
 fn witty_record_for_dataset(name: &str) -> WittyRecord {
@@ -115,7 +83,8 @@ fn codt_matches_witty_minimum_tree_size_on_sampled_datasets() {
             .tree_size
             .expect("Expected tree size for an optimal Witty solution");
 
-        let dataset = load_sampled_csv_dataset(dataset_name);
+        let dataset =
+            DataSet::from_csv(&repo_root().join("data/normal/sampled").join(dataset_name));
         let full_view = DataView::from_dataset(&dataset);
         let mut solver = solver_with_strategy(
             AccuracyTask::new(),

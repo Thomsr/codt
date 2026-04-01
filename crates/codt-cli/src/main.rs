@@ -10,7 +10,7 @@ use codt::{
 };
 use file_reader::read_from_file;
 use log::info;
-use params::{OptimizationTaskEnum, get_cli_args};
+use params::get_cli_args;
 
 mod file_reader;
 mod params;

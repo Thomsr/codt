@@ -143,6 +143,8 @@ pub enum UpperboundStrategy {
     TightFromSibling,
     /// Similar to `TightFromSibling`, but also leave a margin so that when a solution is found the whole interval can be pruned.
     ForRemainingInterval,
+    /// Run the CART algorithm on the remaining dataview to get an upper bound on the size needed.
+    Cart 
 }
 
 #[derive(Debug)]
