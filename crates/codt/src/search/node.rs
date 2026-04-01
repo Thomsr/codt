@@ -10,9 +10,9 @@ use crate::{
     search::{
         pruner::Pruner,
         queue::{BinaryHeapQueue, PQ},
-        solver::{ UpperboundStrategy},
+        solver::UpperboundStrategy,
         solver_impl::SolveContext,
-        strategy::SearchStrategy,
+        strategy::SearchStrategy, upper_bounds::cart::cart_upper_bound,
     },
     tasks::{Cost, CostSum, OptimizationTask},
 };
@@ -415,7 +415,7 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> Node<'a, OT, SS> {
     }
 
     fn compute_child_upper_bound(
-        &self,
+        &mut self,
         context: &SolveContext<OT, SS>,
         child: &mut Node<'a, OT, SS>,
         sibling_lb: OT::CostType,
@@ -438,6 +438,15 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> Node<'a, OT, SS> {
                 } else {
                     remaining_interval
                 }
+            }
+            UpperboundStrategy::Cart => {
+                let tree = cart_upper_bound(context.task, &child.dataview);
+
+                if self.best.cost().less_or_not_much_greater_than(&tree.cost()) {
+                    self.best = tree.clone();  
+                }
+                
+                self.best.cost()
             }
         };
 
