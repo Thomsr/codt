@@ -217,6 +217,7 @@ mod tests {
             solver_with_strategy,
         },
         tasks::{LexicographicCost, accuracy::AccuracyTask},
+        test_support::{read_from_file, repo_root},
     };
 
     fn default_options() -> SolverOptions {
@@ -287,9 +288,10 @@ mod tests {
 
     #[test]
     fn sampled_dataset_runs_and_reports_status() {
-        let dataset = DataSet::from_csv(std::path::Path::new(
-            "../../data/normal/sampled/cloud_0.2_1.csv",
-        ));
+        let mut dataset = DataSet::<LabeledInstance<i32>>::default();
+        let file = repo_root().join("data/sampled/appendicitis_0.2_0.txt");
+        read_from_file(&mut dataset, &file).unwrap();
+
         assert!(
             dataset.instances.len() > 10,
             "Expected a larger-than-toy sampled dataset"

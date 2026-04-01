@@ -75,8 +75,6 @@ pub fn cart_upper_bound<OT: OptimizationTask>(
 
 #[cfg(test)]
 mod tests {
-    use std::path::PathBuf;
-
     mod dataset_by_difficulty {
         include!(concat!(
             env!("CARGO_MANIFEST_DIR"),
@@ -89,11 +87,8 @@ mod tests {
     use crate::model::instance::LabeledInstance;
     use crate::tasks::Cost;
     use crate::tasks::accuracy::AccuracyTask;
+    use crate::test_support::{read_from_file, repo_root};
     use dataset_by_difficulty::DATASETS_BY_DIFFICULTY;
-
-    fn repo_root() -> PathBuf {
-        PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../")
-    }
 
     // Helper to create a dataset with given feature values and labels
     fn create_dataset(feature_values: Vec<i32>, labels: Vec<i32>) -> DataSet<LabeledInstance<i32>> {
@@ -146,12 +141,18 @@ mod tests {
     }
 
     #[test]
-    fn cart_top10_easy_sampled_datasets() {
+    fn cart_on_datasets() {
         let datasets = DATASETS_BY_DIFFICULTY;
 
         for dataset_name in datasets {
-            let dataset =
-                DataSet::from_csv(&repo_root().join("data/normal/sampled").join(dataset_name));
+            let mut dataset = DataSet::default();
+            let sampled_name = dataset_name
+                .strip_suffix(".csv")
+                .expect("Expected dataset names to end with .csv");
+            let file = repo_root()
+                .join("data/sampled")
+                .join(format!("{sampled_name}.txt"));
+            read_from_file(&mut dataset, &file).unwrap();
             let dataview = DataView::<AccuracyTask>::from_dataset(&dataset);
 
             let task = AccuracyTask::new();
