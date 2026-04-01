@@ -1,3 +1,5 @@
+use crate::model::instance::LabeledInstance;
+
 use super::instance::Instance;
 
 pub struct DataSet<I: Instance> {
@@ -78,5 +80,39 @@ impl<I: Instance> DataSet<I> {
 
     pub fn num_instances(&self) -> usize {
         self.feature_values[0].len()
+    }
+
+    pub fn from_csv(path: &std::path::Path) -> Self
+    where
+        I: From<LabeledInstance<i32>>,
+    {
+        let content = std::fs::read_to_string(&path)
+            .unwrap_or_else(|e| panic!("Failed to read dataset {}: {}", path.display(), e));
+
+        let mut dataset = DataSet::<I>::default();
+        for (line_idx, line) in content.lines().enumerate() {
+            if line_idx == 0 || line.trim().is_empty() {
+                continue;
+            }
+
+            let cols: Vec<&str> = line.split(',').collect();
+            assert!(
+                cols.len() >= 2,
+                "Expected at least one feature and one label in {}",
+                path.display()
+            );
+
+            let features = cols[..cols.len() - 1]
+                .iter()
+                .map(|v| v.parse::<f64>().expect("Feature should be a float"));
+            let label = cols[cols.len() - 1]
+                .parse::<i32>()
+                .expect("Label should be an integer class");
+
+            dataset.add_instance(I::from(LabeledInstance::new(label)), features);
+        }
+
+        dataset.preprocess_after_adding_instances();
+        dataset
     }
 }
