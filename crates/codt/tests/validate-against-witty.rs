@@ -1,4 +1,4 @@
-use std::{fs, path::PathBuf, time::Duration};
+use std::{fs, time::Duration};
 
 #[path = "dataset-by-difficulty.rs"]
 mod dataset_by_difficulty;
@@ -9,6 +9,7 @@ use codt::{
         SearchStrategyEnum, SolveStatus, SolverOptions, UpperboundStrategy, solver_with_strategy,
     },
     tasks::accuracy::AccuracyTask,
+    test_support::{read_from_file, repo_root},
 };
 
 use dataset_by_difficulty::DATASETS_BY_DIFFICULTY;
@@ -26,10 +27,6 @@ fn default_options() -> SolverOptions {
         timeout: Some(Duration::from_secs(60)),
         memory_limit: None,
     }
-}
-
-fn repo_root() -> PathBuf {
-    PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../")
 }
 
 fn witty_record_for_dataset(name: &str) -> WittyRecord {
@@ -83,8 +80,14 @@ fn codt_matches_witty_minimum_tree_size_on_sampled_datasets() {
             .tree_size
             .expect("Expected tree size for an optimal Witty solution");
 
-        let dataset =
-            DataSet::from_csv(&repo_root().join("data/normal/sampled").join(dataset_name));
+        let mut dataset = DataSet::default();
+        let sampled_name = dataset_name
+            .strip_suffix(".csv")
+            .expect("Expected dataset names to end with .csv");
+        let file = repo_root()
+            .join("data/sampled")
+            .join(format!("{sampled_name}.txt"));
+        read_from_file(&mut dataset, &file).unwrap();
         let full_view = DataView::from_dataset(&dataset);
         let mut solver = solver_with_strategy(
             AccuracyTask::new(),
