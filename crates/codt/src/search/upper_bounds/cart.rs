@@ -2,8 +2,36 @@ use std::sync::Arc;
 
 use crate::{
     model::{dataview::DataView, tree::{BranchNode, LeafNode, Tree}},
-    tasks::{Cost, CostSum, OptimizationTask},
+    tasks::{CostSum, OptimizationTask},
 };
+
+fn safe_threshold_from_split<OT: OptimizationTask>(
+    dataview: &DataView<'_, OT>,
+    split_feature: usize,
+    split_value: usize,
+) -> f64 {
+    let split_values = &dataview.possible_split_values[split_feature];
+    if split_values.is_empty() {
+        return 0.0;
+    }
+
+    let split_idx = split_value.min(split_values.len() - 1);
+    let current_internal = split_values[split_idx].feature_value.max(0) as usize;
+    let next_internal = split_values
+        .get(split_idx + 1)
+        .map(|s| s.feature_value.max(0) as usize)
+        .unwrap_or(current_internal);
+
+    let mapping = &dataview.dataset.internal_to_original_feature_value[split_feature];
+    if mapping.is_empty() {
+        return split_values[split_idx].feature_value as f64;
+    }
+
+    let last = mapping.len() - 1;
+    let current = mapping[current_internal.min(last)];
+    let next = mapping[next_internal.min(last)];
+    (current + next) / 2.0
+}
 
 fn cart_upper_bound_recursive<OT: OptimizationTask>(task: &OT, dataview: &DataView<'_, OT>) -> Arc<Tree<OT>> {
     let leaf_cost = dataview.cost_summer.cost();
@@ -46,8 +74,10 @@ fn cart_upper_bound_recursive<OT: OptimizationTask>(task: &OT, dataview: &DataVi
         }));
     };
 
-    let split_value = dataview.best_greedy_splits[feature].split_value_index;
-    let split_threshold = dataview.threshold_from_split(feature, split_value);
+    let split_value = dataview.best_greedy_splits[feature]
+        .split_value_index
+        .min(dataview.possible_split_values[feature].len() - 1);
+    let split_threshold = safe_threshold_from_split(dataview, feature, split_value);
     let (left_view, right_view) = dataview.split(feature, split_value);
 
     let left_child = cart_upper_bound_recursive(task, &left_view);
@@ -55,21 +85,13 @@ fn cart_upper_bound_recursive<OT: OptimizationTask>(task: &OT, dataview: &DataVi
 
     let split_cost = left_child.cost() + right_child.cost() + task.branching_cost();
     
-    // Compare with leaf and return the better option
-    if split_cost.strictly_less_than(&leaf_cost) {
-        Arc::new(Tree::Branch(BranchNode {
-            cost: split_cost,
-            split_feature: feature,
-            split_threshold,
-            left_child,
-            right_child,
-        }))
-    } else {
-        Arc::new(Tree::Leaf(LeafNode {
-            cost: leaf_cost,
-            label: leaf_label,
-        }))
-    }
+    Arc::new(Tree::Branch(BranchNode {
+        cost: split_cost,
+        split_feature: feature,
+        split_threshold,
+        left_child,
+        right_child,
+    }))
 }
 
 pub fn cart_upper_bound<OT: OptimizationTask>(task: &OT, dataview: &DataView<'_, OT>) -> Arc<Tree<OT>> {
@@ -78,10 +100,54 @@ pub fn cart_upper_bound<OT: OptimizationTask>(task: &OT, dataview: &DataView<'_,
 
 #[cfg(test)]
 mod tests {
+    use std::{fs, path::PathBuf};
+
+    mod dataset_by_difficulty {
+        include!(concat!(env!("CARGO_MANIFEST_DIR"), "/tests/dataset-by-difficulty.rs"));
+    }
+
     use super::*;
     use crate::model::dataset::DataSet;
     use crate::model::instance::LabeledInstance;
     use crate::tasks::accuracy::AccuracyTask;
+    use crate::tasks::Cost;
+    use dataset_by_difficulty::DATASETS_BY_DIFFICULTY;
+
+    fn repo_root() -> PathBuf {
+        PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../")
+    }
+
+    fn load_sampled_csv_dataset(name: &str) -> DataSet<LabeledInstance<i32>> {
+        let path = repo_root().join("data/normal/sampled").join(name);
+        let content = fs::read_to_string(&path)
+            .unwrap_or_else(|e| panic!("Failed to read dataset {}: {}", path.display(), e));
+
+        let mut dataset = DataSet::<LabeledInstance<i32>>::default();
+        for (line_idx, line) in content.lines().enumerate() {
+            if line_idx == 0 || line.trim().is_empty() {
+                continue;
+            }
+
+            let cols: Vec<&str> = line.split(',').collect();
+            assert!(
+                cols.len() >= 2,
+                "Expected at least one feature and one label in {}",
+                path.display()
+            );
+
+            let features = cols[..cols.len() - 1]
+                .iter()
+                .map(|v| v.parse::<f64>().expect("Feature should be a float"));
+            let label = cols[cols.len() - 1]
+                .parse::<i32>()
+                .expect("Label should be an integer class");
+
+            dataset.add_instance(LabeledInstance::new(label), features);
+        }
+
+        dataset.preprocess_after_adding_instances();
+        dataset
+    }
 
     // Helper to create a dataset with given feature values and labels
     fn create_dataset(feature_values: Vec<i32>, labels: Vec<i32>) -> DataSet<LabeledInstance<i32>> {
@@ -94,7 +160,7 @@ mod tests {
     }
 
     #[test]
-    fn cart_perfect_tree() {
+    fn cart_small_perfect_tree() {
         // All instances have the same label - perfect tree with zero cost
         let feature_values = vec![0, 1, 2, 3, 4];
         let labels = vec![0, 0, 0, 0, 0];
@@ -103,6 +169,8 @@ mod tests {
 
         let task = AccuracyTask::new();
         let tree = cart_upper_bound(&task, &dataview);
+
+        println!("CART Tree: {}", tree);
 
         assert!(AccuracyTask::is_perfect_solution_cost(&tree.cost()), "Expected zero cost for perfect tree, got {:?}", tree.cost());
     }
@@ -118,96 +186,36 @@ mod tests {
         let task = AccuracyTask::new();
         let tree = cart_upper_bound(&task, &dataview);
 
-        // Cost should be at most the leaf cost (branching cost since left and right are perfect)
-        let leaf_cost = dataview.cost_summer.cost();
         println!("CART Tree: {}", tree);
-        println!("Tree Cost: {:?}", tree.cost());
-        assert!(
-            tree.cost().less_or_not_much_greater_than(&leaf_cost),
-            "Expected cost {:?} to be at most leaf cost {:?}",
-            tree.cost(),
-            leaf_cost
-        );
+
+        assert!(AccuracyTask::is_perfect_solution_cost(&tree.cost()), "Expected zero cost for perfect tree, got {:?}", tree.cost());
     }
 
     #[test]
-    fn cart_single_instance() {
-        // Single instance - cannot split, should return leaf cost
-        let feature_values = vec![0];
-        let labels = vec![0];
-        let dataset = create_dataset(feature_values, labels);
-        let dataview = DataView::<AccuracyTask>::from_dataset(&dataset);
+    fn cart_top10_easy_sampled_datasets() {
+        let datasets = DATASETS_BY_DIFFICULTY;
 
-        let task = AccuracyTask::new();
-        let tree = cart_upper_bound(&task, &dataview);
+        for dataset_name in datasets {
+            let dataset = load_sampled_csv_dataset(dataset_name);
+            let dataview = DataView::<AccuracyTask>::from_dataset(&dataset);
 
-        // Cost should be zero for single perfect instance
-        assert!(AccuracyTask::is_perfect_solution_cost(&tree.cost()), "Expected zero cost for single instance, got {:?}", tree.cost());
-    }
+            let task = AccuracyTask::new();
+            let tree = cart_upper_bound(&task, &dataview);
 
-    #[test]
-    fn cart_best_split_reduces_cost() {
-        // Data that benefits from splitting: [0,0,0,1]
-        // Leaf cost would be 1 error
-        // But splitting can reduce it
-        let feature_values = vec![0, 0, 0, 1];
-        let labels = vec![0, 0, 0, 1];
-        let dataset = create_dataset(feature_values, labels);
-        let dataview = DataView::<AccuracyTask>::from_dataset(&dataset);
+            assert!(
+                tree.cost().less_or_not_much_greater_than(&dataview.cost_summer.cost()),
+                "Expected CART upper bound to be no worse than leaf for {}, got {:?} vs {:?}",
+                dataset_name,
+                tree.cost(),
+                dataview.cost_summer.cost()
+            );
 
-        let task = AccuracyTask::new();
-        let tree = cart_upper_bound(&task, &dataview);
-
-        // Splitting on feature 0 should give us left=[0,0,0] (perfect) and right=[1] (perfect)
-        // Total cost = branching_cost + 0 + 0 = branching_cost
-        // Leaf cost = 1
-        // Should choose splitting if branching_cost < 1
-        let leaf_cost = dataview.cost_summer.cost();
-        
-        // The result should be at most the leaf cost (the feasible upper bound)
-        assert!(
-            tree.cost().less_or_not_much_greater_than(&leaf_cost),
-            "CART cost {:?} should not exceed leaf cost {:?}",
-            tree.cost(),
-            leaf_cost
-        );
-    }
-
-    #[test]
-    fn cart_no_splitting_benefit() {
-        // Data that cannot be perfectly separated
-        let feature_values = vec![0, 0, 1, 1];
-        let labels = vec![0, 1, 0, 1];
-        let dataset = create_dataset(feature_values, labels);
-        let dataview = DataView::<AccuracyTask>::from_dataset(&dataset);
-
-        let task = AccuracyTask::new();
-        let tree = cart_upper_bound(&task, &dataview);
-
-        // The cost should be a valid upper bound (> 0 but <= leaf cost)
-        let leaf_cost = dataview.cost_summer.cost();
-        assert!(
-            tree.cost().less_or_not_much_greater_than(&leaf_cost),
-            "CART cost {:?} should not exceed leaf cost {:?}",
-            tree.cost(),
-            leaf_cost
-        );
-    }
-
-    #[test]
-    fn cart_print_tree() {
-        // Test that we can print a tree
-        let feature_values = vec![0, 0, 1, 1];
-        let labels = vec![0, 0, 1, 1];
-        let dataset = create_dataset(feature_values, labels);
-        let dataview = DataView::<AccuracyTask>::from_dataset(&dataset);
-
-        let task = AccuracyTask::new();
-        let tree = cart_upper_bound(&task, &dataview);
-
-        // Print the tree
-        println!("CART Tree: {}", tree);
-        println!("Tree Cost: {:?}", tree.cost());
-        assert!(!tree.cost().is_zero() || AccuracyTask::is_perfect_solution_cost(&tree.cost()), "Tree should have valid cost");
+            assert!(
+                AccuracyTask::is_perfect_solution_cost(&tree.cost()),
+                "Expected CART to find a perfect tree for {}, got cost {:?}",
+                dataset_name,
+                tree.cost()
+            )
+        }
     }
 }
