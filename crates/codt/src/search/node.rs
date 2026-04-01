@@ -2,6 +2,8 @@ use std::{
     cmp::Ordering, collections::VecDeque, fmt::Debug, marker::PhantomData, ops::Range, sync::Arc,
 };
 
+use log::log_enabled;
+
 use crate::{
     model::{
         dataview::DataView,
@@ -12,7 +14,8 @@ use crate::{
         queue::{BinaryHeapQueue, PQ},
         solver::UpperboundStrategy,
         solver_impl::SolveContext,
-        strategy::SearchStrategy, upper_bounds::cart::cart_upper_bound,
+        strategy::SearchStrategy,
+        upper_bounds::cart::cart_upper_bound,
     },
     tasks::{Cost, CostSum, OptimizationTask},
 };
@@ -331,9 +334,7 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> Node<'a, OT, SS> {
 
         let mut queue = BinaryHeapQueue::default();
 
-        if context.task.branching_cost().strictly_less_than(&ub)
-            && dataview.num_instances() > 1
-        {
+        if context.task.branching_cost().strictly_less_than(&ub) && dataview.num_instances() > 1 {
             for (feature, interesting_solutions_range) in
                 interesting_solutions_range.iter_mut().enumerate()
             {
@@ -348,7 +349,7 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> Node<'a, OT, SS> {
                         dataview.num_instances(),
                         dataview.feature_ranking[feature],
                         discrepancies,
-                    ); 
+                    );
                     if SS::should_greedily_split() {
                         feature_test.split_point =
                             dataview.best_greedy_splits[feature].split_value_index;
@@ -442,11 +443,19 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> Node<'a, OT, SS> {
             UpperboundStrategy::Cart => {
                 let tree = cart_upper_bound(context.task, &child.dataview);
 
-                if self.best.cost().less_or_not_much_greater_than(&tree.cost()) {
-                    self.best = tree.clone();  
+                if log_enabled!(log::Level::Debug) {
+                    println!(
+                        "Cost of CART upper bound: {:?}, cost of best solution: {:?}",
+                        tree.cost(),
+                        self.best.cost(),
+                    );
                 }
-                
-                self.best.cost()
+
+                if self.best.cost().less_or_not_much_greater_than(&tree.cost()) {
+                    self.best.cost()
+                } else {
+                    tree.cost()
+                }
             }
         };
 
@@ -748,16 +757,8 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> Node<'a, OT, SS> {
 
         let (left_view, right_view) = self.dataview.split(item.feature, item.split_point);
 
-        let left = Self::new(
-            context,
-            left_view,
-            item.discrepancies,
-        );
-        let right = Self::new(
-            context,
-            right_view,
-            item.discrepancies,
-        );
+        let left = Self::new(context, left_view, item.discrepancies);
+        let right = Self::new(context, right_view, item.discrepancies);
 
         let expanded = ExpandedQueueItem::Children([left, right]);
         item.expanded = Some(expanded);

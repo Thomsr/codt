@@ -1,9 +1,7 @@
 use std::path::PathBuf;
 
 use clap::{ArgAction, Args, Parser, Subcommand};
-use codt::search::solver::{
-    SearchStrategyEnum, UpperboundStrategy,
-};
+use codt::search::solver::{SearchStrategyEnum, UpperboundStrategy};
 
 use crate::clap_enum_variants;
 
@@ -16,7 +14,6 @@ pub fn get_cli_args() -> CliParams {
 #[derive(Parser)]
 #[command(
     version,
-    subcommand_required(true),
     disable_help_flag(true),
     next_line_help(true),
     flatten_help(true)

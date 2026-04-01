@@ -10,7 +10,7 @@ use codt::{
 };
 use file_reader::read_from_file;
 use log::info;
-use params::{OptimizationTaskEnum, get_cli_args};
+use params::get_cli_args;
 
 mod file_reader;
 mod params;
@@ -66,7 +66,7 @@ fn main() {
     if args.verbose {
         log_builer.filter_level(log::LevelFilter::max());
     } else {
-        log_builer.filter_level(log::LevelFilter::Info);
+        log_builer.filter_level(log::LevelFilter::Debug);
     }
     log_builer.init();
 
