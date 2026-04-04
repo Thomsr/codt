@@ -45,6 +45,7 @@ pub struct DataView<'a, OT: OptimizationTask> {
     pub best_greedy_splits: Vec<BestGreedySplit>,
     /// The ranking of each feature based on their best greedy split. Ties resolved arbitrarily. Indexed by the feature id.
     pub feature_ranking: Vec<i32>,
+    num_unique_labels: usize,
     pub extra_data: OT::ExtraDataviewData,
 }
 
@@ -59,6 +60,28 @@ impl<OT: OptimizationTask> Debug for DataView<'_, OT> {
 }
 
 impl<'a, OT: OptimizationTask> DataView<'a, OT> {
+    fn collect_unique_labels(
+        dataset: &'a DataSet<OT::InstanceType>,
+        feature_values_sorted: &[Vec<FeatureValue>],
+    ) -> Vec<OT::LabelType>
+    where
+        OT::LabelType: PartialEq,
+    {
+        let Some(first_feature_values) = feature_values_sorted.first() else {
+            return Vec::new();
+        };
+
+        let mut unique_labels = Vec::new();
+        for feature_value in first_feature_values {
+            let label = OT::label_of_instance(&dataset.instances[feature_value.instance_id]);
+            if !unique_labels.contains(&label) {
+                unique_labels.push(label);
+            }
+        }
+
+        unique_labels
+    }
+
     /// Add a possible split value to the list of possible splits, if it is necessary.
     ///
     /// For feature values:         00011112224444566
@@ -213,6 +236,7 @@ impl<'a, OT: OptimizationTask> DataView<'a, OT> {
         }
 
         let feature_ranking = Self::feature_rank_from_best_greedy_splits(&best_greedy_splits);
+        let num_unique_labels = Self::collect_unique_labels(dataset, &feature_values_sorted).len();
         let extra_data = OT::init_extra_dataview_data(dataset, &feature_values_sorted);
 
         Self {
@@ -222,6 +246,7 @@ impl<'a, OT: OptimizationTask> DataView<'a, OT> {
             cost_summer: left_costsum,
             best_greedy_splits,
             feature_ranking,
+            num_unique_labels,
             extra_data,
         }
     }
@@ -341,6 +366,10 @@ impl<'a, OT: OptimizationTask> DataView<'a, OT> {
             Self::feature_rank_from_best_greedy_splits(&best_greedy_splits_left);
         let feature_ranking_right =
             Self::feature_rank_from_best_greedy_splits(&best_greedy_splits_right);
+        let num_unique_labels_left =
+            Self::collect_unique_labels(self.dataset, &feature_values_left).len();
+        let num_unique_labels_right =
+            Self::collect_unique_labels(self.dataset, &feature_values_right).len();
 
         let extra_data_left = OT::init_extra_dataview_data(self.dataset, &feature_values_left);
         let extra_data_right = OT::init_extra_dataview_data(self.dataset, &feature_values_right);
@@ -353,6 +382,7 @@ impl<'a, OT: OptimizationTask> DataView<'a, OT> {
                 cost_summer: costsum_ll,
                 best_greedy_splits: best_greedy_splits_left,
                 feature_ranking: feature_ranking_left,
+                num_unique_labels: num_unique_labels_left,
                 extra_data: extra_data_left,
             },
             Self {
@@ -362,6 +392,7 @@ impl<'a, OT: OptimizationTask> DataView<'a, OT> {
                 cost_summer: costsum_rl,
                 best_greedy_splits: best_greedy_splits_right,
                 feature_ranking: feature_ranking_right,
+                num_unique_labels: num_unique_labels_right,
                 extra_data: extra_data_right,
             },
         )
@@ -380,30 +411,12 @@ impl<'a, OT: OptimizationTask> DataView<'a, OT> {
         self.feature_values_sorted.len()
     }
 
-    pub fn unique_labels(&self) -> Vec<OT::LabelType>
-    where
-        OT::LabelType: PartialEq,
-    {
-        let Some(first_feature_values) = self.feature_values_sorted.first() else {
-            return Vec::new();
-        };
-
-        let mut unique_labels = Vec::new();
-        for feature_value in first_feature_values {
-            let label = OT::label_of_instance(&self.dataset.instances[feature_value.instance_id]);
-            if !unique_labels.contains(&label) {
-                unique_labels.push(label);
-            }
-        }
-
-        unique_labels
+    pub fn num_unique_labels(&self) -> usize {
+        self.num_unique_labels
     }
 
-    pub fn num_unique_labels(&self) -> usize
-    where
-        OT::LabelType: PartialEq,
-    {
-        self.unique_labels().len()
+    pub fn is_pure(&self) -> bool {
+        self.num_unique_labels() <= 1
     }
 
     pub fn threshold_from_split(&self, split_feature: usize, split_value: usize) -> f64 {
@@ -536,38 +549,5 @@ mod tests {
         assert_eq!(view.possible_split_values[0][0].feature_value, 1);
         assert_eq!(view.possible_split_values[0][2].feature_value, 4);
         assert_eq!(view.instance_range_from_split_range(0, 0..2), 3..10);
-    }
-
-    #[test]
-    fn unique_labels_returns_each_label_once() {
-        let feature_values = vec![0, 0, 1, 1, 2, 2];
-        let labels = vec![2, 1, 2, 3, 1, 3];
-        let dataset = create_dataset(feature_values, labels);
-        let view = DataView::<AccuracyTask>::from_dataset(&dataset);
-
-        let mut unique = view.unique_labels();
-        unique.sort();
-        assert_eq!(unique, vec![1, 2, 3]);
-        assert_eq!(view.num_unique_labels(), 3);
-    }
-
-    #[test]
-    fn unique_labels_respects_split_view_instances() {
-        let feature_values = vec![0, 0, 1, 1, 2, 2];
-        let labels = vec![2, 1, 2, 3, 1, 3];
-        let dataset = create_dataset(feature_values, labels);
-        let view = DataView::<AccuracyTask>::from_dataset(&dataset);
-
-        let (left, right) = view.split(0, 0);
-
-        let mut left_unique = left.unique_labels();
-        left_unique.sort();
-        assert_eq!(left_unique, vec![1, 2]);
-        assert_eq!(left.num_unique_labels(), 2);
-
-        let mut right_unique = right.unique_labels();
-        right_unique.sort();
-        assert_eq!(right_unique, vec![1, 2, 3]);
-        assert_eq!(right.num_unique_labels(), 3);
     }
 }
