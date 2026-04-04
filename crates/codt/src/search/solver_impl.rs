@@ -1,5 +1,5 @@
 use std::{
-    collections::VecDeque,
+    collections::{HashSet, VecDeque},
     marker::PhantomData,
     time::{Duration, Instant},
 };
@@ -12,7 +12,9 @@ use crate::{
     search::{
         node::Node,
         queue::PQ,
-        solver::{SolveResult, SolveStatus, Solver, SolverOptions, UpperboundStrategy},
+        solver::{
+            LowerBoundStrategy, SolveResult, SolveStatus, Solver, SolverOptions, UpperboundStrategy,
+        },
         strategy::SearchStrategy,
     },
     tasks::{Cost, OptimizationTask},
@@ -27,6 +29,7 @@ pub struct SolverImpl<'a, OT: OptimizationTask, SS: SearchStrategy> {
 
 pub struct SolveContext<'a, OT: OptimizationTask, SS: SearchStrategy> {
     pub task: &'a OT,
+    pub lb_strategy: HashSet<LowerBoundStrategy>,
     pub ub_strategy: UpperboundStrategy,
     _ss: PhantomData<SS>,
 }
@@ -39,6 +42,7 @@ impl<OT: OptimizationTask, SS: SearchStrategy> Solver<OT> for SolverImpl<'_, OT,
 
         let context = SolveContext {
             task: &self.task,
+            lb_strategy: options.lb_strategy,
             ub_strategy: options.ub_strategy,
             _ss: PhantomData,
         };
@@ -169,6 +173,7 @@ impl<OT: OptimizationTask, SS: SearchStrategy> Solver<OT> for SolverImpl<'_, OT,
 
         let context = SolveContext {
             task: &self.task,
+            lb_strategy: HashSet::from([LowerBoundStrategy::ClassCount]),
             ub_strategy: UpperboundStrategy::ForRemainingInterval,
             _ss: PhantomData,
         };
@@ -208,12 +213,12 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> SolverImpl<'a, OT, SS> {
 
 #[cfg(test)]
 mod tests {
-    use std::time::Duration;
+    use std::{collections::HashSet, time::Duration};
 
     use crate::{
         model::{dataset::DataSet, dataview::DataView, instance::LabeledInstance, tree::Tree},
         search::solver::{
-            SearchStrategyEnum, SolveStatus, SolverOptions, UpperboundStrategy,
+            LowerBoundStrategy, SearchStrategyEnum, SolveStatus, SolverOptions, UpperboundStrategy,
             solver_with_strategy,
         },
         tasks::{LexicographicCost, accuracy::AccuracyTask},
@@ -222,6 +227,7 @@ mod tests {
 
     fn default_options() -> SolverOptions {
         SolverOptions {
+            lb_strategy: HashSet::from([LowerBoundStrategy::ClassCount]),
             ub_strategy: UpperboundStrategy::ForRemainingInterval,
             track_intermediates: false,
             timeout: Some(Duration::from_secs(5)),

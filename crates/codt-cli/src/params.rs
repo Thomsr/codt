@@ -1,7 +1,7 @@
-use std::path::PathBuf;
+use std::{collections::HashSet, path::PathBuf};
 
 use clap::{ArgAction, Args, Parser, Subcommand};
-use codt::search::solver::{SearchStrategyEnum, UpperboundStrategy};
+use codt::search::solver::{LowerBoundStrategy, SearchStrategyEnum, UpperboundStrategy};
 
 use crate::clap_enum_variants;
 
@@ -34,6 +34,16 @@ pub struct CliParams {
     /// Optionally, the maximum memory used in bytes, if the limit is hit, the best found solution is returned.
     #[arg(short, long, default_value_t=4 * 1024 * 1024 * 1024)]
     pub memory_limit: u64,
+
+    #[arg(
+        short,
+        long,
+        value_parser = clap_enum_variants!(LowerBoundStrategy),
+        value_delimiter = ',',
+        num_args = 1..,
+        default_value = "class-count"
+    )]
+    pub lowerbound: HashSet<LowerBoundStrategy>,
 
     #[arg(short, long, value_enum, default_value = "for-remaining-interval")]
     pub upperbound: UpperboundStrategy,

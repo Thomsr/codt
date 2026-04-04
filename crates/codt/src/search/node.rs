@@ -11,7 +11,7 @@ use crate::{
         lower_bounds::class_count::class_count_lower_bound,
         pruner::Pruner,
         queue::{BinaryHeapQueue, PQ},
-        solver::UpperboundStrategy,
+        solver::{LowerBoundStrategy, UpperboundStrategy},
         solver_impl::SolveContext,
         strategy::SearchStrategy,
         upper_bounds::cart::cart_upper_bound,
@@ -371,11 +371,14 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> Node<'a, OT, SS> {
             }
         }
 
-        let lb = if queue.is_empty() {
-            ub
-        } else {
-            // We know the optimal subtree needs at least this many branch nodes to separate labels.
-            class_count_lower_bound::<OT>(dataview.num_unique_labels())
+        let use_class_count_lb = context
+            .lb_strategy
+            .contains(&LowerBoundStrategy::ClassCount);
+
+        let lb = match (queue.is_empty(), use_class_count_lb) {
+            (true, _) => ub,
+            (false, true) => class_count_lower_bound::<OT>(dataview.num_unique_labels()),
+            (false, false) => context.task.branching_cost(),
         };
 
         Node {

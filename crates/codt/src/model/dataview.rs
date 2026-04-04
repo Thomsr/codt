@@ -415,6 +415,7 @@ impl<'a, OT: OptimizationTask> DataView<'a, OT> {
         self.num_unique_labels
     }
 
+    #[inline]
     pub fn is_pure(&self) -> bool {
         self.num_unique_labels() <= 1
     }
