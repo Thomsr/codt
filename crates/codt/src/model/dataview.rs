@@ -380,6 +380,32 @@ impl<'a, OT: OptimizationTask> DataView<'a, OT> {
         self.feature_values_sorted.len()
     }
 
+    pub fn unique_labels(&self) -> Vec<OT::LabelType>
+    where
+        OT::LabelType: PartialEq,
+    {
+        let Some(first_feature_values) = self.feature_values_sorted.first() else {
+            return Vec::new();
+        };
+
+        let mut unique_labels = Vec::new();
+        for feature_value in first_feature_values {
+            let label = OT::label_of_instance(&self.dataset.instances[feature_value.instance_id]);
+            if !unique_labels.contains(&label) {
+                unique_labels.push(label);
+            }
+        }
+
+        unique_labels
+    }
+
+    pub fn num_unique_labels(&self) -> usize
+    where
+        OT::LabelType: PartialEq,
+    {
+        self.unique_labels().len()
+    }
+
     pub fn threshold_from_split(&self, split_feature: usize, split_value: usize) -> f64 {
         let current_split_value =
             self.possible_split_values[split_feature][split_value].feature_value;
@@ -510,5 +536,38 @@ mod tests {
         assert_eq!(view.possible_split_values[0][0].feature_value, 1);
         assert_eq!(view.possible_split_values[0][2].feature_value, 4);
         assert_eq!(view.instance_range_from_split_range(0, 0..2), 3..10);
+    }
+
+    #[test]
+    fn unique_labels_returns_each_label_once() {
+        let feature_values = vec![0, 0, 1, 1, 2, 2];
+        let labels = vec![2, 1, 2, 3, 1, 3];
+        let dataset = create_dataset(feature_values, labels);
+        let view = DataView::<AccuracyTask>::from_dataset(&dataset);
+
+        let mut unique = view.unique_labels();
+        unique.sort();
+        assert_eq!(unique, vec![1, 2, 3]);
+        assert_eq!(view.num_unique_labels(), 3);
+    }
+
+    #[test]
+    fn unique_labels_respects_split_view_instances() {
+        let feature_values = vec![0, 0, 1, 1, 2, 2];
+        let labels = vec![2, 1, 2, 3, 1, 3];
+        let dataset = create_dataset(feature_values, labels);
+        let view = DataView::<AccuracyTask>::from_dataset(&dataset);
+
+        let (left, right) = view.split(0, 0);
+
+        let mut left_unique = left.unique_labels();
+        left_unique.sort();
+        assert_eq!(left_unique, vec![1, 2]);
+        assert_eq!(left.num_unique_labels(), 2);
+
+        let mut right_unique = right.unique_labels();
+        right_unique.sort();
+        assert_eq!(right_unique, vec![1, 2, 3]);
+        assert_eq!(right.num_unique_labels(), 3);
     }
 }

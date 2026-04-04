@@ -2,14 +2,13 @@ use std::{
     cmp::Ordering, collections::VecDeque, fmt::Debug, marker::PhantomData, ops::Range, sync::Arc,
 };
 
-use log::log_enabled;
-
 use crate::{
     model::{
         dataview::DataView,
         tree::{BranchNode, LeafNode, Tree},
     },
     search::{
+        lower_bounds::class_count::class_count_lower_bound,
         pruner::Pruner,
         queue::{BinaryHeapQueue, PQ},
         solver::UpperboundStrategy,
@@ -334,44 +333,48 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> Node<'a, OT, SS> {
 
         let mut queue = BinaryHeapQueue::default();
 
-        if context.task.branching_cost().strictly_less_than(&ub) && dataview.num_instances() > 1 {
+        if dataview.num_instances() > 1 {
             for (feature, interesting_solutions_range) in
                 interesting_solutions_range.iter_mut().enumerate()
             {
                 let n_splitpoints = dataview.possible_split_values[feature].len();
                 *interesting_solutions_range = 0..n_splitpoints;
-                if n_splitpoints > 0 {
-                    let mut feature_test = FeatureTest::new(
-                        context,
-                        feature,
-                        0..n_splitpoints,
-                        n_splitpoints / 2,
-                        dataview.num_instances(),
-                        dataview.feature_ranking[feature],
-                        discrepancies,
-                    );
-                    if SS::should_greedily_split() {
-                        feature_test.split_point =
-                            dataview.best_greedy_splits[feature].split_value_index;
-                        let (left, right) = feature_test.split_off();
-                        if let Some(left) = left {
-                            queue.push(left);
-                        }
-                        if let Some(right) = right {
-                            queue.push(right);
-                        }
-                    }
-                    queue.push(feature_test);
+
+                if n_splitpoints == 0 {
+                    continue;
                 }
+
+                let mut feature_test = FeatureTest::new(
+                    context,
+                    feature,
+                    0..n_splitpoints,
+                    n_splitpoints / 2,
+                    dataview.num_instances(),
+                    dataview.feature_ranking[feature],
+                    discrepancies,
+                );
+
+                if SS::should_greedily_split() {
+                    feature_test.split_point =
+                        dataview.best_greedy_splits[feature].split_value_index;
+                    let (left, right) = feature_test.split_off();
+                    if let Some(left) = left {
+                        queue.push(left);
+                    }
+                    if let Some(right) = right {
+                        queue.push(right);
+                    }
+                }
+
+                queue.push(feature_test);
             }
         }
 
         let lb = if queue.is_empty() {
             ub
         } else {
-            // We know that the cost is at least the branching cost (otherwise the queue is empty).
-            let lb = context.task.branching_cost();
-            lb
+            // We know the optimal subtree needs at least this many branch nodes to separate labels.
+            class_count_lower_bound::<OT>(dataview.num_unique_labels())
         };
 
         Node {
@@ -442,20 +445,7 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> Node<'a, OT, SS> {
             }
             UpperboundStrategy::Cart => {
                 let tree = cart_upper_bound(context.task, &child.dataview);
-
-                if log_enabled!(log::Level::Debug) {
-                    println!(
-                        "Cost of CART upper bound: {:?}, cost of best solution: {:?}",
-                        tree.cost(),
-                        self.best.cost(),
-                    );
-                }
-
-                if self.best.cost().less_or_not_much_greater_than(&tree.cost()) {
-                    self.best.cost()
-                } else {
-                    tree.cost()
-                }
+                tree.cost()
             }
         };
 
