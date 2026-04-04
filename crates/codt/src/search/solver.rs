@@ -1,4 +1,4 @@
-use std::{sync::Arc, time::Duration};
+use std::{collections::HashSet, sync::Arc, time::Duration};
 
 use strum_macros::{Display, EnumString, IntoStaticStr, VariantNames};
 
@@ -134,6 +134,14 @@ pub enum SearchStrategyEnum {
     BfsLds,
 }
 
+#[derive(
+    Debug, Clone, Copy, PartialEq, Eq, EnumString, VariantNames, IntoStaticStr, Display, Hash,
+)]
+#[strum(serialize_all = "kebab-case")]
+pub enum LowerBoundStrategy {
+    ClassCount,
+}
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq, EnumString, VariantNames, IntoStaticStr, Display)]
 #[strum(serialize_all = "kebab-case")]
 pub enum UpperboundStrategy {
@@ -144,11 +152,12 @@ pub enum UpperboundStrategy {
     /// Similar to `TightFromSibling`, but also leave a margin so that when a solution is found the whole interval can be pruned.
     ForRemainingInterval,
     /// Run the CART algorithm on the remaining dataview to get an upper bound on the size needed.
-    Cart 
+    Cart,
 }
 
 #[derive(Debug)]
 pub struct SolverOptions {
+    pub lb_strategy: HashSet<LowerBoundStrategy>,
     pub ub_strategy: UpperboundStrategy,
     pub track_intermediates: bool,
     pub timeout: Option<Duration>,

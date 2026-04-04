@@ -71,6 +71,7 @@ fn main() {
     log_builer.init();
 
     let options = SolverOptions {
+        lb_strategy: args.lowerbound,
         ub_strategy: args.upperbound,
         memory_limit: Some(args.memory_limit),
         timeout: Some(Duration::from_secs(args.timeout)),

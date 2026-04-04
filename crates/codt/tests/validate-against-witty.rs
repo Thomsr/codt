@@ -1,4 +1,4 @@
-use std::{fs, time::Duration};
+use std::{collections::HashSet, fs, time::Duration};
 
 #[path = "dataset-by-difficulty.rs"]
 mod dataset_by_difficulty;
@@ -6,7 +6,8 @@ mod dataset_by_difficulty;
 use codt::{
     model::{dataset::DataSet, dataview::DataView},
     search::solver::{
-        SearchStrategyEnum, SolveStatus, SolverOptions, UpperboundStrategy, solver_with_strategy,
+        LowerBoundStrategy, SearchStrategyEnum, SolveStatus, SolverOptions, UpperboundStrategy,
+        solver_with_strategy,
     },
     tasks::accuracy::AccuracyTask,
     test_support::{read_from_file, repo_root},
@@ -22,6 +23,7 @@ struct WittyRecord {
 
 fn default_options() -> SolverOptions {
     SolverOptions {
+        lb_strategy: HashSet::from([LowerBoundStrategy::ClassCount]),
         ub_strategy: UpperboundStrategy::ForRemainingInterval,
         track_intermediates: false,
         timeout: Some(Duration::from_secs(60)),

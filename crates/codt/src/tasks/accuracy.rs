@@ -16,9 +16,7 @@ pub struct AccuracyTask {
 
 impl AccuracyTask {
     pub fn new() -> Self {
-        Self {
-            dataset_size: 0,
-        }
+        Self { dataset_size: 0 }
     }
 }
 
@@ -129,6 +127,10 @@ impl OptimizationTask for AccuracyTask {
         self.dataset_size = dataview.num_instances();
     }
 
+    fn label_of_instance(instance: &Self::InstanceType) -> Self::LabelType {
+        instance.label
+    }
+
     fn print_cost(&mut self, cost: &Self::CostType) -> String {
         let accuracy = (1.0 - cost.primary as f64 / self.dataset_size as f64) * 100.0;
         format!(
@@ -150,6 +152,12 @@ impl OptimizationTask for AccuracyTask {
 
     fn branching_cost(&self) -> Self::CostType {
         LexicographicCost::new(0, 1)
+    }
+
+    fn lower_bound_for_num_labels(num_labels: usize) -> Self::CostType {
+        let secondary = i64::try_from(num_labels.saturating_sub(1)).unwrap_or(i64::MAX);
+
+        LexicographicCost::new(0, secondary)
     }
 
     fn is_perfect_solution_cost(cost: &Self::CostType) -> bool

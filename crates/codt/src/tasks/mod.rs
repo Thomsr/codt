@@ -159,7 +159,7 @@ impl Cost for LexicographicCost {
 
 pub trait OptimizationTask {
     /// The label type, e.g. a class label for classification tasks, or a regression target for regression tasks.
-    type LabelType: Clone + Copy + Display;
+    type LabelType: Clone + Copy + Display + PartialEq;
     /// The instance type. For classification and regression, each instance only has a label, see `LabeledInstance`.
     type InstanceType: Instance;
     type CostType: Cost;
@@ -174,6 +174,8 @@ pub trait OptimizationTask {
 
     /// Initialize a costsum, this should only be done once at the start.
     fn init_costsum(dataset: &DataSet<Self::InstanceType>) -> Self::CostSumType;
+
+    fn label_of_instance(instance: &Self::InstanceType) -> Self::LabelType;
 
     fn prepare_for_data(&mut self, dataview: &mut DataView<Self>)
     where
@@ -201,6 +203,8 @@ pub trait OptimizationTask {
             *ub = *candidate;
         }
     }
+
+    fn lower_bound_for_num_labels(num_labels: usize) -> Self::CostType;
 
     fn branching_cost(&self) -> Self::CostType;
 
