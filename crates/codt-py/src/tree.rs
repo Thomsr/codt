@@ -69,7 +69,6 @@ macro_rules! impl_optimal_decision_tree_pyclass {
             #[new]
             #[pyo3(signature = (
                                                                 strategy="bfs-balance-small-lb",
-                                                                complexity_cost=0.0,
                                                                 timeout=None,
                                                                 lowerbound="class-count",
                                                                 upperbound="for-remaining-interval",
@@ -78,7 +77,6 @@ macro_rules! impl_optimal_decision_tree_pyclass {
                                                             ))]
             fn new(
                 strategy: &str,
-                complexity_cost: f64,
                 timeout: Option<u64>,
                 lowerbound: &str,
                 upperbound: &str,
@@ -96,8 +94,6 @@ macro_rules! impl_optimal_decision_tree_pyclass {
                 let lowerbound = lowerbound
                     .parse()
                     .map_err(|_| PyValueError::new_err("Not a valid lower bounding strategy"))?;
-
-                let _ = complexity_cost;
 
                 Ok(Self {
                     lowerbound: HashSet::from([lowerbound]),
@@ -152,33 +148,32 @@ macro_rules! impl_optimal_decision_tree_pyclass {
                 &self,
                 py: Python<'py>,
                 X: PyReadonlyArray2<'py, f64>,
-            ) -> Bound<'py, $array> {
-                let tree = self
-                    .result
-                    .as_ref()
-                    .expect(ERROR_FIT_NOT_CALLED)
-                    .tree
-                    .as_ref()
-                    .expect(ERROR_FIT_NOT_CALLED)
-                    .as_ref();
-                X.as_array()
+            ) -> Result<Bound<'py, $array>, PyErr> {
+                let result = self.result.as_ref().ok_or_else(|| {
+                    pyo3::exceptions::PyRuntimeError::new_err(ERROR_FIT_NOT_CALLED)
+                })?;
+                let tree = result.tree.as_ref().ok_or_else(|| {
+                    pyo3::exceptions::PyRuntimeError::new_err(ERROR_FIT_NOT_CALLED)
+                })?;
+                let tree = tree.as_ref();
+
+                Ok(X
+                    .as_array()
                     .map_axis(Axis(1), |x| {
                         tree.predict(x.iter().copied().collect()).into()
                     })
-                    .into_pyarray(py)
+                    .into_pyarray(py))
             }
 
             #[pyo3(signature = ())]
             fn tree<'py>(&mut self, py: Python<'py>) -> Result<Bound<'py, PyAny>, PyErr> {
-                let tree = self
-                    .result
-                    .as_ref()
-                    .expect(ERROR_FIT_NOT_CALLED)
-                    .tree
-                    .as_ref()
-                    .expect(ERROR_FIT_NOT_CALLED)
-                    .as_ref();
-
+                let result = self.result.as_ref().ok_or_else(|| {
+                    pyo3::exceptions::PyRuntimeError::new_err(ERROR_FIT_NOT_CALLED)
+                })?;
+                let tree = result.tree.as_ref().ok_or_else(|| {
+                    pyo3::exceptions::PyRuntimeError::new_err(ERROR_FIT_NOT_CALLED)
+                })?;
+                let tree = tree.as_ref();
                 tree_to_py(tree, py)
             }
 

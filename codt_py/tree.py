@@ -12,7 +12,6 @@ class _BaseOptimalDecisionTree(BaseEstimator, ABC):
     def __init__(
         self,
         strategy="dfs-prio",
-        complexity_cost=0.0,
         timeout=None,
         lowerbound="class-count",
         upperbound="for-remaining-interval",
@@ -20,7 +19,6 @@ class _BaseOptimalDecisionTree(BaseEstimator, ABC):
         memory_limit=None,
     ):
         self.strategy = strategy
-        self.complexity_cost = complexity_cost
         self.timeout = timeout
         self.lowerbound = lowerbound
         self.upperbound = upperbound
@@ -30,7 +28,6 @@ class _BaseOptimalDecisionTree(BaseEstimator, ABC):
     def _init_rust_class(self):
         return self._rust_class(
             self.strategy,
-            self.complexity_cost,
             self.timeout,
             self.lowerbound,
             self.upperbound,
@@ -56,7 +53,7 @@ class _BaseOptimalDecisionTree(BaseEstimator, ABC):
     def _predict_impl(self, X):
         return self.tree_.predict(X)
 
-    def get_tree(self):
+    def tree(self):
         check_is_fitted(self)
         return self.tree_.tree()
 
