@@ -62,12 +62,14 @@ impl<OT: OptimizationTask, SS: SearchStrategy> Solver<OT> for SolverImpl<'_, OT,
         // Ignore memory usage of previous invocations.
         reset_current_thread_max_memory_usage();
 
-        let timeout_reached = options.timeout.is_some_and(|timeout| elapsed >= timeout);
         let memory_limit_reached = options.memory_limit.is_some_and(|memory_limit| {
             current_thread_memory_usage().bytes_current >= memory_limit as i64
         });
 
-        while !root.is_complete() && !timeout_reached && !memory_limit_reached {
+        while !root.is_complete()
+            && !options.timeout.is_some_and(|timeout| elapsed >= timeout)
+            && !memory_limit_reached
+        {
             graph_expansions += 1;
             // The initial source does not matter, since we always substitute the root manually.
             root.select(&mut path, 0);
