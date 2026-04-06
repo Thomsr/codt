@@ -103,7 +103,6 @@ impl<'a, OT: OptimizationTask> DataView<'a, OT> {
         dataset: &'a DataSet<OT::InstanceType>,
     ) {
         let old_left_cost: OT::CostType = left_costsum.cost();
-        let old_right_cost: OT::CostType = right_costsum.cost();
         *left_costsum += &dataset.instances[value.instance_id];
         *right_costsum -= &dataset.instances[value.instance_id];
 
@@ -130,12 +129,6 @@ impl<'a, OT: OptimizationTask> DataView<'a, OT> {
             if old_left_cost.is_zero() && possible_split_values.len() == 2 {
                 let better_split = possible_split_values.pop().unwrap();
                 possible_split_values[0] = better_split;
-            }
-
-            // If the old right cost is zero, the previous split value had a zero cost on the right side and was bigger.
-            // So we do not need to add this split value, as it is not useful.
-            if old_right_cost.is_zero() {
-                return;
             }
 
             possible_split_values.push(SplitValue {
