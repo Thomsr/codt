@@ -1,4 +1,4 @@
-use std::{collections::HashSet, fs, time::Duration};
+use std::{collections::HashSet, fs};
 
 #[path = "dataset-by-difficulty.rs"]
 mod dataset_by_difficulty;
@@ -23,10 +23,10 @@ struct WittyRecord {
 
 fn default_options() -> SolverOptions {
     SolverOptions {
-        lb_strategy: HashSet::from([LowerBoundStrategy::ClassCount]),
+        lb_strategy: HashSet::from([LowerBoundStrategy::ClassCount, LowerBoundStrategy::Pair]),
         ub_strategy: UpperboundStrategy::ForRemainingInterval,
         track_intermediates: false,
-        timeout: Some(Duration::from_secs(60)),
+        timeout: None,
         memory_limit: None,
     }
 }

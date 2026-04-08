@@ -13,3 +13,4 @@ env_logger = { workspace = true }
 log = { workspace = true }
 codt = { workspace = true }
 strum = { workspace = true }
+gurobi = "0.3.4"

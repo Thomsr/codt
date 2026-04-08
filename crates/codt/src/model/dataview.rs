@@ -45,7 +45,7 @@ pub struct DataView<'a, OT: OptimizationTask> {
     pub best_greedy_splits: Vec<BestGreedySplit>,
     /// The ranking of each feature based on their best greedy split. Ties resolved arbitrarily. Indexed by the feature id.
     pub feature_ranking: Vec<i32>,
-    num_unique_labels: usize,
+    pub unique_labels: Vec<OT::LabelType>,
     pub extra_data: OT::ExtraDataviewData,
 }
 
@@ -229,7 +229,7 @@ impl<'a, OT: OptimizationTask> DataView<'a, OT> {
         }
 
         let feature_ranking = Self::feature_rank_from_best_greedy_splits(&best_greedy_splits);
-        let num_unique_labels = Self::collect_unique_labels(dataset, &feature_values_sorted).len();
+        let unique_labels = Self::collect_unique_labels(dataset, &feature_values_sorted);
         let extra_data = OT::init_extra_dataview_data(dataset, &feature_values_sorted);
 
         Self {
@@ -239,7 +239,7 @@ impl<'a, OT: OptimizationTask> DataView<'a, OT> {
             cost_summer: left_costsum,
             best_greedy_splits,
             feature_ranking,
-            num_unique_labels,
+            unique_labels,
             extra_data,
         }
     }
@@ -359,10 +359,8 @@ impl<'a, OT: OptimizationTask> DataView<'a, OT> {
             Self::feature_rank_from_best_greedy_splits(&best_greedy_splits_left);
         let feature_ranking_right =
             Self::feature_rank_from_best_greedy_splits(&best_greedy_splits_right);
-        let num_unique_labels_left =
-            Self::collect_unique_labels(self.dataset, &feature_values_left).len();
-        let num_unique_labels_right =
-            Self::collect_unique_labels(self.dataset, &feature_values_right).len();
+        let unique_labels_left = Self::collect_unique_labels(self.dataset, &feature_values_left);
+        let unique_labels_right = Self::collect_unique_labels(self.dataset, &feature_values_right);
 
         let extra_data_left = OT::init_extra_dataview_data(self.dataset, &feature_values_left);
         let extra_data_right = OT::init_extra_dataview_data(self.dataset, &feature_values_right);
@@ -375,7 +373,7 @@ impl<'a, OT: OptimizationTask> DataView<'a, OT> {
                 cost_summer: costsum_ll,
                 best_greedy_splits: best_greedy_splits_left,
                 feature_ranking: feature_ranking_left,
-                num_unique_labels: num_unique_labels_left,
+                unique_labels: unique_labels_left,
                 extra_data: extra_data_left,
             },
             Self {
@@ -385,7 +383,7 @@ impl<'a, OT: OptimizationTask> DataView<'a, OT> {
                 cost_summer: costsum_rl,
                 best_greedy_splits: best_greedy_splits_right,
                 feature_ranking: feature_ranking_right,
-                num_unique_labels: num_unique_labels_right,
+                unique_labels: unique_labels_right,
                 extra_data: extra_data_right,
             },
         )
@@ -405,7 +403,7 @@ impl<'a, OT: OptimizationTask> DataView<'a, OT> {
     }
 
     pub fn num_unique_labels(&self) -> usize {
-        self.num_unique_labels
+        self.unique_labels.len()
     }
 
     #[inline]

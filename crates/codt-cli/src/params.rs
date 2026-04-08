@@ -1,4 +1,4 @@
-use std::{collections::HashSet, path::PathBuf};
+use std::path::PathBuf;
 
 use clap::{ArgAction, Args, Parser, Subcommand};
 use codt::search::solver::{LowerBoundStrategy, SearchStrategyEnum, UpperboundStrategy};
@@ -43,7 +43,7 @@ pub struct CliParams {
         num_args = 1..,
         default_value = "class-count"
     )]
-    pub lowerbound: HashSet<LowerBoundStrategy>,
+    pub lowerbound: Vec<LowerBoundStrategy>,
 
     #[arg(short, long, value_enum, default_value = "for-remaining-interval")]
     pub upperbound: UpperboundStrategy,
