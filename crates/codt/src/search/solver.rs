@@ -140,6 +140,7 @@ pub enum SearchStrategyEnum {
 #[strum(serialize_all = "kebab-case")]
 pub enum LowerBoundStrategy {
     ClassCount,
+    Pair,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, EnumString, VariantNames, IntoStaticStr, Display)]

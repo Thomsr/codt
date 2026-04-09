@@ -154,10 +154,8 @@ impl OptimizationTask for AccuracyTask {
         LexicographicCost::new(0, 1)
     }
 
-    fn lower_bound_for_num_labels(num_labels: usize) -> Self::CostType {
-        let secondary = i64::try_from(num_labels.saturating_sub(1)).unwrap_or(i64::MAX);
-
-        LexicographicCost::new(0, secondary)
+    fn to_cost_type(size: i64) -> Self::CostType {
+        LexicographicCost::new(0, size)
     }
 
     fn is_perfect_solution_cost(cost: &Self::CostType) -> bool

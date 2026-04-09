@@ -1,4 +1,5 @@
 use std::{
+    collections::HashSet,
     path::PathBuf,
     time::{Duration, Instant},
 };
@@ -71,7 +72,7 @@ fn main() {
     log_builer.init();
 
     let options = SolverOptions {
-        lb_strategy: args.lowerbound,
+        lb_strategy: args.lowerbound.into_iter().collect::<HashSet<_>>(),
         ub_strategy: args.upperbound,
         memory_limit: Some(args.memory_limit),
         timeout: Some(Duration::from_secs(args.timeout)),

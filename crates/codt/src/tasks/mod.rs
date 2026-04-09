@@ -159,7 +159,7 @@ impl Cost for LexicographicCost {
 
 pub trait OptimizationTask {
     /// The label type, e.g. a class label for classification tasks, or a regression target for regression tasks.
-    type LabelType: Clone + Copy + Display + PartialEq;
+    type LabelType: Clone + Copy + Display + PartialEq + Eq + std::hash::Hash;
     /// The instance type. For classification and regression, each instance only has a label, see `LabeledInstance`.
     type InstanceType: Instance;
     type CostType: Cost;
@@ -192,6 +192,8 @@ pub trait OptimizationTask {
         cost.is_zero()
     }
 
+    fn to_cost_type(size: i64) -> Self::CostType;
+
     fn update_lowerbound(lb: &mut Self::CostType, candidate: &Self::CostType) {
         if candidate.strictly_greater_than(lb) {
             *lb = *candidate;
@@ -203,8 +205,6 @@ pub trait OptimizationTask {
             *ub = *candidate;
         }
     }
-
-    fn lower_bound_for_num_labels(num_labels: usize) -> Self::CostType;
 
     fn branching_cost(&self) -> Self::CostType;
 

@@ -136,6 +136,7 @@ version = "0.1.0"
 dependencies = [
  "ckmeans",
  "fenwick",
+ "gurobi",
  "log",
  "rand",
  "rustc-hash",
@@ -151,6 +152,7 @@ dependencies = [
  "clap",
  "codt",
  "env_logger",
+ "gurobi",
  "log",
  "strum",
 ]
@@ -213,6 +215,22 @@ dependencies = [
 ]
 
 [[package]]
+name = "gurobi"
+version = "0.3.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "6f612f4124936819b6cd1a178cbd971df8e77b7b40aa6afacb21e1b232524dbb"
+dependencies = [
+ "gurobi-sys",
+ "itertools",
+]
+
+[[package]]
+name = "gurobi-sys"
+version = "0.3.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "27abdfeb504168901df67a7ab5f217501ada52d78a882d74be8920b6eeeabbc9"
+
+[[package]]
 name = "heck"
 version = "0.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -232,6 +250,12 @@ name = "is_terminal_polyfill"
 version = "1.70.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a6cb138bb79a146c1bd460005623e142ef0181e3d0219cb493e02f7d08a35695"
+
+[[package]]
+name = "itertools"
+version = "0.4.19"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "c4a9b56eb56058f43dc66e58f40a214b2ccbc9f3df51861b63d51dec7b65bc3f"
 
 [[package]]
 name = "jiff"
