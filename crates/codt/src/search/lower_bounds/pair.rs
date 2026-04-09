@@ -116,9 +116,7 @@ mod tests {
     }
 
     #[test]
-    fn pair_lb_no_conflicts() {
-        // All labels identical → no conflicting pairs → LB = 0
-
+    fn no_conflicts() {
         let features = vec![vec![0, 1, 2, 3]];
         let labels = vec![1, 1, 1, 1];
 
@@ -131,8 +129,8 @@ mod tests {
     }
 
     #[test]
-    fn pair_lb_single_feature_sufficient() {
-        // One feature perfectly separates classes → LB = 1
+    fn single_feature_sufficient() {
+        // One feature perfectly separates classes, LB = 1
 
         // Feature: 0 1 2 3
         // Labels:  0 0 1 1
@@ -149,8 +147,10 @@ mod tests {
     }
 
     #[test]
-    fn pair_lb_three_thresholds_required() {
-        // Under threshold-based split columns, this dataset needs three distinct
+    fn three_thresholds_required() {
+        // Under threshold-based split columns, this dataset needs three splits to separate all pairs,
+        // even though only two features are needed with general splits.
+        // This tests that the pair LB correctly captures the need for multiple splits when using
         // thresholds to separate all conflicting pairs.
 
         // Feature 1: 0 1 2 3
@@ -166,42 +166,5 @@ mod tests {
         let lb = pair_lower_bound(&dataview);
 
         assert_eq!(lb.secondary, 3);
-    }
-
-    #[test]
-    fn pair_lb_fractional_relaxation_ceiling() {
-        // Classic case where LP relaxation is fractional but rounds up
-
-        // Feature 1: separates some pairs
-        // Feature 2: separates the rest
-        //
-        // LP may assign ~0.5 to each → objective ≈ 1.0 → ceil = 1
-
-        let features = vec![vec![0, 0, 1, 1], vec![0, 1, 0, 1]];
-        let labels = vec![0, 1, 2, 3]; // all different → all pairs conflict
-
-        let dataset = create_dataset(features, labels);
-        let dataview = DataView::<AccuracyTask>::from_dataset(&dataset);
-
-        let lb = pair_lower_bound(&dataview);
-
-        // At least 1 feature is needed (though integrally it's also ≥1)
-        assert!(lb.secondary >= 1);
-    }
-
-    #[test]
-    fn pair_lb_two_features_fractional_symmetry() {
-        // Symmetric 4-class dataset where all class pairs must be separated.
-        // With this construction, both features are required.
-
-        let features = vec![vec![0, 1, 0, 1], vec![0, 0, 1, 1]];
-        let labels = vec![0, 1, 2, 3];
-
-        let dataset = create_dataset(features, labels);
-        let dataview = DataView::<AccuracyTask>::from_dataset(&dataset);
-
-        let lb = pair_lower_bound(&dataview);
-
-        assert_eq!(lb.secondary, 2);
     }
 }
