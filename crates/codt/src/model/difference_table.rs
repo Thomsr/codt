@@ -75,6 +75,28 @@ impl DifferenceTable {
         }
     }
 
+    pub fn min_columns_to_cover(&self, target: usize) -> usize {
+        let mut counts = vec![0usize; self.n_columns];
+
+        for row in &self.diffs {
+            for (col, &val) in row.iter().enumerate() {
+                counts[col] += val as usize;
+            }
+        }
+
+        counts.sort_unstable_by(|a, b| b.cmp(a));
+
+        let mut covered = 0usize;
+        for (i, &c) in counts.iter().enumerate() {
+            covered += c;
+            if covered >= target {
+                return i + 1;
+            }
+        }
+
+        counts.len()
+    }
+
     pub fn print(&self) {
         println!("\n=== Difference Table ===");
 

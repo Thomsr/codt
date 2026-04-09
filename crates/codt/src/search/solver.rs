@@ -141,6 +141,7 @@ pub enum SearchStrategyEnum {
 pub enum LowerBoundStrategy {
     ClassCount,
     Pair,
+    Improvement,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, EnumString, VariantNames, IntoStaticStr, Display)]
