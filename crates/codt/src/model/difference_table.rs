@@ -75,7 +75,7 @@ impl DifferenceTable {
         }
     }
 
-    pub fn min_columns_to_cover(&self, target: usize) -> usize {
+    pub fn min_size_based_cover(&self, target: usize) -> usize {
         let mut counts = vec![0usize; self.n_columns];
 
         for row in &self.diffs {
