@@ -8,7 +8,9 @@ use crate::{
         tree::{BranchNode, LeafNode, Tree},
     },
     search::{
-        lower_bounds::class_count::class_count_lower_bound,
+        lower_bounds::{
+            class_count::class_count_lower_bound, improvement::improvement_lower_bound,
+        },
         pruner::Pruner,
         queue::{BinaryHeapQueue, PQ},
         solver::{LowerBoundStrategy, UpperboundStrategy},
@@ -375,10 +377,24 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> Node<'a, OT, SS> {
             .lb_strategy
             .contains(&LowerBoundStrategy::ClassCount);
 
-        let lb = match (queue.is_empty(), use_class_count_lb) {
-            (true, _) => ub,
-            (false, true) => class_count_lower_bound::<OT>(dataview.num_unique_labels()),
-            (false, false) => context.task.branching_cost(),
+        let use_improvement_lb = context
+            .lb_strategy
+            .contains(&LowerBoundStrategy::Improvement);
+
+        let lb = match (queue.is_empty(), use_class_count_lb, use_improvement_lb) {
+            (true, _, _) => ub,
+            (false, true, false) => class_count_lower_bound::<OT>(dataview.num_unique_labels()),
+            (false, false, true) => improvement_lower_bound::<OT>(&dataview),
+            (false, true, true) => {
+                let class_count_lb = class_count_lower_bound::<OT>(dataview.num_unique_labels());
+                let improvement_lb = improvement_lower_bound::<OT>(&dataview);
+                if class_count_lb.greater_or_not_much_less_than(&improvement_lb) {
+                    class_count_lb
+                } else {
+                    improvement_lb
+                }
+            }
+            (false, false, false) => context.task.branching_cost(),
         };
 
         Node {

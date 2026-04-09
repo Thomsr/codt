@@ -1,4 +1,4 @@
-use std::{ops::Sub, time::Instant};
+use std::ops::Sub;
 
 use crate::{
     model::{dataview::DataView, difference_table::DifferenceTable},
@@ -7,16 +7,7 @@ use crate::{
 use gurobi::*;
 
 pub fn pair_lower_bound<OT: OptimizationTask>(dataview: &DataView<'_, OT>) -> OT::CostType {
-    let diff_table_start_time = Instant::now();
     let diff_table = DifferenceTable::new(dataview);
-    let diff_table_duration = diff_table_start_time.elapsed();
-
-    log::debug!(
-        "Constructed difference table with {} pairs and {} split columns in {:.2?}",
-        diff_table.pairs.len(),
-        diff_table.n_columns,
-        diff_table_duration
-    );
 
     if diff_table.diffs.is_empty() {
         return OT::to_cost_type(0);
@@ -73,15 +64,7 @@ pub fn pair_lower_bound<OT: OptimizationTask>(dataview: &DataView<'_, OT>) -> OT
 
     model.set_objective(obj, Minimize).unwrap();
 
-    let optimization_start_time = Instant::now();
     model.optimize().unwrap();
-    let optimization_duration = optimization_start_time.elapsed();
-
-    log::debug!(
-        "Solved pair LB relaxation in {:.2?}, objective value = {}",
-        optimization_duration,
-        model.get(attr::ObjVal).unwrap()
-    );
 
     let obj_val = model.get(attr::ObjVal).unwrap();
 

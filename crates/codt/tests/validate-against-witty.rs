@@ -23,7 +23,11 @@ struct WittyRecord {
 
 fn default_options() -> SolverOptions {
     SolverOptions {
-        lb_strategy: HashSet::from([LowerBoundStrategy::ClassCount, LowerBoundStrategy::Pair]),
+        lb_strategy: HashSet::from([
+            LowerBoundStrategy::ClassCount,
+            LowerBoundStrategy::Improvement,
+            LowerBoundStrategy::Pair,
+        ]),
         ub_strategy: UpperboundStrategy::ForRemainingInterval,
         track_intermediates: false,
         timeout: None,
