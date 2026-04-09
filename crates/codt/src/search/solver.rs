@@ -38,7 +38,6 @@ pub struct SolveResult<OT: OptimizationTask> {
 
 pub trait Solver<OT: OptimizationTask> {
     fn solve(&mut self, options: SolverOptions) -> SolveResult<OT>;
-    fn d0d1_lowerbound(&mut self) -> (OT::CostType, OT::CostType);
 }
 
 macro_rules! solver_impl_for {

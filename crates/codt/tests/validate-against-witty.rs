@@ -95,11 +95,8 @@ fn codt_matches_witty_minimum_tree_size_on_sampled_datasets() {
             .join(format!("{sampled_name}.txt"));
         read_from_file(&mut dataset, &file).unwrap();
         let full_view = DataView::from_dataset(&dataset);
-        let mut solver = solver_with_strategy(
-            AccuracyTask::new(),
-            full_view,
-            SearchStrategyEnum::BfsBalanceSmallLb,
-        );
+        let mut solver =
+            solver_with_strategy(AccuracyTask::new(), full_view, SearchStrategyEnum::AndOr);
 
         let result = solver.solve(default_options());
         println!("dataset: {} status: {:?}", dataset_name, result.status);

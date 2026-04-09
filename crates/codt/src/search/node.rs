@@ -335,8 +335,7 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> Node<'a, OT, SS> {
 
         let mut queue = BinaryHeapQueue::default();
 
-        if !OT::is_perfect_solution_cost(&ub) && !dataview.is_pure() && dataview.num_instances() > 1
-        {
+        if dataview.num_instances() > 1 {
             for (feature, interesting_solutions_range) in
                 interesting_solutions_range.iter_mut().enumerate()
             {
