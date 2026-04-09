@@ -48,17 +48,6 @@ impl<OT: OptimizationTask, SS: SearchStrategy> Solver<OT> for SolverImpl<'_, OT,
             _ss: PhantomData,
         };
 
-        let pair_lb = context
-            .lb_strategy
-            .contains(&LowerBoundStrategy::Pair)
-            .then(|| pair_lower_bound::<OT>(&dataview));
-
-        let mut root: Node<'_, OT, SS> = Node::new(&context, dataview, 0);
-        if let Some(pair_lb) = pair_lb {
-            println!("Pair lower bound: {}", pair_lb);
-            OT::update_lowerbound(&mut root.cost_lower_bound, &pair_lb);
-        }
-
         let mut graph_expansions = 0;
 
         let mut path = VecDeque::new();
@@ -66,8 +55,20 @@ impl<OT: OptimizationTask, SS: SearchStrategy> Solver<OT> for SolverImpl<'_, OT,
         let start_time = Instant::now();
         let mut elapsed = Duration::ZERO;
 
+        let pair_lb = context
+            .lb_strategy
+            .contains(&LowerBoundStrategy::Pair)
+            .then(|| pair_lower_bound::<OT>(&dataview));
+
+        let mut root: Node<'_, OT, SS> = Node::new(&context, dataview, 0);
+
         let mut intermediate_lbs = vec![(root.cost_lower_bound, graph_expansions, 0.0)];
         let mut intermediate_ubs = vec![(root.best.cost(), graph_expansions, 0.0)];
+
+        if let Some(pair_lb) = pair_lb {
+            info!("Pair lower bound: {}", pair_lb);
+            OT::update_lowerbound(&mut root.cost_lower_bound, &pair_lb);
+        }
 
         // Ignore memory usage of previous invocations.
         reset_current_thread_max_memory_usage();

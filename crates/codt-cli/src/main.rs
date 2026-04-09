@@ -67,7 +67,7 @@ fn main() {
     if args.verbose {
         log_builer.filter_level(log::LevelFilter::max());
     } else {
-        log_builer.filter_level(log::LevelFilter::Debug);
+        log_builer.filter_level(log::LevelFilter::Info);
     }
     log_builer.init();
 
