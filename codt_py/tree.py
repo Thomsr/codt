@@ -26,10 +26,14 @@ class _BaseOptimalDecisionTree(BaseEstimator, ABC):
         self.memory_limit = memory_limit
 
     def _init_rust_class(self):
+        lowerbound = self.lowerbound
+        if isinstance(lowerbound, (list, tuple, set)):
+            lowerbound = ",".join(lowerbound)
+
         return self._rust_class(
             self.strategy,
             self.timeout,
-            self.lowerbound,
+            lowerbound,
             self.upperbound,
             self.intermediates,
             self.memory_limit,

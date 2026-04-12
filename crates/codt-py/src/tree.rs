@@ -91,12 +91,27 @@ macro_rules! impl_optimal_decision_tree_pyclass {
                     .parse()
                     .map_err(|_| PyValueError::new_err("Not a valid upper bounding strategy"))?;
 
-                let lowerbound = lowerbound
-                    .parse()
-                    .map_err(|_| PyValueError::new_err("Not a valid lower bounding strategy"))?;
+                let lowerbound: HashSet<LowerBoundStrategy> = lowerbound
+                    .split(',')
+                    .map(str::trim)
+                    .filter(|s| !s.is_empty())
+                    .map(|s| {
+                        s.parse().map_err(|_| {
+                            PyValueError::new_err(format!(
+                                "Not a valid lower bounding strategy: {s}"
+                            ))
+                        })
+                    })
+                    .collect::<Result<_, _>>()?;
+
+                if lowerbound.is_empty() {
+                    return Err(PyValueError::new_err(
+                        "At least one lower bounding strategy is required",
+                    ));
+                }
 
                 Ok(Self {
-                    lowerbound: HashSet::from([lowerbound]),
+                    lowerbound,
                     upperbound,
                     strategy,
                     intermediates,
