@@ -382,7 +382,6 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> Node<'a, OT, SS> {
         if use_cart_ub {
             let cart_tree = cart_upper_bound(context.task, &dataview);
             let cart_ub = cart_tree.cost();
-            // println!("Initial upper bound: {}, cart upper bound: {}", ub, cart_ub);
             if cart_ub.less_or_not_much_greater_than(&ub) {
                 ub = cart_ub;
                 best = cart_tree;
