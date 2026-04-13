@@ -74,6 +74,7 @@ fn main() {
     let options = SolverOptions {
         lb_strategy: args.lowerbound.into_iter().collect::<HashSet<_>>(),
         ub_strategy: args.upperbound,
+        cart_ub_strategy: args.cart_upperbound,
         memory_limit: Some(args.memory_limit),
         timeout: Some(Duration::from_secs(args.timeout)),
         track_intermediates: args.intermediates,

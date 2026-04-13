@@ -14,7 +14,8 @@ use crate::{
         node::Node,
         queue::PQ,
         solver::{
-            LowerBoundStrategy, SolveResult, SolveStatus, Solver, SolverOptions, UpperboundStrategy,
+            CartUpperboundStrategy, LowerBoundStrategy, SolveResult, SolveStatus, Solver,
+            SolverOptions, UpperboundStrategy,
         },
         strategy::SearchStrategy,
     },
@@ -32,6 +33,7 @@ pub struct SolveContext<'a, OT: OptimizationTask, SS: SearchStrategy> {
     pub task: &'a OT,
     pub lb_strategy: HashSet<LowerBoundStrategy>,
     pub ub_strategy: UpperboundStrategy,
+    pub cart_ub_strategy: CartUpperboundStrategy,
     _ss: PhantomData<SS>,
 }
 
@@ -45,6 +47,7 @@ impl<OT: OptimizationTask, SS: SearchStrategy> Solver<OT> for SolverImpl<'_, OT,
             task: &self.task,
             lb_strategy: options.lb_strategy,
             ub_strategy: options.ub_strategy,
+            cart_ub_strategy: options.cart_ub_strategy,
             _ss: PhantomData,
         };
 
@@ -196,8 +199,8 @@ mod tests {
     use crate::{
         model::{dataset::DataSet, dataview::DataView, instance::LabeledInstance, tree::Tree},
         search::solver::{
-            LowerBoundStrategy, SearchStrategyEnum, SolveStatus, SolverOptions, UpperboundStrategy,
-            solver_with_strategy,
+            CartUpperboundStrategy, LowerBoundStrategy, SearchStrategyEnum, SolveStatus,
+            SolverOptions, UpperboundStrategy, solver_with_strategy,
         },
         tasks::{LexicographicCost, accuracy::AccuracyTask},
         test_support::{read_from_file, repo_root},
@@ -207,6 +210,7 @@ mod tests {
         SolverOptions {
             lb_strategy: HashSet::from([LowerBoundStrategy::ClassCount, LowerBoundStrategy::Pair]),
             ub_strategy: UpperboundStrategy::ForRemainingInterval,
+            cart_ub_strategy: CartUpperboundStrategy::Disabled,
             track_intermediates: false,
             timeout: Some(Duration::from_secs(5)),
             memory_limit: None,

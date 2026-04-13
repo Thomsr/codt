@@ -15,6 +15,7 @@ class _BaseOptimalDecisionTree(BaseEstimator, ABC):
         timeout=None,
         lowerbound="class-count",
         upperbound="for-remaining-interval",
+        cart_upperbound="disabled",
         intermediates=False,
         memory_limit=None,
     ):
@@ -22,6 +23,7 @@ class _BaseOptimalDecisionTree(BaseEstimator, ABC):
         self.timeout = timeout
         self.lowerbound = lowerbound
         self.upperbound = upperbound
+        self.cart_upperbound = cart_upperbound
         self.intermediates = intermediates
         self.memory_limit = memory_limit
 
@@ -35,6 +37,7 @@ class _BaseOptimalDecisionTree(BaseEstimator, ABC):
             self.timeout,
             lowerbound,
             self.upperbound,
+            self.cart_upperbound,
             self.intermediates,
             self.memory_limit,
         )
