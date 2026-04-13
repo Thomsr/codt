@@ -14,6 +14,7 @@ from typing import Any, Dict, List, Optional, Sequence, Tuple
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+import seaborn as sns
 from codt_py import OptimalDecisionTreeClassifier
 
 
@@ -23,6 +24,7 @@ class SolverConfig:
     strategy: str
     lowerbound: str
     upperbound: str
+    cart_upperbound: str
     timeout: Optional[int]
     memory_limit: Optional[int]
     intermediates: bool
@@ -32,6 +34,7 @@ class SolverConfig:
             "strategy": self.strategy,
             "lowerbound": self.lowerbound,
             "upperbound": self.upperbound,
+            "cart_upperbound": self.cart_upperbound,
             "timeout": self.timeout,
             "memory_limit": self.memory_limit,
             "intermediates": self.intermediates,
@@ -60,7 +63,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--num-instances",
         type=int,
-        default=50,
+        default=200,
         help="How many instances to run from easiest to hardest.",
     )
     parser.add_argument(
@@ -104,13 +107,19 @@ def add_solver_args(parser: argparse.ArgumentParser, prefix: str, default_name: 
         f"--{prefix}-lowerbound",
         type=str,
         default="class-count",
-        help=f"Lower bound strategy for {prefix}.",
+        help=f"Lower bound strategy for {prefix} (comma-separated values supported).",
     )
     parser.add_argument(
         f"--{prefix}-upperbound",
         type=str,
         default="for-remaining-interval",
         help=f"Upper bound strategy for {prefix}.",
+    )
+    parser.add_argument(
+        f"--{prefix}-cart-upperbound",
+        type=str,
+        default="disabled",
+        help=f"CART upper bound for {prefix} (disabled or enabled).",
     )
     parser.add_argument(
         f"--{prefix}-timeout",
@@ -138,6 +147,7 @@ def build_solver_config(args: argparse.Namespace, prefix: str) -> SolverConfig:
         strategy=getattr(args, f"{key}_strategy"),
         lowerbound=getattr(args, f"{key}_lowerbound"),
         upperbound=getattr(args, f"{key}_upperbound"),
+        cart_upperbound=getattr(args, f"{key}_cart_upperbound"),
         timeout=getattr(args, f"{key}_timeout"),
         memory_limit=getattr(args, f"{key}_memory_limit"),
         intermediates=getattr(args, f"{key}_intermediates"),
@@ -335,26 +345,31 @@ def save_results(long_df: pd.DataFrame, paired_df: pd.DataFrame, output_dir: Pat
     return long_path, paired_path
 
 
-def make_cactus_plot(long_df: pd.DataFrame, solver_a: SolverConfig, solver_b: SolverConfig, output_dir: Path) -> Path:
+def make_runtime_ecdf_plot(long_df: pd.DataFrame, solver_a: SolverConfig, solver_b: SolverConfig, output_dir: Path) -> Path:
     output_dir.mkdir(parents=True, exist_ok=True)
-    plt.figure(figsize=(9, 5))
+    fig, ax = plt.subplots(figsize=(10, 6))
 
     for solver in (solver_a, solver_b):
         subset = long_df[(long_df["solver_name"] == solver.name) & (long_df["solved"])].copy()
-        runtimes = np.sort(subset["runtime_seconds"].to_numpy())
-        x = np.arange(1, len(runtimes) + 1)
-        plt.step(x, runtimes, where="post", label=solver.name)
+        sns.ecdfplot(
+            data=subset,
+            x="runtime_seconds",
+            stat="count",
+            label=solver.name,
+            ax=ax,
+            linewidth=2,
+        )
 
-    plt.xlabel("Instances solved")
-    plt.ylabel("Runtime (seconds)")
-    plt.title("Cactus Plot: Runtime vs. Instances Solved")
-    plt.grid(alpha=0.3)
-    plt.legend()
+    ax.set_xlabel("Runtime (seconds)")
+    ax.set_ylabel("Instances solved")
+    ax.set_title("ECDF: Instances Solved vs. Runtime")
+    ax.grid(alpha=0.3)
+    ax.legend()
 
-    out_path = output_dir / "cactus_runtime_vs_instances_solved.png"
+    out_path = output_dir / "ecdf_runtime_vs_instances_solved.png"
     plt.tight_layout()
     plt.savefig(out_path, dpi=160)
-    plt.close()
+    plt.close(fig)
     return out_path
 
 
@@ -414,7 +429,7 @@ def main() -> None:
     paired_df = build_paired_results(long_df, solver_a, solver_b)
     long_csv, paired_csv = save_results(long_df, paired_df, args.output_dir)
 
-    cactus_path = make_cactus_plot(long_df, solver_a, solver_b, args.output_dir)
+    ecdf_path = make_runtime_ecdf_plot(long_df, solver_a, solver_b, args.output_dir)
     scatter_path = make_scatter_plot(paired_df, solver_a, solver_b, args.output_dir)
 
     cache_hits = int(long_df["from_cache"].sum())
@@ -426,7 +441,7 @@ def main() -> None:
     print(f"Computed fresh: {total_runs - cache_hits}")
     print(f"Long-form results: {long_csv}")
     print(f"Paired results: {paired_csv}")
-    print(f"Cactus plot: {cactus_path}")
+    print(f"ECDF plot: {ecdf_path}")
     print(f"Scatter plot: {scatter_path}")
 
 
