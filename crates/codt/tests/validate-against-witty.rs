@@ -6,8 +6,8 @@ mod dataset_by_difficulty;
 use codt::{
     model::{dataset::DataSet, dataview::DataView},
     search::solver::{
-        LowerBoundStrategy, SearchStrategyEnum, SolveStatus, SolverOptions, UpperboundStrategy,
-        solver_with_strategy,
+        CartUpperboundStrategy, LowerBoundStrategy, SearchStrategyEnum, SolveStatus, SolverOptions,
+        UpperboundStrategy, solver_with_strategy,
     },
     tasks::accuracy::AccuracyTask,
     test_support::{read_from_file, repo_root},
@@ -29,6 +29,7 @@ fn default_options() -> SolverOptions {
             LowerBoundStrategy::Pair,
         ]),
         ub_strategy: UpperboundStrategy::ForRemainingInterval,
+        cart_ub_strategy: CartUpperboundStrategy::Enabled,
         track_intermediates: false,
         timeout: None,
         memory_limit: None,
@@ -75,7 +76,7 @@ fn witty_record_for_dataset(name: &str) -> WittyRecord {
 fn codt_matches_witty_minimum_tree_size_on_sampled_datasets() {
     let datasets = &DATASETS_BY_DIFFICULTY[..40];
 
-    for dataset_name in datasets {
+    for (i, dataset_name) in datasets.iter().enumerate() {
         let witty = witty_record_for_dataset(dataset_name);
         assert!(
             witty.optimal,
@@ -98,8 +99,13 @@ fn codt_matches_witty_minimum_tree_size_on_sampled_datasets() {
         let mut solver =
             solver_with_strategy(AccuracyTask::new(), full_view, SearchStrategyEnum::AndOr);
 
+        println!(
+            "({}/{}) Testing dataset {}",
+            i + 1,
+            datasets.len(),
+            dataset_name
+        );
         let result = solver.solve(default_options());
-        println!("dataset: {} status: {:?}", dataset_name, result.status);
 
         assert_eq!(
             result.status,
@@ -112,9 +118,31 @@ fn codt_matches_witty_minimum_tree_size_on_sampled_datasets() {
             .tree
             .expect("Tree should exist for perfect solution status");
         let size = tree.branch_count();
+
+        let mut correct = 0usize;
+        let n = dataset.instances.len();
+        for instance_idx in 0..n {
+            let features: Vec<f64> = dataset
+                .original_feature_values
+                .iter()
+                .map(|feature| feature[instance_idx])
+                .collect();
+            let pred_y = tree.predict(features);
+            if pred_y == dataset.instances[instance_idx].label {
+                correct += 1;
+            }
+        }
+        let accuracy = correct as f64 / n as f64;
+
+        assert!(
+            (accuracy - 1.0).abs() < 1e-6,
+            "Expected perfect accuracy for {}",
+            dataset_name
+        );
+
         println!(
-            "dataset: {} witty_size: {} codt_size: {} tree: {}",
-            dataset_name, expected_size, size, tree
+            "witty_size: {} codt_size: {} accuracy: {} tree: {}",
+            expected_size, size, accuracy, tree
         );
 
         assert_eq!(

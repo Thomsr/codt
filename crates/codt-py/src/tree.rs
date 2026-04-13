@@ -8,8 +8,8 @@ use std::{
 use codt::{
     model::{dataset::DataSet, dataview::DataView, instance::LabeledInstance, tree::Tree},
     search::solver::{
-        LowerBoundStrategy, SearchStrategyEnum, SolveResult, SolverOptions, UpperboundStrategy,
-        solver_with_strategy,
+        CartUpperboundStrategy, LowerBoundStrategy, SearchStrategyEnum, SolveResult, SolverOptions,
+        UpperboundStrategy, solver_with_strategy,
     },
     tasks::{OptimizationTask, accuracy::AccuracyTask},
 };
@@ -54,6 +54,7 @@ macro_rules! impl_optimal_decision_tree_pyclass {
         pub struct $pyclass {
             lowerbound: HashSet<LowerBoundStrategy>,
             upperbound: UpperboundStrategy,
+            cart_upperbound: CartUpperboundStrategy,
             timeout: Option<Duration>,
             memory_limit: Option<u64>,
             intermediates: bool,
@@ -72,6 +73,7 @@ macro_rules! impl_optimal_decision_tree_pyclass {
                                                                 timeout=None,
                                                                 lowerbound="class-count",
                                                                 upperbound="for-remaining-interval",
+                                                                cart_upperbound="disabled",
                                                                 intermediates=false,
                                                                 memory_limit=None
                                                             ))]
@@ -80,6 +82,7 @@ macro_rules! impl_optimal_decision_tree_pyclass {
                 timeout: Option<u64>,
                 lowerbound: &str,
                 upperbound: &str,
+                cart_upperbound: &str,
                 intermediates: bool,
                 memory_limit: Option<u64>,
             ) -> Result<Self, PyErr> {
@@ -90,6 +93,9 @@ macro_rules! impl_optimal_decision_tree_pyclass {
                 let upperbound = upperbound
                     .parse()
                     .map_err(|_| PyValueError::new_err("Not a valid upper bounding strategy"))?;
+                let cart_upperbound = cart_upperbound.parse().map_err(|_| {
+                    PyValueError::new_err("Not a valid CART upper bounding strategy")
+                })?;
 
                 let lowerbound: HashSet<LowerBoundStrategy> = lowerbound
                     .split(',')
@@ -113,6 +119,7 @@ macro_rules! impl_optimal_decision_tree_pyclass {
                 Ok(Self {
                     lowerbound,
                     upperbound,
+                    cart_upperbound,
                     strategy,
                     intermediates,
                     timeout: timeout.map(Duration::from_secs),
@@ -148,6 +155,7 @@ macro_rules! impl_optimal_decision_tree_pyclass {
                 let options = SolverOptions {
                     lb_strategy: self.lowerbound.clone(),
                     ub_strategy: self.upperbound,
+                    cart_ub_strategy: self.cart_upperbound,
                     timeout: self.timeout,
                     track_intermediates: self.intermediates,
                     memory_limit: self.memory_limit,

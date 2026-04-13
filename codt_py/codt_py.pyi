@@ -4,10 +4,10 @@ class OptimalDecisionTreeClassifier:
     def __init__(
         self,
         strategy: str = ..., 
-        complexity_cost: float = ..., 
         timeout: int | None = ..., 
         lowerbound: str = ..., 
         upperbound: str = ..., 
+        cart_upperbound: str = ..., 
         intermediates: bool = ..., 
         memory_limit: int | None = ..., 
     ) -> None: ...
@@ -28,3 +28,4 @@ class OptimalDecisionTreeClassifier:
 def all_search_strategies() -> list[str]: ...
 def all_lowerbounds() -> list[str]: ...
 def all_upperbounds() -> list[str]: ...
+def all_cart_upperbounds() -> list[str]: ...

@@ -13,7 +13,7 @@ use crate::{
         },
         pruner::Pruner,
         queue::{BinaryHeapQueue, PQ},
-        solver::{LowerBoundStrategy, UpperboundStrategy},
+        solver::{CartUpperboundStrategy, LowerBoundStrategy, UpperboundStrategy},
         solver_impl::SolveContext,
         strategy::SearchStrategy,
         upper_bounds::cart::cart_upper_bound,
@@ -331,7 +331,12 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> Node<'a, OT, SS> {
         // Replaced by full range if we are actually searching
         let mut interesting_solutions_range = vec![0..0; dataview.num_features()];
 
-        let ub = dataview.cost_summer.cost();
+        let leaf_cost = dataview.cost_summer.cost();
+        let mut ub = leaf_cost;
+        let mut best = Arc::new(Tree::Leaf(LeafNode {
+            cost: leaf_cost,
+            label: dataview.cost_summer.label(),
+        }));
 
         let mut queue = BinaryHeapQueue::default();
 
@@ -372,6 +377,18 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> Node<'a, OT, SS> {
             }
         }
 
+        let use_cart_ub = matches!(context.cart_ub_strategy, CartUpperboundStrategy::Enabled);
+
+        if use_cart_ub {
+            let cart_tree = cart_upper_bound(context.task, &dataview);
+            let cart_ub = cart_tree.cost();
+            // println!("Initial upper bound: {}, cart upper bound: {}", ub, cart_ub);
+            if cart_ub.less_or_not_much_greater_than(&ub) {
+                ub = cart_ub;
+                best = cart_tree;
+            }
+        }
+
         let use_class_count_lb = context
             .lb_strategy
             .contains(&LowerBoundStrategy::ClassCount);
@@ -403,10 +420,7 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> Node<'a, OT, SS> {
                 .peek()
                 .map_or(f64::MAX, |item| item.lowest_descendant_heuristic()),
             pruner: Pruner::new(dataview.num_features()),
-            best: Arc::new(Tree::Leaf(LeafNode {
-                cost: ub,
-                label: dataview.cost_summer.label(),
-            })),
+            best,
             dataview,
             queue,
             interesting_solutions_range,
@@ -460,17 +474,6 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> Node<'a, OT, SS> {
                     best
                 } else {
                     remaining_interval
-                }
-            }
-            UpperboundStrategy::Cart => {
-                let tree = cart_upper_bound(context.task, &child.dataview);
-                let cart_cost = tree.cost();
-
-                let best = self.best.cost();
-                if cart_cost.less_or_not_much_greater_than(&best) {
-                    cart_cost
-                } else {
-                    best
                 }
             }
         };

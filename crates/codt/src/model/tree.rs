@@ -12,7 +12,7 @@ impl<OT: OptimizationTask> Display for Tree<OT> {
         match self {
             Self::Branch(branch) => write!(
                 f,
-                "[{}<={}:{},{}]",
+                "[{}<={:.2}:{},{}]",
                 branch.split_feature, branch.split_threshold, branch.left_child, branch.right_child
             ),
             Self::Leaf(leaf) => write!(f, "{}", leaf.label),
