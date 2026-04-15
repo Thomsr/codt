@@ -13,6 +13,7 @@ pub struct DifferenceTable {
     pub diffs: Vec<Vec<bool>>,
     pub split_columns: Vec<SplitColumn>,
     pub n_columns: usize,
+    pub group_instance_ids: Vec<Vec<usize>>,
 }
 
 impl DifferenceTable {
@@ -22,12 +23,12 @@ impl DifferenceTable {
         let labels = &dataview.unique_labels;
         if labels.len() <= 1 {
             // All instances have the same label, no features needed
-            let split_columns = Self::collect_split_columns(dataview);
             return Self {
                 pairs: Vec::new(),
                 diffs: Vec::new(),
-                n_columns: split_columns.len(),
-                split_columns,
+                n_columns: 0,
+                split_columns: Vec::new(),
+                group_instance_ids: vec![Vec::new(); labels.len()],
             };
         }
 
@@ -72,6 +73,7 @@ impl DifferenceTable {
             diffs,
             n_columns: split_columns.len(),
             split_columns,
+            group_instance_ids,
         }
     }
 
@@ -121,6 +123,64 @@ impl DifferenceTable {
         }
 
         println!("========================\n");
+    }
+
+    pub fn feature_label_purity<OT: OptimizationTask>(
+        &self,
+        dataview: &DataView<'_, OT>,
+    ) -> Vec<Vec<&'static str>> {
+        let mut result = vec![vec![""; self.group_instance_ids.len()]; self.n_columns];
+
+        for (col_idx, split) in self.split_columns.iter().enumerate() {
+            let feature_col = &dataview.dataset.feature_values[split.feature];
+
+            for (group_idx, instances) in self.group_instance_ids.iter().enumerate() {
+                let mut all_left = true;
+                let mut all_right = true;
+
+                for &inst in instances {
+                    let goes_left = feature_col[inst] <= split.threshold_value;
+
+                    if goes_left {
+                        all_right = false;
+                    } else {
+                        all_left = false;
+                    }
+
+                    if !all_left && !all_right {
+                        break;
+                    }
+                }
+
+                result[col_idx][group_idx] = if all_left {
+                    "ALL_1"
+                } else if all_right {
+                    "ALL_0"
+                } else {
+                    "MIXED"
+                };
+            }
+        }
+
+        result
+    }
+
+    pub fn print_feature_label_purity<OT: OptimizationTask>(&self, dataview: &DataView<'_, OT>) {
+        let purity = self.feature_label_purity(dataview);
+
+        println!("\n=== Feature × Label Purity ===");
+
+        for (col_idx, split) in self.split_columns.iter().enumerate() {
+            print!("f{} <= {}: ", split.feature, split.threshold_value);
+
+            for (group_idx, status) in purity[col_idx].iter().enumerate() {
+                print!("L{}={}, ", group_idx, status);
+            }
+
+            println!();
+        }
+
+        println!("=============================\n");
     }
 
     fn collect_split_columns<OT: OptimizationTask>(
