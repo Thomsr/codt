@@ -135,7 +135,13 @@ impl<OT: OptimizationTask, SS: SearchStrategy> Solver<OT> for SolverImpl<'_, OT,
                 }
 
                 if actual_lb.strictly_greater_than(&intermediate_lbs.last().unwrap().0) {
-                    intermediate_lbs.push((actual_lb, graph_expansions, elapsed.as_secs_f64()))
+                    intermediate_lbs.push((actual_lb, graph_expansions, elapsed.as_secs_f64()));
+                    info!(
+                        "New intermediate LB: {} (expansions: {}, time: {:.2}s)",
+                        actual_lb,
+                        graph_expansions,
+                        elapsed.as_secs_f64()
+                    );
                 }
 
                 if root
@@ -147,7 +153,13 @@ impl<OT: OptimizationTask, SS: SearchStrategy> Solver<OT> for SolverImpl<'_, OT,
                         root.best.cost(),
                         graph_expansions,
                         elapsed.as_secs_f64(),
-                    ))
+                    ));
+                    info!(
+                        "New intermediate UB: {} (expansions: {}, time: {:.2}s)",
+                        root.best.cost(),
+                        graph_expansions,
+                        elapsed.as_secs_f64()
+                    );
                 }
             }
         }
