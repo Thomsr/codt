@@ -214,8 +214,6 @@ mod tests {
                 datasets,
                 tree.cost()
             );
-
-            // println!("{}", tree)
         }
     }
 }
