@@ -161,11 +161,19 @@ pub enum CartUpperboundStrategy {
     Enabled,
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq, EnumString, VariantNames, IntoStaticStr, Display)]
+#[strum(serialize_all = "kebab-case")]
+pub enum DataReductionOption {
+    Disabled,
+    Enabled,
+}
+
 #[derive(Debug)]
 pub struct SolverOptions {
     pub lb_strategy: HashSet<LowerBoundStrategy>,
     pub ub_strategy: UpperboundStrategy,
     pub cart_ub_strategy: CartUpperboundStrategy,
+    pub data_reduction: DataReductionOption,
     pub track_intermediates: bool,
     pub timeout: Option<Duration>,
     pub memory_limit: Option<u64>,

@@ -6,8 +6,8 @@ mod dataset_by_difficulty;
 use codt::{
     model::{dataset::DataSet, dataview::DataView},
     search::solver::{
-        CartUpperboundStrategy, LowerBoundStrategy, SearchStrategyEnum, SolveStatus, SolverOptions,
-        UpperboundStrategy, solver_with_strategy,
+        CartUpperboundStrategy, DataReductionOption, LowerBoundStrategy, SearchStrategyEnum,
+        SolveStatus, SolverOptions, UpperboundStrategy, solver_with_strategy,
     },
     tasks::accuracy::AccuracyTask,
     test_support::{read_from_file, repo_root},
@@ -30,6 +30,7 @@ fn default_options() -> SolverOptions {
         ]),
         ub_strategy: UpperboundStrategy::ForRemainingInterval,
         cart_ub_strategy: CartUpperboundStrategy::Enabled,
+        data_reduction: DataReductionOption::Enabled,
         track_intermediates: false,
         timeout: None,
         memory_limit: None,
@@ -74,7 +75,7 @@ fn witty_record_for_dataset(name: &str) -> WittyRecord {
 
 #[test]
 fn codt_matches_witty_minimum_tree_size_on_sampled_datasets() {
-    let datasets = &DATASETS_BY_DIFFICULTY[..40];
+    let datasets = &DATASETS_BY_DIFFICULTY[194..];
 
     for (i, dataset_name) in datasets.iter().enumerate() {
         let witty = witty_record_for_dataset(dataset_name);

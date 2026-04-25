@@ -67,7 +67,8 @@ fn cart_upper_bound_recursive<OT: OptimizationTask>(
 
     Arc::new(Tree::Branch(BranchNode {
         cost: split_cost,
-        split_feature: best_feature,
+        split_feature: dataview
+            .original_split_feature_from_split(best_feature, best_split_value_index),
         split_threshold: dataview.threshold_from_split(best_feature, best_split_value_index),
         left_child,
         right_child,

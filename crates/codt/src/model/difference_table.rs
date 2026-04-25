@@ -152,9 +152,8 @@ impl DifferenceTable {
         split_columns
             .iter()
             .map(|split| {
-                let feature_col = &dataview.dataset.feature_values[split.feature];
-                let p_left = feature_col[p] <= split.threshold_value;
-                let n_left = feature_col[n] <= split.threshold_value;
+                let p_left = dataview.feature_value(split.feature, p) <= split.threshold_value;
+                let n_left = dataview.feature_value(split.feature, n) <= split.threshold_value;
                 p_left != n_left
             })
             .collect::<Vec<bool>>()

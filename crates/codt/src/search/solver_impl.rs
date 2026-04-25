@@ -211,8 +211,8 @@ mod tests {
     use crate::{
         model::{dataset::DataSet, dataview::DataView, instance::LabeledInstance, tree::Tree},
         search::solver::{
-            CartUpperboundStrategy, LowerBoundStrategy, SearchStrategyEnum, SolveStatus,
-            SolverOptions, UpperboundStrategy, solver_with_strategy,
+            CartUpperboundStrategy, DataReductionOption, LowerBoundStrategy, SearchStrategyEnum,
+            SolveStatus, SolverOptions, UpperboundStrategy, solver_with_strategy,
         },
         tasks::{LexicographicCost, accuracy::AccuracyTask},
         test_support::{read_from_file, repo_root},
@@ -223,6 +223,7 @@ mod tests {
             lb_strategy: HashSet::from([LowerBoundStrategy::ClassCount, LowerBoundStrategy::Pair]),
             ub_strategy: UpperboundStrategy::ForRemainingInterval,
             cart_ub_strategy: CartUpperboundStrategy::Disabled,
+            data_reduction: DataReductionOption::Enabled,
             track_intermediates: false,
             timeout: Some(Duration::from_secs(5)),
             memory_limit: None,
