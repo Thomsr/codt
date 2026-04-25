@@ -354,7 +354,6 @@ def make_runtime_ecdf_plot(long_df: pd.DataFrame, solver_a: SolverConfig, solver
         sns.ecdfplot(
             data=subset,
             x="runtime_seconds",
-            stat="count",
             label=solver.name,
             ax=ax,
             linewidth=2,
@@ -362,7 +361,7 @@ def make_runtime_ecdf_plot(long_df: pd.DataFrame, solver_a: SolverConfig, solver
 
     ax.set_xlabel("Runtime (seconds)")
     ax.set_ylabel("Instances solved")
-    ax.set_title("ECDF: Instances Solved vs. Runtime")
+    ax.set_title("Instances Solved vs. Runtime")
     ax.grid(alpha=0.3)
     ax.legend()
 
@@ -371,47 +370,6 @@ def make_runtime_ecdf_plot(long_df: pd.DataFrame, solver_a: SolverConfig, solver
     plt.savefig(out_path, dpi=160)
     plt.close(fig)
     return out_path
-
-
-def make_scatter_plot(paired_df: pd.DataFrame, solver_a: SolverConfig, solver_b: SolverConfig, output_dir: Path) -> Path:
-    output_dir.mkdir(parents=True, exist_ok=True)
-
-    x = paired_df["runtime_seconds_b"].to_numpy()
-    y = paired_df["runtime_seconds_a"].to_numpy()
-    hardness = paired_df["hardness_norm"].to_numpy()
-
-    fig, ax = plt.subplots(figsize=(8, 8))
-    scatter = ax.scatter(
-        x,
-        y,
-        c=hardness,
-        cmap="RdYlGn_r",
-        s=55,
-        alpha=0.9,
-        edgecolor="black",
-        linewidth=0.3,
-    )
-
-    x_lim = float(np.max(x)) if len(x) else 1.0
-    y_lim = float(np.max(y)) if len(y) else 1.0
-    parity_lim = min(x_lim, y_lim)
-    ax.plot([0, parity_lim], [0, parity_lim], linestyle="--", color="black", linewidth=1.0)
-    ax.set_xlim(0, x_lim * 1.02)
-    ax.set_ylim(0, y_lim * 1.02)
-    ax.set_xlabel(f"{solver_b.name} runtime (seconds)")
-    ax.set_ylabel(f"{solver_a.name} runtime (seconds)")
-    ax.set_title("Runtime Scatter: Solver Comparison by Instance")
-    ax.grid(alpha=0.3)
-
-    cbar = fig.colorbar(scatter, ax=ax)
-    cbar.set_label("Difficulty (green = easy, red = hard)")
-
-    out_path = output_dir / "scatter_runtime_solver_a_vs_b.png"
-    plt.tight_layout()
-    plt.savefig(out_path, dpi=160)
-    plt.close(fig)
-    return out_path
-
 
 def main() -> None:
     args = parse_args()
@@ -430,7 +388,6 @@ def main() -> None:
     long_csv, paired_csv = save_results(long_df, paired_df, args.output_dir)
 
     ecdf_path = make_runtime_ecdf_plot(long_df, solver_a, solver_b, args.output_dir)
-    scatter_path = make_scatter_plot(paired_df, solver_a, solver_b, args.output_dir)
 
     cache_hits = int(long_df["from_cache"].sum())
     total_runs = int(len(long_df))
@@ -442,7 +399,6 @@ def main() -> None:
     print(f"Long-form results: {long_csv}")
     print(f"Paired results: {paired_csv}")
     print(f"ECDF plot: {ecdf_path}")
-    print(f"Scatter plot: {scatter_path}")
 
 
 if __name__ == "__main__":

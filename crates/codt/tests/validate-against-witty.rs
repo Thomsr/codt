@@ -38,7 +38,7 @@ fn default_options() -> SolverOptions {
 
 fn witty_record_for_dataset(name: &str) -> WittyRecord {
     let target = format!("normal/sampled/{name}");
-    let path = repo_root().join("results/witty-results");
+    let path = repo_root().join("experiments/results/witty-results");
     let content = fs::read_to_string(&path)
         .unwrap_or_else(|e| panic!("Failed to read Witty results {}: {}", path.display(), e));
 
