@@ -1,3 +1,5 @@
+use rand::seq::SliceRandom;
+use rand::{SeedableRng, rngs::StdRng};
 use std::sync::Arc;
 
 use crate::{
@@ -11,66 +13,97 @@ use crate::{
 fn cart_upper_bound_recursive<OT: OptimizationTask>(
     task: &OT,
     dataview: &DataView<'_, OT>,
+    use_subset: Option<bool>,
+    rng: &mut StdRng,
 ) -> Arc<Tree<OT>> {
+    let use_subset = use_subset.unwrap_or(true);
+
     let leaf_cost = dataview.cost_summer.cost();
     let leaf_label = dataview.cost_summer.label();
 
     // If the leaf is already a perfect solution (zero cost), we can use it directly.
-    if OT::is_perfect_solution_cost(&leaf_cost) {
+    if OT::is_perfect_solution_cost(&leaf_cost) || dataview.num_instances() <= 1 {
         return Arc::new(Tree::Leaf(LeafNode {
             cost: leaf_cost,
             label: leaf_label,
         }));
     }
 
-    if dataview.num_instances() <= 1 {
-        return Arc::new(Tree::Leaf(LeafNode {
-            cost: leaf_cost,
-            label: leaf_label,
-        }));
+    let mut feature_indices: Vec<usize> = (0..dataview.possible_split_values.len()).collect();
+    feature_indices.shuffle(rng);
+
+    if use_subset {
+        let n_features = dataview.possible_split_values.len() as f64;
+        let subset_size = n_features.sqrt().ceil() as usize;
+        feature_indices.truncate(subset_size);
     }
 
-    let mut best_split = None;
-    let mut best_greedy = f32::INFINITY;
+    let candidate = feature_indices
+        .iter()
+        .filter_map(|&feature_idx| {
+            dataview.possible_split_values[feature_idx]
+                .iter()
+                .enumerate()
+                .min_by(|(_, a), (_, b)| a.greedy_value.total_cmp(&b.greedy_value))
+                .map(|(split_value_index, split)| {
+                    (feature_idx, split_value_index, split.greedy_value)
+                })
+        })
+        .min_by(|(_, _, a), (_, _, b)| a.total_cmp(b));
 
-    for (feature, split_values) in dataview.possible_split_values.iter().enumerate() {
-        for (split_value, split) in split_values.iter().enumerate() {
-            if split.greedy_value < best_greedy {
-                best_greedy = split.greedy_value;
-                best_split = Some((feature, split_value));
-            }
-        }
-    }
-
-    let Some((feature, split_value)) = best_split else {
+    let Some((best_feature, best_split_value_index, _)) = candidate else {
         return Arc::new(Tree::Leaf(LeafNode {
             cost: leaf_cost,
             label: leaf_label,
         }));
     };
 
-    let split_threshold = dataview.threshold_from_split(feature, split_value);
-    let (left_view, right_view) = dataview.split(feature, split_value);
+    let (left_view, right_view) = dataview.split(best_feature, best_split_value_index);
 
-    let left_child = cart_upper_bound_recursive(task, &left_view);
-    let right_child = cart_upper_bound_recursive(task, &right_view);
+    let left_child = cart_upper_bound_recursive(task, &left_view, Some(use_subset), rng);
+    let right_child = cart_upper_bound_recursive(task, &right_view, Some(use_subset), rng);
 
     let split_cost = left_child.cost() + right_child.cost() + task.branching_cost();
 
     Arc::new(Tree::Branch(BranchNode {
         cost: split_cost,
-        split_feature: feature,
-        split_threshold,
+        split_feature: best_feature,
+        split_threshold: dataview.threshold_from_split(best_feature, best_split_value_index),
         left_child,
         right_child,
     }))
 }
 
+/// Computes an upper bound on the optimal tree cost using a CART-like greedy approach.
+/// Uses all features by default, matching standard CART behavior.
 pub fn cart_upper_bound<OT: OptimizationTask>(
     task: &OT,
     dataview: &DataView<'_, OT>,
 ) -> Arc<Tree<OT>> {
-    cart_upper_bound_recursive(task, dataview)
+    let mut rng = StdRng::seed_from_u64(42);
+    cart_upper_bound_recursive(task, dataview, Some(false), &mut rng)
+}
+
+/// Computes an upper bound on the optimal tree cost using a CART-like greedy approach.
+/// `use_subset` is true by default.
+pub fn cart_upper_bound_with_subset<OT: OptimizationTask>(
+    task: &OT,
+    dataview: &DataView<'_, OT>,
+    use_subset: Option<bool>,
+) -> Arc<Tree<OT>> {
+    cart_upper_bound_with_subset_seed(task, dataview, use_subset, 42)
+}
+
+/// Computes an upper bound on the optimal tree cost using a CART-like greedy approach.
+/// Uses an explicit RNG seed, useful for repeated stochastic runs.
+pub fn cart_upper_bound_with_subset_seed<OT: OptimizationTask>(
+    task: &OT,
+    dataview: &DataView<'_, OT>,
+    use_subset: Option<bool>,
+    seed: u64,
+) -> Arc<Tree<OT>> {
+    let mut rng = StdRng::seed_from_u64(seed);
+    cart_upper_bound_recursive(task, dataview, use_subset, &mut rng)
 }
 
 #[cfg(test)]
@@ -109,7 +142,7 @@ mod tests {
         let dataview = DataView::<AccuracyTask>::from_dataset(&dataset);
 
         let task = AccuracyTask::new();
-        let tree = cart_upper_bound(&task, &dataview);
+        let tree = cart_upper_bound_with_subset(&task, &dataview, Some(false));
 
         println!("CART Tree: {}", tree);
 
@@ -129,7 +162,7 @@ mod tests {
         let dataview = DataView::<AccuracyTask>::from_dataset(&dataset);
 
         let task = AccuracyTask::new();
-        let tree = cart_upper_bound(&task, &dataview);
+        let tree = cart_upper_bound_with_subset(&task, &dataview, Some(false));
 
         println!("CART Tree: {}", tree);
 
@@ -144,9 +177,10 @@ mod tests {
     fn cart_on_datasets() {
         let datasets = DATASETS_BY_DIFFICULTY;
 
-        for dataset_name in datasets {
+        for datasets in datasets {
+            // for dataset_name in datasets
             let mut dataset = DataSet::default();
-            let sampled_name = dataset_name
+            let sampled_name = datasets
                 .strip_suffix(".csv")
                 .expect("Expected dataset names to end with .csv");
             let file = repo_root()
@@ -156,11 +190,11 @@ mod tests {
             let dataview = DataView::<AccuracyTask>::from_dataset(&dataset);
 
             let task = AccuracyTask::new();
-            let tree = cart_upper_bound(&task, &dataview);
+            let tree = cart_upper_bound_with_subset(&task, &dataview, Some(false));
 
             println!(
                 "CART Tree for {} instances {}: {}",
-                dataset_name,
+                datasets,
                 dataset.num_instances(),
                 tree.cost()
             );
@@ -169,7 +203,7 @@ mod tests {
                 tree.cost()
                     .less_or_not_much_greater_than(&dataview.cost_summer.cost()),
                 "Expected CART upper bound to be no worse than leaf for {}, got {:?} vs {:?}",
-                dataset_name,
+                datasets,
                 tree.cost(),
                 dataview.cost_summer.cost()
             );
@@ -177,9 +211,9 @@ mod tests {
             assert!(
                 AccuracyTask::is_perfect_solution_cost(&tree.cost()),
                 "Expected CART to find a perfect tree for {}, got cost {:?}",
-                dataset_name,
+                datasets,
                 tree.cost()
-            )
+            );
         }
     }
 }

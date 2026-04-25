@@ -16,7 +16,7 @@ use crate::{
         solver::{CartUpperboundStrategy, LowerBoundStrategy, UpperboundStrategy},
         solver_impl::SolveContext,
         strategy::SearchStrategy,
-        upper_bounds::cart::cart_upper_bound,
+        upper_bounds::cart::cart_upper_bound_with_subset,
     },
     tasks::{Cost, CostSum, OptimizationTask},
 };
@@ -380,7 +380,7 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> Node<'a, OT, SS> {
         let use_cart_ub = matches!(context.cart_ub_strategy, CartUpperboundStrategy::Enabled);
 
         if use_cart_ub {
-            let cart_tree = cart_upper_bound(context.task, &dataview);
+            let cart_tree = cart_upper_bound_with_subset(context.task, &dataview, Some(false));
             let cart_ub = cart_tree.cost();
             if cart_ub.less_or_not_much_greater_than(&ub) {
                 ub = cart_ub;

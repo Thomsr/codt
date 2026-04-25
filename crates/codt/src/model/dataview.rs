@@ -1,4 +1,4 @@
-use crate::tasks::{Cost, CostSum, OptimizationTask};
+use crate::tasks::{CostSum, OptimizationTask};
 
 use super::dataset::DataSet;
 
@@ -102,13 +102,9 @@ impl<'a, OT: OptimizationTask> DataView<'a, OT> {
         best_greedy_split: &mut BestGreedySplit,
         dataset: &'a DataSet<OT::InstanceType>,
     ) {
-        let old_left_cost: OT::CostType = left_costsum.cost();
-        *left_costsum += &dataset.instances[value.instance_id];
-        *right_costsum -= &dataset.instances[value.instance_id];
-
         if value.feature_value != *previous_feature_value {
-            // We now have all the instances with this feature value on the left side. So we can compute the greedy value.
-            // The final feature value is never encountered, but we never include it in any case.
+            // We reached a new feature value, so the previous split value (if any) can now be evaluated:
+            // left currently has all instances <= previous_feature_value.
             if let Some(prev_split_value) = possible_split_values.last_mut() {
                 // If the previous split value was not added for some reason, then we do not need to update it.
                 // This can happen if the previous split value was not useful, e.g. a previous split had a zero cost on the right side.
@@ -125,17 +121,14 @@ impl<'a, OT: OptimizationTask> DataView<'a, OT> {
 
             *previous_feature_value = value.feature_value;
 
-            // Ensure we have at most one split with zero cost on the left side.
-            if old_left_cost.is_zero() && possible_split_values.len() == 2 {
-                let better_split = possible_split_values.pop().unwrap();
-                possible_split_values[0] = better_split;
-            }
-
             possible_split_values.push(SplitValue {
                 feature_value: value.feature_value,
                 greedy_value: 0.0, // This will be set later.
             });
         }
+
+        *left_costsum += &dataset.instances[value.instance_id];
+        *right_costsum -= &dataset.instances[value.instance_id];
     }
 
     /// Post-process the possible split values to remove the last one if it is the final feature value.
@@ -483,20 +476,11 @@ mod tests {
 
     #[test]
     fn possible_splits_smoke_test() {
-        // For feature values:         00011112224444566
-        // And cumulative left cost:   00000000123456666
-        // And cumulative right cost:  66666666543210000
-        // We add possible splits:     0--1---2--4---56-
-        // - 0, 1 is a bigger zero split.
-        // + 1
-        // + 2
-        // - 3, feature value not in this range.
-        // + 4
-        // - 5, 4 is a bigger right zero split.
-        // - 6, 4 is a bigger right zero split.
+        // We keep all unique split values except the final one, because the final one would
+        // leave the right side empty.
         let feature_values = vec![0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 4, 4, 4, 4, 5, 6, 6];
         let labels = vec![0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 3, 4, 5, 6, 0, 0, 0];
-        let expected_splits = vec![1, 2, 4];
+        let expected_splits = vec![0, 1, 2, 4, 5];
         test_possible_splits(feature_values, labels, expected_splits);
     }
 
@@ -520,7 +504,7 @@ mod tests {
     fn possible_splits_none() {
         let feature_values = vec![0, 1];
         let labels = vec![0, 0];
-        let expected_splits = vec![];
+        let expected_splits = vec![0];
         test_possible_splits(feature_values, labels, expected_splits);
     }
 
@@ -528,7 +512,7 @@ mod tests {
     fn possible_splits_largest_left() {
         let feature_values = vec![0, 1, 2, 3, 4, 5];
         let labels = vec![0, 0, 0, 0, 0, 1];
-        let expected_splits = vec![4];
+        let expected_splits = vec![0, 1, 2, 3, 4];
         test_possible_splits(feature_values, labels, expected_splits);
     }
 
@@ -538,8 +522,8 @@ mod tests {
         let labels = vec![0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 3, 4, 5, 6, 0, 0, 0];
         let dataset = create_dataset(feature_values, labels);
         let view = DataView::<AccuracyTask>::from_dataset(&dataset);
-        assert_eq!(view.possible_split_values[0][0].feature_value, 1);
-        assert_eq!(view.possible_split_values[0][2].feature_value, 4);
-        assert_eq!(view.instance_range_from_split_range(0, 0..2), 3..10);
+        assert_eq!(view.possible_split_values[0][0].feature_value, 0);
+        assert_eq!(view.possible_split_values[0][2].feature_value, 2);
+        assert_eq!(view.instance_range_from_split_range(0, 0..2), 0..7);
     }
 }

@@ -5,4 +5,4 @@ pub(crate) mod queue;
 pub mod solver;
 pub(crate) mod solver_impl;
 pub(crate) mod strategy;
-pub(crate) mod upper_bounds;
+pub mod upper_bounds;
