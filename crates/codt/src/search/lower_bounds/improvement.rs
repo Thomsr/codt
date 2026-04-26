@@ -45,7 +45,7 @@ mod tests {
         let labels = vec![1, 1, 1, 1];
 
         let dataset = create_dataset(features, labels);
-        let dataview = DataView::<AccuracyTask>::from_dataset(&dataset);
+        let dataview = DataView::<AccuracyTask>::from_dataset(&dataset, false);
 
         let lb = improvement_lower_bound(&dataview);
         assert_eq!(lb.secondary, 0);
@@ -58,7 +58,7 @@ mod tests {
         let labels = vec![0, 0, 1, 1];
 
         let dataset = create_dataset(features, labels);
-        let dataview = DataView::<AccuracyTask>::from_dataset(&dataset);
+        let dataview = DataView::<AccuracyTask>::from_dataset(&dataset, false);
 
         let lb = improvement_lower_bound(&dataview);
         assert_eq!(lb.secondary, 1);
@@ -70,7 +70,7 @@ mod tests {
         let labels = vec![0, 1, 0, 1];
 
         let dataset = create_dataset(features, labels);
-        let dataview = DataView::<AccuracyTask>::from_dataset(&dataset);
+        let dataview = DataView::<AccuracyTask>::from_dataset(&dataset, false);
         let improvement_lower_bound = improvement_lower_bound(&dataview);
         let pair_lower_bound = pair_lower_bound(&dataview);
 

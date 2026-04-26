@@ -31,7 +31,7 @@ mod cart_subset_experiment {
     };
 
     fn cart_size(dataset: &DataSet<LabeledInstance<i32>>, use_subset: bool, seed: u64) -> usize {
-        let view = DataView::<AccuracyTask>::from_dataset(dataset);
+        let view = DataView::<AccuracyTask>::from_dataset(dataset, false);
         let task = AccuracyTask::new();
         let tree = search::upper_bounds::cart::cart_upper_bound_with_subset_seed(
             &task,

@@ -140,7 +140,7 @@ mod tests {
         let feature_values = vec![0, 1, 2, 3, 4];
         let labels = vec![0, 0, 0, 0, 0];
         let dataset = create_dataset(feature_values, labels);
-        let dataview = DataView::<AccuracyTask>::from_dataset(&dataset);
+        let dataview = DataView::<AccuracyTask>::from_dataset(&dataset, false);
 
         let task = AccuracyTask::new();
         let tree = cart_upper_bound_with_subset(&task, &dataview, Some(false));
@@ -160,7 +160,7 @@ mod tests {
         let feature_values = vec![0, 0, 1, 1];
         let labels = vec![0, 0, 1, 1];
         let dataset = create_dataset(feature_values, labels);
-        let dataview = DataView::<AccuracyTask>::from_dataset(&dataset);
+        let dataview = DataView::<AccuracyTask>::from_dataset(&dataset, false);
 
         let task = AccuracyTask::new();
         let tree = cart_upper_bound_with_subset(&task, &dataview, Some(false));
@@ -188,7 +188,7 @@ mod tests {
                 .join("data/sampled")
                 .join(format!("{sampled_name}.txt"));
             read_from_file(&mut dataset, &file).unwrap();
-            let dataview = DataView::<AccuracyTask>::from_dataset(&dataset);
+            let dataview = DataView::<AccuracyTask>::from_dataset(&dataset, false);
 
             let task = AccuracyTask::new();
             let tree = cart_upper_bound_with_subset(&task, &dataview, Some(false));

@@ -2,8 +2,7 @@ use std::path::PathBuf;
 
 use clap::{ArgAction, Args, Parser, Subcommand};
 use codt::search::solver::{
-    CartUpperboundStrategy, DataReductionOption, LowerBoundStrategy, SearchStrategyEnum,
-    UpperboundStrategy,
+    CartUpperboundStrategy, LowerBoundStrategy, SearchStrategyEnum, UpperboundStrategy,
 };
 
 use crate::clap_enum_variants;
@@ -44,25 +43,29 @@ pub struct CliParams {
         value_parser = clap_enum_variants!(LowerBoundStrategy),
         value_delimiter = ',',
         num_args = 1..,
-        default_value = "class-count"
+        default_values_t = [
+            LowerBoundStrategy::ClassCount,
+            LowerBoundStrategy::Improvement,
+            LowerBoundStrategy::Pair
+        ]
     )]
     pub lowerbound: Vec<LowerBoundStrategy>,
 
     #[arg(short, long, value_enum, default_value = "for-remaining-interval")]
     pub upperbound: UpperboundStrategy,
 
-    #[arg(long, value_enum, default_value = "disabled")]
+    #[arg(long, value_enum, default_value = "enabled")]
     pub cart_upperbound: CartUpperboundStrategy,
 
-    #[arg(long, value_enum, default_value = "enabled")]
-    pub data_reduction: DataReductionOption,
+    #[arg(long, action=ArgAction::Set, default_value_t=true)]
+    pub use_data_reduction: bool,
 
     /// Determines if the solver should track intermediate solutions.
     #[arg(long, action=ArgAction::Set, default_value_t=false)]
     pub intermediates: bool,
 
     /// The search strategy to use.
-    #[arg(short, long, value_parser=clap_enum_variants!(SearchStrategyEnum), default_value_t=SearchStrategyEnum::BfsBalanceSmallLb)]
+    #[arg(short, long, value_parser=clap_enum_variants!(SearchStrategyEnum), default_value_t=SearchStrategyEnum::AndOr)]
     pub strategy: SearchStrategyEnum,
 }
 

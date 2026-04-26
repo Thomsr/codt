@@ -5,10 +5,8 @@ use std::{
 };
 
 use codt::{
-    model::{dataset::DataSet, dataview::DataView, reduction::DataReductionStrategy},
-    search::solver::{
-        DataReductionOption, SearchStrategyEnum, SolveStatus, SolverOptions, solver_with_strategy,
-    },
+    model::{dataset::DataSet, dataview::DataView},
+    search::solver::{SearchStrategyEnum, SolveStatus, SolverOptions, solver_with_strategy},
     tasks::{OptimizationTask, accuracy::AccuracyTask},
 };
 use file_reader::read_from_file;
@@ -22,7 +20,6 @@ mod value_parser;
 fn run_solver_for_task<T: OptimizationTask>(
     file: &PathBuf,
     options: SolverOptions,
-    reduction_strategy: DataReductionStrategy,
     task: T,
     strategy: SearchStrategyEnum,
 ) where
@@ -37,7 +34,7 @@ fn run_solver_for_task<T: OptimizationTask>(
 
     let before_solve = Instant::now();
     T::preprocess_dataset(&mut dataset);
-    let full_view = DataView::from_dataset_with_reduction(&dataset, reduction_strategy);
+    let full_view = DataView::from_dataset(&dataset, options.use_data_reduction);
     let mut solver = solver_with_strategy(task, full_view, strategy);
     let result = solver.solve(options);
 
@@ -80,16 +77,12 @@ fn main() {
         lb_strategy: args.lowerbound.into_iter().collect::<HashSet<_>>(),
         ub_strategy: args.upperbound,
         cart_ub_strategy: args.cart_upperbound,
-        data_reduction: args.data_reduction,
+        use_data_reduction: args.use_data_reduction,
         memory_limit: Some(args.memory_limit),
         timeout: Some(Duration::from_secs(args.timeout)),
         track_intermediates: args.intermediates,
     };
 
     let task = AccuracyTask::new();
-    let reduction_strategy = match args.data_reduction {
-        DataReductionOption::Disabled => DataReductionStrategy::Disabled,
-        DataReductionOption::Enabled => DataReductionStrategy::Enabled,
-    };
-    run_solver_for_task(&args.file, options, reduction_strategy, task, args.strategy);
+    run_solver_for_task(&args.file, options, task, args.strategy);
 }

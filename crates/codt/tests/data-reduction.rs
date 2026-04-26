@@ -1,13 +1,10 @@
 use std::collections::HashSet;
 
 use codt::{
-    model::{
-        dataset::DataSet, dataview::DataView, instance::LabeledInstance,
-        reduction::DataReductionStrategy,
-    },
+    model::{dataset::DataSet, dataview::DataView, instance::LabeledInstance},
     search::solver::{
-        CartUpperboundStrategy, DataReductionOption, LowerBoundStrategy, SearchStrategyEnum,
-        SolveStatus, SolverOptions, UpperboundStrategy, solver_with_strategy,
+        CartUpperboundStrategy, LowerBoundStrategy, SearchStrategyEnum, SolveStatus, SolverOptions,
+        UpperboundStrategy, solver_with_strategy,
     },
     tasks::accuracy::AccuracyTask,
 };
@@ -21,7 +18,7 @@ fn default_options() -> SolverOptions {
         ]),
         ub_strategy: UpperboundStrategy::ForRemainingInterval,
         cart_ub_strategy: CartUpperboundStrategy::Enabled,
-        data_reduction: DataReductionOption::Enabled,
+        use_data_reduction: true,
         track_intermediates: false,
         timeout: None,
         memory_limit: None,
@@ -42,14 +39,8 @@ fn build_dataset() -> DataSet<LabeledInstance<i32>> {
 fn reduction_toggle_changes_view_size() {
     let dataset = build_dataset();
 
-    let reduced = DataView::<AccuracyTask>::from_dataset_with_reduction(
-        &dataset,
-        DataReductionStrategy::Enabled,
-    );
-    let unreduced = DataView::<AccuracyTask>::from_dataset_with_reduction(
-        &dataset,
-        DataReductionStrategy::Disabled,
-    );
+    let reduced = DataView::<AccuracyTask>::from_dataset(&dataset, true);
+    let unreduced = DataView::<AccuracyTask>::from_dataset(&dataset, false);
 
     assert!(reduced.num_instances() <= unreduced.num_instances());
     assert!(reduced.num_features() <= unreduced.num_features());
@@ -75,10 +66,7 @@ fn reduction_toggle_changes_view_size() {
 #[test]
 fn merged_feature_split_maps_to_original_feature() {
     let dataset = build_dataset();
-    let reduced = DataView::<AccuracyTask>::from_dataset_with_reduction(
-        &dataset,
-        DataReductionStrategy::Enabled,
-    );
+    let reduced = DataView::<AccuracyTask>::from_dataset(&dataset, true);
 
     if reduced.num_features() == 0 || reduced.possible_split_values[0].is_empty() {
         return;

@@ -4,12 +4,6 @@ use crate::tasks::OptimizationTask;
 
 use super::dataset::DataSet;
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum DataReductionStrategy {
-    Disabled,
-    Enabled,
-}
-
 #[derive(Debug, Clone, Default)]
 pub struct ReductionStats {
     pub before_examples: usize,
@@ -420,7 +414,7 @@ fn apply_remove_dimension(w: &mut WorkingData) -> usize {
 
 pub fn reduce_dataset<OT: OptimizationTask>(
     dataset: &DataSet<OT::InstanceType>,
-    strategy: DataReductionStrategy,
+    use_reduction: bool,
 ) -> ReducedData
 where
     OT::LabelType: PartialEq,
@@ -460,7 +454,7 @@ where
             .collect(),
     };
 
-    if matches!(strategy, DataReductionStrategy::Enabled) {
+    if use_reduction {
         stats.removed_cuts_dimension_reduction += apply_dimension_reduction::<OT>(&mut w, dataset);
         stats.removed_cuts_equivalent += apply_equivalent_cuts(&mut w);
         stats.merged_dimensions += apply_dimension_merge(&mut w);
@@ -490,7 +484,7 @@ mod tests {
         test_support::{read_from_file, repo_root},
     };
 
-    use super::{DataReductionStrategy, reduce_dataset};
+    use super::reduce_dataset;
 
     fn dataset(features: Vec<Vec<i32>>, labels: Vec<i32>) -> DataSet<LabeledInstance<i32>> {
         let mut ds = DataSet::default();
@@ -515,7 +509,7 @@ mod tests {
     fn remove_duplicate_examples() {
         // Two identical examples with the same label should be reduced to one.
         let ds = dataset(vec![vec![0, 0, 1], vec![0, 0, 1]], vec![1, 1, 0]);
-        let out = reduce_dataset::<AccuracyTask>(&ds, DataReductionStrategy::Enabled);
+        let out = reduce_dataset::<AccuracyTask>(&ds, true);
         assert_eq!(out.instance_ids.len(), 2);
     }
 
@@ -523,7 +517,7 @@ mod tests {
     fn remove_dimension_rule() {
         // Feature 1 has the same value for all examples, so it should be removed.
         let ds = dataset(vec![vec![0, 0, 0], vec![0, 1, 1]], vec![0, 1, 1]);
-        let out = reduce_dataset::<AccuracyTask>(&ds, DataReductionStrategy::Enabled);
+        let out = reduce_dataset::<AccuracyTask>(&ds, true);
         assert_eq!(out.feature_values.len(), 1);
     }
     #[test]
@@ -533,14 +527,14 @@ mod tests {
             vec![vec![0, 1, 2, 3], vec![1, 0, 2, 2], vec![0, 0, 2, 1]],
             vec![0, 0, 1, 0],
         );
-        let out = reduce_dataset::<AccuracyTask>(&ds, DataReductionStrategy::Enabled);
+        let out = reduce_dataset::<AccuracyTask>(&ds, true);
         assert_eq!(out.feature_values.len(), 2);
     }
 
     #[test]
     fn equivalent_cuts_rule_reduces() {
         let ds = dataset(vec![vec![0, 0, 1, 1], vec![0, 0, 1, 1]], vec![0, 1, 0, 1]);
-        let out = reduce_dataset::<AccuracyTask>(&ds, DataReductionStrategy::Enabled);
+        let out = reduce_dataset::<AccuracyTask>(&ds, true);
         assert!(out.stats.after_cuts < out.stats.before_cuts);
     }
 
@@ -550,21 +544,21 @@ mod tests {
             vec![vec![0, 1, 2, 3], vec![1, 0, 2, 2], vec![0, 0, 2, 1]],
             vec![0, 0, 1, 0],
         );
-        let out = reduce_dataset::<AccuracyTask>(&ds, DataReductionStrategy::Enabled);
+        let out = reduce_dataset::<AccuracyTask>(&ds, true);
         assert_eq!(out.feature_values.len(), 2);
     }
 
     #[test]
     fn dimension_reduction_rule_reduces_extremes() {
         let ds = dataset(vec![vec![0, 1, 2, 3], vec![0, 0, 0, 0]], vec![1, 1, 1, 0]);
-        let out = reduce_dataset::<AccuracyTask>(&ds, DataReductionStrategy::Enabled);
+        let out = reduce_dataset::<AccuracyTask>(&ds, true);
         assert!(out.stats.after_cuts < out.stats.before_cuts);
     }
 
     #[test]
     fn dimension_merge_rule_can_merge() {
         let ds = dataset(vec![vec![0, 1, 2, 3], vec![0, 1, 2, 3]], vec![0, 0, 1, 1]);
-        let out = reduce_dataset::<AccuracyTask>(&ds, DataReductionStrategy::Enabled);
+        let out = reduce_dataset::<AccuracyTask>(&ds, true);
         assert!(out.stats.merged_dimensions >= 1);
     }
 
@@ -688,7 +682,7 @@ mod tests {
                 )
             });
 
-            let reduced = reduce_dataset::<AccuracyTask>(&dataset, DataReductionStrategy::Enabled);
+            let reduced = reduce_dataset::<AccuracyTask>(&dataset, true);
 
             if reduced.stats.before_examples != record.n {
                 mismatches.push(format!(

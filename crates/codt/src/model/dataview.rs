@@ -1,5 +1,5 @@
 use crate::{
-    model::reduction::{DataReductionStrategy, ReductionStats, reduce_dataset},
+    model::reduction::{ReductionStats, reduce_dataset},
     tasks::{CostSum, OptimizationTask},
 };
 
@@ -159,21 +159,11 @@ impl<'a, OT: OptimizationTask> DataView<'a, OT> {
             .collect()
     }
 
-    pub fn from_dataset(dataset: &'a DataSet<OT::InstanceType>) -> Self
+    pub fn from_dataset(dataset: &'a DataSet<OT::InstanceType>, use_reduction: bool) -> Self
     where
         OT::LabelType: PartialEq,
     {
-        Self::from_dataset_with_reduction(dataset, DataReductionStrategy::Enabled)
-    }
-
-    pub fn from_dataset_with_reduction(
-        dataset: &'a DataSet<OT::InstanceType>,
-        reduction: DataReductionStrategy,
-    ) -> Self
-    where
-        OT::LabelType: PartialEq,
-    {
-        let reduced = reduce_dataset::<OT>(dataset, reduction);
+        let reduced = reduce_dataset::<OT>(dataset, use_reduction);
 
         let mut feature_values_sorted = Vec::new();
         let mut possible_split_values = Vec::new();
@@ -557,10 +547,7 @@ mod tests {
 
     fn test_possible_splits(feature_values: Vec<i32>, labels: Vec<i32>, expected_splits: Vec<i32>) {
         let dataset = create_dataset(feature_values, labels);
-        let view = DataView::<AccuracyTask>::from_dataset_with_reduction(
-            &dataset,
-            DataReductionStrategy::Disabled,
-        );
+        let view = DataView::<AccuracyTask>::from_dataset(&dataset, false);
 
         assert_eq!(
             view.possible_split_values[0]
@@ -592,10 +579,7 @@ mod tests {
         let feature_values = vec![0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 4, 4, 4, 4, 5, 6, 6];
         let labels = vec![0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 3, 4, 5, 6, 0, 0, 0];
         let dataset = create_dataset(feature_values, labels);
-        let view = DataView::<AccuracyTask>::from_dataset_with_reduction(
-            &dataset,
-            DataReductionStrategy::Disabled,
-        );
+        let view = DataView::<AccuracyTask>::from_dataset(&dataset, false);
         assert_eq!(view.possible_split_values[0][0].feature_value, 0);
         assert_eq!(view.possible_split_values[0][2].feature_value, 2);
         assert_eq!(view.instance_range_from_split_range(0, 0..2), 0..7);
