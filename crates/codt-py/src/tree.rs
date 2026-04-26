@@ -8,8 +8,8 @@ use std::{
 use codt::{
     model::{dataset::DataSet, dataview::DataView, instance::LabeledInstance, tree::Tree},
     search::solver::{
-        CartUpperboundStrategy, LowerBoundStrategy, SearchStrategyEnum, SolveResult, SolverOptions,
-        UpperboundStrategy, solver_with_strategy,
+        CartUpperboundStrategy, DataReductionOption, LowerBoundStrategy, SearchStrategyEnum,
+        SolveResult, SolverOptions, UpperboundStrategy, solver_with_strategy,
     },
     tasks::{OptimizationTask, accuracy::AccuracyTask},
 };
@@ -156,6 +156,7 @@ macro_rules! impl_optimal_decision_tree_pyclass {
                     lb_strategy: self.lowerbound.clone(),
                     ub_strategy: self.upperbound,
                     cart_ub_strategy: self.cart_upperbound,
+                    data_reduction: DataReductionOption::Enabled,
                     timeout: self.timeout,
                     track_intermediates: self.intermediates,
                     memory_limit: self.memory_limit,

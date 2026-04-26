@@ -152,9 +152,8 @@ impl DifferenceTable {
         split_columns
             .iter()
             .map(|split| {
-                let feature_col = &dataview.dataset.feature_values[split.feature];
-                let p_left = feature_col[p] <= split.threshold_value;
-                let n_left = feature_col[n] <= split.threshold_value;
+                let p_left = dataview.feature_value(split.feature, p) <= split.threshold_value;
+                let n_left = dataview.feature_value(split.feature, n) <= split.threshold_value;
                 p_left != n_left
             })
             .collect::<Vec<bool>>()
@@ -182,7 +181,7 @@ mod tests {
         dataset.feature_values.push(vec![0, 1]);
         dataset.feature_values.push(vec![1, 0]);
 
-        let dataview = DataView::<AccuracyTask>::from_dataset(&dataset);
+        let dataview = DataView::<AccuracyTask>::from_dataset(&dataset, false);
         let diff_table = DifferenceTable::new(&dataview);
 
         assert_eq!(diff_table.diffs.len(), 1);
@@ -204,7 +203,7 @@ mod tests {
         dataset.feature_values.push(vec![0, 1, 1, 1]);
         dataset.feature_values.push(vec![1, 0, 1, 0]);
 
-        let dataview = DataView::<AccuracyTask>::from_dataset(&dataset);
+        let dataview = DataView::<AccuracyTask>::from_dataset(&dataset, false);
         let diff_table = DifferenceTable::new(&dataview);
 
         let expected_diffs = vec![
@@ -230,7 +229,7 @@ mod tests {
         dataset.feature_values.push(vec![0, 1, 1, 0]);
         dataset.feature_values.push(vec![1, 0, 1, 1]);
 
-        let dataview = DataView::<AccuracyTask>::from_dataset(&dataset);
+        let dataview = DataView::<AccuracyTask>::from_dataset(&dataset, false);
         let diff_table = DifferenceTable::new(&dataview);
         diff_table.print();
 
@@ -258,7 +257,7 @@ mod tests {
         // Feature 1 yields one candidate split threshold: 0.
         dataset.feature_values.push(vec![0, 0, 1, 1]);
 
-        let dataview = DataView::<AccuracyTask>::from_dataset(&dataset);
+        let dataview = DataView::<AccuracyTask>::from_dataset(&dataset, false);
         let diff_table = DifferenceTable::new(&dataview);
 
         assert_eq!(diff_table.n_columns, 3);

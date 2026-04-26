@@ -166,6 +166,7 @@ pub struct SolverOptions {
     pub lb_strategy: HashSet<LowerBoundStrategy>,
     pub ub_strategy: UpperboundStrategy,
     pub cart_ub_strategy: CartUpperboundStrategy,
+    pub use_data_reduction: bool,
     pub track_intermediates: bool,
     pub timeout: Option<Duration>,
     pub memory_limit: Option<u64>,

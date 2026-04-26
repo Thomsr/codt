@@ -30,6 +30,7 @@ fn default_options() -> SolverOptions {
         ]),
         ub_strategy: UpperboundStrategy::ForRemainingInterval,
         cart_ub_strategy: CartUpperboundStrategy::Enabled,
+        use_data_reduction: true,
         track_intermediates: false,
         timeout: None,
         memory_limit: None,
@@ -74,7 +75,7 @@ fn witty_record_for_dataset(name: &str) -> WittyRecord {
 
 #[test]
 fn codt_matches_witty_minimum_tree_size_on_sampled_datasets() {
-    let datasets = &DATASETS_BY_DIFFICULTY[..40];
+    let datasets = &DATASETS_BY_DIFFICULTY[..100];
 
     for (i, dataset_name) in datasets.iter().enumerate() {
         let witty = witty_record_for_dataset(dataset_name);
@@ -95,7 +96,7 @@ fn codt_matches_witty_minimum_tree_size_on_sampled_datasets() {
             .join("data/sampled")
             .join(format!("{sampled_name}.txt"));
         read_from_file(&mut dataset, &file).unwrap();
-        let full_view = DataView::from_dataset(&dataset);
+        let full_view = DataView::from_dataset(&dataset, true);
         let mut solver =
             solver_with_strategy(AccuracyTask::new(), full_view, SearchStrategyEnum::AndOr);
 

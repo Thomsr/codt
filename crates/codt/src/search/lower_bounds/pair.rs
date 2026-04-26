@@ -104,7 +104,7 @@ mod tests {
         let labels = vec![1, 1, 1, 1];
 
         let dataset = create_dataset(features, labels);
-        let dataview = DataView::<AccuracyTask>::from_dataset(&dataset);
+        let dataview = DataView::<AccuracyTask>::from_dataset(&dataset, false);
 
         let lb = pair_lower_bound(&dataview);
 
@@ -122,7 +122,7 @@ mod tests {
         let labels = vec![0, 0, 1, 1];
 
         let dataset = create_dataset(features, labels);
-        let dataview = DataView::<AccuracyTask>::from_dataset(&dataset);
+        let dataview = DataView::<AccuracyTask>::from_dataset(&dataset, false);
 
         let lb = pair_lower_bound(&dataview);
 
@@ -144,7 +144,7 @@ mod tests {
         let labels = vec![0, 1, 0, 1];
 
         let dataset = create_dataset(features, labels);
-        let dataview = DataView::<AccuracyTask>::from_dataset(&dataset);
+        let dataview = DataView::<AccuracyTask>::from_dataset(&dataset, false);
 
         let lb = pair_lower_bound(&dataview);
 

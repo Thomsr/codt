@@ -634,7 +634,9 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> Node<'a, OT, SS> {
             self.best = match expanded {
                 ExpandedQueueItem::Children(children) => Arc::new(Tree::Branch(BranchNode {
                     cost: best_cost,
-                    split_feature: item.feature,
+                    split_feature: self
+                        .dataview
+                        .original_split_feature_from_split(item.feature, item.split_point),
                     split_threshold: self
                         .dataview
                         .threshold_from_split(item.feature, item.split_point),

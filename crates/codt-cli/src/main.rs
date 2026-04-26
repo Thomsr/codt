@@ -22,7 +22,9 @@ fn run_solver_for_task<T: OptimizationTask>(
     options: SolverOptions,
     task: T,
     strategy: SearchStrategyEnum,
-) {
+) where
+    T::LabelType: PartialEq,
+{
     info!("Starting solve with options:\n{:?}\n", options);
 
     let before_read = Instant::now();
@@ -32,7 +34,7 @@ fn run_solver_for_task<T: OptimizationTask>(
 
     let before_solve = Instant::now();
     T::preprocess_dataset(&mut dataset);
-    let full_view = DataView::from_dataset(&dataset);
+    let full_view = DataView::from_dataset(&dataset, options.use_data_reduction);
     let mut solver = solver_with_strategy(task, full_view, strategy);
     let result = solver.solve(options);
 
@@ -75,6 +77,7 @@ fn main() {
         lb_strategy: args.lowerbound.into_iter().collect::<HashSet<_>>(),
         ub_strategy: args.upperbound,
         cart_ub_strategy: args.cart_upperbound,
+        use_data_reduction: args.use_data_reduction,
         memory_limit: Some(args.memory_limit),
         timeout: Some(Duration::from_secs(args.timeout)),
         track_intermediates: args.intermediates,

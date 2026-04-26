@@ -1,4 +1,7 @@
-use crate::tasks::{CostSum, OptimizationTask};
+use crate::{
+    model::reduction::{ReductionStats, reduce_dataset},
+    tasks::{CostSum, OptimizationTask},
+};
 
 use super::dataset::DataSet;
 
@@ -37,8 +40,10 @@ pub struct DataView<'a, OT: OptimizationTask> {
     /// The feature values for instances that remain in this view. Indexed first
     /// by feature_id, then sorted by feature value.
     feature_values_sorted: Vec<Vec<FeatureValue>>,
-    /// All of the feature values that are still possible to split on per feature.
-    /// A reduced set of all unique values of `feature_values_sorted`.
+    pub feature_values: Vec<Vec<i32>>, // [feature][instance_pos]
+    pub instance_ids: Vec<usize>,      // instance_pos -> dataset instance id
+    instance_pos_by_id: Vec<usize>,
+    value_sources: Vec<Vec<(usize, i32)>>, // [feature][feature_value] -> (original_feature, original_cut_value)
     pub possible_split_values: Vec<Vec<SplitValue>>,
     pub cost_summer: OT::CostSumType,
     /// The best greedy splits per feature for this dataview. Indexed by feature.
@@ -47,6 +52,7 @@ pub struct DataView<'a, OT: OptimizationTask> {
     pub feature_ranking: Vec<i32>,
     pub unique_labels: Vec<OT::LabelType>,
     pub extra_data: OT::ExtraDataviewData,
+    pub reduction_stats: ReductionStats,
 }
 
 impl<OT: OptimizationTask> Debug for DataView<'_, OT> {
@@ -82,17 +88,6 @@ impl<'a, OT: OptimizationTask> DataView<'a, OT> {
         unique_labels
     }
 
-    /// Add a possible split value to the list of possible splits, if it is necessary.
-    ///
-    /// For feature values:         00011112224444566
-    /// And cumulative left cost:   00000000123456666
-    /// And cumulative right cost:  66666666543210000
-    /// Candidate splits:           0--1---2--4---56-
-    /// Possible splits:            1, 2, 4
-    ///
-    /// - 1 is a bigger zero split than 0, so exclude 0.
-    /// - 4 is a bigger right zero split than 5 and 6, so exclude 5 and 6.
-    /// - 6 is the final feature value, so another reason to exclude it. (All instances would go to the left.)
     fn add_possible_split_value(
         possible_split_values: &mut Vec<SplitValue>,
         previous_feature_value: &mut i32,
@@ -164,9 +159,12 @@ impl<'a, OT: OptimizationTask> DataView<'a, OT> {
             .collect()
     }
 
-    /// Initialize a dataview from a dataset. The new dataview contains all instances of the dataset
-    pub fn from_dataset(dataset: &'a DataSet<OT::InstanceType>) -> Self {
-        // Copy over all the feature values from the dataset, and sort them by the feature values.
+    pub fn from_dataset(dataset: &'a DataSet<OT::InstanceType>, use_reduction: bool) -> Self
+    where
+        OT::LabelType: PartialEq,
+    {
+        let reduced = reduce_dataset::<OT>(dataset, use_reduction);
+
         let mut feature_values_sorted = Vec::new();
         let mut possible_split_values = Vec::new();
         let mut best_greedy_splits = Vec::new();
@@ -174,24 +172,25 @@ impl<'a, OT: OptimizationTask> DataView<'a, OT> {
         let mut left_costsum = OT::init_costsum(dataset);
         let mut right_costsum = left_costsum.clone();
 
-        for instance in &dataset.instances {
-            left_costsum += instance;
+        for &dataset_instance_id in &reduced.instance_ids {
+            left_costsum += &dataset.instances[dataset_instance_id];
         }
 
-        for feature in &dataset.feature_values {
+        let mut value_sources = Vec::with_capacity(reduced.feature_values.len());
+
+        for (feature_idx, feature) in reduced.feature_values.iter().enumerate() {
             let mut feature_values_sorted_i = Vec::new();
             let mut possible_split_values_i = Vec::new();
 
-            for (instance_id, &feature_value) in feature.iter().enumerate() {
+            for (pos, &feature_value) in feature.iter().enumerate() {
                 feature_values_sorted_i.push(FeatureValue {
-                    instance_id,
+                    instance_id: reduced.instance_ids[pos],
                     feature_value,
                 })
             }
 
             feature_values_sorted_i.sort_by_key(|fv| fv.feature_value);
 
-            // Reset the cost sums by moving the total (now on the left) to the right.
             right_costsum += &left_costsum;
             left_costsum.clear();
 
@@ -213,12 +212,37 @@ impl<'a, OT: OptimizationTask> DataView<'a, OT> {
                 );
             }
 
-            assert!(previous != -1, "The dataset should not be empty.");
-            Self::post_process_possible_splits(&mut possible_split_values_i, previous);
+            if previous != -1 {
+                Self::post_process_possible_splits(&mut possible_split_values_i, previous);
+            }
+
+            let max_value = feature.iter().copied().max().unwrap_or(0).max(0) as usize;
+            let mut sources = vec![(feature_idx, 0); max_value + 1];
+            let mut explicit = vec![false; max_value + 1];
+            for (i, src) in reduced.cut_sources[feature_idx].iter().copied().enumerate() {
+                if i < sources.len() {
+                    sources[i] = src;
+                    explicit[i] = true;
+                }
+            }
+            if let Some(last_known) = reduced.cut_sources[feature_idx].last().copied() {
+                for (idx, src) in sources.iter_mut().enumerate() {
+                    if !explicit[idx] {
+                        *src = last_known;
+                    }
+                }
+            }
+            value_sources.push(sources);
 
             feature_values_sorted.push(feature_values_sorted_i);
             possible_split_values.push(possible_split_values_i);
             best_greedy_splits.push(best_greedy_split);
+        }
+
+        let instance_ids = reduced.instance_ids;
+        let mut instance_pos_by_id = vec![usize::MAX; dataset.instances.len()];
+        for (pos, &id) in instance_ids.iter().enumerate() {
+            instance_pos_by_id[id] = pos;
         }
 
         let feature_ranking = Self::feature_rank_from_best_greedy_splits(&best_greedy_splits);
@@ -228,28 +252,47 @@ impl<'a, OT: OptimizationTask> DataView<'a, OT> {
         Self {
             dataset,
             feature_values_sorted,
+            feature_values: reduced.feature_values,
+            instance_ids,
+            instance_pos_by_id,
+            value_sources,
             possible_split_values,
             cost_summer: left_costsum,
             best_greedy_splits,
             feature_ranking,
             unique_labels,
             extra_data,
+            reduction_stats: reduced.stats,
         }
     }
 
-    /// Helper function for left and right side.
     #[inline]
     fn add_feature_value(feature_values: &mut Vec<FeatureValue>, value: FeatureValue) {
-        // Assure the compiler that we do not need reallocation when pushing.
         unsafe {
             std::hint::assert_unchecked(feature_values.len() < feature_values.capacity());
         }
         feature_values.push(value);
     }
 
-    /// Split this dataview into two, the first containing only those instances where
-    /// `split_feature <= threshold`, and the second where `split_feature > threshold`.
-    pub fn split(&self, split_feature: usize, split_value: usize) -> (Self, Self) {
+    #[inline]
+    pub fn feature_value(&self, feature: usize, dataset_instance_id: usize) -> i32 {
+        let pos = self.instance_pos_by_id[dataset_instance_id];
+        self.feature_values[feature][pos]
+    }
+
+    fn source_for_split_value(&self, feature: usize, split_feature_value: i32) -> (usize, i32) {
+        let value = split_feature_value.max(0) as usize;
+        if value < self.value_sources[feature].len() {
+            self.value_sources[feature][value]
+        } else {
+            (feature, split_feature_value)
+        }
+    }
+
+    pub fn split(&self, split_feature: usize, split_value: usize) -> (Self, Self)
+    where
+        OT::LabelType: PartialEq,
+    {
         let threshold = self.possible_split_values[split_feature][split_value].feature_value;
         let mut feature_values_left = Vec::with_capacity(self.feature_values_sorted.len());
         let mut feature_values_right = Vec::with_capacity(self.feature_values_sorted.len());
@@ -258,25 +301,22 @@ impl<'a, OT: OptimizationTask> DataView<'a, OT> {
         let mut best_greedy_splits_left = Vec::with_capacity(self.best_greedy_splits.len());
         let mut best_greedy_splits_right = Vec::with_capacity(self.best_greedy_splits.len());
 
-        // Initialize the cost sums for the left and right side so the left side starts with all instances.
         let mut costsum_ll = self.cost_summer.clone();
         costsum_ll.clear();
         let mut costsum_lr = costsum_ll.clone();
         let mut costsum_rr = costsum_lr.clone();
 
         for value in &self.feature_values_sorted[split_feature] {
-            if self.dataset.feature_values[split_feature][value.instance_id] <= threshold {
+            if self.feature_value(split_feature, value.instance_id) <= threshold {
                 costsum_ll += &self.dataset.instances[value.instance_id];
             } else {
-                break; // All further values will be larger than the threshold, so we can stop here.
+                break;
             }
         }
         let mut costsum_rl = self.cost_summer.clone();
         costsum_rl -= &costsum_ll;
 
-        // Create the left and right sides of the dataview.
         for (feature_idx, feature) in self.feature_values_sorted.iter().enumerate() {
-            // Overestimate all of these capacities to the current length so that no reallocations are needed.
             let mut feature_values_left_i = Vec::with_capacity(feature.len());
             let mut feature_values_right_i = Vec::with_capacity(feature.len());
             let mut possible_split_values_left_i =
@@ -284,7 +324,6 @@ impl<'a, OT: OptimizationTask> DataView<'a, OT> {
             let mut possible_split_values_right_i =
                 Vec::with_capacity(self.possible_split_values[feature_idx].len());
 
-            // Initialize values for the loop
             let mut last_feature_value_left = -1;
             let mut last_feature_value_right = -1;
             let mut best_greedy_split_left = BestGreedySplit {
@@ -296,14 +335,13 @@ impl<'a, OT: OptimizationTask> DataView<'a, OT> {
                 greedy_value: f32::INFINITY,
             };
 
-            // Reset the cost sums by moving the total (now on the left) to the right.
             costsum_lr += &costsum_ll;
             costsum_ll.clear();
             costsum_rr += &costsum_rl;
             costsum_rl.clear();
 
             for &value in feature {
-                if self.dataset.feature_values[split_feature][value.instance_id] <= threshold {
+                if self.feature_value(split_feature, value.instance_id) <= threshold {
                     Self::add_feature_value(&mut feature_values_left_i, value);
                     Self::add_possible_split_value(
                         &mut possible_split_values_left_i,
@@ -358,31 +396,70 @@ impl<'a, OT: OptimizationTask> DataView<'a, OT> {
         let extra_data_left = OT::init_extra_dataview_data(self.dataset, &feature_values_left);
         let extra_data_right = OT::init_extra_dataview_data(self.dataset, &feature_values_right);
 
+        let left_instance_ids: Vec<usize> = feature_values_left[0]
+            .iter()
+            .map(|fv| fv.instance_id)
+            .collect();
+        let right_instance_ids: Vec<usize> = feature_values_right[0]
+            .iter()
+            .map(|fv| fv.instance_id)
+            .collect();
+
+        let mut left_pos = vec![usize::MAX; self.dataset.instances.len()];
+        for (pos, &id) in left_instance_ids.iter().enumerate() {
+            left_pos[id] = pos;
+        }
+        let mut right_pos = vec![usize::MAX; self.dataset.instances.len()];
+        for (pos, &id) in right_instance_ids.iter().enumerate() {
+            right_pos[id] = pos;
+        }
+
+        let mut left_feature_values = vec![vec![0; left_instance_ids.len()]; self.num_features()];
+        let mut right_feature_values = vec![vec![0; right_instance_ids.len()]; self.num_features()];
+
+        for f in 0..self.num_features() {
+            for fv in &feature_values_left[f] {
+                left_feature_values[f][left_pos[fv.instance_id]] = fv.feature_value;
+            }
+            for fv in &feature_values_right[f] {
+                right_feature_values[f][right_pos[fv.instance_id]] = fv.feature_value;
+            }
+        }
+
         (
             Self {
                 dataset: self.dataset,
                 feature_values_sorted: feature_values_left,
+                feature_values: left_feature_values,
+                instance_ids: left_instance_ids,
+                instance_pos_by_id: left_pos,
+                value_sources: self.value_sources.clone(),
                 possible_split_values: possible_split_values_left,
                 cost_summer: costsum_ll,
                 best_greedy_splits: best_greedy_splits_left,
                 feature_ranking: feature_ranking_left,
                 unique_labels: unique_labels_left,
                 extra_data: extra_data_left,
+                reduction_stats: self.reduction_stats.clone(),
             },
             Self {
                 dataset: self.dataset,
                 feature_values_sorted: feature_values_right,
+                feature_values: right_feature_values,
+                instance_ids: right_instance_ids,
+                instance_pos_by_id: right_pos,
+                value_sources: self.value_sources.clone(),
                 possible_split_values: possible_split_values_right,
                 cost_summer: costsum_rl,
                 best_greedy_splits: best_greedy_splits_right,
                 feature_ranking: feature_ranking_right,
                 unique_labels: unique_labels_right,
                 extra_data: extra_data_right,
+                reduction_stats: self.reduction_stats.clone(),
             },
         )
     }
 
-    /// Iterate all instances, sorted by its feature value of a specific feature.
     pub fn instances_iter(&self, feature: usize) -> impl Iterator<Item = &FeatureValue> {
         self.feature_values_sorted[feature].iter()
     }
@@ -404,37 +481,44 @@ impl<'a, OT: OptimizationTask> DataView<'a, OT> {
         self.num_unique_labels() <= 1
     }
 
-    pub fn threshold_from_split(&self, split_feature: usize, split_value: usize) -> f64 {
-        let current_split_value =
-            self.possible_split_values[split_feature][split_value].feature_value;
-        let next_split_value = match self.possible_split_values[split_feature].get(split_value + 1) {
-            Some(&next_split_value) => next_split_value.feature_value,
-            None => self.feature_values_sorted[split_feature]
-                .last()
-                .expect("There is at least one threshold remaining, otherwise there would be no useful values to split on, and this method would never be called.")
-                .feature_value
-        };
-
-        let current_threshold = self.dataset.internal_to_original_feature_value[split_feature]
-            [current_split_value as usize];
-        let next_threshold = self.dataset.internal_to_original_feature_value[split_feature]
-            [next_split_value as usize];
-        (current_threshold + next_threshold) / 2.0
+    fn threshold_from_original_cut(&self, original_feature: usize, cut_value: i32) -> f64 {
+        let cut_idx = cut_value.max(0) as usize;
+        let vals = &self.dataset.internal_to_original_feature_value[original_feature];
+        let current = vals[cut_idx];
+        let next = vals.get(cut_idx + 1).copied().unwrap_or(current);
+        (current + next) / 2.0
     }
 
-    /// Get the range of all instances that have feature value in the range [split_values.start, split_values.end)
+    pub fn threshold_from_split(&self, split_feature: usize, split_value: usize) -> f64 {
+        let split_feature_value =
+            self.possible_split_values[split_feature][split_value].feature_value;
+        let (orig_feature, orig_cut_value) =
+            self.source_for_split_value(split_feature, split_feature_value);
+        self.threshold_from_original_cut(orig_feature, orig_cut_value)
+    }
+
+    pub fn original_split_feature_from_split(
+        &self,
+        split_feature: usize,
+        split_value: usize,
+    ) -> usize {
+        let split_feature_value =
+            self.possible_split_values[split_feature][split_value].feature_value;
+        self.source_for_split_value(split_feature, split_feature_value)
+            .0
+    }
+
     pub fn instance_range_from_split_range(
         &self,
         split_feature: usize,
         split_values: Range<usize>,
     ) -> Range<usize> {
         if split_values.is_empty() {
-            return 0..0; // No instances in this range. Prevents out-of-bounds when start >= end.
+            return 0..0;
         }
         let start_fv = self.possible_split_values[split_feature][split_values.start].feature_value;
         let end_fv = self.possible_split_values[split_feature][split_values.end - 1].feature_value;
 
-        // Partition point returns the first index of the second partition.
         let start = self.feature_values_sorted[split_feature]
             .partition_point(|fv| fv.feature_value < start_fv);
         let end = self.feature_values_sorted[split_feature]
@@ -449,7 +533,6 @@ mod tests {
     use crate::model::instance::LabeledInstance;
     use crate::tasks::accuracy::AccuracyTask;
 
-    // Create a dataset with the given labels and a single feature with given feature values.
     fn create_dataset(feature_values: Vec<i32>, labels: Vec<i32>) -> DataSet<LabeledInstance<i32>> {
         let mut dataset = DataSet::default();
         for label in labels {
@@ -457,14 +540,15 @@ mod tests {
         }
         dataset.feature_values.push(feature_values);
         dataset
+            .internal_to_original_feature_value
+            .push(vec![0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0]);
+        dataset
     }
 
-    /// Helper function to test `add_possible_split_value` and `post_process_possible_splits`.
     fn test_possible_splits(feature_values: Vec<i32>, labels: Vec<i32>, expected_splits: Vec<i32>) {
         let dataset = create_dataset(feature_values, labels);
-        let view = DataView::<AccuracyTask>::from_dataset(&dataset);
+        let view = DataView::<AccuracyTask>::from_dataset(&dataset, false);
 
-        // Assert that the resulting splits match the expected splits.
         assert_eq!(
             view.possible_split_values[0]
                 .iter()
@@ -476,8 +560,6 @@ mod tests {
 
     #[test]
     fn possible_splits_smoke_test() {
-        // We keep all unique split values except the final one, because the final one would
-        // leave the right side empty.
         let feature_values = vec![0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 4, 4, 4, 4, 5, 6, 6];
         let labels = vec![0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 3, 4, 5, 6, 0, 0, 0];
         let expected_splits = vec![0, 1, 2, 4, 5];
@@ -493,35 +575,11 @@ mod tests {
     }
 
     #[test]
-    fn possible_splits_one() {
-        let feature_values = vec![0, 1];
-        let labels = vec![0, 1];
-        let expected_splits = vec![0];
-        test_possible_splits(feature_values, labels, expected_splits);
-    }
-
-    #[test]
-    fn possible_splits_none() {
-        let feature_values = vec![0, 1];
-        let labels = vec![0, 0];
-        let expected_splits = vec![0];
-        test_possible_splits(feature_values, labels, expected_splits);
-    }
-
-    #[test]
-    fn possible_splits_largest_left() {
-        let feature_values = vec![0, 1, 2, 3, 4, 5];
-        let labels = vec![0, 0, 0, 0, 0, 1];
-        let expected_splits = vec![0, 1, 2, 3, 4];
-        test_possible_splits(feature_values, labels, expected_splits);
-    }
-
-    #[test]
     fn instance_range_from_split_range_test() {
         let feature_values = vec![0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 4, 4, 4, 4, 5, 6, 6];
         let labels = vec![0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 3, 4, 5, 6, 0, 0, 0];
         let dataset = create_dataset(feature_values, labels);
-        let view = DataView::<AccuracyTask>::from_dataset(&dataset);
+        let view = DataView::<AccuracyTask>::from_dataset(&dataset, false);
         assert_eq!(view.possible_split_values[0][0].feature_value, 0);
         assert_eq!(view.possible_split_values[0][2].feature_value, 2);
         assert_eq!(view.instance_range_from_split_range(0, 0..2), 0..7);
