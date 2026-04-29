@@ -52,10 +52,10 @@ pub struct CliParams {
     #[arg(short, long, value_enum, default_value = "for-remaining-interval")]
     pub upperbound: UpperboundStrategy,
 
-    #[arg(long, action=ArgAction::Set, default_value_t=false, requires_if("true", "cart_upper_bound_patience"))]
+    #[arg(long, action=ArgAction::Set, default_value_t=true, requires_if("true", "cart_upper_bound_patience"))]
     pub cart_upperbound: bool,
 
-    #[arg(long, default_value_t = 5, requires_if("true", "cart_upperbound"))]
+    #[arg(long, default_value_t = 5)]
     pub cart_upper_bound_patience: usize,
 
     #[arg(long, action=ArgAction::Set, default_value_t=true)]

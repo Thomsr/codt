@@ -30,6 +30,11 @@ def main() -> None:
     parser.add_argument("--data-dir", default="data/sampled")
     parser.add_argument("--random-state", type=int, default=42)
     parser.add_argument(
+        "--plot-type",
+        choices=["line", "patience"],
+        default="line",
+    )
+    parser.add_argument(
         "--start-iteration",
         type=int,
         default=1,
@@ -49,6 +54,51 @@ def main() -> None:
         )
 
     df = pd.read_csv(args.file)
+    df = df.sort_values(["dataset", "iteration"]).reset_index(drop=True)
+
+    if args.plot_type == "patience":
+        wait_lengths: list[int] = []
+        for _, group in df.groupby("dataset", sort=False):
+            group = group.sort_values("iteration")
+
+            improvement_iters = []
+            prev_best = None
+            for _, row in group.iterrows():
+                current_best = row["best_so_far"]
+                if prev_best is None:
+                    prev_best = current_best
+                    continue
+                if current_best < prev_best:
+                    improvement_iters.append(int(row["iteration"]))
+                prev_best = current_best
+
+            anchors = [0] + improvement_iters
+            for i in range(len(anchors) - 1):
+                wait_lengths.append(anchors[i + 1] - anchors[i])
+
+        if not wait_lengths:
+            raise ValueError("No improvements found in the data; patience histogram is empty.")
+
+        wait_series = pd.Series(wait_lengths, name="wait")
+        counts = wait_series.value_counts().sort_index()
+
+        plt.figure(figsize=(10, 6))
+        plt.bar(counts.index.astype(int), counts.values, width=0.9, color="tab:blue")
+        plt.xlabel("Iterations Until Next Improvement")
+        plt.ylabel("Count Across Datasets")
+        plt.title("Patience Distribution of CART Improvements")
+        plt.grid(axis="y", alpha=0.3)
+        plt.tight_layout()
+
+        output_path = Path(args.output)
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+        plt.savefig(output_path, dpi=300, bbox_inches="tight")
+        plt.close()
+
+        print(f"Saved plot to {output_path}")
+        print(f"Total improvement intervals counted: {len(wait_lengths)}")
+        print(f"Distinct patience values: {counts.index.min()}..{counts.index.max()}")
+        return
 
     df["cart_gap"] = ((df["cart_size"] - df["optimal_size"]) / df["optimal_size"]) * 100
     df["best_gap"] = ((df["best_so_far"] - df["optimal_size"]) / df["optimal_size"]) * 100

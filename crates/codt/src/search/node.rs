@@ -378,15 +378,24 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> Node<'a, OT, SS> {
         }
 
         if context.cart_ub {
-            let max_iterations = 1;
-            for seed in 42..(42 + max_iterations as u64) {
+            let seed_base = 42u64;
+
+            // Subsequent runs: subset CART with patience on non-improving iterations.
+            let mut no_improvements_counter = 0usize;
+            let mut iter = 1u64;
+            while no_improvements_counter < context.cart_ub_patience {
+                let seed = seed_base.wrapping_add(iter);
                 let cart_tree =
-                    cart_upper_bound_with_subset_seed(context.task, &dataview, Some(false), seed);
+                    cart_upper_bound_with_subset_seed(context.task, &dataview, Some(true), seed);
                 let cart_ub = cart_tree.cost();
-                if cart_ub.less_or_not_much_greater_than(&ub) {
+                if cart_ub.strictly_less_than(&ub) {
                     ub = cart_ub;
                     best = cart_tree;
+                    no_improvements_counter = 0;
+                } else {
+                    no_improvements_counter += 1;
                 }
+                iter = iter.wrapping_add(1);
             }
         }
 

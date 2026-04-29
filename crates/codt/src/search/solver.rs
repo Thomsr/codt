@@ -177,7 +177,7 @@ impl Default for SolverOptions {
             .into_iter()
             .collect(),
             ub_strategy: UpperboundStrategy::ForRemainingInterval,
-            cart_ub: false,
+            cart_ub: true,
             cart_ub_patience: 5,
             data_reduction: true,
             track_intermediates: false,
