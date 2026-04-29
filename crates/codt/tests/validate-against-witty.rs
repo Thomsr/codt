@@ -1,14 +1,11 @@
-use std::{collections::HashSet, fs};
+use std::fs;
 
 #[path = "dataset-by-difficulty.rs"]
 mod dataset_by_difficulty;
 
 use codt::{
     model::{dataset::DataSet, dataview::DataView},
-    search::solver::{
-        CartUpperboundStrategy, LowerBoundStrategy, SearchStrategyEnum, SolveStatus, SolverOptions,
-        UpperboundStrategy, solver_with_strategy,
-    },
+    search::solver::{SearchStrategyEnum, SolveStatus, SolverOptions, solver_with_strategy},
     tasks::accuracy::AccuracyTask,
     test_support::{read_from_file, repo_root},
 };
@@ -19,22 +16,6 @@ use dataset_by_difficulty::DATASETS_BY_DIFFICULTY;
 struct WittyRecord {
     optimal: bool,
     tree_size: Option<usize>,
-}
-
-fn default_options() -> SolverOptions {
-    SolverOptions {
-        lb_strategy: HashSet::from([
-            LowerBoundStrategy::ClassCount,
-            LowerBoundStrategy::Improvement,
-            LowerBoundStrategy::Pair,
-        ]),
-        ub_strategy: UpperboundStrategy::ForRemainingInterval,
-        cart_ub_strategy: CartUpperboundStrategy::Enabled,
-        use_data_reduction: true,
-        track_intermediates: false,
-        timeout: None,
-        memory_limit: None,
-    }
 }
 
 fn witty_record_for_dataset(name: &str) -> WittyRecord {
@@ -106,7 +87,7 @@ fn codt_matches_witty_minimum_tree_size_on_sampled_datasets() {
             datasets.len(),
             dataset_name
         );
-        let result = solver.solve(default_options());
+        let result = solver.solve(SolverOptions::default());
 
         assert_eq!(
             result.status,

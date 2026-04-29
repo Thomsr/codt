@@ -1,9 +1,7 @@
 use std::path::PathBuf;
 
 use clap::{ArgAction, Args, Parser, Subcommand};
-use codt::search::solver::{
-    CartUpperboundStrategy, LowerBoundStrategy, SearchStrategyEnum, UpperboundStrategy,
-};
+use codt::search::solver::{LowerBoundStrategy, SearchStrategyEnum, UpperboundStrategy};
 
 use crate::clap_enum_variants;
 
@@ -54,11 +52,14 @@ pub struct CliParams {
     #[arg(short, long, value_enum, default_value = "for-remaining-interval")]
     pub upperbound: UpperboundStrategy,
 
-    #[arg(long, value_enum, default_value = "enabled")]
-    pub cart_upperbound: CartUpperboundStrategy,
+    #[arg(long, action=ArgAction::Set, default_value_t=false, requires_if("true", "cart_upperbound_max_iterations"))]
+    pub cart_upperbound: bool,
+
+    #[arg(long, default_value_t = 5, requires_if("true", "cart_upperbound"))]
+    pub cart_upper_bound_patience: usize,
 
     #[arg(long, action=ArgAction::Set, default_value_t=true)]
-    pub use_data_reduction: bool,
+    pub data_reduction: bool,
 
     /// Determines if the solver should track intermediate solutions.
     #[arg(long, action=ArgAction::Set, default_value_t=false)]

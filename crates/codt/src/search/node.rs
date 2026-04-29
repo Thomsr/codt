@@ -13,10 +13,10 @@ use crate::{
         },
         pruner::Pruner,
         queue::{BinaryHeapQueue, PQ},
-        solver::{CartUpperboundStrategy, LowerBoundStrategy, UpperboundStrategy},
+        solver::{LowerBoundStrategy, UpperboundStrategy},
         solver_impl::SolveContext,
         strategy::SearchStrategy,
-        upper_bounds::cart::cart_upper_bound_with_subset,
+        upper_bounds::cart::cart_upper_bound_with_subset_seed,
     },
     tasks::{Cost, CostSum, OptimizationTask},
 };
@@ -377,14 +377,16 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> Node<'a, OT, SS> {
             }
         }
 
-        let use_cart_ub = matches!(context.cart_ub_strategy, CartUpperboundStrategy::Enabled);
-
-        if use_cart_ub {
-            let cart_tree = cart_upper_bound_with_subset(context.task, &dataview, Some(false));
-            let cart_ub = cart_tree.cost();
-            if cart_ub.less_or_not_much_greater_than(&ub) {
-                ub = cart_ub;
-                best = cart_tree;
+        if context.cart_ub {
+            let max_iterations = 1;
+            for seed in 42..(42 + max_iterations as u64) {
+                let cart_tree =
+                    cart_upper_bound_with_subset_seed(context.task, &dataview, Some(false), seed);
+                let cart_ub = cart_tree.cost();
+                if cart_ub.less_or_not_much_greater_than(&ub) {
+                    ub = cart_ub;
+                    best = cart_tree;
+                }
             }
         }
 

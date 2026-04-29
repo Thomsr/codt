@@ -14,8 +14,7 @@ use crate::{
         node::Node,
         queue::PQ,
         solver::{
-            CartUpperboundStrategy, LowerBoundStrategy, SolveResult, SolveStatus, Solver,
-            SolverOptions, UpperboundStrategy,
+            LowerBoundStrategy, SolveResult, SolveStatus, Solver, SolverOptions, UpperboundStrategy,
         },
         strategy::SearchStrategy,
     },
@@ -33,7 +32,8 @@ pub struct SolveContext<'a, OT: OptimizationTask, SS: SearchStrategy> {
     pub task: &'a OT,
     pub lb_strategy: HashSet<LowerBoundStrategy>,
     pub ub_strategy: UpperboundStrategy,
-    pub cart_ub_strategy: CartUpperboundStrategy,
+    pub cart_ub: bool,
+    pub cart_ub_patience: usize,
     _ss: PhantomData<SS>,
 }
 
@@ -47,7 +47,8 @@ impl<OT: OptimizationTask, SS: SearchStrategy> Solver<OT> for SolverImpl<'_, OT,
             task: &self.task,
             lb_strategy: options.lb_strategy,
             ub_strategy: options.ub_strategy,
-            cart_ub_strategy: options.cart_ub_strategy,
+            cart_ub: options.cart_ub,
+            cart_ub_patience: options.cart_ub_patience,
             _ss: PhantomData,
         };
 
@@ -206,29 +207,12 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> SolverImpl<'a, OT, SS> {
 
 #[cfg(test)]
 mod tests {
-    use std::{collections::HashSet, time::Duration};
-
     use crate::{
         model::{dataset::DataSet, dataview::DataView, instance::LabeledInstance, tree::Tree},
-        search::solver::{
-            CartUpperboundStrategy, LowerBoundStrategy, SearchStrategyEnum, SolveStatus,
-            SolverOptions, UpperboundStrategy, solver_with_strategy,
-        },
+        search::solver::{SearchStrategyEnum, SolveStatus, SolverOptions, solver_with_strategy},
         tasks::{LexicographicCost, accuracy::AccuracyTask},
         test_support::{read_from_file, repo_root},
     };
-
-    fn default_options() -> SolverOptions {
-        SolverOptions {
-            lb_strategy: HashSet::from([LowerBoundStrategy::ClassCount, LowerBoundStrategy::Pair]),
-            ub_strategy: UpperboundStrategy::ForRemainingInterval,
-            cart_ub_strategy: CartUpperboundStrategy::Disabled,
-            use_data_reduction: false,
-            track_intermediates: false,
-            timeout: Some(Duration::from_secs(5)),
-            memory_limit: None,
-        }
-    }
 
     #[test]
     fn perfect_tree_pure_dataset_is_single_leaf() {
@@ -245,7 +229,7 @@ mod tests {
             SearchStrategyEnum::BfsBalanceSmallLb,
         );
 
-        let result = solver.solve(default_options());
+        let result = solver.solve(SolverOptions::default());
 
         assert_eq!(result.status, SolveStatus::PerfectTreeFound);
         let tree = result.tree.expect("Expected a perfect tree for pure data");
@@ -275,7 +259,7 @@ mod tests {
             SearchStrategyEnum::BfsBalanceSmallLb,
         );
 
-        let result = solver.solve(default_options());
+        let result = solver.solve(SolverOptions::default());
 
         assert_eq!(result.status, SolveStatus::PerfectTreeFound);
         let tree = result
@@ -305,7 +289,7 @@ mod tests {
             SearchStrategyEnum::BfsBalanceSmallLb,
         );
 
-        let result = solver.solve(default_options());
+        let result = solver.solve(SolverOptions::default());
 
         println!("sampled dataset status: {:?}", result.status);
         match result.status {

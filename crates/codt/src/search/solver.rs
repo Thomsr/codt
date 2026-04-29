@@ -154,20 +154,35 @@ pub enum UpperboundStrategy {
     ForRemainingInterval,
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, EnumString, VariantNames, IntoStaticStr, Display)]
-#[strum(serialize_all = "kebab-case")]
-pub enum CartUpperboundStrategy {
-    Disabled,
-    Enabled,
-}
-
 #[derive(Debug)]
 pub struct SolverOptions {
     pub lb_strategy: HashSet<LowerBoundStrategy>,
     pub ub_strategy: UpperboundStrategy,
-    pub cart_ub_strategy: CartUpperboundStrategy,
-    pub use_data_reduction: bool,
+    pub cart_ub: bool,
+    pub cart_ub_patience: usize,
+    pub data_reduction: bool,
     pub track_intermediates: bool,
     pub timeout: Option<Duration>,
     pub memory_limit: Option<u64>,
+}
+
+impl Default for SolverOptions {
+    fn default() -> Self {
+        Self {
+            lb_strategy: [
+                LowerBoundStrategy::ClassCount,
+                LowerBoundStrategy::Improvement,
+                LowerBoundStrategy::Pair,
+            ]
+            .into_iter()
+            .collect(),
+            ub_strategy: UpperboundStrategy::ForRemainingInterval,
+            cart_ub: false,
+            cart_ub_patience: 5,
+            data_reduction: true,
+            track_intermediates: false,
+            timeout: None,
+            memory_limit: None,
+        }
+    }
 }

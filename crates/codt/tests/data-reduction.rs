@@ -1,29 +1,8 @@
-use std::collections::HashSet;
-
 use codt::{
     model::{dataset::DataSet, dataview::DataView, instance::LabeledInstance},
-    search::solver::{
-        CartUpperboundStrategy, LowerBoundStrategy, SearchStrategyEnum, SolveStatus, SolverOptions,
-        UpperboundStrategy, solver_with_strategy,
-    },
+    search::solver::{SearchStrategyEnum, SolveStatus, SolverOptions, solver_with_strategy},
     tasks::accuracy::AccuracyTask,
 };
-
-fn default_options() -> SolverOptions {
-    SolverOptions {
-        lb_strategy: HashSet::from([
-            LowerBoundStrategy::ClassCount,
-            LowerBoundStrategy::Improvement,
-            LowerBoundStrategy::Pair,
-        ]),
-        ub_strategy: UpperboundStrategy::ForRemainingInterval,
-        cart_ub_strategy: CartUpperboundStrategy::Enabled,
-        use_data_reduction: true,
-        track_intermediates: false,
-        timeout: None,
-        memory_limit: None,
-    }
-}
 
 fn build_dataset() -> DataSet<LabeledInstance<i32>> {
     let mut ds = DataSet::default();
@@ -56,8 +35,8 @@ fn reduction_toggle_changes_view_size() {
         SearchStrategyEnum::BfsBalanceSmallLb,
     );
 
-    let result_reduced = solver_reduced.solve(default_options());
-    let result_unreduced = solver_unreduced.solve(default_options());
+    let result_reduced = solver_reduced.solve(SolverOptions::default());
+    let result_unreduced = solver_unreduced.solve(SolverOptions::default());
 
     assert_eq!(result_reduced.status, SolveStatus::PerfectTreeFound);
     assert_eq!(result_unreduced.status, SolveStatus::PerfectTreeFound);
