@@ -2,6 +2,8 @@ use std::{
     cmp::Ordering, collections::VecDeque, fmt::Debug, marker::PhantomData, ops::Range, sync::Arc,
 };
 
+use log::info;
+
 use crate::{
     model::{
         dataview::DataView,
@@ -327,6 +329,7 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> Node<'a, OT, SS> {
         context: &SolveContext<OT, SS>,
         dataview: DataView<'a, OT>,
         discrepancies: i32,
+        is_root: bool,
     ) -> Self {
         // Replaced by full range if we are actually searching
         let mut interesting_solutions_range = vec![0..0; dataview.num_features()];
@@ -390,7 +393,9 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> Node<'a, OT, SS> {
                 let cart_ub = cart_tree.cost();
                 if cart_ub.strictly_less_than(&ub) {
                     ub = cart_ub;
-                    best = cart_tree;
+                    if is_root {
+                        best = cart_tree;
+                    }
                     no_improvements_counter = 0;
                 } else {
                     no_improvements_counter += 1;
@@ -788,8 +793,8 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> Node<'a, OT, SS> {
 
         let (left_view, right_view) = self.dataview.split(item.feature, item.split_point);
 
-        let left = Self::new(context, left_view, item.discrepancies);
-        let right = Self::new(context, right_view, item.discrepancies);
+        let left = Self::new(context, left_view, item.discrepancies, false);
+        let right = Self::new(context, right_view, item.discrepancies, false);
 
         let expanded = ExpandedQueueItem::Children([left, right]);
         item.expanded = Some(expanded);

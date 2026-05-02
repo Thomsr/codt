@@ -64,7 +64,7 @@ impl<OT: OptimizationTask, SS: SearchStrategy> Solver<OT> for SolverImpl<'_, OT,
             .contains(&LowerBoundStrategy::Pair)
             .then(|| pair_lower_bound::<OT>(&dataview));
 
-        let mut root: Node<'_, OT, SS> = Node::new(&context, dataview, 0);
+        let mut root: Node<'_, OT, SS> = Node::new(&context, dataview, 0, true);
 
         let mut intermediate_lbs = vec![(root.cost_lower_bound, graph_expansions, 0.0)];
         let mut intermediate_ubs = vec![(root.best.cost(), graph_expansions, 0.0)];
