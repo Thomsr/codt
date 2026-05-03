@@ -1,8 +1,6 @@
 mod tree;
 
-use codt::search::solver::{
-    CartUpperboundStrategy, LowerBoundStrategy, SearchStrategyEnum, UpperboundStrategy,
-};
+use codt::search::solver::{LowerBoundStrategy, SearchStrategyEnum, UpperboundStrategy};
 use pyo3::prelude::*;
 use strum::VariantNames;
 use tree::OptimalDecisionTreeClassifier;
@@ -23,8 +21,8 @@ pub fn all_upperbounds() -> &'static [&'static str] {
 }
 
 #[pyfunction(signature = ())]
-pub fn all_cart_upperbounds() -> &'static [&'static str] {
-    CartUpperboundStrategy::VARIANTS
+pub fn all_cart_upperbounds() -> Vec<&'static str> {
+    vec!["disabled", "enabled"]
 }
 
 #[pymodule]

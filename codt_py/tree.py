@@ -11,7 +11,7 @@ class _BaseOptimalDecisionTree(BaseEstimator, ABC):
 
     def __init__(
         self,
-        strategy="dfs-prio",
+        strategy="bfs-balance-small-lb",
         timeout=None,
         lowerbound="class-count",
         upperbound="for-remaining-interval",

@@ -8,8 +8,8 @@ use std::{
 use codt::{
     model::{dataset::DataSet, dataview::DataView, instance::LabeledInstance, tree::Tree},
     search::solver::{
-        CartUpperboundStrategy, DataReductionOption, LowerBoundStrategy, SearchStrategyEnum,
-        SolveResult, SolverOptions, UpperboundStrategy, solver_with_strategy,
+        LowerBoundStrategy, SearchStrategyEnum, SolveResult, SolverOptions, UpperboundStrategy,
+        solver_with_strategy,
     },
     tasks::{OptimizationTask, accuracy::AccuracyTask},
 };
@@ -54,7 +54,7 @@ macro_rules! impl_optimal_decision_tree_pyclass {
         pub struct $pyclass {
             lowerbound: HashSet<LowerBoundStrategy>,
             upperbound: UpperboundStrategy,
-            cart_upperbound: CartUpperboundStrategy,
+            cart_upperbound: bool,
             timeout: Option<Duration>,
             memory_limit: Option<u64>,
             intermediates: bool,
@@ -93,9 +93,15 @@ macro_rules! impl_optimal_decision_tree_pyclass {
                 let upperbound = upperbound
                     .parse()
                     .map_err(|_| PyValueError::new_err("Not a valid upper bounding strategy"))?;
-                let cart_upperbound = cart_upperbound.parse().map_err(|_| {
-                    PyValueError::new_err("Not a valid CART upper bounding strategy")
-                })?;
+                let cart_upperbound = match cart_upperbound {
+                    "disabled" | "false" | "0" => false,
+                    "enabled" | "true" | "1" => true,
+                    _ => {
+                        return Err(PyValueError::new_err(
+                            "Not a valid CART upper bounding strategy (expected 'disabled' or 'enabled')",
+                        ));
+                    }
+                };
 
                 let lowerbound: HashSet<LowerBoundStrategy> = lowerbound
                     .split(',')
@@ -150,13 +156,14 @@ macro_rules! impl_optimal_decision_tree_pyclass {
                 dataset.preprocess_after_adding_instances();
 
                 <$task>::preprocess_dataset(&mut dataset);
-                let full_view = DataView::from_dataset(&dataset);
+                let full_view = DataView::from_dataset(&dataset, true);
 
                 let options = SolverOptions {
                     lb_strategy: self.lowerbound.clone(),
                     ub_strategy: self.upperbound,
-                    cart_ub_strategy: self.cart_upperbound,
-                    data_reduction: DataReductionOption::Enabled,
+                    cart_ub: self.cart_upperbound,
+                    cart_ub_patience: 5,
+                    data_reduction: true,
                     timeout: self.timeout,
                     track_intermediates: self.intermediates,
                     memory_limit: self.memory_limit,
