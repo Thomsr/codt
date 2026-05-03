@@ -11,11 +11,11 @@ class _BaseOptimalDecisionTree(BaseEstimator, ABC):
 
     def __init__(
         self,
-        strategy="bfs-balance-small-lb",
+        strategy="and-or",
         timeout=None,
-        lowerbound="class-count",
+        lowerbound="class-count,improvement,pair",
         upperbound="for-remaining-interval",
-        cart_upperbound="disabled",
+        cart_upperbound="enabled",
         intermediates=False,
         memory_limit=None,
     ):

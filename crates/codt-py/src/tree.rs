@@ -69,11 +69,11 @@ macro_rules! impl_optimal_decision_tree_pyclass {
         impl $pyclass {
             #[new]
             #[pyo3(signature = (
-                                                                strategy="bfs-balance-small-lb",
+                                                                strategy="and-or",
                                                                 timeout=None,
-                                                                lowerbound="class-count",
+                                                                lowerbound="class-count,improvement,pair",
                                                                 upperbound="for-remaining-interval",
-                                                                cart_upperbound="disabled",
+                                                                cart_upperbound="enabled",
                                                                 intermediates=false,
                                                                 memory_limit=None
                                                             ))]
