@@ -1,0 +1,164 @@
+[
+  {
+    "id": 15,
+    "name": "breast-w",
+    "num_instances": 699,
+    "num_features": 10
+  },
+  {
+    "id": 37,
+    "name": "diabetes",
+    "num_instances": 768,
+    "num_features": 9
+  },
+  {
+    "id": 40,
+    "name": "sonar",
+    "num_instances": 208,
+    "num_features": 61
+  },
+  {
+    "id": 44,
+    "name": "spambase",
+    "num_instances": 4601,
+    "num_features": 58
+  },
+  {
+    "id": 53,
+    "name": "heart-statlog",
+    "num_instances": 270,
+    "num_features": 14
+  },
+  {
+    "id": 59,
+    "name": "ionosphere",
+    "num_instances": 351,
+    "num_features": 35
+  },
+  {
+    "id": 152,
+    "name": "Hyperplane_10_1E-3",
+    "num_instances": 1000000,
+    "num_features": 11
+  },
+  {
+    "id": 153,
+    "name": "Hyperplane_10_1E-4",
+    "num_instances": 1000000,
+    "num_features": 11
+  },
+  {
+    "id": 161,
+    "name": "SEA(50)",
+    "num_instances": 1000000,
+    "num_features": 4
+  },
+  {
+    "id": 162,
+    "name": "SEA(50000)",
+    "num_instances": 1000000,
+    "num_features": 4
+  },
+  {
+    "id": 251,
+    "name": "BNG(breast-w)",
+    "num_instances": 39366,
+    "num_features": 10
+  },
+  {
+    "id": 264,
+    "name": "BNG(sonar)",
+    "num_instances": 1000000,
+    "num_features": 61
+  },
+  {
+    "id": 267,
+    "name": "BNG(heart-statlog)",
+    "num_instances": 1000000,
+    "num_features": 14
+  },
+  {
+    "id": 293,
+    "name": "covertype",
+    "num_instances": 581012,
+    "num_features": 55
+  },
+  {
+    "id": 310,
+    "name": "mammography",
+    "num_instances": 11183,
+    "num_features": 7
+  },
+  {
+    "id": 311,
+    "name": "oil_spill",
+    "num_instances": 937,
+    "num_features": 50
+  },
+  {
+    "id": 337,
+    "name": "SPECTF",
+    "num_instances": 349,
+    "num_features": 45
+  },
+  {
+    "id": 351,
+    "name": "codrna",
+    "num_instances": 488565,
+    "num_features": 9
+  },
+  {
+    "id": 354,
+    "name": "poker",
+    "num_instances": 1025010,
+    "num_features": 11
+  },
+  {
+    "id": 376,
+    "name": "SyskillWebert-Sheep",
+    "num_instances": 65,
+    "num_features": 3
+  },
+  {
+    "id": 464,
+    "name": "prnn_synth",
+    "num_instances": 250,
+    "num_features": 3
+  },
+  {
+    "id": 467,
+    "name": "analcatdata_japansolvent",
+    "num_instances": 52,
+    "num_features": 9
+  },
+  {
+    "id": 472,
+    "name": "lupus",
+    "num_instances": 87,
+    "num_features": 4
+  },
+  {
+    "id": 476,
+    "name": "analcatdata_bankruptcy",
+    "num_instances": 50,
+    "num_features": 6
+  },
+  {
+    "id": 683,
+    "name": "sleuth_ex2015",
+    "num_instances": 60,
+    "num_features": 8
+  },
+  {
+    "id": 713,
+    "name": "vineyard",
+    "num_instances": 52,
+    "num_features": 3
+  },
+  {
+    "id": 717,
+    "name": "rmftsa_ladata",
+    "num_instances": 508,
+    "num_features": 11
+  }
+]
