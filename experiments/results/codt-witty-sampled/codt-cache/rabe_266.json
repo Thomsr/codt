@@ -1,0 +1,17 @@
+{
+  "accuracy": 1.0,
+  "branch_count": 9,
+  "dataset": "rabe_266.txt",
+  "dataset_path": "data/openml/sampled/rabe_266.txt",
+  "error": null,
+  "expansions": 0,
+  "memory_usage_bytes": 14019,
+  "n_examples": 100,
+  "n_features": 2,
+  "runtime_seconds": 0.004903798006125726,
+  "solved": true,
+  "solver": "codt",
+  "status": "perfect-tree-found",
+  "tree": "[0, -5.0, [1, 12.5, [0, -25.0, [1, 7.5, [0, -45.0, 1, 0], 1], 0], [1, 17.5, [0, -15.0, 1, 0], 1]], [1, 32.5, 0, [0, 5.0, 1, 0]]]",
+  "tree_size": 19
+}

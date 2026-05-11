@@ -1,0 +1,17 @@
+{
+  "accuracy": 1.0,
+  "branch_count": 10,
+  "dataset": "pc1.txt",
+  "dataset_path": "data/openml/sampled/pc1.txt",
+  "error": null,
+  "expansions": 28445,
+  "memory_usage_bytes": 4295314323,
+  "n_examples": 100,
+  "n_features": 21,
+  "runtime_seconds": 48.4591370210037,
+  "solved": true,
+  "solver": "codt",
+  "status": "perfect-tree-found",
+  "tree": "[8, 30.905, [14, 1.5, [19, 0.5, 0, [19, 12.5, 1, [19, 17.5, 0, [13, 2.5, 0, 1]]]], 0], [10, 0.045, 0, [15, 2.5, 0, [12, 106.5, 1, [0, 108.5, 0, 1]]]]]",
+  "tree_size": 21
+}
