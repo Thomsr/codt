@@ -107,33 +107,24 @@ def extract_runtime_and_status(results: Dict[str, Dict], solver_name: str = "unk
 def plot_edfc(codt_results: Dict[str, Dict], witty_results: Dict[str, Dict], 
               output_path: Path = None, timeout_seconds: float = 1800):
     """
-    Plot ECDF comparing two solvers using seaborn.
-    Includes all instances (solved and unsolved) to properly normalize the ECDF.
+    Plot ECDF comparing two solvers.
+    Only plots solved instances, normalizing by total instances so y-axis reaches actual solve fraction.
     """
     # Extract data
     codt_runtimes, codt_statuses, codt_solved, codt_mem_errors = extract_runtime_and_status(codt_results, "codt")
     witty_runtimes, witty_statuses, witty_solved, witty_mem_errors = extract_runtime_and_status(witty_results, "witty")
     
-    # Create dataframe for seaborn plotting
-    # Include all instances: solved at actual runtime, unsolved at timeout
-    data_rows = []
-    for rt, status, solved in zip(codt_runtimes, codt_statuses, codt_solved):
-        if solved:
-            data_rows.append({"runtime_seconds": rt, "solver": "CODT"})
-        else:
-            # Unsolved instances appear at timeout boundary
-            data_rows.append({"runtime_seconds": timeout_seconds, "solver": "CODT"})
+    codt_items = len(codt_solved)
+    witty_items = len(witty_solved)
     
-    for rt, status, solved in zip(witty_runtimes, witty_statuses, witty_solved):
-        if solved:
-            data_rows.append({"runtime_seconds": rt, "solver": "Witty"})
-        else:
-            # Unsolved instances appear at timeout boundary
-            data_rows.append({"runtime_seconds": timeout_seconds, "solver": "Witty"})
+    # Extract only solved runtimes
+    codt_solved_runtimes = [rt for rt, solved in zip(codt_runtimes, codt_solved) if solved]
+    codt_unsolved_runtimes = [rt for rt, solved in zip(codt_runtimes, codt_solved) if not solved]
     
-    df = pd.DataFrame(data_rows)
+    witty_solved_runtimes = [rt for rt, solved in zip(witty_runtimes, witty_solved) if solved]
+    witty_unsolved_runtimes = [rt for rt, solved in zip(witty_runtimes, witty_solved) if not solved]
     
-    # Count memory errors
+    # Count metrics
     codt_timeouts = sum(1 for s in codt_statuses if s == "timeout")
     codt_mem_errors = sum(1 for s in codt_statuses if s == "memory_error")
     codt_solved_count = sum(codt_solved)
@@ -145,24 +136,55 @@ def plot_edfc(codt_results: Dict[str, Dict], witty_results: Dict[str, Dict],
     # Create figure for runtime comparison
     fig, ax1 = plt.subplots(1, 1, figsize=(10, 6))
     
-    # ECDF with log scale x-axis
-    sns.ecdfplot(
-        data=df[df["solver"] == "CODT"],
-        x="runtime_seconds",
-        ax=ax1,
-        linewidth=2.5,
-        label="CodTree",
-        color="#00A6D6",
-    )
-    sns.ecdfplot(
-        data=df[df["solver"] == "Witty"],
-        x="runtime_seconds",
-        ax=ax1,
-        linewidth=2.5,
-        label="Witty",
-        color="#BABABA",
-    )
+    # Plot CODT solved instances
+    if codt_solved_runtimes:
+        codt_sorted = np.sort(np.asarray(codt_solved_runtimes))
+        codt_fraction = np.arange(1, len(codt_sorted) + 1) / codt_items
+        ax1.step(
+            codt_sorted,
+            codt_fraction,
+            where='post',
+            linewidth=2.5,
+            color="#00A6D6",
+            label="CodTree",
+        )
+    
+    # Plot Witty solved instances
+    if witty_solved_runtimes:
+        witty_sorted = np.sort(np.asarray(witty_solved_runtimes))
+        witty_fraction = np.arange(1, len(witty_sorted) + 1) / witty_items
+        ax1.step(
+            witty_sorted,
+            witty_fraction,
+            where='post',
+            linewidth=2.5,
+            color="#BABABA",
+            label="Witty",
+        )
+    
+    # Plot unsolved instances as scatter points at y=0
+    if codt_unsolved_runtimes:
+        ax1.scatter(
+            codt_unsolved_runtimes,
+            np.zeros(len(codt_unsolved_runtimes)),
+            marker='x',
+            s=35,
+            color="#00A6D6",
+            alpha=0.7,
+        )
+    
+    if witty_unsolved_runtimes:
+        ax1.scatter(
+            witty_unsolved_runtimes,
+            np.zeros(len(witty_unsolved_runtimes)),
+            marker='x',
+            s=35,
+            color="#BABABA",
+            alpha=0.7,
+        )
+    
     ax1.set_xscale('log')
+    ax1.set_ylim(bottom=0)
     ax1.set_xlabel('Runtime (seconds, log scale)', fontsize=12)
     ax1.set_ylabel('Fraction of instances solved', fontsize=12)
     ax1.set_title('Runtime vs Instances Solved (Log Scale)', fontsize=14)
@@ -263,7 +285,7 @@ def plot_search_nodes(codt_results: Dict[str, Dict], witty_results: Dict[str, Di
             where='post',
             linewidth=2.5,
             color="#00A6D6",
-            label="CODT expansions",
+            label="CodTree expansions",
         )
 
     if witty_solved_nodes:
