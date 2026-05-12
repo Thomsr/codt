@@ -1,0 +1,17 @@
+{
+  "accuracy": 1.0,
+  "branch_count": 2,
+  "dataset": "kc2.txt",
+  "dataset_path": "data/openml/sampled/kc2.txt",
+  "error": null,
+  "expansions": 0,
+  "memory_usage_bytes": 153443,
+  "n_examples": 100,
+  "n_features": 21,
+  "runtime_seconds": 0.2985997049981961,
+  "solved": true,
+  "solver": "codt",
+  "status": "perfect-tree-found",
+  "tree": "[19, 143.5, [0, 1.05, 1, 0], 1]",
+  "tree_size": 5
+}

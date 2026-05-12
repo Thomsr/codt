@@ -50,6 +50,7 @@ def extract_runtime_and_status(results: Dict[str, Dict], solver_name: str = "unk
     solved_flags = []
     memory_error_flags = []
     memory_limit_bytes = memory_limit_gb * 1024 * 1024 * 1024
+    timeout_threshold = 1800
     
     for dataset_name, result in sorted(results.items()):
         runtime = result.get("runtime_seconds", 0)
@@ -85,10 +86,8 @@ def extract_runtime_and_status(results: Dict[str, Dict], solver_name: str = "unk
                 status = "timeout"
             else:
                 status = "error"
-        elif timed_out or not solved:
-            # Check if it's a timeout case
-            # If runtime is at the timeout boundary (like 1800), likely timed out
-            timeout_threshold = 1799  # 30 minutes
+        elif timed_out or not solved or runtime > timeout_threshold:
+            # Check if it's a timeout case.
             if timed_out or runtime > timeout_threshold:
                 status = "timeout"
             else:
@@ -98,7 +97,7 @@ def extract_runtime_and_status(results: Dict[str, Dict], solver_name: str = "unk
         
         runtimes.append(runtime)
         statuses.append(status)
-        solved_flags.append(solved and not has_memory_error)  # Unsolved if memory error occurred
+        solved_flags.append(status == "solved")
         memory_error_flags.append(has_memory_error)
     
     return runtimes, statuses, solved_flags, memory_error_flags
@@ -117,12 +116,21 @@ def plot_edfc(codt_results: Dict[str, Dict], witty_results: Dict[str, Dict],
     codt_items = len(codt_solved)
     witty_items = len(witty_solved)
     
-    # Extract only solved runtimes
+    # Extract only solved runtimes.
+    # Timeouts are shown at the timeout boundary so they do not look like short runs.
     codt_solved_runtimes = [rt for rt, solved in zip(codt_runtimes, codt_solved) if solved]
-    codt_unsolved_runtimes = [rt for rt, solved in zip(codt_runtimes, codt_solved) if not solved]
-    
+    codt_unsolved_runtimes = [
+        timeout_seconds if status == "timeout" else rt
+        for rt, status, solved in zip(codt_runtimes, codt_statuses, codt_solved)
+        if not solved
+    ]
+
     witty_solved_runtimes = [rt for rt, solved in zip(witty_runtimes, witty_solved) if solved]
-    witty_unsolved_runtimes = [rt for rt, solved in zip(witty_runtimes, witty_solved) if not solved]
+    witty_unsolved_runtimes = [
+        timeout_seconds if status == "timeout" else rt
+        for rt, status, solved in zip(witty_runtimes, witty_statuses, witty_solved)
+        if not solved
+    ]
     
     # Count metrics
     codt_timeouts = sum(1 for s in codt_statuses if s == "timeout")
@@ -258,7 +266,7 @@ def plot_search_nodes(codt_results: Dict[str, Dict], witty_results: Dict[str, Di
         expansions = result.get("expansions")
         if expansions is None:
             continue
-        if result.get("solved", False) and not _is_memory_error_result(result):
+        if result.get("solved", False) and not _is_memory_error_result(result) and not _is_timeout_result(result):
             codt_solved_nodes.append(int(expansions))
         else:
             codt_unsolved_nodes.append(int(expansions))
@@ -345,6 +353,22 @@ def _is_memory_error_result(result: Dict[str, Dict]) -> bool:
         return True
     memory_usage_bytes = result.get("memory_usage_bytes")
     return memory_usage_bytes is not None and int(memory_usage_bytes) > 4 * 1024 * 1024 * 1024
+
+
+def _is_timeout_result(result: Dict[str, Dict]) -> bool:
+    error = result.get("error")
+    if error and "timeout" in str(error).lower():
+        return True
+
+    if result.get("timed_out", False):
+        return True
+
+    status = result.get("status")
+    if status == "timeout":
+        return True
+
+    runtime_seconds = result.get("runtime_seconds", 0)
+    return runtime_seconds > 1800
 
 
 def _get_witty_search_tree_nodes_checked(result: Dict[str, Dict]) -> Optional[int]:

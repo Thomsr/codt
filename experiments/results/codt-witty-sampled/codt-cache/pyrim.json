@@ -1,0 +1,17 @@
+{
+  "accuracy": 1.0,
+  "branch_count": 9,
+  "dataset": "pyrim.txt",
+  "dataset_path": "data/openml/sampled/pyrim.txt",
+  "error": null,
+  "expansions": 6707342,
+  "memory_usage_bytes": 1788615,
+  "n_examples": 74,
+  "n_features": 27,
+  "runtime_seconds": 1800.0070283100067,
+  "solved": true,
+  "solver": "codt",
+  "status": "perfect-tree-found",
+  "tree": "[1, 0.18, 1, [10, 0.18, [19, 0.5, [5, 0.3, 1, [18, 0.23349999999999999, 0, [7, 0.7665, 1, 0]]], [5, 0.3, 1, 0]], [6, 0.7, [3, 0.3, 0, 1], 1]]]",
+  "tree_size": 19
+}
