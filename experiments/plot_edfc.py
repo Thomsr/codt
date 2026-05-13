@@ -142,7 +142,7 @@ def plot_edfc(codt_results: Dict[str, Dict], witty_results: Dict[str, Dict],
     witty_solved_count = sum(witty_solved)
 
     # Create figure for runtime comparison
-    fig, ax1 = plt.subplots(1, 1, figsize=(10, 6))
+    fig, ax1 = plt.subplots(1, 1, figsize=(8.5, 5.5))
     
     # Plot CODT solved instances
     if codt_solved_runtimes:
@@ -152,7 +152,7 @@ def plot_edfc(codt_results: Dict[str, Dict], witty_results: Dict[str, Dict],
             codt_sorted,
             codt_fraction,
             where='post',
-            linewidth=2.5,
+            linewidth=4,
             color="#00A6D6",
             label="CodTree",
         )
@@ -165,7 +165,7 @@ def plot_edfc(codt_results: Dict[str, Dict], witty_results: Dict[str, Dict],
             witty_sorted,
             witty_fraction,
             where='post',
-            linewidth=2.5,
+            linewidth=4,
             color="#BABABA",
             label="Witty",
         )
@@ -193,26 +193,14 @@ def plot_edfc(codt_results: Dict[str, Dict], witty_results: Dict[str, Dict],
     
     ax1.set_xscale('log')
     ax1.set_ylim(bottom=0)
-    ax1.set_xlabel('Runtime (seconds, log scale)', fontsize=12)
-    ax1.set_ylabel('Fraction of instances solved', fontsize=12)
-    ax1.set_title('Runtime vs Instances Solved (Log Scale)', fontsize=14)
+    ax1.set_xlabel('Runtime (seconds, log scale)', fontsize=18)
+    ax1.set_ylabel('Fraction of instances solved', fontsize=18)
+    # ax1.set_title('Runtime vs Instances Solved', fontsize=20)
     ax1.grid(True, which='major', alpha=0.4)
     ax1.grid(True, which='minor', alpha=0.4, linestyle=':')
-    ax1.legend(fontsize=11)
-    
-    # Add text with statistics
-    stats_parts = []
-    
-    codt_parts = [f"CodTree: {codt_solved_count} solved"]
-    if codt_mem_errors > 0: codt_parts.append(f"{codt_mem_errors} memory errors")
-    stats_parts.append(", ".join(codt_parts))
-    
-    witty_parts = [f"Witty: {witty_solved_count} solved"]
-    if witty_mem_errors > 0: witty_parts.append(f"{witty_mem_errors} memory errors")
-    stats_parts.append(", ".join(witty_parts))
-    
-    stats_text = "\n".join(stats_parts)
-    fig.suptitle(stats_text, fontsize=11, y=1.00)
+    ax1.legend(fontsize=15)
+    ax1.tick_params(axis='y', labelsize=14)
+    ax1.tick_params(axis='x', labelsize=14)
     
     plt.tight_layout()
     
@@ -282,7 +270,7 @@ def plot_search_nodes(codt_results: Dict[str, Dict], witty_results: Dict[str, Di
         else:
             witty_unsolved_nodes.append(int(nodes_checked))
 
-    fig, ax = plt.subplots(1, 1, figsize=(10, 6))
+    fig, ax = plt.subplots(1, 1, figsize=(8.5, 5.5))
 
     if codt_solved_nodes:
         codt_sorted = np.sort(np.asarray(codt_solved_nodes))
@@ -291,7 +279,7 @@ def plot_search_nodes(codt_results: Dict[str, Dict], witty_results: Dict[str, Di
             codt_sorted,
             codt_fraction,
             where='post',
-            linewidth=2.5,
+            linewidth=4,
             color="#00A6D6",
             label="CodTree expansions",
         )
@@ -303,7 +291,7 @@ def plot_search_nodes(codt_results: Dict[str, Dict], witty_results: Dict[str, Di
             witty_sorted,
             witty_fraction,
             where='post',
-            linewidth=2.5,
+            linewidth=4,
             color="#BABABA",
             label="Witty nodes checked",
         )
@@ -330,12 +318,13 @@ def plot_search_nodes(codt_results: Dict[str, Dict], witty_results: Dict[str, Di
 
     ax.set_xscale('log')
     ax.set_ylim(bottom=0)
-    ax.set_xlabel('Search effort (log scale)', fontsize=12)
-    ax.set_ylabel('Fraction of instances solved', fontsize=12)
-    ax.set_title('CODT Expansions vs Witty Nodes Checked', fontsize=14)
+    ax.set_xlabel('Search effort (log scale)', fontsize=18)
+    # ax.set_title('CODT Expansions vs Witty Nodes Checked', fontsize=20)
     ax.grid(True, which='major', alpha=0.4)
     ax.grid(True, which='minor', alpha=0.4, linestyle=':')
-    ax.legend(fontsize=11)
+    ax.legend(fontsize=15)
+    ax.tick_params(axis='y', labelsize=14)
+    ax.tick_params(axis='x', labelsize=14)
 
     plt.tight_layout()
 
