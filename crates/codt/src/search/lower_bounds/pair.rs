@@ -64,9 +64,22 @@ pub fn pair_lower_bound<OT: OptimizationTask>(dataview: &DataView<'_, OT>) -> OT
 
     model.set_objective(obj, Minimize).unwrap();
 
-    model.optimize().unwrap();
+    // Run the optimizer and handle potential API/runtime errors gracefully.
+    // Gurobi (gurobi = 0.3.4) can return an error when requesting `ObjVal`
+    // if the model has not been successfully optimized or no solution exists.
+    if let Err(_e) = model.optimize() {
+        // If optimization failed for any reason, conservatively return 0 as the
+        // pair lower bound (no information).
+        return OT::to_cost_type(0);
+    }
 
-    let obj_val = model.get(attr::ObjVal).unwrap();
+    let obj_val = match model.get(attr::ObjVal) {
+        Ok(v) => v,
+        Err(_e) => {
+            // If ObjVal is not available, return 0 as a safe fallback.
+            return OT::to_cost_type(0);
+        }
+    };
 
     // Small delta to ensure we round up correctly when the LP solution is fractional.
     let delta = 1e-5;

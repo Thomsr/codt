@@ -1,0 +1,17 @@
+{
+  "accuracy": 1.0,
+  "branch_count": 16,
+  "dataset": "credit_approval_classification.txt",
+  "dataset_path": "data/openml/sampled/credit_approval_classification.txt",
+  "error": null,
+  "expansions": 4111745,
+  "memory_usage_bytes": 3289699,
+  "n_examples": 100,
+  "n_features": 50,
+  "runtime_seconds": 1800.0258733219962,
+  "solved": true,
+  "solver": "codt",
+  "status": "perfect-tree-found",
+  "tree": "[34, 0.5, [1, 28.5, [2, 2040.5, [1, 16.5, [7, 36.5, [4, 0.5, 1, [2, 1306.5, 0, 1]], 1], [2, 1288.5, 0, 1]], [6, 2.5, [7, 34.5, 1, 0], 1]], [1, 39.0, [4, 3.5, 1, 0], [7, 34.5, 0, 1]]], [11, 0.5, [7, 35.5, 1, 0], [2, 6126.5, 1, 0]]]",
+  "tree_size": 33
+}
