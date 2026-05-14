@@ -359,6 +359,9 @@ def plot_anytime_performance(results_list, output_dir, x_key="time"):
         if y_limits is not None:
             ax.set_ylim(*y_limits)
         ax.grid(True, alpha=0.3)
+        for spine in ax.spines.values():
+            spine.set_linewidth(0.6)
+        ax.tick_params(width=0.6)
         
         filename = f"fig-anytime-{x_key}-{strategy}.png"
         plt.tight_layout()
@@ -369,7 +372,7 @@ def plot_anytime_performance(results_list, output_dir, x_key="time"):
 
 
 def main():
-    output_dir = Path("anytime_results")
+    output_dir = Path("experiments/results/anytime_results")
     output_dir.mkdir(exist_ok=True)
     results_file = output_dir / "results.json"
     per_run_dir = output_dir / "runs"
