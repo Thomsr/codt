@@ -1,0 +1,87 @@
+{
+  "dataset": "diggle_table_a1",
+  "strategy": "dfs-prio",
+  "status": "perfect-tree-found",
+  "solver_status": "perfect-tree-found",
+  "error": null,
+  "timed_out": false,
+  "memory_limit_exceeded": false,
+  "is_perfect": true,
+  "tree_size": 23,
+  "branch_count": 11,
+  "expansions": 2133856,
+  "memory_usage_bytes": 633777,
+  "runtime_seconds": 1200.002304,
+  "cost": [
+    0,
+    11
+  ],
+  "intermediate_ubs": [
+    {
+      "cost": [
+        0,
+        13
+      ],
+      "expansions": 0,
+      "time": 0.0
+    },
+    {
+      "cost": [
+        0,
+        12
+      ],
+      "expansions": 68969,
+      "time": 38.501965205
+    },
+    {
+      "cost": [
+        0,
+        11
+      ],
+      "expansions": 157795,
+      "time": 85.425593771
+    }
+  ],
+  "intermediate_lbs": [
+    {
+      "cost": [
+        0,
+        2
+      ],
+      "expansions": 0,
+      "time": 0.0
+    },
+    {
+      "cost": [
+        0,
+        3
+      ],
+      "expansions": 481579,
+      "time": 266.72914747
+    },
+    {
+      "cost": [
+        0,
+        4
+      ],
+      "expansions": 483623,
+      "time": 267.75973257
+    },
+    {
+      "cost": [
+        0,
+        5
+      ],
+      "expansions": 505051,
+      "time": 279.578677116
+    },
+    {
+      "cost": [
+        0,
+        6
+      ],
+      "expansions": 935498,
+      "time": 534.891174787
+    }
+  ]
+}

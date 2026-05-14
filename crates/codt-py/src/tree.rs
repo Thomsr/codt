@@ -1,9 +1,4 @@
-use std::{
-    collections::HashSet,
-    convert::{Infallible, TryInto},
-    marker::PhantomData,
-    time::Duration,
-};
+use std::{collections::HashSet, convert::Infallible, marker::PhantomData, time::Duration};
 
 use codt::{
     model::{dataset::DataSet, dataview::DataView, instance::LabeledInstance, tree::Tree},
@@ -260,8 +255,7 @@ macro_rules! impl_optimal_decision_tree_pyclass {
                     .intermediate_lbs
                     .iter()
                     .map(|(lb, exp, time)| {
-                        let lb_float: f64 = (*lb).try_into().expect("Cost should convert to f64");
-                        (lb_float, exp, time)
+                        ((lb.primary, lb.secondary), exp, time)
                     })
                     .collect::<Vec<_>>();
                 intermediates.into_pyobject(py)
@@ -279,8 +273,7 @@ macro_rules! impl_optimal_decision_tree_pyclass {
                     .intermediate_ubs
                     .iter()
                     .map(|(ub, exp, time)| {
-                        let ub_float: f64 = (*ub).try_into().expect("Cost should convert to f64");
-                        (ub_float, exp, time)
+                        ((ub.primary, ub.secondary), exp, time)
                     })
                     .collect::<Vec<_>>();
                 intermediates.into_pyobject(py)

@@ -1,0 +1,39 @@
+{
+  "dataset": "diggle_table_a1",
+  "strategy": "bfs-lb",
+  "status": "perfect-tree-found",
+  "solver_status": "perfect-tree-found",
+  "error": null,
+  "timed_out": false,
+  "memory_limit_exceeded": false,
+  "is_perfect": true,
+  "tree_size": 27,
+  "branch_count": 13,
+  "expansions": 2325833,
+  "memory_usage_bytes": 441233,
+  "runtime_seconds": 1200.001835,
+  "cost": [
+    0,
+    13
+  ],
+  "intermediate_ubs": [
+    {
+      "cost": [
+        0,
+        13
+      ],
+      "expansions": 0,
+      "time": 0.0
+    }
+  ],
+  "intermediate_lbs": [
+    {
+      "cost": [
+        0,
+        2
+      ],
+      "expansions": 0,
+      "time": 0.0
+    }
+  ]
+}

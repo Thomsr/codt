@@ -1,0 +1,47 @@
+{
+  "dataset": "diggle_table_a1",
+  "strategy": "bfs-balance-small-lb",
+  "status": "perfect-tree-found",
+  "solver_status": "perfect-tree-found",
+  "error": null,
+  "timed_out": false,
+  "memory_limit_exceeded": false,
+  "is_perfect": true,
+  "tree_size": 25,
+  "branch_count": 12,
+  "expansions": 2509649,
+  "memory_usage_bytes": 450737,
+  "runtime_seconds": 1200.001748,
+  "cost": [
+    0,
+    12
+  ],
+  "intermediate_ubs": [
+    {
+      "cost": [
+        0,
+        13
+      ],
+      "expansions": 0,
+      "time": 0.0
+    },
+    {
+      "cost": [
+        0,
+        12
+      ],
+      "expansions": 2286343,
+      "time": 1101.650164245
+    }
+  ],
+  "intermediate_lbs": [
+    {
+      "cost": [
+        0,
+        2
+      ],
+      "expansions": 0,
+      "time": 0.0
+    }
+  ]
+}
