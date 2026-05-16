@@ -170,7 +170,7 @@ def run_codt(dataset_path: Path, timeout_seconds: Optional[int]) -> Dict[str, An
     x = frame.iloc[:, 1:].to_numpy()
     y = frame.iloc[:, 0].to_numpy()
 
-    model = OptimalDecisionTreeClassifier(strategy="and-or", timeout=timeout_seconds, memory_limit=4 * 1024 * 1024 * 1024)
+    model = OptimalDecisionTreeClassifier(strategy="dfs-prio", timeout=timeout_seconds, memory_limit=4 * 1024 * 1024 * 1024)
     started = time.perf_counter()
     error: Optional[str] = None
 

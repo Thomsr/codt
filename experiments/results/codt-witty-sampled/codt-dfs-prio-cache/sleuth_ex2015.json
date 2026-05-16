@@ -1,0 +1,17 @@
+{
+  "accuracy": 1.0,
+  "branch_count": 11,
+  "dataset": "sleuth_ex2015.txt",
+  "dataset_path": "data/openml/sampled/sleuth_ex2015.txt",
+  "error": null,
+  "expansions": 3030634,
+  "memory_usage_bytes": 1104479,
+  "n_examples": 60,
+  "n_features": 7,
+  "runtime_seconds": 1800.0044347490038,
+  "solved": true,
+  "solver": "codt",
+  "status": "perfect-tree-found",
+  "tree": "[5, 67.25, [4, 55.75, [1, 48.55, [0, 50.5, 0, 1], 0], [2, 69.6, [0, 71.0, 1, 0], 1]], [0, 73.5, [4, 78.2, 0, [1, 65.85, 0, 1]], [1, 91.80000000000001, 1, [2, 83.4, 0, 1]]]]",
+  "tree_size": 23
+}

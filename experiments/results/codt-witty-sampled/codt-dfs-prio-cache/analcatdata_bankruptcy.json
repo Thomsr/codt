@@ -1,0 +1,17 @@
+{
+  "accuracy": 1.0,
+  "branch_count": 4,
+  "dataset": "analcatdata_bankruptcy.txt",
+  "dataset_path": "data/openml/sampled/analcatdata_bankruptcy.txt",
+  "error": null,
+  "expansions": 89,
+  "memory_usage_bytes": 209589,
+  "n_examples": 50,
+  "n_features": 5,
+  "runtime_seconds": 0.2957436429999234,
+  "solved": true,
+  "solver": "codt",
+  "status": "perfect-tree-found",
+  "tree": "[2, -3.75, [1, -45.7, 1, 0], [3, 21.35, 1, [4, 0.7015, 1, 0]]]",
+  "tree_size": 9
+}

@@ -1,0 +1,17 @@
+{
+  "accuracy": 1.0,
+  "branch_count": 6,
+  "dataset": "vehicle.txt",
+  "dataset_path": "data/openml/sampled/vehicle.txt",
+  "error": null,
+  "expansions": 1253599,
+  "memory_usage_bytes": 2056835,
+  "n_examples": 100,
+  "n_features": 18,
+  "runtime_seconds": 1800.1136230420088,
+  "solved": true,
+  "solver": "codt",
+  "status": "perfect-tree-found",
+  "tree": "[11, 403.0, [7, 46.5, [14, 13.5, [2, 76.5, [9, 135.5, 0, 1], 0], 0], 0], [5, 7.5, 1, 0]]",
+  "tree_size": 13
+}
