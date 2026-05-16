@@ -22,17 +22,12 @@ from codt_py import OptimalDecisionTreeClassifier, all_search_strategies
 
 
 def set_style():
-    sns.set_context('paper')
-    plt.rc('font', size=10, family='sans-serif')
-    plt.rcParams['font.sans-serif'] = ['DejaVu Sans', 'Liberation Sans', 'Arial']
-    plt.rc('xtick', labelsize='small')
-    plt.rc('ytick', labelsize='small')
-    plt.rc('axes', labelsize='medium', grid=True)
-    plt.rc('legend', fontsize='small')
+    # Keep anytime figures visually consistent with EDFC plots.
+    plt.rc('axes', grid=True)
     plt.rc('pdf', fonttype=42)
     plt.rc('ps', fonttype=42)
     plt.rc('text', usetex=False)
-    sns.set_palette("colorblind")
+    sns.set_palette("tab10")
 
 
 def find_data_dir():
@@ -311,8 +306,6 @@ def plot_anytime_performance(results_list, output_dir, x_key="time"):
     else:
         y_limits = None
 
-    line_color = "#00A6D6"
-    
     # Group results by strategy so each strategy gets its own figure.
     grouped = defaultdict(list)
     for result in results_list:
@@ -323,9 +316,10 @@ def plot_anytime_performance(results_list, output_dir, x_key="time"):
         if not group_results:
             continue
         
-        fig, ax = plt.subplots(figsize=(3, 2.51))
+        fig, ax = plt.subplots(figsize=(5, 4))
+        strategy_colors = sns.color_palette("tab10", n_colors=max(3, len(group_results)))
         
-        for result in group_results:
+        for idx, result in enumerate(group_results):
             ubs = result["intermediate_ubs"]
             lbs = result["intermediate_lbs"]
             
@@ -339,15 +333,16 @@ def plot_anytime_performance(results_list, output_dir, x_key="time"):
             
             lb_scores = [extract_cost_components(lb[0])[1] for lb in lbs]
             lb_xs = [lb[2] if x_key == "time" else lb[1] for lb in lbs]
+            curve_color = strategy_colors[idx % len(strategy_colors)]
             
-            # Plot upper and lower bounds using the same blue; lower bound dashed.
-            ax.plot(ub_xs, ub_scores, marker='o', drawstyle="steps-post", linewidth=2.0, color=line_color, markersize=5)
-            ax.plot(lb_xs, lb_scores, marker='s', drawstyle="steps-post", linewidth=2.0, linestyle='--', color=line_color, markersize=5)
+            # Match EDFC line weight and overall visual scale.
+            ax.plot(ub_xs, ub_scores, marker='o', drawstyle="steps-post", linewidth=3, color=curve_color, markersize=5)
+            ax.plot(lb_xs, lb_scores, marker='s', drawstyle="steps-post", linewidth=3, linestyle='--', color=curve_color, markersize=5)
         
         x_label = "Time (s)" if x_key == "time" else "Graph expansions"
-        ax.set_xlabel(x_label, fontsize=8)
+        ax.set_xlabel(x_label)
         if x_key == "expansions":
-            ax.set_ylabel("Branch count", fontsize=8)
+            ax.set_ylabel("Branch count")
         else:
             ax.set_ylabel("")
         ax.set_title(f"{strategy}")
@@ -358,10 +353,10 @@ def plot_anytime_performance(results_list, output_dir, x_key="time"):
             ax.set_xlim(*x_limits)
         if y_limits is not None:
             ax.set_ylim(*y_limits)
-        ax.grid(True, alpha=0.3)
-        for spine in ax.spines.values():
-            spine.set_linewidth(0.6)
-        ax.tick_params(width=0.6)
+        ax.grid(True, which='major', alpha=0.4)
+        ax.grid(True, which='minor', alpha=0.4, linestyle=':')
+        ax.tick_params(axis='y')
+        ax.tick_params(axis='x')
         
         filename = f"fig-anytime-{x_key}-{strategy}.png"
         plt.tight_layout()

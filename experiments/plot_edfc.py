@@ -137,7 +137,7 @@ def plot_edfc(all_results: Dict[str, Dict[str, Dict]],
     colors = sns.color_palette("tab10", n_colors=max(3, len(solver_names)))
 
     # Figure
-    fig, ax1 = plt.subplots(1, 1, figsize=(8.5, 5.5))
+    fig, ax1 = plt.subplots(1, 1, figsize=(5, 4))
 
     summary_stats = {}
 
@@ -217,13 +217,13 @@ def plot_edfc(all_results: Dict[str, Dict[str, Dict]],
 
     ax1.set_xscale('log')
     ax1.set_ylim(bottom=0)
-    ax1.set_xlabel('Runtime (seconds, log scale)', fontsize=14)
-    ax1.set_ylabel('Fraction of instances solved', fontsize=14)
+    ax1.set_xlabel('Runtime (seconds, log scale)')
+    ax1.set_ylabel('Fraction of instances solved')
     ax1.grid(True, which='major', alpha=0.4)
     ax1.grid(True, which='minor', alpha=0.4, linestyle=':')
-    ax1.legend(fontsize=12)
-    ax1.tick_params(axis='y', labelsize=12)
-    ax1.tick_params(axis='x', labelsize=12)
+    ax1.legend()
+    ax1.tick_params(axis='y')
+    ax1.tick_params(axis='x')
 
     plt.tight_layout()
 
@@ -256,7 +256,7 @@ def plot_search_nodes(all_results: Dict[str, Dict[str, Dict]], output_path: Path
     solver_names = list(all_results.keys())
     colors = sns.color_palette("tab10", n_colors=max(3, len(solver_names)))
 
-    fig, ax = plt.subplots(1, 1, figsize=(8.5, 5.5))
+    fig, ax = plt.subplots(1, 1, figsize=(5, 4))
 
     any_plotted = False
     for i, solver in enumerate(solver_names):
@@ -316,12 +316,12 @@ def plot_search_nodes(all_results: Dict[str, Dict[str, Dict]], output_path: Path
 
     ax.set_xscale('log')
     ax.set_ylim(bottom=0)
-    ax.set_xlabel('Search effort (log scale)', fontsize=14)
+    ax.set_xlabel('Search effort (log scale)')
     ax.grid(True, which='major', alpha=0.4)
     ax.grid(True, which='minor', alpha=0.4, linestyle=':')
-    ax.legend(fontsize=12)
-    ax.tick_params(axis='y', labelsize=12)
-    ax.tick_params(axis='x', labelsize=12)
+    ax.legend()
+    ax.tick_params(axis='y')
+    ax.tick_params(axis='x')
 
     plt.tight_layout()
 
