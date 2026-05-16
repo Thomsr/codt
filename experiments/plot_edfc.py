@@ -103,228 +103,225 @@ def extract_runtime_and_status(results: Dict[str, Dict], solver_name: str = "unk
     return runtimes, statuses, solved_flags, memory_error_flags
 
 
-def plot_edfc(codt_results: Dict[str, Dict], witty_results: Dict[str, Dict], 
+def load_all_results(results_dir: Path) -> Dict[str, Dict[str, Dict]]:
+    """Load all solver caches in a results directory.
+
+    Expects subdirectories named like `<solver>-cache`. Returns a mapping
+    `{solver_name: {dataset: result_dict}}`.
+    """
+    solvers: Dict[str, Dict[str, Dict]] = {}
+    if not results_dir.exists():
+        print(f"Results directory {results_dir} does not exist")
+        return solvers
+
+    for sub in sorted(results_dir.iterdir()):
+        if not sub.is_dir():
+            continue
+        if sub.name.endswith("-cache"):
+            solver_name = sub.name[: -len("-cache")]
+            print(f"Loading results for solver: {solver_name} from {sub}")
+            solvers[solver_name] = load_solver_results(sub, solver_name)
+
+    return solvers
+
+
+def plot_edfc(all_results: Dict[str, Dict[str, Dict]],
               output_path: Path = None, timeout_seconds: float = 1800):
-    """
-    Plot ECDF comparing two solvers.
-    Only plots solved instances, normalizing by total instances so y-axis reaches actual solve fraction.
-    """
-    # Extract data
-    codt_runtimes, codt_statuses, codt_solved, codt_mem_errors = extract_runtime_and_status(codt_results, "codt")
-    witty_runtimes, witty_statuses, witty_solved, witty_mem_errors = extract_runtime_and_status(witty_results, "witty")
-    
-    codt_items = len(codt_solved)
-    witty_items = len(witty_solved)
-    
-    # Extract only solved runtimes.
-    # Timeouts are shown at the timeout boundary so they do not look like short runs.
-    codt_solved_runtimes = [rt for rt, solved in zip(codt_runtimes, codt_solved) if solved]
-    codt_unsolved_runtimes = [
-        timeout_seconds if status == "timeout" else rt
-        for rt, status, solved in zip(codt_runtimes, codt_statuses, codt_solved)
-        if not solved
-    ]
+    """Plot ECDFs for all solvers in `all_results` on a single plot."""
+    if not all_results:
+        print("No solver results provided to plot.")
+        return
 
-    witty_solved_runtimes = [rt for rt, solved in zip(witty_runtimes, witty_solved) if solved]
-    witty_unsolved_runtimes = [
-        timeout_seconds if status == "timeout" else rt
-        for rt, status, solved in zip(witty_runtimes, witty_statuses, witty_solved)
-        if not solved
-    ]
-    
-    # Count metrics
-    codt_timeouts = sum(1 for s in codt_statuses if s == "timeout")
-    codt_mem_errors = sum(1 for s in codt_statuses if s == "memory_error")
-    codt_solved_count = sum(codt_solved)
-    
-    witty_timeouts = sum(1 for s in witty_statuses if s == "timeout")
-    witty_mem_errors = sum(1 for s in witty_statuses if s == "memory_error")
-    witty_solved_count = sum(witty_solved)
+    # Prepare colors
+    solver_names = list(all_results.keys())
+    colors = sns.color_palette("tab10", n_colors=max(3, len(solver_names)))
 
-    # Create figure for runtime comparison
+    # Figure
     fig, ax1 = plt.subplots(1, 1, figsize=(8.5, 5.5))
-    
-    # Plot CODT solved instances
-    if codt_solved_runtimes:
-        codt_sorted = np.sort(np.asarray(codt_solved_runtimes))
-        codt_fraction = np.arange(1, len(codt_sorted) + 1) / codt_items
-        ax1.step(
-            codt_sorted,
-            codt_fraction,
-            where='post',
-            linewidth=4,
-            color="#00A6D6",
-            label="CodTree",
-        )
-    
-    # Plot Witty solved instances
-    if witty_solved_runtimes:
-        witty_sorted = np.sort(np.asarray(witty_solved_runtimes))
-        witty_fraction = np.arange(1, len(witty_sorted) + 1) / witty_items
-        ax1.step(
-            witty_sorted,
-            witty_fraction,
-            where='post',
-            linewidth=4,
-            color="#BABABA",
-            label="Witty",
-        )
-    
-    # Plot unsolved instances as scatter points at y=0
-    if codt_unsolved_runtimes:
-        ax1.scatter(
-            codt_unsolved_runtimes,
-            np.zeros(len(codt_unsolved_runtimes)),
-            marker='x',
-            s=35,
-            color="#00A6D6",
-            alpha=0.7,
-        )
-    
-    if witty_unsolved_runtimes:
-        ax1.scatter(
-            witty_unsolved_runtimes,
-            np.zeros(len(witty_unsolved_runtimes)),
-            marker='x',
-            s=35,
-            color="#BABABA",
-            alpha=0.7,
-        )
-    
+
+    summary_stats = {}
+
+    for i, solver in enumerate(solver_names):
+        results = all_results[solver]
+        runtimes, statuses, solved_flags, mem_errors = extract_runtime_and_status(results, solver)
+
+        total = len(solved_flags)
+        solved_runtimes = [rt for rt, s in zip(runtimes, solved_flags) if s]
+        # Split unsolved into timeouts, memory errors, and others so we can mark them
+        timeout_runtimes = [
+            timeout_seconds
+            for rt, status, s in zip(runtimes, statuses, solved_flags)
+            if (not s) and status == 'timeout'
+        ]
+        memerr_runtimes = [
+            (timeout_seconds if status == 'timeout' else rt)  # keep timeout boundary if timed out
+            for rt, status, s in zip(runtimes, statuses, solved_flags)
+            if (not s) and status == 'memory_error'
+        ]
+        other_unsolved = [
+            (timeout_seconds if status == 'timeout' else rt)
+            for rt, status, s in zip(runtimes, statuses, solved_flags)
+            if (not s) and status not in ('timeout', 'memory_error')
+        ]
+
+        if solved_runtimes:
+            sorted_r = np.sort(np.asarray(solved_runtimes))
+            fraction = np.arange(1, len(sorted_r) + 1) / total
+            ax1.step(
+                sorted_r,
+                fraction,
+                where='post',
+                linewidth=3,
+                color=colors[i % len(colors)],
+                label=solver,
+            )
+
+        # Plot unsolved cases: timeouts and memory errors as crosses, others as 'x'
+        if other_unsolved:
+            ax1.scatter(
+                other_unsolved,
+                np.zeros(len(other_unsolved)),
+                marker='x',
+                s=35,
+                color=colors[i % len(colors)],
+                alpha=0.7,
+            )
+        if timeout_runtimes:
+            ax1.scatter(
+                timeout_runtimes,
+                np.zeros(len(timeout_runtimes)),
+                marker='x',
+                s=35,
+                color=colors[i % len(colors)],
+                alpha=0.7,
+            )
+        if memerr_runtimes:
+            ax1.scatter(
+                memerr_runtimes,
+                np.zeros(len(memerr_runtimes)),
+                marker='x',
+                s=35,
+                color=colors[i % len(colors)],
+                alpha=0.7,
+            )
+
+        # collect stats
+        summary_stats[solver] = {
+            'total': total,
+            'solved': sum(solved_flags),
+            'timeouts': sum(1 for s in statuses if s == 'timeout'),
+            'memory_errors': sum(1 for s in statuses if s == 'memory_error'),
+            'avg_solved_runtime': float(np.mean([r for r, s in zip(runtimes, solved_flags) if s])) if any(solved_flags) else None,
+            'median_solved_runtime': float(np.median([r for r, s in zip(runtimes, solved_flags) if s])) if any(solved_flags) else None,
+        }
+
     ax1.set_xscale('log')
     ax1.set_ylim(bottom=0)
-    ax1.set_xlabel('Runtime (seconds, log scale)', fontsize=18)
-    ax1.set_ylabel('Fraction of instances solved', fontsize=18)
-    # ax1.set_title('Runtime vs Instances Solved', fontsize=20)
+    ax1.set_xlabel('Runtime (seconds, log scale)', fontsize=14)
+    ax1.set_ylabel('Fraction of instances solved', fontsize=14)
     ax1.grid(True, which='major', alpha=0.4)
     ax1.grid(True, which='minor', alpha=0.4, linestyle=':')
-    ax1.legend(fontsize=15)
-    ax1.tick_params(axis='y', labelsize=14)
-    ax1.tick_params(axis='x', labelsize=14)
-    
+    ax1.legend(fontsize=12)
+    ax1.tick_params(axis='y', labelsize=12)
+    ax1.tick_params(axis='x', labelsize=12)
+
     plt.tight_layout()
-    
+
     if output_path:
         plt.savefig(output_path, dpi=300, bbox_inches='tight')
         print(f"Plot saved to {output_path}")
-    
+
     plt.show()
 
-    plot_search_nodes(codt_results, witty_results, output_path)
-    
-    # Print summary statistics
-    print("\n" + "="*60)
+    # Plot search nodes for all solvers that have node info
+    plot_search_nodes(all_results, output_path)
+
+    # Print summary
+    print("\n" + "=" * 60)
     print("SOLVER COMPARISON SUMMARY")
-    print("="*60)
-    print(f"\nCODT:")
-    print(f"  Solved:          {codt_solved_count}/{len(codt_solved)}")
-    print(f"  Memory errors:   {codt_mem_errors} (returned tree but exceeded memory limit)")
-    print(f"  Timeouts:        {codt_timeouts}")
-    if sum(codt_solved) > 0:
-        print(f"  Avg runtime (solved): {np.mean([r for r, s in zip(codt_runtimes, codt_solved) if s]):.2f}s")
-        print(f"  Median runtime (solved): {np.median([r for r, s in zip(codt_runtimes, codt_solved) if s]):.2f}s")
-    
-    print(f"\nWitty:")
-    print(f"  Solved:          {witty_solved_count}/{len(witty_solved)}")
-    print(f"  Memory errors:   {witty_mem_errors}")
-    print(f"  Timeouts:        {witty_timeouts}")
-    if sum(witty_solved) > 0:
-        print(f"  Avg runtime (solved): {np.mean([r for r, s in zip(witty_runtimes, witty_solved) if s]):.2f}s")
-        print(f"  Median runtime (solved): {np.median([r for r, s in zip(witty_runtimes, witty_solved) if s]):.2f}s")
-    
-    # Head-to-head comparison
-    print(f"\nHead-to-head:")
-    codt_faster = sum(1 for cr, wr, cs, ws in zip(codt_runtimes, witty_runtimes, codt_solved, witty_solved)
-                      if cs and ws and cr < wr)
-    witty_faster = sum(1 for cr, wr, cs, ws in zip(codt_runtimes, witty_runtimes, codt_solved, witty_solved)
-                       if cs and ws and wr < cr)
-    print(f"  CODT faster: {codt_faster}")
-    print(f"  Witty faster: {witty_faster}")
-    print("="*60 + "\n")
+    print("=" * 60)
+    for solver, stats in summary_stats.items():
+        print(f"\n{solver}:")
+        print(f"  Solved:          {stats['solved']}/{stats['total']}")
+        print(f"  Memory errors:   {stats['memory_errors']}")
+        print(f"  Timeouts:        {stats['timeouts']}")
+        if stats['avg_solved_runtime'] is not None:
+            print(f"  Avg runtime (solved): {stats['avg_solved_runtime']:.2f}s")
+            print(f"  Median runtime (solved): {stats['median_solved_runtime']:.2f}s")
+    print("=" * 60 + "\n")
 
 
-def plot_search_nodes(codt_results: Dict[str, Dict], witty_results: Dict[str, Dict], output_path: Path = None):
-    """Plot CODT expansions against Witty search-tree nodes checked."""
-    codt_items = sorted(codt_results.items())
-    witty_items = sorted(witty_results.items())
-
-    codt_solved_nodes: List[int] = []
-    codt_unsolved_nodes: List[int] = []
-    for _, result in codt_items:
-        expansions = result.get("expansions")
-        if expansions is None:
-            continue
-        if result.get("solved", False) and not _is_memory_error_result(result) and not _is_timeout_result(result):
-            codt_solved_nodes.append(int(expansions))
-        else:
-            codt_unsolved_nodes.append(int(expansions))
-
-    witty_solved_nodes: List[int] = []
-    witty_unsolved_nodes: List[int] = []
-    for _, result in witty_items:
-        nodes_checked = _get_witty_search_tree_nodes_checked(result)
-        if nodes_checked is None:
-            continue
-        if result.get("optimal", False) and not result.get("timed_out", False):
-            witty_solved_nodes.append(int(nodes_checked))
-        else:
-            witty_unsolved_nodes.append(int(nodes_checked))
+def plot_search_nodes(all_results: Dict[str, Dict[str, Dict]], output_path: Path = None):
+    """Plot search effort (expansions / nodes checked) for all solvers."""
+    solver_names = list(all_results.keys())
+    colors = sns.color_palette("tab10", n_colors=max(3, len(solver_names)))
 
     fig, ax = plt.subplots(1, 1, figsize=(8.5, 5.5))
 
-    if codt_solved_nodes:
-        codt_sorted = np.sort(np.asarray(codt_solved_nodes))
-        codt_fraction = np.arange(1, len(codt_sorted) + 1) / len(codt_items)
-        ax.step(
-            codt_sorted,
-            codt_fraction,
-            where='post',
-            linewidth=4,
-            color="#00A6D6",
-            label="CodTree expansions",
-        )
+    any_plotted = False
+    for i, solver in enumerate(solver_names):
+        items = sorted(all_results[solver].items())
+        solved_nodes: List[int] = []
+        unsolved_nodes: List[int] = []
 
-    if witty_solved_nodes:
-        witty_sorted = np.sort(np.asarray(witty_solved_nodes))
-        witty_fraction = np.arange(1, len(witty_sorted) + 1) / len(witty_items)
-        ax.step(
-            witty_sorted,
-            witty_fraction,
-            where='post',
-            linewidth=4,
-            color="#BABABA",
-            label="Witty nodes checked",
-        )
+        for _, result in items:
+            # Prefer CODT 'expansions', fallback to Witty search tree nodes
+            expansions = result.get("expansions")
+            nodes_checked = None
+            if expansions is None:
+                nodes_checked = _get_witty_search_tree_nodes_checked(result)
+            else:
+                nodes_checked = expansions
 
-    if codt_unsolved_nodes:
-        ax.scatter(
-            codt_unsolved_nodes,
-            np.zeros(len(codt_unsolved_nodes)),
-            marker='x',
-            s=35,
-            color="#00A6D6",
-            alpha=0.7,
-        )
+            if nodes_checked is None:
+                continue
 
-    if witty_unsolved_nodes:
-        ax.scatter(
-            witty_unsolved_nodes,
-            np.zeros(len(witty_unsolved_nodes)),
-            marker='x',
-            s=35,
-            color="#BABABA",
-            alpha=0.7,
-        )
+            is_solved = False
+            if 'solved' in result:
+                is_solved = bool(result.get('solved', False)) and not _is_memory_error_result(result) and not _is_timeout_result(result)
+            elif 'optimal' in result:
+                is_solved = bool(result.get('optimal', False)) and not result.get('timed_out', False)
+
+            if is_solved:
+                solved_nodes.append(int(nodes_checked))
+            else:
+                unsolved_nodes.append(int(nodes_checked))
+
+        if solved_nodes:
+            sorted_r = np.sort(np.asarray(solved_nodes))
+            fraction = np.arange(1, len(sorted_r) + 1) / max(1, len(items))
+            ax.step(
+                sorted_r,
+                fraction,
+                where='post',
+                linewidth=3,
+                color=colors[i % len(colors)],
+                label=f"{solver}",
+            )
+            any_plotted = True
+
+        if unsolved_nodes:
+            ax.scatter(
+                unsolved_nodes,
+                np.zeros(len(unsolved_nodes)),
+                marker='x',
+                s=35,
+                color=colors[i % len(colors)],
+                alpha=0.7,
+            )
+
+    if not any_plotted:
+        print("No node/expansion info found for any solver; skipping node plot.")
+        return
 
     ax.set_xscale('log')
     ax.set_ylim(bottom=0)
-    ax.set_xlabel('Search effort (log scale)', fontsize=18)
-    # ax.set_title('CODT Expansions vs Witty Nodes Checked', fontsize=20)
+    ax.set_xlabel('Search effort (log scale)', fontsize=14)
     ax.grid(True, which='major', alpha=0.4)
     ax.grid(True, which='minor', alpha=0.4, linestyle=':')
-    ax.legend(fontsize=15)
-    ax.tick_params(axis='y', labelsize=14)
-    ax.tick_params(axis='x', labelsize=14)
+    ax.legend(fontsize=12)
+    ax.tick_params(axis='y', labelsize=12)
+    ax.tick_params(axis='x', labelsize=12)
 
     plt.tight_layout()
 
@@ -381,7 +378,7 @@ def _get_witty_search_tree_nodes_checked(result: Dict[str, Dict]) -> Optional[in
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Plot EDFC comparing CODT and Witty solver results"
+        description="Plot EDFC comparing multiple solver results (detects *-cache dirs)"
     )
     parser.add_argument(
         "--results-dir",
@@ -404,19 +401,16 @@ def main():
     
     args = parser.parse_args()
     
-    # Load results
-    print("Loading CODT results...")
-    codt_results = load_solver_results(args.results_dir / "codt-cache", "codt")
-    print(f"  Found {len(codt_results)} CODT results")
-    
-    print("Loading Witty results...")
-    witty_results = load_solver_results(args.results_dir / "witty-cache", "witty")
-    print(f"  Found {len(witty_results)} Witty results")
-    
+    # Load all solver caches found in results dir
+    print("Loading solver caches from results directory...")
+    all_results = load_all_results(args.results_dir)
+    for s, r in all_results.items():
+        print(f"  Found {len(r)} results for solver: {s}")
+
     # Create plot
     print(f"Creating EDFC plot...")
     args.output.parent.mkdir(parents=True, exist_ok=True)
-    plot_edfc(codt_results, witty_results, args.output, args.timeout)
+    plot_edfc(all_results, args.output, args.timeout)
 
 
 if __name__ == "__main__":
