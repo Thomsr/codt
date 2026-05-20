@@ -1,17 +1,13 @@
-use crate::{
-    model::{dataview::DataView, difference_table::DifferenceTable},
-    tasks::OptimizationTask,
-};
+use crate::{model::difference_table::DifferenceTableView, tasks::OptimizationTask};
 
-pub fn improvement_lower_bound<OT: OptimizationTask>(dataview: &DataView<'_, OT>) -> OT::CostType {
-    let diff_table = DifferenceTable::new(dataview);
-
-    if diff_table.diffs.is_empty() {
+pub fn improvement_lower_bound<OT: OptimizationTask>(
+    diff_table: &DifferenceTableView<'_>,
+) -> OT::CostType {
+    if diff_table.is_empty() {
         return OT::to_cost_type(0);
     }
 
-    let n_pairs = diff_table.pairs.len();
-    let improvement_lower_bound = diff_table.min_size_based_cover(n_pairs);
+    let improvement_lower_bound = diff_table.min_size_based_cover(diff_table.n_rows());
 
     OT::to_cost_type(improvement_lower_bound as i64)
 }
@@ -19,6 +15,7 @@ pub fn improvement_lower_bound<OT: OptimizationTask>(dataview: &DataView<'_, OT>
 #[cfg(test)]
 mod tests {
     use crate::{
+        model::difference_table::DifferenceTable,
         model::{dataset::DataSet, dataview::DataView, instance::LabeledInstance},
         search::lower_bounds::{improvement::improvement_lower_bound, pair::pair_lower_bound},
         tasks::{Cost, accuracy::AccuracyTask},
@@ -46,8 +43,10 @@ mod tests {
 
         let dataset = create_dataset(features, labels);
         let dataview = DataView::<AccuracyTask>::from_dataset(&dataset, false);
+        let difference_table = DifferenceTable::new(&dataview);
+        let view = difference_table.view();
 
-        let lb = improvement_lower_bound(&dataview);
+        let lb = improvement_lower_bound::<AccuracyTask>(&view);
         assert_eq!(lb.secondary, 0);
     }
 
@@ -59,8 +58,10 @@ mod tests {
 
         let dataset = create_dataset(features, labels);
         let dataview = DataView::<AccuracyTask>::from_dataset(&dataset, false);
+        let difference_table = DifferenceTable::new(&dataview);
+        let view = difference_table.view();
 
-        let lb = improvement_lower_bound(&dataview);
+        let lb = improvement_lower_bound::<AccuracyTask>(&view);
         assert_eq!(lb.secondary, 1);
     }
 
@@ -71,8 +72,10 @@ mod tests {
 
         let dataset = create_dataset(features, labels);
         let dataview = DataView::<AccuracyTask>::from_dataset(&dataset, false);
-        let improvement_lower_bound = improvement_lower_bound(&dataview);
-        let pair_lower_bound = pair_lower_bound(&dataview);
+        let difference_table = DifferenceTable::new(&dataview);
+        let view = difference_table.view();
+        let improvement_lower_bound = improvement_lower_bound::<AccuracyTask>(&view);
+        let pair_lower_bound = pair_lower_bound::<AccuracyTask>(&view);
 
         assert!(
             improvement_lower_bound.less_or_not_much_greater_than(&pair_lower_bound),

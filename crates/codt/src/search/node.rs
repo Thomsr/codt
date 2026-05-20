@@ -2,8 +2,6 @@ use std::{
     cmp::Ordering, collections::VecDeque, fmt::Debug, marker::PhantomData, ops::Range, sync::Arc,
 };
 
-use log::info;
-
 use crate::{
     model::{
         dataview::DataView,
@@ -380,7 +378,7 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> Node<'a, OT, SS> {
             }
         }
 
-        if context.cart_ub {
+        if context.cart_ub && is_root {
             let seed_base = 42u64;
 
             // Subsequent runs: subset CART with patience on non-improving iterations.
@@ -415,10 +413,22 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> Node<'a, OT, SS> {
         let lb = match (queue.is_empty(), use_class_count_lb, use_improvement_lb) {
             (true, _, _) => ub,
             (false, true, false) => class_count_lower_bound::<OT>(dataview.num_unique_labels()),
-            (false, false, true) => improvement_lower_bound::<OT>(&dataview),
+            (false, false, true) => {
+                let diff_table = context
+                    .difference_table
+                    .as_ref()
+                    .expect("Improvement lower bound requires a shared DifferenceTable");
+                let view = diff_table.view_for_dataview(&dataview);
+                improvement_lower_bound::<OT>(&view)
+            }
             (false, true, true) => {
                 let class_count_lb = class_count_lower_bound::<OT>(dataview.num_unique_labels());
-                let improvement_lb = improvement_lower_bound::<OT>(&dataview);
+                let diff_table = context
+                    .difference_table
+                    .as_ref()
+                    .expect("Improvement lower bound requires a shared DifferenceTable");
+                let view = diff_table.view_for_dataview(&dataview);
+                let improvement_lb = improvement_lower_bound::<OT>(&view);
                 if class_count_lb.greater_or_not_much_less_than(&improvement_lb) {
                     class_count_lb
                 } else {

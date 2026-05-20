@@ -1,5 +1,5 @@
 use crate::{model::dataview::DataView, tasks::OptimizationTask};
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub struct SplitColumn {
@@ -13,6 +13,12 @@ pub struct DifferenceTable {
     pub diffs: Vec<Vec<bool>>,
     pub split_columns: Vec<SplitColumn>,
     pub n_columns: usize,
+}
+
+pub struct DifferenceTableView<'a> {
+    table: &'a DifferenceTable,
+    row_indices: Vec<usize>,
+    column_indices: Vec<usize>,
 }
 
 impl DifferenceTable {
@@ -75,26 +81,19 @@ impl DifferenceTable {
         }
     }
 
+    pub fn view(&self) -> DifferenceTableView<'_> {
+        DifferenceTableView::new(self)
+    }
+
+    pub fn view_for_dataview<OT: OptimizationTask>(
+        &self,
+        dataview: &DataView<'_, OT>,
+    ) -> DifferenceTableView<'_> {
+        DifferenceTableView::from_dataview(self, dataview)
+    }
+
     pub fn min_size_based_cover(&self, target: usize) -> usize {
-        let mut counts = vec![0usize; self.n_columns];
-
-        for row in &self.diffs {
-            for (col, &val) in row.iter().enumerate() {
-                counts[col] += val as usize;
-            }
-        }
-
-        counts.sort_unstable_by(|a, b| b.cmp(a));
-
-        let mut covered = 0usize;
-        for (i, &c) in counts.iter().enumerate() {
-            covered += c;
-            if covered >= target {
-                return i + 1;
-            }
-        }
-
-        counts.len()
+        self.view().min_size_based_cover(target)
     }
 
     pub fn print(&self) {
@@ -157,6 +156,129 @@ impl DifferenceTable {
                 p_left != n_left
             })
             .collect::<Vec<bool>>()
+    }
+}
+
+impl<'a> DifferenceTableView<'a> {
+    pub fn new(table: &'a DifferenceTable) -> Self {
+        Self {
+            table,
+            row_indices: (0..table.pairs.len()).collect(),
+            column_indices: (0..table.n_columns).collect(),
+        }
+    }
+
+    pub fn from_dataview<OT: OptimizationTask>(
+        table: &'a DifferenceTable,
+        dataview: &DataView<'_, OT>,
+    ) -> Self {
+        let active_instances: HashSet<usize> = dataview.instance_ids.iter().copied().collect();
+        let active_columns: HashSet<(usize, i32)> = dataview
+            .possible_split_values
+            .iter()
+            .enumerate()
+            .flat_map(|(feature, split_values)| {
+                split_values
+                    .iter()
+                    .map(move |split| (feature, split.feature_value))
+            })
+            .collect();
+
+        let row_indices = table
+            .pairs
+            .iter()
+            .enumerate()
+            .filter(|(_, (left, right))| {
+                active_instances.contains(left) && active_instances.contains(right)
+            })
+            .map(|(row_idx, _)| row_idx)
+            .collect();
+
+        let column_indices = table
+            .split_columns
+            .iter()
+            .enumerate()
+            .filter(|(_, split)| active_columns.contains(&(split.feature, split.threshold_value)))
+            .map(|(column_idx, _)| column_idx)
+            .collect();
+
+        Self {
+            table,
+            row_indices,
+            column_indices,
+        }
+    }
+
+    pub fn is_empty(&self) -> bool {
+        self.row_indices.is_empty() || self.column_indices.is_empty()
+    }
+
+    pub fn n_rows(&self) -> usize {
+        self.row_indices.len()
+    }
+
+    pub fn n_columns(&self) -> usize {
+        self.column_indices.len()
+    }
+
+    pub fn pair(&self, row: usize) -> (usize, usize) {
+        self.table.pairs[self.row_indices[row]]
+    }
+
+    pub fn split_column(&self, column: usize) -> SplitColumn {
+        self.table.split_columns[self.column_indices[column]]
+    }
+
+    pub fn diff(&self, row: usize, column: usize) -> bool {
+        self.table.diffs[self.row_indices[row]][self.column_indices[column]]
+    }
+
+    pub fn min_size_based_cover(&self, target: usize) -> usize {
+        let mut counts = vec![0usize; self.n_columns()];
+
+        for row in 0..self.n_rows() {
+            for column in 0..self.n_columns() {
+                counts[column] += self.diff(row, column) as usize;
+            }
+        }
+
+        counts.sort_unstable_by(|a, b| b.cmp(a));
+
+        let mut covered = 0usize;
+        for (i, &count) in counts.iter().enumerate() {
+            covered += count;
+            if covered >= target {
+                return i + 1;
+            }
+        }
+
+        counts.len()
+    }
+
+    pub fn print(&self) {
+        println!("\n=== Difference Table ===");
+
+        for row in 0..self.n_rows() {
+            let (p, n) = self.pair(row);
+            let diff_str = (0..self.n_columns())
+                .map(|column| {
+                    let split = self.split_column(column);
+                    let diff = self.diff(row, column);
+                    format!(
+                        "f{}<=v{}(={}):{}",
+                        split.feature,
+                        split.split_value,
+                        split.threshold_value,
+                        if diff { "1" } else { "0" }
+                    )
+                })
+                .collect::<Vec<_>>()
+                .join(", ");
+
+            println!("Pair {} (pos={}, neg={}) -> [{}]", row, p, n, diff_str);
+        }
+
+        println!("========================\n");
     }
 }
 
