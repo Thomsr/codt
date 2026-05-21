@@ -1,0 +1,17 @@
+{
+  "accuracy": 1.0,
+  "branch_count": 15,
+  "dataset": "appendicitis_test_edsa.txt",
+  "dataset_path": "data/openml/sampled/appendicitis_test_edsa.txt",
+  "error": null,
+  "expansions": 131765,
+  "memory_usage_bytes": 8590461510,
+  "n_examples": 100,
+  "n_features": 7,
+  "runtime_seconds": 1202.7736641990014,
+  "solved": true,
+  "solver": "codt",
+  "status": "perfect-tree-found",
+  "tree": "[6, 0.1475, [5, 0.5874999999999999, [0, 0.2085, 1, 0], [4, 0.0165, 1, 0]], [6, 0.9185, [2, 0.4115, [5, 0.686, [1, 0.393, [1, 0.20500000000000002, 0, 1], 0], [5, 0.757, [6, 0.365, [1, 0.8125, 1, 0], 0], 0]], [2, 0.46950000000000003, [6, 0.432, 0, [2, 0.461, 0, 1]], 0]], 1]]",
+  "tree_size": 31
+}

@@ -1,0 +1,17 @@
+{
+  "accuracy": 1.0,
+  "branch_count": 3,
+  "dataset": "wind_correlations.txt",
+  "dataset_path": "data/openml/sampled/wind_correlations.txt",
+  "error": null,
+  "expansions": 234,
+  "memory_usage_bytes": 30227443,
+  "n_examples": 45,
+  "n_features": 46,
+  "runtime_seconds": 7.077800961997127,
+  "solved": true,
+  "solver": "codt",
+  "status": "perfect-tree-found",
+  "tree": "[13, 0.536, 1, [28, 0.46950000000000003, [6, 0.443, 1, 0], 0]]",
+  "tree_size": 7
+}

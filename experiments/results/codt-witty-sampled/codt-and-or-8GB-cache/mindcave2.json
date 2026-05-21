@@ -1,0 +1,17 @@
+{
+  "accuracy": 1.0,
+  "branch_count": 22,
+  "dataset": "mindcave2.txt",
+  "dataset_path": "data/openml/sampled/mindcave2.txt",
+  "error": null,
+  "expansions": 25129,
+  "memory_usage_bytes": 8591973467,
+  "n_examples": 100,
+  "n_features": 39,
+  "runtime_seconds": 1651.301807511998,
+  "solved": true,
+  "solver": "codt",
+  "status": "perfect-tree-found",
+  "tree": "[35, 17.5, [36, 135.5, [30, 31.5, [25, 1135.685, [7, 0.185, 0, [34, 10.5, [7, 0.225, [38, 14.5, 1, 0], [32, 6.5, [35, 7.5, 0, 1], 0]], [14, 0.53, [7, 0.32, [19, 15.735, 1, 0], 1], 1]]], 0], 1], 1], [14, 0.53, [13, 7.5, [7, 0.235, [25, 5751.585, [31, 0.065, [33, 226.5, 1, 0], 0], 1], [17, 4.5, 0, 1]], 0], [18, 0.985, 1, [7, 0.175, 0, 1]]]]",
+  "tree_size": 45
+}

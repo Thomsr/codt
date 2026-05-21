@@ -1,0 +1,17 @@
+{
+  "accuracy": 1.0,
+  "branch_count": 17,
+  "dataset": "kc1-binary.txt",
+  "dataset_path": "data/openml/sampled/kc1-binary.txt",
+  "error": null,
+  "expansions": 11901,
+  "memory_usage_bytes": 8593551083,
+  "n_examples": 100,
+  "n_features": 94,
+  "runtime_seconds": 1797.9708050010013,
+  "solved": true,
+  "solver": "codt",
+  "status": "perfect-tree-found",
+  "tree": "[88, 1270.81, [51, 38.5, [57, 1.527778, 0, [88, 13.75, [8, 5.5, 1, 0], 0]], [72, 11.1746035, 1, [4, 12.5, 1, 0]]], [61, 4.0973205, [47, 46.5, 0, 1], [7, 0.5, 1, [92, 110.0, [45, 1119.37, 0, [80, 250.0, [77, 37.5, 1, [93, 255.0, 0, 1]], 0]], [40, 45.785, [37, 18.5, 1, 0], 0]]]]]",
+  "tree_size": 35
+}
