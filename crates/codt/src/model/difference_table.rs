@@ -1,5 +1,5 @@
 use crate::{model::dataview::DataView, tasks::OptimizationTask};
-use std::collections::{HashMap, HashSet};
+use std::collections::HashMap;
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub struct SplitColumn {
@@ -172,24 +172,25 @@ impl<'a> DifferenceTableView<'a> {
         table: &'a DifferenceTable,
         dataview: &DataView<'_, OT>,
     ) -> Self {
-        let active_instances: HashSet<usize> = dataview.instance_ids.iter().copied().collect();
-        let active_columns: HashSet<(usize, i32)> = dataview
-            .possible_split_values
-            .iter()
-            .enumerate()
-            .flat_map(|(feature, split_values)| {
-                split_values
-                    .iter()
-                    .map(move |split| (feature, split.feature_value))
-            })
-            .collect();
+        let mut active_instances = vec![false; dataview.dataset.instances.len()];
+        for &instance_id in &dataview.instance_ids {
+            active_instances[instance_id] = true;
+        }
+
+        let mut active_columns_by_feature = vec![Vec::new(); dataview.possible_split_values.len()];
+        for (feature, split_values) in dataview.possible_split_values.iter().enumerate() {
+            let active_columns = &mut active_columns_by_feature[feature];
+            active_columns.extend(split_values.iter().map(|split| split.feature_value));
+            active_columns.sort_unstable();
+            active_columns.dedup();
+        }
 
         let row_indices = table
             .pairs
             .iter()
             .enumerate()
             .filter(|(_, (left, right))| {
-                active_instances.contains(left) && active_instances.contains(right)
+                active_instances[*left] && active_instances[*right]
             })
             .map(|(row_idx, _)| row_idx)
             .collect();
@@ -198,7 +199,12 @@ impl<'a> DifferenceTableView<'a> {
             .split_columns
             .iter()
             .enumerate()
-            .filter(|(_, split)| active_columns.contains(&(split.feature, split.threshold_value)))
+            .filter(|(_, split)| {
+                split.feature < active_columns_by_feature.len()
+                    && active_columns_by_feature[split.feature]
+                        .binary_search(&split.threshold_value)
+                        .is_ok()
+            })
             .map(|(column_idx, _)| column_idx)
             .collect();
 
