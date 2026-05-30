@@ -1,15 +1,12 @@
 use std::ops::Sub;
 
-use crate::{
-    model::{dataview::DataView, difference_table::DifferenceTable},
-    tasks::OptimizationTask,
-};
+use crate::{model::difference_table::DifferenceTableView, tasks::OptimizationTask};
 use gurobi::*;
 
-pub fn pair_lower_bound<OT: OptimizationTask>(dataview: &DataView<'_, OT>) -> OT::CostType {
-    let diff_table = DifferenceTable::new(dataview);
-
-    if diff_table.diffs.is_empty() {
+pub fn pair_lower_bound<OT: OptimizationTask>(
+    difference_table: &DifferenceTableView<'_>,
+) -> OT::CostType {
+    if difference_table.is_empty() {
         return OT::to_cost_type(0);
     }
 
@@ -18,7 +15,7 @@ pub fn pair_lower_bound<OT: OptimizationTask>(dataview: &DataView<'_, OT>) -> OT
     env.set(param::LogToConsole, 0).unwrap();
     let mut model = Model::new("pair_lb_relaxation", &env).unwrap();
 
-    let n_columns = diff_table.n_columns;
+    let n_columns = difference_table.n_columns();
 
     let x_vars: Vec<Var> = (0..n_columns)
         .map(|column| {
@@ -41,18 +38,18 @@ pub fn pair_lower_bound<OT: OptimizationTask>(dataview: &DataView<'_, OT>) -> OT
         obj = obj.add_term(1.0, var.clone());
     }
 
-    for (p_idx, diffs) in diff_table.diffs.iter().enumerate() {
+    for row in 0..difference_table.n_rows() {
         let mut expr = LinExpr::new();
 
-        for (f, &d) in diffs.iter().enumerate() {
-            if d {
-                expr = expr.add_term(1.0, x_vars[f].clone());
+        for column in 0..difference_table.n_columns() {
+            if difference_table.diff(row, column) {
+                expr = expr.add_term(1.0, x_vars[column].clone());
             }
         }
 
         model
             .add_constr(
-                &format!("cover_pair_{}", p_idx),
+                &format!("cover_pair_{}", row),
                 expr,
                 ConstrSense::Greater,
                 1.0,
@@ -93,6 +90,7 @@ mod tests {
     use super::*;
     use crate::model::dataset::DataSet;
     use crate::model::dataview::DataView;
+    use crate::model::difference_table::DifferenceTable;
     use crate::model::instance::LabeledInstance;
     use crate::tasks::accuracy::AccuracyTask;
 
@@ -118,8 +116,10 @@ mod tests {
 
         let dataset = create_dataset(features, labels);
         let dataview = DataView::<AccuracyTask>::from_dataset(&dataset, false);
+        let difference_table = DifferenceTable::new(&dataview);
+        let view = difference_table.view();
 
-        let lb = pair_lower_bound(&dataview);
+        let lb = pair_lower_bound::<AccuracyTask>(&view);
 
         assert_eq!(lb.secondary, 0);
     }
@@ -136,8 +136,10 @@ mod tests {
 
         let dataset = create_dataset(features, labels);
         let dataview = DataView::<AccuracyTask>::from_dataset(&dataset, false);
+        let difference_table = DifferenceTable::new(&dataview);
+        let view = difference_table.view();
 
-        let lb = pair_lower_bound(&dataview);
+        let lb = pair_lower_bound::<AccuracyTask>(&view);
 
         assert_eq!(lb.secondary, 1);
     }
@@ -158,8 +160,10 @@ mod tests {
 
         let dataset = create_dataset(features, labels);
         let dataview = DataView::<AccuracyTask>::from_dataset(&dataset, false);
+        let difference_table = DifferenceTable::new(&dataview);
+        let view = difference_table.view();
 
-        let lb = pair_lower_bound(&dataview);
+        let lb = pair_lower_bound::<AccuracyTask>(&view);
 
         assert_eq!(lb.secondary, 3);
     }

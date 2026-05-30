@@ -8,7 +8,7 @@ use log::{info, trace};
 
 use crate::{
     allocator::{current_thread_memory_usage, reset_current_thread_max_memory_usage},
-    model::dataview::DataView,
+    model::{dataview::DataView, difference_table::DifferenceTable},
     search::{
         lower_bounds::pair::pair_lower_bound,
         node::Node,
@@ -34,6 +34,7 @@ pub struct SolveContext<'a, OT: OptimizationTask, SS: SearchStrategy> {
     pub ub_strategy: UpperboundStrategy,
     pub cart_ub: bool,
     pub cart_ub_patience: usize,
+    pub difference_table: Option<&'a DifferenceTable>,
     _ss: PhantomData<SS>,
 }
 
@@ -43,12 +44,24 @@ impl<OT: OptimizationTask, SS: SearchStrategy> Solver<OT> for SolverImpl<'_, OT,
 
         self.task.prepare_for_data(&mut dataview);
 
+        let use_pair_lowerbound = options.lb_strategy.contains(&LowerBoundStrategy::Pair);
+        let use_improvement_lowerbound = options
+            .lb_strategy
+            .contains(&LowerBoundStrategy::Improvement);
+
+        let difference_table = if use_pair_lowerbound || use_improvement_lowerbound {
+            Some(DifferenceTable::new(&dataview))
+        } else {
+            None
+        };
+
         let context = SolveContext {
             task: &self.task,
             lb_strategy: options.lb_strategy,
             ub_strategy: options.ub_strategy,
             cart_ub: options.cart_ub,
             cart_ub_patience: options.cart_ub_patience,
+            difference_table: difference_table.as_ref(),
             _ss: PhantomData,
         };
 
@@ -59,17 +72,21 @@ impl<OT: OptimizationTask, SS: SearchStrategy> Solver<OT> for SolverImpl<'_, OT,
         let start_time = Instant::now();
         let mut elapsed = Duration::ZERO;
 
-        let pair_lb = context
-            .lb_strategy
-            .contains(&LowerBoundStrategy::Pair)
-            .then(|| pair_lower_bound::<OT>(&dataview));
+        let root_pair_lower_bound = if use_pair_lowerbound {
+            context.difference_table.as_ref().map(|table| {
+                let view = table.view_for_dataview(&dataview);
+                pair_lower_bound::<OT>(&view)
+            })
+        } else {
+            None
+        };
 
         let mut root: Node<'_, OT, SS> = Node::new(&context, dataview, 0, true);
 
         let mut intermediate_lbs = vec![(root.cost_lower_bound, graph_expansions, 0.0)];
         let mut intermediate_ubs = vec![(root.best.cost(), graph_expansions, 0.0)];
 
-        if let Some(pair_lb) = pair_lb {
+        if let Some(pair_lb) = root_pair_lower_bound {
             info!("Pair lower bound: {}", pair_lb);
             OT::update_lowerbound(&mut root.cost_lower_bound, &pair_lb);
         }
