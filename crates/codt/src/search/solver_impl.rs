@@ -34,6 +34,7 @@ pub struct SolveContext<'a, OT: OptimizationTask, SS: SearchStrategy> {
     pub ub_strategy: UpperboundStrategy,
     pub cart_ub: bool,
     pub cart_ub_patience: usize,
+    pub memory_limit: Option<u64>,
     pub difference_table: Option<&'a DifferenceTable>,
     _ss: PhantomData<SS>,
 }
@@ -61,6 +62,7 @@ impl<OT: OptimizationTask, SS: SearchStrategy> Solver<OT> for SolverImpl<'_, OT,
             ub_strategy: options.ub_strategy,
             cart_ub: options.cart_ub,
             cart_ub_patience: options.cart_ub_patience,
+            memory_limit: options.memory_limit,
             difference_table: difference_table.as_ref(),
             _ss: PhantomData,
         };
@@ -103,7 +105,7 @@ impl<OT: OptimizationTask, SS: SearchStrategy> Solver<OT> for SolverImpl<'_, OT,
             graph_expansions += 1;
 
             // The initial source does not matter, since we always substitute the root manually.
-            root.select(&mut path, 0);
+            root.select(&context, &mut path, 0);
             trace!("Selected path: {:?}", path);
 
             let mut current = path.pop_front();

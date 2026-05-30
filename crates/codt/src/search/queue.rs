@@ -23,6 +23,12 @@ impl<T: Ord> Default for BinaryHeapQueue<T> {
     }
 }
 
+impl<T: Ord> BinaryHeapQueue<T> {
+    pub fn rebuild(&mut self) {
+        self.queue = std::mem::take(&mut self.queue).into_iter().collect();
+    }
+}
+
 impl<T: Ord> PQ<T> for BinaryHeapQueue<T> {
     fn is_empty(&self) -> bool {
         self.queue.is_empty()
