@@ -11,7 +11,10 @@ pub mod andor;
 pub mod bfs;
 pub mod dfs;
 pub mod dfsprio;
+pub mod memory_adaptive;
 pub mod random;
+
+pub use memory_adaptive::{AndOrDfsPrioSearchStrategy, MemoryAdaptiveMode};
 
 pub trait SearchStrategy {
     /// The order in which the items in the queue should be handled. Items are handled in ascending order.
@@ -31,6 +34,10 @@ pub trait SearchStrategy {
     fn item_front_of_queue_is_lowest_lb<OT: OptimizationTask, SS: SearchStrategy>(
         item: &FeatureTest<OT, SS>,
     ) -> bool;
+
+    fn refresh_memory_mode(_memory_limit: Option<u64>) -> Option<MemoryAdaptiveMode> {
+        None
+    }
 
     fn heuristic<OT: OptimizationTask, SS: SearchStrategy>(_item: &FeatureTest<OT, SS>) -> f64 {
         0.0 // Only used for global best first search strategy

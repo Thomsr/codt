@@ -7,6 +7,7 @@ use crate::{
     search::{
         solver_impl::SolverImpl,
         strategy::{
+            AndOrDfsPrioSearchStrategy,
             andor::AndOrSearchStrategy,
             bfs::{
                 BfsSearchStrategy, CuriosityHeuristic, LBSupportHeuristic,
@@ -60,6 +61,9 @@ pub fn solver_with_strategy<'a, OT: OptimizationTask + 'a>(
         }
         SearchStrategyEnum::DfsPrio => {
             solver_impl_for!(task, dataview, DfsPrioSearchStrategy)
+        }
+        SearchStrategyEnum::AndOrDfsPrio => {
+            solver_impl_for!(task, dataview, AndOrDfsPrioSearchStrategy)
         }
         SearchStrategyEnum::DfsRandom => {
             solver_impl_for!(task, dataview, RandomDfsSearchStrategy)
@@ -118,6 +122,7 @@ pub enum SearchStrategyEnum {
     AndOr,
     Dfs,
     DfsPrio,
+    AndOrDfsPrio,
     DfsRandom,
     BfsLb,
     BfsCuriosity,

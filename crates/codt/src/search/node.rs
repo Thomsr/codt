@@ -2,8 +2,6 @@ use std::{
     cmp::Ordering, collections::VecDeque, fmt::Debug, marker::PhantomData, ops::Range, sync::Arc,
 };
 
-use log::info;
-
 use crate::{
     model::{
         dataview::DataView,
@@ -17,7 +15,7 @@ use crate::{
         queue::{BinaryHeapQueue, PQ},
         solver::{LowerBoundStrategy, UpperboundStrategy},
         solver_impl::SolveContext,
-        strategy::SearchStrategy,
+        strategy::{MemoryAdaptiveMode, SearchStrategy},
         upper_bounds::cart::cart_upper_bound_with_subset_seed,
     },
     tasks::{Cost, CostSum, OptimizationTask},
@@ -322,15 +320,27 @@ pub struct Node<'a, OT: OptimizationTask, SS: SearchStrategy> {
     pruner: Pruner<OT>,
     /// The threshold range we are still interested in per feature. Initially the full range, but shrunk when a zero solution is found.
     pub interesting_solutions_range: Vec<Range<usize>>,
+    ordering_mode: Option<MemoryAdaptiveMode>,
 }
 
 impl<'a, OT: OptimizationTask, SS: SearchStrategy> Node<'a, OT, SS> {
+    fn refresh_ordering_mode(&mut self, context: &SolveContext<OT, SS>) {
+        if let Some(mode) = SS::refresh_memory_mode(context.memory_limit) {
+            if self.ordering_mode != Some(mode) {
+                self.queue.rebuild();
+                self.ordering_mode = Some(mode);
+            }
+        }
+    }
+
     pub fn new(
         context: &SolveContext<OT, SS>,
         dataview: DataView<'a, OT>,
         discrepancies: i32,
         is_root: bool,
     ) -> Self {
+        let ordering_mode = SS::refresh_memory_mode(context.memory_limit);
+
         // Replaced by full range if we are actually searching
         let mut interesting_solutions_range = vec![0..0; dataview.num_features()];
 
@@ -439,6 +449,7 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> Node<'a, OT, SS> {
             dataview,
             queue,
             interesting_solutions_range,
+            ordering_mode,
         }
     }
 
@@ -605,6 +616,8 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> Node<'a, OT, SS> {
         context: &SolveContext<OT, SS>,
         item: FeatureTest<'a, OT, SS>,
     ) {
+        self.refresh_ordering_mode(context);
+
         let expanded = item
             .expanded
             .as_ref()
@@ -744,9 +757,12 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> Node<'a, OT, SS> {
     /// Select the path to the item to expand next. The deepest item is first in the path.
     pub fn select(
         &mut self,
+        context: &SolveContext<OT, SS>,
         path_buffer: &mut VecDeque<(usize, FeatureTest<'a, OT, SS>)>,
         source: usize,
     ) {
+        self.refresh_ordering_mode(context);
+
         assert!(path_buffer.is_empty());
         assert!(!self.is_complete());
 
@@ -757,7 +773,7 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> Node<'a, OT, SS> {
 
         if let Some(child_idx) = next.current_node() {
             let child = next.child_by_idx(child_idx).unwrap();
-            child.select(path_buffer, child_idx);
+            child.select(context, path_buffer, child_idx);
         }
 
         path_buffer.push_back((source, next));
