@@ -353,6 +353,21 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> Node<'a, OT, SS> {
 
         let mut queue = BinaryHeapQueue::default();
 
+        if OT::is_perfect_solution_cost(&leaf_cost) {
+            // Node is a pure leaf, we are done.
+            return Node {
+                cost_upper_bound: OT::to_cost_type(0),
+                cost_lower_bound: OT::to_cost_type(0),
+                lowest_descendant_heuristic: 0.0,
+                pruner: Pruner::new(dataview.num_features()),
+                best,
+                dataview,
+                queue,
+                interesting_solutions_range,
+                ordering_mode,
+            };
+        }
+
         if dataview.num_instances() > 1 {
             for (feature, interesting_solutions_range) in
                 interesting_solutions_range.iter_mut().enumerate()
