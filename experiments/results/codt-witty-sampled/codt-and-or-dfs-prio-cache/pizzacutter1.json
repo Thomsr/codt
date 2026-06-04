@@ -1,0 +1,17 @@
+{
+  "accuracy": 1.0,
+  "branch_count": 13,
+  "dataset": "pizzacutter1.txt",
+  "dataset_path": "data/openml/sampled/pizzacutter1.txt",
+  "error": null,
+  "expansions": 4897091,
+  "memory_usage_bytes": 3225781451,
+  "n_examples": 100,
+  "n_features": 37,
+  "runtime_seconds": 1801.5273514380024,
+  "solved": true,
+  "solver": "codt",
+  "status": "perfect-tree-found",
+  "tree": "[31, 51.5, [33, 14.5, 0, [31, 27.0, 1, 0]], [22, 0.065, [3, 18.0, [33, 67.0, [27, 7.5, [24, 523.0550000000001, 1, [28, 12.5, 1, [11, 0.59, 1, 0]]], 0], 1], 1], [33, 13.5, 0, [30, 41.5, 1, [0, 7.5, 0, 1]]]]]",
+  "tree_size": 27
+}

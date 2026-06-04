@@ -1,0 +1,17 @@
+{
+  "accuracy": 1.0,
+  "branch_count": 8,
+  "dataset": "chscase_adopt.txt",
+  "dataset_path": "data/openml/sampled/chscase_adopt.txt",
+  "error": null,
+  "expansions": 1015,
+  "memory_usage_bytes": 131395,
+  "n_examples": 39,
+  "n_features": 2,
+  "runtime_seconds": 1.3599072720007825,
+  "solved": true,
+  "solver": "codt",
+  "status": "perfect-tree-found",
+  "tree": "[0, 51.5, [1, 5.5, [0, 8.0, 1, 0], [0, 19.0, [0, 16.0, 1, 0], 1]], [1, 211.0, [0, 53.0, 0, [0, 186.5, 1, 0]], 0]]",
+  "tree_size": 17
+}

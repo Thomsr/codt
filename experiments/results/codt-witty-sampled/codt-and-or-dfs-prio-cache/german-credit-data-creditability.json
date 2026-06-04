@@ -1,0 +1,17 @@
+{
+  "accuracy": 1.0,
+  "branch_count": 8,
+  "dataset": "german-credit-data-creditability.txt",
+  "dataset_path": "data/openml/sampled/german-credit-data-creditability.txt",
+  "error": null,
+  "expansions": 6028592,
+  "memory_usage_bytes": 3224918371,
+  "n_examples": 100,
+  "n_features": 71,
+  "runtime_seconds": 1801.6059084349981,
+  "solved": true,
+  "solver": "codt",
+  "status": "perfect-tree-found",
+  "tree": "[64, 0.5, [2, 33.5, [18, 0.5, [2, 32.5, [1, 1220.0, [12, 0.5, 1, 0], 1], [62, 0.5, 1, 0]], 0], 1], [29, 0.5, 1, 0]]",
+  "tree_size": 17
+}

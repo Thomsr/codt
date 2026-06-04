@@ -1,17 +1,17 @@
 {
   "accuracy": 1.0,
-  "branch_count": 7,
+  "branch_count": 6,
   "dataset": "kc3.txt",
   "dataset_path": "data/openml/sampled/kc3.txt",
   "error": null,
-  "expansions": 886221,
-  "memory_usage_bytes": 3290043,
+  "expansions": 5920739,
+  "memory_usage_bytes": 3852969,
   "n_examples": 100,
   "n_features": 39,
-  "runtime_seconds": 1800.8363809260045,
+  "runtime_seconds": 1801.4237966910005,
   "solved": true,
   "solver": "codt",
   "status": "perfect-tree-found",
-  "tree": "[20, 11.315000000000001, [25, 87.86500000000001, [26, 184.065, 0, 1], 0], [12, 18.5, 0, [27, 0.435, [20, 14.145, 1, [27, 0.325, 0, 1]], 0]]]",
-  "tree_size": 15
+  "tree": "[32, 45.0, [19, 32.775000000000006, [19, 29.93, 0, 1], 0], [18, 0.77, 0, [18, 0.815, 1, [34, 99.5, 0, 1]]]]",
+  "tree_size": 13
 }

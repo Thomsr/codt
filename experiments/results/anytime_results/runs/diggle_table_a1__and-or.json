@@ -9,9 +9,9 @@
   "is_perfect": true,
   "tree_size": 27,
   "branch_count": 13,
-  "expansions": 178862,
-  "memory_usage_bytes": 4295021793,
-  "runtime_seconds": 525.242468,
+  "expansions": 185131,
+  "memory_usage_bytes": 4294981385,
+  "runtime_seconds": 31.546569,
   "cost": [
     0,
     13
@@ -30,7 +30,7 @@
     {
       "cost": [
         0,
-        2
+        1
       ],
       "expansions": 0,
       "time": 0.0
@@ -38,50 +38,42 @@
     {
       "cost": [
         0,
-        3
+        2
       ],
       "expansions": 4,
-      "time": 0.019005302
+      "time": 0.00228705
+    },
+    {
+      "cost": [
+        0,
+        3
+      ],
+      "expansions": 55,
+      "time": 0.007493266
     },
     {
       "cost": [
         0,
         4
       ],
-      "expansions": 55,
-      "time": 0.212652124
+      "expansions": 423,
+      "time": 0.056520454
     },
     {
       "cost": [
         0,
         5
       ],
-      "expansions": 371,
-      "time": 1.328888247
+      "expansions": 3798,
+      "time": 0.489675569
     },
     {
       "cost": [
         0,
         6
       ],
-      "expansions": 2733,
-      "time": 9.160173414
-    },
-    {
-      "cost": [
-        0,
-        7
-      ],
-      "expansions": 19427,
-      "time": 63.211892025
-    },
-    {
-      "cost": [
-        0,
-        8
-      ],
-      "expansions": 141329,
-      "time": 418.920312864
+      "expansions": 31605,
+      "time": 4.535221066
     }
   ]
 }

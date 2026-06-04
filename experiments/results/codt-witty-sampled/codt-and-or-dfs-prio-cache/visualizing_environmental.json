@@ -1,0 +1,17 @@
+{
+  "accuracy": 1.0,
+  "branch_count": 26,
+  "dataset": "visualizing_environmental.txt",
+  "dataset_path": "data/openml/sampled/visualizing_environmental.txt",
+  "error": null,
+  "expansions": 10859479,
+  "memory_usage_bytes": 3222067915,
+  "n_examples": 100,
+  "n_features": 3,
+  "runtime_seconds": 1800.6554434880018,
+  "solved": true,
+  "solver": "codt",
+  "status": "perfect-tree-found",
+  "tree": "[1, 200.0, [1, 97.0, [1, 49.5, [1, 21.5, [1, 10.5, 1, 0], [2, 65.5, 1, 0]], [2, 77.5, 0, [2, 82.5, 1, [1, 93.5, 0, 1]]]], [1, 162.0, [0, 19.5, 0, 1], [0, 44.5, [2, 67.5, 1, 0], 1]]], [1, 255.5, [1, 217.5, 1, [1, 233.0, [0, 90.0, 0, 1], [0, 45.5, [1, 241.0, [0, 33.0, 1, 0], 0], 1]]], [1, 284.5, [2, 73.5, [1, 259.5, 1, 0], [0, 35.5, 0, 1]], [2, 86.5, [1, 303.0, 1, 0], 0]]]]",
+  "tree_size": 53
+}

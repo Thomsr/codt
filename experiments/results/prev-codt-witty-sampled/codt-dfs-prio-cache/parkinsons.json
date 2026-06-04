@@ -1,0 +1,17 @@
+{
+  "accuracy": 1.0,
+  "branch_count": 3,
+  "dataset": "parkinsons.txt",
+  "dataset_path": "data/openml/sampled/parkinsons.txt",
+  "error": null,
+  "expansions": 108,
+  "memory_usage_bytes": 866723,
+  "n_examples": 100,
+  "n_features": 22,
+  "runtime_seconds": 1.0682076689990936,
+  "solved": true,
+  "solver": "codt",
+  "status": "perfect-tree-found",
+  "tree": "[3, 0.004085, [0, 192.40449999999998, 1, 0], [6, 0.002055, 0, 1]]",
+  "tree_size": 7
+}

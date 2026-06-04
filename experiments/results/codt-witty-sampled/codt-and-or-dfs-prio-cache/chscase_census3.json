@@ -1,0 +1,17 @@
+{
+  "accuracy": 1.0,
+  "branch_count": 19,
+  "dataset": "chscase_census3.txt",
+  "dataset_path": "data/openml/sampled/chscase_census3.txt",
+  "error": null,
+  "expansions": 5630235,
+  "memory_usage_bytes": 3222775443,
+  "n_examples": 100,
+  "n_features": 7,
+  "runtime_seconds": 1800.4633977130002,
+  "solved": true,
+  "solver": "codt",
+  "status": "perfect-tree-found",
+  "tree": "[3, 4.242649999999999, [3, 4.1781500000000005, [0, 4.4455, [4, 4.2499, [0, 4.16555, 0, 1], [4, 4.2626, 0, 1]], 0], [1, 4.19605, [5, 4.233499999999999, 0, 1], [0, 4.375249999999999, [4, 4.2117, 0, 1], 1]]], [5, 4.2448, [1, 4.35635, [5, 4.2138, 0, [2, 4.1775, 1, [6, 4.25755, 0, 1]]], 1], [3, 4.32925, [0, 4.3905, [5, 4.268700000000001, 1, 0], 0], [0, 4.2834, 0, 1]]]]",
+  "tree_size": 39
+}

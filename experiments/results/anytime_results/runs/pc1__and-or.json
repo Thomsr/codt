@@ -1,0 +1,63 @@
+{
+  "dataset": "pc1",
+  "strategy": "and-or",
+  "status": "memory-limit",
+  "solver_status": "perfect-tree-found",
+  "error": null,
+  "timed_out": false,
+  "memory_limit_exceeded": true,
+  "is_perfect": true,
+  "tree_size": 21,
+  "branch_count": 10,
+  "expansions": 26234,
+  "memory_usage_bytes": 4295014905,
+  "runtime_seconds": 14.63066,
+  "cost": [
+    0,
+    10
+  ],
+  "intermediate_ubs": [
+    {
+      "cost": [
+        0,
+        10
+      ],
+      "expansions": 0,
+      "time": 0.0
+    }
+  ],
+  "intermediate_lbs": [
+    {
+      "cost": [
+        0,
+        1
+      ],
+      "expansions": 0,
+      "time": 0.0
+    },
+    {
+      "cost": [
+        0,
+        2
+      ],
+      "expansions": 20,
+      "time": 0.014179203
+    },
+    {
+      "cost": [
+        0,
+        3
+      ],
+      "expansions": 577,
+      "time": 0.224009545
+    },
+    {
+      "cost": [
+        0,
+        4
+      ],
+      "expansions": 12970,
+      "time": 6.548216095
+    }
+  ]
+}

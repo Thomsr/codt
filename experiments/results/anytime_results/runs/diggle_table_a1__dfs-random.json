@@ -9,9 +9,9 @@
   "is_perfect": true,
   "tree_size": 27,
   "branch_count": 13,
-  "expansions": 2590736,
-  "memory_usage_bytes": 501721,
-  "runtime_seconds": 1200.001776,
+  "expansions": 18130458,
+  "memory_usage_bytes": 517569,
+  "runtime_seconds": 1200.001543,
   "cost": [
     0,
     13
@@ -30,7 +30,7 @@
     {
       "cost": [
         0,
-        2
+        1
       ],
       "expansions": 0,
       "time": 0.0

@@ -1,0 +1,55 @@
+{
+  "dataset": "german-credit-data-creditability",
+  "strategy": "and-or",
+  "status": "memory-limit",
+  "solver_status": "perfect-tree-found",
+  "error": null,
+  "timed_out": false,
+  "memory_limit_exceeded": true,
+  "is_perfect": true,
+  "tree_size": 17,
+  "branch_count": 8,
+  "expansions": 15070,
+  "memory_usage_bytes": 4295157005,
+  "runtime_seconds": 7.682568,
+  "cost": [
+    0,
+    8
+  ],
+  "intermediate_ubs": [
+    {
+      "cost": [
+        0,
+        8
+      ],
+      "expansions": 0,
+      "time": 0.0
+    }
+  ],
+  "intermediate_lbs": [
+    {
+      "cost": [
+        0,
+        1
+      ],
+      "expansions": 0,
+      "time": 0.0
+    },
+    {
+      "cost": [
+        0,
+        2
+      ],
+      "expansions": 63,
+      "time": 0.045189762
+    },
+    {
+      "cost": [
+        0,
+        3
+      ],
+      "expansions": 2120,
+      "time": 0.895054636
+    }
+  ]
+}

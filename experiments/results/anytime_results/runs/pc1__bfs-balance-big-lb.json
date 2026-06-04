@@ -1,0 +1,47 @@
+{
+  "dataset": "pc1",
+  "strategy": "bfs-balance-big-lb",
+  "status": "memory-limit",
+  "solver_status": "perfect-tree-found",
+  "error": null,
+  "timed_out": false,
+  "memory_limit_exceeded": true,
+  "is_perfect": true,
+  "tree_size": 21,
+  "branch_count": 10,
+  "expansions": 24614,
+  "memory_usage_bytes": 4295073073,
+  "runtime_seconds": 25.186842,
+  "cost": [
+    0,
+    10
+  ],
+  "intermediate_ubs": [
+    {
+      "cost": [
+        0,
+        10
+      ],
+      "expansions": 0,
+      "time": 0.0
+    }
+  ],
+  "intermediate_lbs": [
+    {
+      "cost": [
+        0,
+        1
+      ],
+      "expansions": 0,
+      "time": 0.0
+    },
+    {
+      "cost": [
+        0,
+        2
+      ],
+      "expansions": 622,
+      "time": 0.386271221
+    }
+  ]
+}

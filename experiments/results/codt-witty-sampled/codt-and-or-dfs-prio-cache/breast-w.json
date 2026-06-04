@@ -1,0 +1,17 @@
+{
+  "accuracy": 1.0,
+  "branch_count": 5,
+  "dataset": "breast-w.txt",
+  "dataset_path": "data/openml/sampled/breast-w.txt",
+  "error": null,
+  "expansions": 20429,
+  "memory_usage_bytes": 1045317617,
+  "n_examples": 100,
+  "n_features": 9,
+  "runtime_seconds": 12.144851245999917,
+  "solved": true,
+  "solver": "codt",
+  "status": "perfect-tree-found",
+  "tree": "[4, 7.5, [0, 6.5, [3, 1.5, [4, 3.5, 0, 1], [7, 2.5, 0, 1]], 1], 1]",
+  "tree_size": 11
+}

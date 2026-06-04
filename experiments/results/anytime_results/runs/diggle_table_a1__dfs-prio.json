@@ -9,9 +9,9 @@
   "is_perfect": true,
   "tree_size": 23,
   "branch_count": 11,
-  "expansions": 2133856,
-  "memory_usage_bytes": 633777,
-  "runtime_seconds": 1200.002304,
+  "expansions": 18676403,
+  "memory_usage_bytes": 743361,
+  "runtime_seconds": 1200.001681,
   "cost": [
     0,
     11
@@ -30,23 +30,23 @@
         0,
         12
       ],
-      "expansions": 68969,
-      "time": 38.501965205
+      "expansions": 500733,
+      "time": 27.056394335
     },
     {
       "cost": [
         0,
         11
       ],
-      "expansions": 157795,
-      "time": 85.425593771
+      "expansions": 1023656,
+      "time": 56.095362823
     }
   ],
   "intermediate_lbs": [
     {
       "cost": [
         0,
-        2
+        1
       ],
       "expansions": 0,
       "time": 0.0
@@ -54,34 +54,42 @@
     {
       "cost": [
         0,
+        2
+      ],
+      "expansions": 3202991,
+      "time": 187.755532913
+    },
+    {
+      "cost": [
+        0,
         3
       ],
-      "expansions": 481579,
-      "time": 266.72914747
+      "expansions": 3228572,
+      "time": 189.112430492
     },
     {
       "cost": [
         0,
         4
       ],
-      "expansions": 483623,
-      "time": 267.75973257
+      "expansions": 3231239,
+      "time": 189.248627558
     },
     {
       "cost": [
         0,
         5
       ],
-      "expansions": 505051,
-      "time": 279.578677116
+      "expansions": 3441564,
+      "time": 202.287679804
     },
     {
       "cost": [
         0,
         6
       ],
-      "expansions": 935498,
-      "time": 534.891174787
+      "expansions": 7134439,
+      "time": 436.57881026
     }
   ]
 }

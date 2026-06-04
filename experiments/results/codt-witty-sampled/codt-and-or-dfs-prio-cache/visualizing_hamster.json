@@ -1,0 +1,17 @@
+{
+  "accuracy": 1.0,
+  "branch_count": 13,
+  "dataset": "visualizing_hamster.txt",
+  "dataset_path": "data/openml/sampled/visualizing_hamster.txt",
+  "error": null,
+  "expansions": 11097167,
+  "memory_usage_bytes": 3222730571,
+  "n_examples": 73,
+  "n_features": 5,
+  "runtime_seconds": 1800.5555392919996,
+  "solved": true,
+  "solver": "codt",
+  "status": "perfect-tree-found",
+  "tree": "[2, 6.6827565, [4, 1.1171030000000002, [2, 3.2635045, [3, 0.055099999999999996, 1, 0], [0, 1.008553, 1, 0]], [3, 0.06425, 0, [4, 1.1732529999999999, 0, 1]]], [4, 1.368853, [0, 0.87295, [1, 1.269353, 0, 1], [2, 8.578858, 1, 0]], [2, 12.281865, [0, 1.073653, 1, 0], 0]]]",
+  "tree_size": 27
+}

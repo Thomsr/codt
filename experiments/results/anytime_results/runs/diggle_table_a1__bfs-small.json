@@ -7,14 +7,14 @@
   "timed_out": false,
   "memory_limit_exceeded": false,
   "is_perfect": true,
-  "tree_size": 25,
-  "branch_count": 12,
-  "expansions": 2507372,
-  "memory_usage_bytes": 450737,
-  "runtime_seconds": 1200.001893,
+  "tree_size": 27,
+  "branch_count": 13,
+  "expansions": 18479882,
+  "memory_usage_bytes": 475257,
+  "runtime_seconds": 1200.001477,
   "cost": [
     0,
-    12
+    13
   ],
   "intermediate_ubs": [
     {
@@ -24,21 +24,13 @@
       ],
       "expansions": 0,
       "time": 0.0
-    },
-    {
-      "cost": [
-        0,
-        12
-      ],
-      "expansions": 2286343,
-      "time": 1102.758168616
     }
   ],
   "intermediate_lbs": [
     {
       "cost": [
         0,
-        2
+        1
       ],
       "expansions": 0,
       "time": 0.0

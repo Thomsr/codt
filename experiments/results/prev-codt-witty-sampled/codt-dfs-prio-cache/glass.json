@@ -1,0 +1,17 @@
+{
+  "accuracy": 1.0,
+  "branch_count": 12,
+  "dataset": "glass.txt",
+  "dataset_path": "data/openml/sampled/glass.txt",
+  "error": null,
+  "expansions": 1991262,
+  "memory_usage_bytes": 1895207,
+  "n_examples": 100,
+  "n_features": 9,
+  "runtime_seconds": 1800.0121185199969,
+  "solved": true,
+  "solver": "codt",
+  "status": "perfect-tree-found",
+  "tree": "[0, 1.5176699999999999, [3, 1.475, [6, 8.655000000000001, [3, 1.395, 0, 1], 1], [8, 0.055, [2, 2.7, 0, 1], 0]], [6, 9.105, [7, 0.03, [2, 3.67, 0, 1], [0, 1.5186950000000001, 1, 0]], [6, 10.365, 0, [4, 72.195, 1, 0]]]]",
+  "tree_size": 25
+}

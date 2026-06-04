@@ -10,9 +10,9 @@
     "is_perfect": true,
     "tree_size": 27,
     "branch_count": 13,
-    "expansions": 178862,
-    "memory_usage_bytes": 4295021793,
-    "runtime_seconds": 525.242468,
+    "expansions": 185131,
+    "memory_usage_bytes": 4294981385,
+    "runtime_seconds": 31.546569,
     "cost": [
       0,
       13
@@ -31,7 +31,7 @@
       {
         "cost": [
           0,
-          2
+          1
         ],
         "expansions": 0,
         "time": 0.0
@@ -39,50 +39,42 @@
       {
         "cost": [
           0,
-          3
+          2
         ],
         "expansions": 4,
-        "time": 0.019005302
+        "time": 0.00228705
+      },
+      {
+        "cost": [
+          0,
+          3
+        ],
+        "expansions": 55,
+        "time": 0.007493266
       },
       {
         "cost": [
           0,
           4
         ],
-        "expansions": 55,
-        "time": 0.212652124
+        "expansions": 423,
+        "time": 0.056520454
       },
       {
         "cost": [
           0,
           5
         ],
-        "expansions": 371,
-        "time": 1.328888247
+        "expansions": 3798,
+        "time": 0.489675569
       },
       {
         "cost": [
           0,
           6
         ],
-        "expansions": 2733,
-        "time": 9.160173414
-      },
-      {
-        "cost": [
-          0,
-          7
-        ],
-        "expansions": 19427,
-        "time": 63.211892025
-      },
-      {
-        "cost": [
-          0,
-          8
-        ],
-        "expansions": 141329,
-        "time": 418.920312864
+        "expansions": 31605,
+        "time": 4.535221066
       }
     ]
   },
@@ -97,9 +89,9 @@
     "is_perfect": true,
     "tree_size": 27,
     "branch_count": 13,
-    "expansions": 2286353,
-    "memory_usage_bytes": 501721,
-    "runtime_seconds": 1200.002479,
+    "expansions": 17980441,
+    "memory_usage_bytes": 505561,
+    "runtime_seconds": 1200.001437,
     "cost": [
       0,
       13
@@ -118,7 +110,7 @@
       {
         "cost": [
           0,
-          2
+          1
         ],
         "expansions": 0,
         "time": 0.0
@@ -136,9 +128,9 @@
     "is_perfect": true,
     "tree_size": 23,
     "branch_count": 11,
-    "expansions": 2133856,
-    "memory_usage_bytes": 633777,
-    "runtime_seconds": 1200.002304,
+    "expansions": 18676403,
+    "memory_usage_bytes": 743361,
+    "runtime_seconds": 1200.001681,
     "cost": [
       0,
       11
@@ -157,23 +149,23 @@
           0,
           12
         ],
-        "expansions": 68969,
-        "time": 38.501965205
+        "expansions": 500733,
+        "time": 27.056394335
       },
       {
         "cost": [
           0,
           11
         ],
-        "expansions": 157795,
-        "time": 85.425593771
+        "expansions": 1023656,
+        "time": 56.095362823
       }
     ],
     "intermediate_lbs": [
       {
         "cost": [
           0,
-          2
+          1
         ],
         "expansions": 0,
         "time": 0.0
@@ -181,34 +173,137 @@
       {
         "cost": [
           0,
+          2
+        ],
+        "expansions": 3202991,
+        "time": 187.755532913
+      },
+      {
+        "cost": [
+          0,
           3
         ],
-        "expansions": 481579,
-        "time": 266.72914747
+        "expansions": 3228572,
+        "time": 189.112430492
       },
       {
         "cost": [
           0,
           4
         ],
-        "expansions": 483623,
-        "time": 267.75973257
+        "expansions": 3231239,
+        "time": 189.248627558
       },
       {
         "cost": [
           0,
           5
         ],
-        "expansions": 505051,
-        "time": 279.578677116
+        "expansions": 3441564,
+        "time": 202.287679804
       },
       {
         "cost": [
           0,
           6
         ],
-        "expansions": 935498,
-        "time": 534.891174787
+        "expansions": 7134439,
+        "time": 436.57881026
+      }
+    ]
+  },
+  {
+    "dataset": "diggle_table_a1",
+    "strategy": "and-or-dfs-prio",
+    "status": "perfect-tree-found",
+    "solver_status": "perfect-tree-found",
+    "error": null,
+    "timed_out": false,
+    "memory_limit_exceeded": false,
+    "is_perfect": true,
+    "tree_size": 23,
+    "branch_count": 11,
+    "expansions": 8494316,
+    "memory_usage_bytes": 3222130993,
+    "runtime_seconds": 1200.933894,
+    "cost": [
+      0,
+      11
+    ],
+    "intermediate_ubs": [
+      {
+        "cost": [
+          0,
+          13
+        ],
+        "expansions": 0,
+        "time": 0.0
+      },
+      {
+        "cost": [
+          0,
+          12
+        ],
+        "expansions": 1857826,
+        "time": 256.876530505
+      },
+      {
+        "cost": [
+          0,
+          11
+        ],
+        "expansions": 1866653,
+        "time": 257.996674114
+      }
+    ],
+    "intermediate_lbs": [
+      {
+        "cost": [
+          0,
+          1
+        ],
+        "expansions": 0,
+        "time": 0.0
+      },
+      {
+        "cost": [
+          0,
+          2
+        ],
+        "expansions": 4,
+        "time": 0.002237425
+      },
+      {
+        "cost": [
+          0,
+          3
+        ],
+        "expansions": 55,
+        "time": 0.008000491
+      },
+      {
+        "cost": [
+          0,
+          4
+        ],
+        "expansions": 423,
+        "time": 0.068080875
+      },
+      {
+        "cost": [
+          0,
+          5
+        ],
+        "expansions": 3798,
+        "time": 0.652483162
+      },
+      {
+        "cost": [
+          0,
+          6
+        ],
+        "expansions": 31605,
+        "time": 5.581620446
       }
     ]
   },
@@ -223,9 +318,9 @@
     "is_perfect": true,
     "tree_size": 27,
     "branch_count": 13,
-    "expansions": 2590736,
-    "memory_usage_bytes": 501721,
-    "runtime_seconds": 1200.001776,
+    "expansions": 18130458,
+    "memory_usage_bytes": 517569,
+    "runtime_seconds": 1200.001543,
     "cost": [
       0,
       13
@@ -244,7 +339,7 @@
       {
         "cost": [
           0,
-          2
+          1
         ],
         "expansions": 0,
         "time": 0.0
@@ -262,9 +357,9 @@
     "is_perfect": true,
     "tree_size": 27,
     "branch_count": 13,
-    "expansions": 2325833,
-    "memory_usage_bytes": 441233,
-    "runtime_seconds": 1200.001835,
+    "expansions": 18400683,
+    "memory_usage_bytes": 459473,
+    "runtime_seconds": 1200.001628,
     "cost": [
       0,
       13
@@ -283,7 +378,7 @@
       {
         "cost": [
           0,
-          2
+          1
         ],
         "expansions": 0,
         "time": 0.0
@@ -301,9 +396,9 @@
     "is_perfect": true,
     "tree_size": 27,
     "branch_count": 13,
-    "expansions": 2388313,
-    "memory_usage_bytes": 441233,
-    "runtime_seconds": 1200.001823,
+    "expansions": 18410137,
+    "memory_usage_bytes": 459473,
+    "runtime_seconds": 1200.001559,
     "cost": [
       0,
       13
@@ -322,7 +417,7 @@
       {
         "cost": [
           0,
-          2
+          1
         ],
         "expansions": 0,
         "time": 0.0
@@ -338,14 +433,14 @@
     "timed_out": false,
     "memory_limit_exceeded": false,
     "is_perfect": true,
-    "tree_size": 25,
-    "branch_count": 12,
-    "expansions": 2500878,
-    "memory_usage_bytes": 450737,
-    "runtime_seconds": 1200.002033,
+    "tree_size": 27,
+    "branch_count": 13,
+    "expansions": 18396083,
+    "memory_usage_bytes": 475257,
+    "runtime_seconds": 1200.001429,
     "cost": [
       0,
-      12
+      13
     ],
     "intermediate_ubs": [
       {
@@ -355,21 +450,13 @@
         ],
         "expansions": 0,
         "time": 0.0
-      },
-      {
-        "cost": [
-          0,
-          12
-        ],
-        "expansions": 2286343,
-        "time": 1105.231525877
       }
     ],
     "intermediate_lbs": [
       {
         "cost": [
           0,
-          2
+          1
         ],
         "expansions": 0,
         "time": 0.0
@@ -387,9 +474,9 @@
     "is_perfect": true,
     "tree_size": 27,
     "branch_count": 13,
-    "expansions": 175691,
-    "memory_usage_bytes": 4295025641,
-    "runtime_seconds": 482.71296,
+    "expansions": 174117,
+    "memory_usage_bytes": 4294974409,
+    "runtime_seconds": 34.806895,
     "cost": [
       0,
       13
@@ -408,7 +495,7 @@
       {
         "cost": [
           0,
-          2
+          1
         ],
         "expansions": 0,
         "time": 0.0
@@ -416,10 +503,10 @@
       {
         "cost": [
           0,
-          3
+          2
         ],
         "expansions": 78,
-        "time": 0.266676001
+        "time": 0.009343614
       }
     ]
   },
@@ -432,14 +519,14 @@
     "timed_out": false,
     "memory_limit_exceeded": false,
     "is_perfect": true,
-    "tree_size": 25,
-    "branch_count": 12,
-    "expansions": 2507372,
-    "memory_usage_bytes": 450737,
-    "runtime_seconds": 1200.001893,
+    "tree_size": 27,
+    "branch_count": 13,
+    "expansions": 18479882,
+    "memory_usage_bytes": 475257,
+    "runtime_seconds": 1200.001477,
     "cost": [
       0,
-      12
+      13
     ],
     "intermediate_ubs": [
       {
@@ -449,21 +536,13 @@
         ],
         "expansions": 0,
         "time": 0.0
-      },
-      {
-        "cost": [
-          0,
-          12
-        ],
-        "expansions": 2286343,
-        "time": 1102.758168616
       }
     ],
     "intermediate_lbs": [
       {
         "cost": [
           0,
-          2
+          1
         ],
         "expansions": 0,
         "time": 0.0
@@ -481,9 +560,9 @@
     "is_perfect": true,
     "tree_size": 27,
     "branch_count": 13,
-    "expansions": 175691,
-    "memory_usage_bytes": 4295025641,
-    "runtime_seconds": 470.554644,
+    "expansions": 174117,
+    "memory_usage_bytes": 4294974409,
+    "runtime_seconds": 31.760161,
     "cost": [
       0,
       13
@@ -502,7 +581,7 @@
       {
         "cost": [
           0,
-          2
+          1
         ],
         "expansions": 0,
         "time": 0.0
@@ -510,10 +589,10 @@
       {
         "cost": [
           0,
-          3
+          2
         ],
         "expansions": 78,
-        "time": 0.2588427
+        "time": 0.009279108
       }
     ]
   },
@@ -526,14 +605,14 @@
     "timed_out": false,
     "memory_limit_exceeded": false,
     "is_perfect": true,
-    "tree_size": 25,
-    "branch_count": 12,
-    "expansions": 2509713,
-    "memory_usage_bytes": 450737,
-    "runtime_seconds": 1200.001614,
+    "tree_size": 27,
+    "branch_count": 13,
+    "expansions": 18508804,
+    "memory_usage_bytes": 475257,
+    "runtime_seconds": 1200.001458,
     "cost": [
       0,
-      12
+      13
     ],
     "intermediate_ubs": [
       {
@@ -543,21 +622,13 @@
         ],
         "expansions": 0,
         "time": 0.0
-      },
-      {
-        "cost": [
-          0,
-          12
-        ],
-        "expansions": 2286343,
-        "time": 1101.121495408
       }
     ],
     "intermediate_lbs": [
       {
         "cost": [
           0,
-          2
+          1
         ],
         "expansions": 0,
         "time": 0.0
@@ -575,9 +646,9 @@
     "is_perfect": true,
     "tree_size": 27,
     "branch_count": 13,
-    "expansions": 175691,
-    "memory_usage_bytes": 4295025641,
-    "runtime_seconds": 470.850118,
+    "expansions": 174117,
+    "memory_usage_bytes": 4294974409,
+    "runtime_seconds": 31.618618,
     "cost": [
       0,
       13
@@ -596,7 +667,7 @@
       {
         "cost": [
           0,
-          2
+          1
         ],
         "expansions": 0,
         "time": 0.0
@@ -604,10 +675,10 @@
       {
         "cost": [
           0,
-          3
+          2
         ],
         "expansions": 78,
-        "time": 0.258280264
+        "time": 0.009378206
       }
     ]
   },
@@ -620,14 +691,14 @@
     "timed_out": false,
     "memory_limit_exceeded": false,
     "is_perfect": true,
-    "tree_size": 25,
-    "branch_count": 12,
-    "expansions": 2509649,
-    "memory_usage_bytes": 450737,
-    "runtime_seconds": 1200.001748,
+    "tree_size": 27,
+    "branch_count": 13,
+    "expansions": 18559923,
+    "memory_usage_bytes": 475257,
+    "runtime_seconds": 1200.001463,
     "cost": [
       0,
-      12
+      13
     ],
     "intermediate_ubs": [
       {
@@ -637,21 +708,13 @@
         ],
         "expansions": 0,
         "time": 0.0
-      },
-      {
-        "cost": [
-          0,
-          12
-        ],
-        "expansions": 2286343,
-        "time": 1101.650164245
       }
     ],
     "intermediate_lbs": [
       {
         "cost": [
           0,
-          2
+          1
         ],
         "expansions": 0,
         "time": 0.0
@@ -669,9 +732,9 @@
     "is_perfect": true,
     "tree_size": 27,
     "branch_count": 13,
-    "expansions": 175691,
-    "memory_usage_bytes": 4295025641,
-    "runtime_seconds": 470.870416,
+    "expansions": 174117,
+    "memory_usage_bytes": 4294974409,
+    "runtime_seconds": 31.556651,
     "cost": [
       0,
       13
@@ -690,7 +753,7 @@
       {
         "cost": [
           0,
-          2
+          1
         ],
         "expansions": 0,
         "time": 0.0
@@ -698,10 +761,10 @@
       {
         "cost": [
           0,
-          3
+          2
         ],
         "expansions": 78,
-        "time": 0.255503174
+        "time": 0.009276304
       }
     ]
   },
@@ -716,9 +779,9 @@
     "is_perfect": true,
     "tree_size": 27,
     "branch_count": 13,
-    "expansions": 2349802,
-    "memory_usage_bytes": 32959873,
-    "runtime_seconds": 1200.004844,
+    "expansions": 12880095,
+    "memory_usage_bytes": 205328177,
+    "runtime_seconds": 1200.086035,
     "cost": [
       0,
       13
@@ -737,7 +800,7 @@
       {
         "cost": [
           0,
-          2
+          1
         ],
         "expansions": 0,
         "time": 0.0
@@ -747,17 +810,17 @@
   {
     "dataset": "diggle_table_a1",
     "strategy": "bfs-lds",
-    "status": "perfect-tree-found",
+    "status": "memory-limit",
     "solver_status": "perfect-tree-found",
     "error": null,
     "timed_out": false,
-    "memory_limit_exceeded": false,
+    "memory_limit_exceeded": true,
     "is_perfect": true,
     "tree_size": 27,
     "branch_count": 13,
-    "expansions": 2236447,
-    "memory_usage_bytes": 110351121,
-    "runtime_seconds": 1200.006404,
+    "expansions": 6956702,
+    "memory_usage_bytes": 4294978697,
+    "runtime_seconds": 587.382882,
     "cost": [
       0,
       13
@@ -776,7 +839,1485 @@
       {
         "cost": [
           0,
+          1
+        ],
+        "expansions": 0,
+        "time": 0.0
+      }
+    ]
+  },
+  {
+    "dataset": "pc1",
+    "strategy": "and-or",
+    "status": "memory-limit",
+    "solver_status": "perfect-tree-found",
+    "error": null,
+    "timed_out": false,
+    "memory_limit_exceeded": true,
+    "is_perfect": true,
+    "tree_size": 21,
+    "branch_count": 10,
+    "expansions": 26234,
+    "memory_usage_bytes": 4295014905,
+    "runtime_seconds": 14.63066,
+    "cost": [
+      0,
+      10
+    ],
+    "intermediate_ubs": [
+      {
+        "cost": [
+          0,
+          10
+        ],
+        "expansions": 0,
+        "time": 0.0
+      }
+    ],
+    "intermediate_lbs": [
+      {
+        "cost": [
+          0,
+          1
+        ],
+        "expansions": 0,
+        "time": 0.0
+      },
+      {
+        "cost": [
+          0,
           2
+        ],
+        "expansions": 20,
+        "time": 0.014179203
+      },
+      {
+        "cost": [
+          0,
+          3
+        ],
+        "expansions": 577,
+        "time": 0.224009545
+      },
+      {
+        "cost": [
+          0,
+          4
+        ],
+        "expansions": 12970,
+        "time": 6.548216095
+      }
+    ]
+  },
+  {
+    "dataset": "pc1",
+    "strategy": "dfs",
+    "status": "perfect-tree-found",
+    "solver_status": "perfect-tree-found",
+    "error": null,
+    "timed_out": false,
+    "memory_limit_exceeded": false,
+    "is_perfect": true,
+    "tree_size": 21,
+    "branch_count": 10,
+    "expansions": 10443055,
+    "memory_usage_bytes": 1759505,
+    "runtime_seconds": 1200.70365,
+    "cost": [
+      0,
+      10
+    ],
+    "intermediate_ubs": [
+      {
+        "cost": [
+          0,
+          10
+        ],
+        "expansions": 0,
+        "time": 0.0
+      }
+    ],
+    "intermediate_lbs": [
+      {
+        "cost": [
+          0,
+          1
+        ],
+        "expansions": 0,
+        "time": 0.0
+      }
+    ]
+  },
+  {
+    "dataset": "pc1",
+    "strategy": "dfs-prio",
+    "status": "perfect-tree-found",
+    "solver_status": "perfect-tree-found",
+    "error": null,
+    "timed_out": false,
+    "memory_limit_exceeded": false,
+    "is_perfect": true,
+    "tree_size": 19,
+    "branch_count": 9,
+    "expansions": 10918681,
+    "memory_usage_bytes": 2570217,
+    "runtime_seconds": 1200.707499,
+    "cost": [
+      0,
+      9
+    ],
+    "intermediate_ubs": [
+      {
+        "cost": [
+          0,
+          10
+        ],
+        "expansions": 0,
+        "time": 0.0
+      },
+      {
+        "cost": [
+          0,
+          9
+        ],
+        "expansions": 10173702,
+        "time": 1116.324813954
+      }
+    ],
+    "intermediate_lbs": [
+      {
+        "cost": [
+          0,
+          1
+        ],
+        "expansions": 0,
+        "time": 0.0
+      }
+    ]
+  },
+  {
+    "dataset": "pc1",
+    "strategy": "and-or-dfs-prio",
+    "status": "perfect-tree-found",
+    "solver_status": "perfect-tree-found",
+    "error": null,
+    "timed_out": false,
+    "memory_limit_exceeded": false,
+    "is_perfect": true,
+    "tree_size": 21,
+    "branch_count": 10,
+    "expansions": 2943152,
+    "memory_usage_bytes": 3223349129,
+    "runtime_seconds": 1201.138631,
+    "cost": [
+      0,
+      10
+    ],
+    "intermediate_ubs": [
+      {
+        "cost": [
+          0,
+          10
+        ],
+        "expansions": 0,
+        "time": 0.0
+      }
+    ],
+    "intermediate_lbs": [
+      {
+        "cost": [
+          0,
+          1
+        ],
+        "expansions": 0,
+        "time": 0.0
+      },
+      {
+        "cost": [
+          0,
+          2
+        ],
+        "expansions": 20,
+        "time": 0.013496001
+      },
+      {
+        "cost": [
+          0,
+          3
+        ],
+        "expansions": 577,
+        "time": 0.224198227
+      },
+      {
+        "cost": [
+          0,
+          4
+        ],
+        "expansions": 12970,
+        "time": 6.5653645
+      }
+    ]
+  },
+  {
+    "dataset": "pc1",
+    "strategy": "dfs-random",
+    "status": "perfect-tree-found",
+    "solver_status": "perfect-tree-found",
+    "error": null,
+    "timed_out": false,
+    "memory_limit_exceeded": false,
+    "is_perfect": true,
+    "tree_size": 21,
+    "branch_count": 10,
+    "expansions": 10437389,
+    "memory_usage_bytes": 1759505,
+    "runtime_seconds": 1200.713173,
+    "cost": [
+      0,
+      10
+    ],
+    "intermediate_ubs": [
+      {
+        "cost": [
+          0,
+          10
+        ],
+        "expansions": 0,
+        "time": 0.0
+      }
+    ],
+    "intermediate_lbs": [
+      {
+        "cost": [
+          0,
+          1
+        ],
+        "expansions": 0,
+        "time": 0.0
+      }
+    ]
+  },
+  {
+    "dataset": "pc1",
+    "strategy": "bfs-lb",
+    "status": "perfect-tree-found",
+    "solver_status": "perfect-tree-found",
+    "error": null,
+    "timed_out": false,
+    "memory_limit_exceeded": false,
+    "is_perfect": true,
+    "tree_size": 21,
+    "branch_count": 10,
+    "expansions": 10469715,
+    "memory_usage_bytes": 1759505,
+    "runtime_seconds": 1200.711779,
+    "cost": [
+      0,
+      10
+    ],
+    "intermediate_ubs": [
+      {
+        "cost": [
+          0,
+          10
+        ],
+        "expansions": 0,
+        "time": 0.0
+      }
+    ],
+    "intermediate_lbs": [
+      {
+        "cost": [
+          0,
+          1
+        ],
+        "expansions": 0,
+        "time": 0.0
+      }
+    ]
+  },
+  {
+    "dataset": "pc1",
+    "strategy": "bfs-curiosity",
+    "status": "perfect-tree-found",
+    "solver_status": "perfect-tree-found",
+    "error": null,
+    "timed_out": false,
+    "memory_limit_exceeded": false,
+    "is_perfect": true,
+    "tree_size": 21,
+    "branch_count": 10,
+    "expansions": 10428723,
+    "memory_usage_bytes": 1759505,
+    "runtime_seconds": 1200.712605,
+    "cost": [
+      0,
+      10
+    ],
+    "intermediate_ubs": [
+      {
+        "cost": [
+          0,
+          10
+        ],
+        "expansions": 0,
+        "time": 0.0
+      }
+    ],
+    "intermediate_lbs": [
+      {
+        "cost": [
+          0,
+          1
+        ],
+        "expansions": 0,
+        "time": 0.0
+      }
+    ]
+  },
+  {
+    "dataset": "pc1",
+    "strategy": "bfs-lb-tiebreak-small",
+    "status": "perfect-tree-found",
+    "solver_status": "perfect-tree-found",
+    "error": null,
+    "timed_out": false,
+    "memory_limit_exceeded": false,
+    "is_perfect": true,
+    "tree_size": 21,
+    "branch_count": 10,
+    "expansions": 10423034,
+    "memory_usage_bytes": 1781601,
+    "runtime_seconds": 1200.712659,
+    "cost": [
+      0,
+      10
+    ],
+    "intermediate_ubs": [
+      {
+        "cost": [
+          0,
+          10
+        ],
+        "expansions": 0,
+        "time": 0.0
+      }
+    ],
+    "intermediate_lbs": [
+      {
+        "cost": [
+          0,
+          1
+        ],
+        "expansions": 0,
+        "time": 0.0
+      }
+    ]
+  },
+  {
+    "dataset": "pc1",
+    "strategy": "bfs-lb-tiebreak-big",
+    "status": "memory-limit",
+    "solver_status": "perfect-tree-found",
+    "error": null,
+    "timed_out": false,
+    "memory_limit_exceeded": true,
+    "is_perfect": true,
+    "tree_size": 21,
+    "branch_count": 10,
+    "expansions": 24614,
+    "memory_usage_bytes": 4295073073,
+    "runtime_seconds": 25.179874,
+    "cost": [
+      0,
+      10
+    ],
+    "intermediate_ubs": [
+      {
+        "cost": [
+          0,
+          10
+        ],
+        "expansions": 0,
+        "time": 0.0
+      }
+    ],
+    "intermediate_lbs": [
+      {
+        "cost": [
+          0,
+          1
+        ],
+        "expansions": 0,
+        "time": 0.0
+      },
+      {
+        "cost": [
+          0,
+          2
+        ],
+        "expansions": 622,
+        "time": 0.385309192
+      }
+    ]
+  },
+  {
+    "dataset": "pc1",
+    "strategy": "bfs-small",
+    "status": "perfect-tree-found",
+    "solver_status": "perfect-tree-found",
+    "error": null,
+    "timed_out": false,
+    "memory_limit_exceeded": false,
+    "is_perfect": true,
+    "tree_size": 21,
+    "branch_count": 10,
+    "expansions": 10462295,
+    "memory_usage_bytes": 1781601,
+    "runtime_seconds": 1200.702015,
+    "cost": [
+      0,
+      10
+    ],
+    "intermediate_ubs": [
+      {
+        "cost": [
+          0,
+          10
+        ],
+        "expansions": 0,
+        "time": 0.0
+      }
+    ],
+    "intermediate_lbs": [
+      {
+        "cost": [
+          0,
+          1
+        ],
+        "expansions": 0,
+        "time": 0.0
+      }
+    ]
+  },
+  {
+    "dataset": "pc1",
+    "strategy": "bfs-big",
+    "status": "memory-limit",
+    "solver_status": "perfect-tree-found",
+    "error": null,
+    "timed_out": false,
+    "memory_limit_exceeded": true,
+    "is_perfect": true,
+    "tree_size": 21,
+    "branch_count": 10,
+    "expansions": 24614,
+    "memory_usage_bytes": 4295073073,
+    "runtime_seconds": 25.210443,
+    "cost": [
+      0,
+      10
+    ],
+    "intermediate_ubs": [
+      {
+        "cost": [
+          0,
+          10
+        ],
+        "expansions": 0,
+        "time": 0.0
+      }
+    ],
+    "intermediate_lbs": [
+      {
+        "cost": [
+          0,
+          1
+        ],
+        "expansions": 0,
+        "time": 0.0
+      },
+      {
+        "cost": [
+          0,
+          2
+        ],
+        "expansions": 622,
+        "time": 0.3800307
+      }
+    ]
+  },
+  {
+    "dataset": "pc1",
+    "strategy": "bfs-small-tiebreak-lb",
+    "status": "perfect-tree-found",
+    "solver_status": "perfect-tree-found",
+    "error": null,
+    "timed_out": false,
+    "memory_limit_exceeded": false,
+    "is_perfect": true,
+    "tree_size": 21,
+    "branch_count": 10,
+    "expansions": 10477642,
+    "memory_usage_bytes": 1781601,
+    "runtime_seconds": 1200.703804,
+    "cost": [
+      0,
+      10
+    ],
+    "intermediate_ubs": [
+      {
+        "cost": [
+          0,
+          10
+        ],
+        "expansions": 0,
+        "time": 0.0
+      }
+    ],
+    "intermediate_lbs": [
+      {
+        "cost": [
+          0,
+          1
+        ],
+        "expansions": 0,
+        "time": 0.0
+      }
+    ]
+  },
+  {
+    "dataset": "pc1",
+    "strategy": "bfs-big-tiebreak-lb",
+    "status": "memory-limit",
+    "solver_status": "perfect-tree-found",
+    "error": null,
+    "timed_out": false,
+    "memory_limit_exceeded": true,
+    "is_perfect": true,
+    "tree_size": 21,
+    "branch_count": 10,
+    "expansions": 24614,
+    "memory_usage_bytes": 4295073073,
+    "runtime_seconds": 25.214705,
+    "cost": [
+      0,
+      10
+    ],
+    "intermediate_ubs": [
+      {
+        "cost": [
+          0,
+          10
+        ],
+        "expansions": 0,
+        "time": 0.0
+      }
+    ],
+    "intermediate_lbs": [
+      {
+        "cost": [
+          0,
+          1
+        ],
+        "expansions": 0,
+        "time": 0.0
+      },
+      {
+        "cost": [
+          0,
+          2
+        ],
+        "expansions": 622,
+        "time": 0.382456399
+      }
+    ]
+  },
+  {
+    "dataset": "pc1",
+    "strategy": "bfs-balance-small-lb",
+    "status": "perfect-tree-found",
+    "solver_status": "perfect-tree-found",
+    "error": null,
+    "timed_out": false,
+    "memory_limit_exceeded": false,
+    "is_perfect": true,
+    "tree_size": 21,
+    "branch_count": 10,
+    "expansions": 10487019,
+    "memory_usage_bytes": 1781601,
+    "runtime_seconds": 1200.709253,
+    "cost": [
+      0,
+      10
+    ],
+    "intermediate_ubs": [
+      {
+        "cost": [
+          0,
+          10
+        ],
+        "expansions": 0,
+        "time": 0.0
+      }
+    ],
+    "intermediate_lbs": [
+      {
+        "cost": [
+          0,
+          1
+        ],
+        "expansions": 0,
+        "time": 0.0
+      }
+    ]
+  },
+  {
+    "dataset": "pc1",
+    "strategy": "bfs-balance-big-lb",
+    "status": "memory-limit",
+    "solver_status": "perfect-tree-found",
+    "error": null,
+    "timed_out": false,
+    "memory_limit_exceeded": true,
+    "is_perfect": true,
+    "tree_size": 21,
+    "branch_count": 10,
+    "expansions": 24614,
+    "memory_usage_bytes": 4295073073,
+    "runtime_seconds": 25.186842,
+    "cost": [
+      0,
+      10
+    ],
+    "intermediate_ubs": [
+      {
+        "cost": [
+          0,
+          10
+        ],
+        "expansions": 0,
+        "time": 0.0
+      }
+    ],
+    "intermediate_lbs": [
+      {
+        "cost": [
+          0,
+          1
+        ],
+        "expansions": 0,
+        "time": 0.0
+      },
+      {
+        "cost": [
+          0,
+          2
+        ],
+        "expansions": 622,
+        "time": 0.386271221
+      }
+    ]
+  },
+  {
+    "dataset": "pc1",
+    "strategy": "bfs-random",
+    "status": "perfect-tree-found",
+    "solver_status": "perfect-tree-found",
+    "error": null,
+    "timed_out": false,
+    "memory_limit_exceeded": false,
+    "is_perfect": true,
+    "tree_size": 21,
+    "branch_count": 10,
+    "expansions": 9553568,
+    "memory_usage_bytes": 275421553,
+    "runtime_seconds": 1200.77092,
+    "cost": [
+      0,
+      10
+    ],
+    "intermediate_ubs": [
+      {
+        "cost": [
+          0,
+          10
+        ],
+        "expansions": 0,
+        "time": 0.0
+      }
+    ],
+    "intermediate_lbs": [
+      {
+        "cost": [
+          0,
+          1
+        ],
+        "expansions": 0,
+        "time": 0.0
+      }
+    ]
+  },
+  {
+    "dataset": "pc1",
+    "strategy": "bfs-lds",
+    "status": "perfect-tree-found",
+    "solver_status": "perfect-tree-found",
+    "error": null,
+    "timed_out": false,
+    "memory_limit_exceeded": false,
+    "is_perfect": true,
+    "tree_size": 21,
+    "branch_count": 10,
+    "expansions": 8005463,
+    "memory_usage_bytes": 593698425,
+    "runtime_seconds": 1200.905945,
+    "cost": [
+      0,
+      10
+    ],
+    "intermediate_ubs": [
+      {
+        "cost": [
+          0,
+          10
+        ],
+        "expansions": 0,
+        "time": 0.0
+      }
+    ],
+    "intermediate_lbs": [
+      {
+        "cost": [
+          0,
+          1
+        ],
+        "expansions": 0,
+        "time": 0.0
+      }
+    ]
+  },
+  {
+    "dataset": "german-credit-data-creditability",
+    "strategy": "and-or",
+    "status": "memory-limit",
+    "solver_status": "perfect-tree-found",
+    "error": null,
+    "timed_out": false,
+    "memory_limit_exceeded": true,
+    "is_perfect": true,
+    "tree_size": 17,
+    "branch_count": 8,
+    "expansions": 15070,
+    "memory_usage_bytes": 4295157005,
+    "runtime_seconds": 7.682568,
+    "cost": [
+      0,
+      8
+    ],
+    "intermediate_ubs": [
+      {
+        "cost": [
+          0,
+          8
+        ],
+        "expansions": 0,
+        "time": 0.0
+      }
+    ],
+    "intermediate_lbs": [
+      {
+        "cost": [
+          0,
+          1
+        ],
+        "expansions": 0,
+        "time": 0.0
+      },
+      {
+        "cost": [
+          0,
+          2
+        ],
+        "expansions": 63,
+        "time": 0.045189762
+      },
+      {
+        "cost": [
+          0,
+          3
+        ],
+        "expansions": 2120,
+        "time": 0.895054636
+      }
+    ]
+  },
+  {
+    "dataset": "german-credit-data-creditability",
+    "strategy": "dfs",
+    "status": "perfect-tree-found",
+    "solver_status": "perfect-tree-found",
+    "error": null,
+    "timed_out": false,
+    "memory_limit_exceeded": false,
+    "is_perfect": true,
+    "tree_size": 17,
+    "branch_count": 8,
+    "expansions": 6381862,
+    "memory_usage_bytes": 3365969,
+    "runtime_seconds": 1201.198651,
+    "cost": [
+      0,
+      8
+    ],
+    "intermediate_ubs": [
+      {
+        "cost": [
+          0,
+          8
+        ],
+        "expansions": 0,
+        "time": 0.0
+      }
+    ],
+    "intermediate_lbs": [
+      {
+        "cost": [
+          0,
+          1
+        ],
+        "expansions": 0,
+        "time": 0.0
+      }
+    ]
+  },
+  {
+    "dataset": "german-credit-data-creditability",
+    "strategy": "dfs-prio",
+    "status": "perfect-tree-found",
+    "solver_status": "perfect-tree-found",
+    "error": null,
+    "timed_out": false,
+    "memory_limit_exceeded": false,
+    "is_perfect": true,
+    "tree_size": 17,
+    "branch_count": 8,
+    "expansions": 5177012,
+    "memory_usage_bytes": 4296317,
+    "runtime_seconds": 1201.213301,
+    "cost": [
+      0,
+      8
+    ],
+    "intermediate_ubs": [
+      {
+        "cost": [
+          0,
+          8
+        ],
+        "expansions": 0,
+        "time": 0.0
+      }
+    ],
+    "intermediate_lbs": [
+      {
+        "cost": [
+          0,
+          1
+        ],
+        "expansions": 0,
+        "time": 0.0
+      }
+    ]
+  },
+  {
+    "dataset": "german-credit-data-creditability",
+    "strategy": "and-or-dfs-prio",
+    "status": "perfect-tree-found",
+    "solver_status": "perfect-tree-found",
+    "error": null,
+    "timed_out": false,
+    "memory_limit_exceeded": false,
+    "is_perfect": true,
+    "tree_size": 17,
+    "branch_count": 8,
+    "expansions": 4042068,
+    "memory_usage_bytes": 3225102949,
+    "runtime_seconds": 1201.588216,
+    "cost": [
+      0,
+      8
+    ],
+    "intermediate_ubs": [
+      {
+        "cost": [
+          0,
+          8
+        ],
+        "expansions": 0,
+        "time": 0.0
+      }
+    ],
+    "intermediate_lbs": [
+      {
+        "cost": [
+          0,
+          1
+        ],
+        "expansions": 0,
+        "time": 0.0
+      },
+      {
+        "cost": [
+          0,
+          2
+        ],
+        "expansions": 63,
+        "time": 0.044948688
+      },
+      {
+        "cost": [
+          0,
+          3
+        ],
+        "expansions": 2120,
+        "time": 0.909832698
+      }
+    ]
+  },
+  {
+    "dataset": "german-credit-data-creditability",
+    "strategy": "dfs-random",
+    "status": "perfect-tree-found",
+    "solver_status": "perfect-tree-found",
+    "error": null,
+    "timed_out": false,
+    "memory_limit_exceeded": false,
+    "is_perfect": true,
+    "tree_size": 17,
+    "branch_count": 8,
+    "expansions": 6368040,
+    "memory_usage_bytes": 3365969,
+    "runtime_seconds": 1201.196619,
+    "cost": [
+      0,
+      8
+    ],
+    "intermediate_ubs": [
+      {
+        "cost": [
+          0,
+          8
+        ],
+        "expansions": 0,
+        "time": 0.0
+      }
+    ],
+    "intermediate_lbs": [
+      {
+        "cost": [
+          0,
+          1
+        ],
+        "expansions": 0,
+        "time": 0.0
+      }
+    ]
+  },
+  {
+    "dataset": "german-credit-data-creditability",
+    "strategy": "bfs-lb",
+    "status": "perfect-tree-found",
+    "solver_status": "perfect-tree-found",
+    "error": null,
+    "timed_out": false,
+    "memory_limit_exceeded": false,
+    "is_perfect": true,
+    "tree_size": 17,
+    "branch_count": 8,
+    "expansions": 5087672,
+    "memory_usage_bytes": 5300801,
+    "runtime_seconds": 1201.187435,
+    "cost": [
+      0,
+      8
+    ],
+    "intermediate_ubs": [
+      {
+        "cost": [
+          0,
+          8
+        ],
+        "expansions": 0,
+        "time": 0.0
+      }
+    ],
+    "intermediate_lbs": [
+      {
+        "cost": [
+          0,
+          1
+        ],
+        "expansions": 0,
+        "time": 0.0
+      }
+    ]
+  },
+  {
+    "dataset": "german-credit-data-creditability",
+    "strategy": "bfs-curiosity",
+    "status": "perfect-tree-found",
+    "solver_status": "perfect-tree-found",
+    "error": null,
+    "timed_out": false,
+    "memory_limit_exceeded": false,
+    "is_perfect": true,
+    "tree_size": 17,
+    "branch_count": 8,
+    "expansions": 5077369,
+    "memory_usage_bytes": 5300801,
+    "runtime_seconds": 1201.19527,
+    "cost": [
+      0,
+      8
+    ],
+    "intermediate_ubs": [
+      {
+        "cost": [
+          0,
+          8
+        ],
+        "expansions": 0,
+        "time": 0.0
+      }
+    ],
+    "intermediate_lbs": [
+      {
+        "cost": [
+          0,
+          1
+        ],
+        "expansions": 0,
+        "time": 0.0
+      }
+    ]
+  },
+  {
+    "dataset": "german-credit-data-creditability",
+    "strategy": "bfs-lb-tiebreak-small",
+    "status": "perfect-tree-found",
+    "solver_status": "perfect-tree-found",
+    "error": null,
+    "timed_out": false,
+    "memory_limit_exceeded": false,
+    "is_perfect": true,
+    "tree_size": 17,
+    "branch_count": 8,
+    "expansions": 5070352,
+    "memory_usage_bytes": 5301057,
+    "runtime_seconds": 1201.19991,
+    "cost": [
+      0,
+      8
+    ],
+    "intermediate_ubs": [
+      {
+        "cost": [
+          0,
+          8
+        ],
+        "expansions": 0,
+        "time": 0.0
+      }
+    ],
+    "intermediate_lbs": [
+      {
+        "cost": [
+          0,
+          1
+        ],
+        "expansions": 0,
+        "time": 0.0
+      }
+    ]
+  },
+  {
+    "dataset": "german-credit-data-creditability",
+    "strategy": "bfs-lb-tiebreak-big",
+    "status": "memory-limit",
+    "solver_status": "perfect-tree-found",
+    "error": null,
+    "timed_out": false,
+    "memory_limit_exceeded": true,
+    "is_perfect": true,
+    "tree_size": 17,
+    "branch_count": 8,
+    "expansions": 12661,
+    "memory_usage_bytes": 4295122037,
+    "runtime_seconds": 8.560403,
+    "cost": [
+      0,
+      8
+    ],
+    "intermediate_ubs": [
+      {
+        "cost": [
+          0,
+          8
+        ],
+        "expansions": 0,
+        "time": 0.0
+      }
+    ],
+    "intermediate_lbs": [
+      {
+        "cost": [
+          0,
+          1
+        ],
+        "expansions": 0,
+        "time": 0.0
+      },
+      {
+        "cost": [
+          0,
+          2
+        ],
+        "expansions": 159,
+        "time": 0.095071152
+      }
+    ]
+  },
+  {
+    "dataset": "german-credit-data-creditability",
+    "strategy": "bfs-small",
+    "status": "perfect-tree-found",
+    "solver_status": "perfect-tree-found",
+    "error": null,
+    "timed_out": false,
+    "memory_limit_exceeded": false,
+    "is_perfect": true,
+    "tree_size": 17,
+    "branch_count": 8,
+    "expansions": 5052764,
+    "memory_usage_bytes": 5301057,
+    "runtime_seconds": 1201.205251,
+    "cost": [
+      0,
+      8
+    ],
+    "intermediate_ubs": [
+      {
+        "cost": [
+          0,
+          8
+        ],
+        "expansions": 0,
+        "time": 0.0
+      }
+    ],
+    "intermediate_lbs": [
+      {
+        "cost": [
+          0,
+          1
+        ],
+        "expansions": 0,
+        "time": 0.0
+      }
+    ]
+  },
+  {
+    "dataset": "german-credit-data-creditability",
+    "strategy": "bfs-big",
+    "status": "memory-limit",
+    "solver_status": "perfect-tree-found",
+    "error": null,
+    "timed_out": false,
+    "memory_limit_exceeded": true,
+    "is_perfect": true,
+    "tree_size": 17,
+    "branch_count": 8,
+    "expansions": 12661,
+    "memory_usage_bytes": 4295122037,
+    "runtime_seconds": 8.634699,
+    "cost": [
+      0,
+      8
+    ],
+    "intermediate_ubs": [
+      {
+        "cost": [
+          0,
+          8
+        ],
+        "expansions": 0,
+        "time": 0.0
+      }
+    ],
+    "intermediate_lbs": [
+      {
+        "cost": [
+          0,
+          1
+        ],
+        "expansions": 0,
+        "time": 0.0
+      },
+      {
+        "cost": [
+          0,
+          2
+        ],
+        "expansions": 159,
+        "time": 0.093934401
+      }
+    ]
+  },
+  {
+    "dataset": "german-credit-data-creditability",
+    "strategy": "bfs-small-tiebreak-lb",
+    "status": "perfect-tree-found",
+    "solver_status": "perfect-tree-found",
+    "error": null,
+    "timed_out": false,
+    "memory_limit_exceeded": false,
+    "is_perfect": true,
+    "tree_size": 17,
+    "branch_count": 8,
+    "expansions": 5069072,
+    "memory_usage_bytes": 5301057,
+    "runtime_seconds": 1201.214251,
+    "cost": [
+      0,
+      8
+    ],
+    "intermediate_ubs": [
+      {
+        "cost": [
+          0,
+          8
+        ],
+        "expansions": 0,
+        "time": 0.0
+      }
+    ],
+    "intermediate_lbs": [
+      {
+        "cost": [
+          0,
+          1
+        ],
+        "expansions": 0,
+        "time": 0.0
+      }
+    ]
+  },
+  {
+    "dataset": "german-credit-data-creditability",
+    "strategy": "bfs-big-tiebreak-lb",
+    "status": "memory-limit",
+    "solver_status": "perfect-tree-found",
+    "error": null,
+    "timed_out": false,
+    "memory_limit_exceeded": true,
+    "is_perfect": true,
+    "tree_size": 17,
+    "branch_count": 8,
+    "expansions": 12661,
+    "memory_usage_bytes": 4295122037,
+    "runtime_seconds": 8.673239,
+    "cost": [
+      0,
+      8
+    ],
+    "intermediate_ubs": [
+      {
+        "cost": [
+          0,
+          8
+        ],
+        "expansions": 0,
+        "time": 0.0
+      }
+    ],
+    "intermediate_lbs": [
+      {
+        "cost": [
+          0,
+          1
+        ],
+        "expansions": 0,
+        "time": 0.0
+      },
+      {
+        "cost": [
+          0,
+          2
+        ],
+        "expansions": 159,
+        "time": 0.096225887
+      }
+    ]
+  },
+  {
+    "dataset": "german-credit-data-creditability",
+    "strategy": "bfs-balance-small-lb",
+    "status": "perfect-tree-found",
+    "solver_status": "perfect-tree-found",
+    "error": null,
+    "timed_out": false,
+    "memory_limit_exceeded": false,
+    "is_perfect": true,
+    "tree_size": 17,
+    "branch_count": 8,
+    "expansions": 5070327,
+    "memory_usage_bytes": 5301057,
+    "runtime_seconds": 1201.207962,
+    "cost": [
+      0,
+      8
+    ],
+    "intermediate_ubs": [
+      {
+        "cost": [
+          0,
+          8
+        ],
+        "expansions": 0,
+        "time": 0.0
+      }
+    ],
+    "intermediate_lbs": [
+      {
+        "cost": [
+          0,
+          1
+        ],
+        "expansions": 0,
+        "time": 0.0
+      }
+    ]
+  },
+  {
+    "dataset": "german-credit-data-creditability",
+    "strategy": "bfs-balance-big-lb",
+    "status": "memory-limit",
+    "solver_status": "perfect-tree-found",
+    "error": null,
+    "timed_out": false,
+    "memory_limit_exceeded": true,
+    "is_perfect": true,
+    "tree_size": 17,
+    "branch_count": 8,
+    "expansions": 12661,
+    "memory_usage_bytes": 4295122037,
+    "runtime_seconds": 8.593277,
+    "cost": [
+      0,
+      8
+    ],
+    "intermediate_ubs": [
+      {
+        "cost": [
+          0,
+          8
+        ],
+        "expansions": 0,
+        "time": 0.0
+      }
+    ],
+    "intermediate_lbs": [
+      {
+        "cost": [
+          0,
+          1
+        ],
+        "expansions": 0,
+        "time": 0.0
+      },
+      {
+        "cost": [
+          0,
+          2
+        ],
+        "expansions": 159,
+        "time": 0.094252146
+      }
+    ]
+  },
+  {
+    "dataset": "german-credit-data-creditability",
+    "strategy": "bfs-random",
+    "status": "perfect-tree-found",
+    "solver_status": "perfect-tree-found",
+    "error": null,
+    "timed_out": false,
+    "memory_limit_exceeded": false,
+    "is_perfect": true,
+    "tree_size": 17,
+    "branch_count": 8,
+    "expansions": 4724372,
+    "memory_usage_bytes": 98285569,
+    "runtime_seconds": 1201.212868,
+    "cost": [
+      0,
+      8
+    ],
+    "intermediate_ubs": [
+      {
+        "cost": [
+          0,
+          8
+        ],
+        "expansions": 0,
+        "time": 0.0
+      }
+    ],
+    "intermediate_lbs": [
+      {
+        "cost": [
+          0,
+          1
+        ],
+        "expansions": 0,
+        "time": 0.0
+      }
+    ]
+  },
+  {
+    "dataset": "german-credit-data-creditability",
+    "strategy": "bfs-lds",
+    "status": "perfect-tree-found",
+    "solver_status": "perfect-tree-found",
+    "error": null,
+    "timed_out": false,
+    "memory_limit_exceeded": false,
+    "is_perfect": true,
+    "tree_size": 17,
+    "branch_count": 8,
+    "expansions": 4953692,
+    "memory_usage_bytes": 262682661,
+    "runtime_seconds": 1201.243965,
+    "cost": [
+      0,
+      8
+    ],
+    "intermediate_ubs": [
+      {
+        "cost": [
+          0,
+          8
+        ],
+        "expansions": 0,
+        "time": 0.0
+      }
+    ],
+    "intermediate_lbs": [
+      {
+        "cost": [
+          0,
+          1
         ],
         "expansions": 0,
         "time": 0.0

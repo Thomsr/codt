@@ -1,0 +1,17 @@
+{
+  "accuracy": 1.0,
+  "branch_count": 3,
+  "dataset": "datatrieve.txt",
+  "dataset_path": "data/openml/sampled/datatrieve.txt",
+  "error": null,
+  "expansions": 54,
+  "memory_usage_bytes": 346555,
+  "n_examples": 100,
+  "n_features": 8,
+  "runtime_seconds": 0.24998879998747725,
+  "solved": true,
+  "solver": "codt",
+  "status": "perfect-tree-found",
+  "tree": "[4, 95.5, [1, 608.0, [1, 557.5, 0, 1], 0], 1]",
+  "tree_size": 7
+}

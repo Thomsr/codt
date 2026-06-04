@@ -1,0 +1,17 @@
+{
+  "accuracy": 1.0,
+  "branch_count": 1,
+  "dataset": "iris.txt",
+  "dataset_path": "data/openml/sampled/iris.txt",
+  "error": null,
+  "expansions": 0,
+  "memory_usage_bytes": 20495,
+  "n_examples": 100,
+  "n_features": 4,
+  "runtime_seconds": 7.689955467008986,
+  "solved": true,
+  "solver": "codt",
+  "status": "perfect-tree-found",
+  "tree": "[3, 0.8, 1, 0]",
+  "tree_size": 3
+}

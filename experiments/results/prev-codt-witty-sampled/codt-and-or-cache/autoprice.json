@@ -1,0 +1,17 @@
+{
+  "accuracy": 1.0,
+  "branch_count": 3,
+  "dataset": "autoprice.txt",
+  "dataset_path": "data/openml/sampled/autoprice.txt",
+  "error": null,
+  "expansions": 72,
+  "memory_usage_bytes": 2239591,
+  "n_examples": 100,
+  "n_features": 15,
+  "runtime_seconds": 0.05697699900065345,
+  "solved": true,
+  "solver": "codt",
+  "status": "perfect-tree-found",
+  "tree": "[14, 29.5, 0, [2, 98.94999999999999, 1, [0, -0.5, 1, 0]]]",
+  "tree_size": 7
+}

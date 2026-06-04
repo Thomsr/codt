@@ -1,0 +1,17 @@
+{
+  "accuracy": 1.0,
+  "branch_count": 17,
+  "dataset": "arcene_seed_3_nrows_2000_nclasses_10_ncols_100_stratify_true.txt",
+  "dataset_path": "data/openml/sampled/arcene_seed_3_nrows_2000_nclasses_10_ncols_100_stratify_true.txt",
+  "error": null,
+  "expansions": 210003,
+  "memory_usage_bytes": 9890643,
+  "n_examples": 100,
+  "n_features": 100,
+  "runtime_seconds": 1801.210077316,
+  "solved": true,
+  "solver": "codt",
+  "status": "perfect-tree-found",
+  "tree": "[66, 415.0, [66, 167.5, [60, 73.5, [40, 277.0, 1, 0], [30, 154.5, 1, 0]], [23, 276.5, [21, 463.0, 0, 1], [72, 4.5, 1, 0]]], [97, 405.5, [97, 346.0, [77, 27.5, 0, [44, 7.5, 1, 0]], [90, 219.5, 0, 1]], [66, 531.5, [42, 45.0, 0, 1], [45, 18.0, [46, 403.5, 0, 1], 1]]]]",
+  "tree_size": 35
+}

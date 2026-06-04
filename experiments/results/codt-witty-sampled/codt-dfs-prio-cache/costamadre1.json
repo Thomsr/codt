@@ -1,17 +1,17 @@
 {
   "accuracy": 1.0,
-  "branch_count": 13,
+  "branch_count": 12,
   "dataset": "costamadre1.txt",
   "dataset_path": "data/openml/sampled/costamadre1.txt",
   "error": null,
-  "expansions": 843714,
-  "memory_usage_bytes": 4238407,
+  "expansions": 4475384,
+  "memory_usage_bytes": 6647359,
   "n_examples": 100,
   "n_features": 37,
-  "runtime_seconds": 1801.527125957,
+  "runtime_seconds": 1801.6942610019905,
   "solved": true,
   "solver": "codt",
   "status": "perfect-tree-found",
-  "tree": "[23, 474.77, [23, 177.065, [28, 11.5, [10, 2.5, 0, 1], 0], [34, 36.5, 0, [28, 11.5, 1, [23, 450.775, 0, 1]]]], [31, 118.5, [35, 25.865000000000002, [4, 5.5, 0, 1], 0], [31, 465.0, [3, 2.5, 0, [11, 0.785, 0, 1]], 1]]]",
-  "tree_size": 27
+  "tree": "[23, 474.77, [35, 36.01, [0, 2.5, [3, 1.5, 0, 1], 0], [12, 14.5, [34, 35.5, 0, 1], 0]], [31, 118.5, [35, 25.865000000000002, [4, 5.5, 0, 1], 0], [31, 465.0, [3, 2.5, 0, [11, 0.785, 0, 1]], 1]]]",
+  "tree_size": 25
 }

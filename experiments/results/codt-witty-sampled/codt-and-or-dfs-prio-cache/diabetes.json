@@ -1,0 +1,17 @@
+{
+  "accuracy": 1.0,
+  "branch_count": 14,
+  "dataset": "diabetes.txt",
+  "dataset_path": "data/openml/sampled/diabetes.txt",
+  "error": null,
+  "expansions": 8163926,
+  "memory_usage_bytes": 3223067631,
+  "n_examples": 100,
+  "n_features": 8,
+  "runtime_seconds": 1800.5708779339984,
+  "solved": true,
+  "solver": "codt",
+  "status": "perfect-tree-found",
+  "tree": "[1, 124.5, [4, 26.0, [7, 40.5, [7, 35.0, 0, 1], 0], [4, 195.0, [3, 36.5, [2, 83.0, 0, 1], 1], 1]], [5, 34.400000000000006, [5, 27.1, 0, [6, 0.339, [2, 64.5, 1, 0], 1]], [2, 77.0, [0, 3.5, 1, 0], [0, 1.5, 0, 1]]]]",
+  "tree_size": 29
+}

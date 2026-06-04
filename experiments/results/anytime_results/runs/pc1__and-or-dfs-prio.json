@@ -1,0 +1,63 @@
+{
+  "dataset": "pc1",
+  "strategy": "and-or-dfs-prio",
+  "status": "perfect-tree-found",
+  "solver_status": "perfect-tree-found",
+  "error": null,
+  "timed_out": false,
+  "memory_limit_exceeded": false,
+  "is_perfect": true,
+  "tree_size": 21,
+  "branch_count": 10,
+  "expansions": 2943152,
+  "memory_usage_bytes": 3223349129,
+  "runtime_seconds": 1201.138631,
+  "cost": [
+    0,
+    10
+  ],
+  "intermediate_ubs": [
+    {
+      "cost": [
+        0,
+        10
+      ],
+      "expansions": 0,
+      "time": 0.0
+    }
+  ],
+  "intermediate_lbs": [
+    {
+      "cost": [
+        0,
+        1
+      ],
+      "expansions": 0,
+      "time": 0.0
+    },
+    {
+      "cost": [
+        0,
+        2
+      ],
+      "expansions": 20,
+      "time": 0.013496001
+    },
+    {
+      "cost": [
+        0,
+        3
+      ],
+      "expansions": 577,
+      "time": 0.224198227
+    },
+    {
+      "cost": [
+        0,
+        4
+      ],
+      "expansions": 12970,
+      "time": 6.5653645
+    }
+  ]
+}

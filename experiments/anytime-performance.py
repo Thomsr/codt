@@ -20,6 +20,8 @@ from pathlib import Path
 from collections import defaultdict
 from codt_py import OptimalDecisionTreeClassifier, all_search_strategies
 
+WITTY_RESULTS_DIR = Path("experiments/results/codt-witty-sampled/witty-cache")
+
 
 def set_style():
     # Keep anytime figures visually consistent with EDFC plots.
@@ -157,6 +159,23 @@ def load_results(results_file):
     return results
 
 
+def load_witty_tree_sizes(results_list, witty_results_dir=WITTY_RESULTS_DIR):
+    """Load Witty optimal tree sizes for the datasets used in the anytime plots."""
+    tree_sizes = {}
+    for dataset in {result["dataset"] for result in results_list}:
+        result_file = witty_results_dir / f"{dataset}.json"
+        if not result_file.exists():
+            continue
+
+        with result_file.open("r", encoding="utf-8") as handle:
+            result = json.load(handle)
+
+        if result.get("optimal") and result.get("tree_size") is not None:
+            tree_sizes[dataset] = int(result["tree_size"])
+
+    return tree_sizes
+
+
 def result_key(dataset_name, strategy):
     """Unique key for a dataset/strategy run."""
     return (dataset_name, strategy)
@@ -203,7 +222,7 @@ def run_experiment(dataset_name, X, y, strategy, timeout=600):
     clf = OptimalDecisionTreeClassifier(
         strategy=strategy,
         timeout=timeout,
-        lowerbound="improvement",
+        lowerbound="class-count",
         intermediates=True,
         memory_limit=memory_limit_bytes,
     )
@@ -277,6 +296,7 @@ def plot_anytime_performance(results_list, output_dir, x_key="time"):
     """
     set_style()
     output_dir.mkdir(parents=True, exist_ok=True)
+    witty_tree_sizes = load_witty_tree_sizes(results_list)
 
     x_values = []
     y_values = []
@@ -287,6 +307,8 @@ def plot_anytime_performance(results_list, output_dir, x_key="time"):
         for lb in result.get("intermediate_lbs", []):
             x_values.append(lb[2] if x_key == "time" else lb[1])
             y_values.append(extract_cost_components(lb[0])[1])
+        if result["dataset"] in witty_tree_sizes:
+            y_values.append(witty_tree_sizes[result["dataset"]])
 
     if x_values:
         x_min = min(x_values)
@@ -338,6 +360,14 @@ def plot_anytime_performance(results_list, output_dir, x_key="time"):
             # Match EDFC line weight and overall visual scale.
             ax.plot(ub_xs, ub_scores, marker='o', drawstyle="steps-post", linewidth=3, color=curve_color, markersize=5)
             ax.plot(lb_xs, lb_scores, marker='s', drawstyle="steps-post", linewidth=3, linestyle='--', color=curve_color, markersize=5)
+            if result["dataset"] in witty_tree_sizes:
+                ax.axhline(
+                    witty_tree_sizes[result["dataset"]],
+                    color=curve_color,
+                    linestyle="--",
+                    linewidth=1.5,
+                    alpha=0.8,
+                )
         
         x_label = "Time (s)" if x_key == "time" else "Graph expansions"
         ax.set_xlabel(x_label)
@@ -346,7 +376,6 @@ def plot_anytime_performance(results_list, output_dir, x_key="time"):
         else:
             ax.set_ylabel("")
         ax.set_title(f"{strategy}")
-        ax.axhline(10, color="grey", linestyle="--", linewidth=1.5, alpha=0.8)
         if x_key == "expansions":
             ax.xaxis.set_major_formatter(FuncFormatter(format_expansion_tick))
         if x_limits is not None:
@@ -380,7 +409,7 @@ def main():
     print(f"Found {len(datasets_available)} datasets: {datasets_available[:5]}...")
     
     # Select a subset for testing
-    datasets_to_use = ["diggle_table_a1"]
+    datasets_to_use = ["diggle_table_a1", "pc1", "german-credit-data-creditability"]
     
     # Get available strategies from the library
     available_strategies = all_search_strategies()

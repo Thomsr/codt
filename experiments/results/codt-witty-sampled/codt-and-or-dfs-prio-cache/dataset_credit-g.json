@@ -1,0 +1,17 @@
+{
+  "accuracy": 1.0,
+  "branch_count": 23,
+  "dataset": "dataset_credit-g.txt",
+  "dataset_path": "data/openml/sampled/dataset_credit-g.txt",
+  "error": null,
+  "expansions": 8865311,
+  "memory_usage_bytes": 3223362274,
+  "n_examples": 100,
+  "n_features": 20,
+  "runtime_seconds": 1800.4027588370009,
+  "solved": true,
+  "solver": "codt",
+  "status": "perfect-tree-found",
+  "tree": "[4, 2307.0, [4, 1500.0, [12, 36.5, [4, 1306.5, [14, 1.5, [12, 27.5, 1, 0], 0], 1], [1, 16.5, 1, 0]], [4, 1994.5, [4, 1811.5, 1, [8, 2.5, 1, 0]], [1, 13.5, 1, [4, 2233.0, 0, 1]]]], [4, 5550.0, [4, 3404.0, 1, [4, 4527.0, [1, 33.0, 1, 0], [1, 28.5, [12, 51.5, 1, 0], 0]]], [12, 36.5, [12, 25.5, [1, 33.0, 1, 0], 1], [12, 45.5, [6, 1.5, 1, 0], 0]]]]",
+  "tree_size": 47
+}
