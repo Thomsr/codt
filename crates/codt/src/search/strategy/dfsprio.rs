@@ -39,12 +39,12 @@ impl SearchStrategy for DfsPrioSearchStrategy {
     ) -> usize {
         // We choose the path in the graph as the most promising
         // solution (lowest lower bound), but when choosing which
-        // 'and' node to expand, we choose the node most likely to
-        // change the estimate (highest upper bound).
-        if children[0]
-            .cost_upper_bound
-            .greater_or_not_much_less_than(&children[1].cost_upper_bound)
-        {
+        // 'and' node to expand, we choose the node with the largest
+        // remaining uncertainty (upper bound - lower bound).
+        let gap0 = children[0].cost_upper_bound - children[0].cost_lower_bound;
+        let gap1 = children[1].cost_upper_bound - children[1].cost_lower_bound;
+
+        if gap0.greater_or_not_much_less_than(&gap1) {
             0
         } else {
             1
