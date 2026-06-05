@@ -7,8 +7,6 @@ use std::{
     sync::Arc,
 };
 
-use log::info;
-
 use crate::{
     model::{
         dataview::DataView,
@@ -16,7 +14,8 @@ use crate::{
     },
     search::{
         lower_bounds::{
-            class_count::class_count_lower_bound, improvement::improvement_lower_bound,
+            class_count::class_count_lower_bound,
+            improvement::improvement_lower_bound_with_feature_counts,
         },
         pruner::Pruner,
         queue::{BinaryHeapQueue, PQ},
@@ -123,6 +122,9 @@ pub struct FeatureTest<'a, OT: OptimizationTask, SS: SearchStrategy> {
     /// Whether this split feature is currently a one-off feature.
     pub is_one_off_feature: bool,
 
+    /// Number of times this feature was selected by this node's improvement lower-bound cover.
+    pub improvement_selection_count: usize,
+
     /// The number of discrepancies from the heuristically best solution.
     /// This is the discrepancies of the parent + feature_rank + the number of subdivisions this interval has gone through.
     pub discrepancies: i32,
@@ -173,6 +175,7 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> FeatureTest<'a, OT, SS> {
         support: usize,
         feature_rank: i32,
         is_one_off_feature: bool,
+        improvement_selection_count: usize,
         discrepancies: i32,
     ) -> Self {
         Self {
@@ -189,6 +192,7 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> FeatureTest<'a, OT, SS> {
             },
             feature_rank,
             is_one_off_feature,
+            improvement_selection_count,
             discrepancies: discrepancies + feature_rank,
             _ss: PhantomData,
         }
@@ -216,6 +220,7 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> FeatureTest<'a, OT, SS> {
                 },
                 feature_rank: self.feature_rank,
                 is_one_off_feature: self.is_one_off_feature,
+                improvement_selection_count: self.improvement_selection_count,
                 discrepancies: self.discrepancies + 1,
                 _ss: PhantomData,
             })
@@ -235,6 +240,7 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> FeatureTest<'a, OT, SS> {
                 },
                 feature_rank: self.feature_rank,
                 is_one_off_feature: self.is_one_off_feature,
+                improvement_selection_count: self.improvement_selection_count,
                 discrepancies: self.discrepancies + 1,
                 _ss: PhantomData,
             })
@@ -386,6 +392,23 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> Node<'a, OT, SS> {
             };
         }
 
+        let use_improvement_lb = context
+            .lb_strategy
+            .contains(&LowerBoundStrategy::Improvement);
+
+        let (improvement_lb, improvement_selection_counts) = if use_improvement_lb {
+            let diff_table = context
+                .difference_table
+                .as_ref()
+                .expect("Improvement lower bound requires a shared DifferenceTable");
+            let view = diff_table.view_for_dataview(&dataview);
+            let (lb, mut feature_counts) = improvement_lower_bound_with_feature_counts::<OT>(&view);
+            feature_counts.resize(dataview.num_features(), 0);
+            (Some(lb), feature_counts)
+        } else {
+            (None, vec![0; dataview.num_features()])
+        };
+
         if dataview.num_instances() > 1 {
             for (feature, interesting_solutions_range) in
                 interesting_solutions_range.iter_mut().enumerate()
@@ -405,6 +428,7 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> Node<'a, OT, SS> {
                     dataview.num_instances(),
                     dataview.feature_ranking[feature],
                     one_off_witnesses.contains_key(&feature),
+                    improvement_selection_counts[feature],
                     discrepancies,
                 );
 
@@ -452,30 +476,14 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> Node<'a, OT, SS> {
             .lb_strategy
             .contains(&LowerBoundStrategy::ClassCount);
 
-        let use_improvement_lb = context
-            .lb_strategy
-            .contains(&LowerBoundStrategy::Improvement);
-
         let one_off_lb = OT::to_cost_type(one_off_witnesses.len() as i64);
         let mut lb = match (queue.is_empty(), use_class_count_lb, use_improvement_lb) {
             (true, _, _) => ub,
             (false, true, false) => class_count_lower_bound::<OT>(dataview.num_unique_labels()),
-            (false, false, true) => {
-                let diff_table = context
-                    .difference_table
-                    .as_ref()
-                    .expect("Improvement lower bound requires a shared DifferenceTable");
-                let view = diff_table.view_for_dataview(&dataview);
-                improvement_lower_bound::<OT>(&view)
-            }
+            (false, false, true) => improvement_lb.unwrap(),
             (false, true, true) => {
                 let class_count_lb = class_count_lower_bound::<OT>(dataview.num_unique_labels());
-                let diff_table = context
-                    .difference_table
-                    .as_ref()
-                    .expect("Improvement lower bound requires a shared DifferenceTable");
-                let view = diff_table.view_for_dataview(&dataview);
-                let improvement_lb = improvement_lower_bound::<OT>(&view);
+                let improvement_lb = improvement_lb.unwrap();
                 if class_count_lb.greater_or_not_much_less_than(&improvement_lb) {
                     class_count_lb
                 } else {

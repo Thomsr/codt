@@ -1,15 +1,19 @@
 use crate::{model::difference_table::DifferenceTableView, tasks::OptimizationTask};
 
-pub fn improvement_lower_bound<OT: OptimizationTask>(
+pub fn improvement_lower_bound_with_feature_counts<OT: OptimizationTask>(
     diff_table: &DifferenceTableView<'_>,
-) -> OT::CostType {
+) -> (OT::CostType, Vec<usize>) {
     if diff_table.is_empty() {
-        return OT::to_cost_type(0);
+        return (OT::to_cost_type(0), Vec::new());
     }
 
-    let improvement_lower_bound = diff_table.min_size_based_cover(diff_table.n_rows());
+    let (improvement_lower_bound, feature_counts) =
+        diff_table.size_based_cover_feature_counts(diff_table.n_rows());
 
-    OT::to_cost_type(improvement_lower_bound as i64)
+    (
+        OT::to_cost_type(improvement_lower_bound as i64),
+        feature_counts,
+    )
 }
 
 #[cfg(test)]
@@ -17,7 +21,9 @@ mod tests {
     use crate::{
         model::difference_table::DifferenceTable,
         model::{dataset::DataSet, dataview::DataView, instance::LabeledInstance},
-        search::lower_bounds::{improvement::improvement_lower_bound, pair::pair_lower_bound},
+        search::lower_bounds::{
+            improvement::improvement_lower_bound_with_feature_counts, pair::pair_lower_bound,
+        },
         tasks::{Cost, accuracy::AccuracyTask},
     };
 
@@ -46,7 +52,7 @@ mod tests {
         let difference_table = DifferenceTable::new(&dataview);
         let view = difference_table.view();
 
-        let lb = improvement_lower_bound::<AccuracyTask>(&view);
+        let lb = improvement_lower_bound_with_feature_counts::<AccuracyTask>(&view).0;
         assert_eq!(lb.secondary, 0);
     }
 
@@ -61,7 +67,7 @@ mod tests {
         let difference_table = DifferenceTable::new(&dataview);
         let view = difference_table.view();
 
-        let lb = improvement_lower_bound::<AccuracyTask>(&view);
+        let lb = improvement_lower_bound_with_feature_counts::<AccuracyTask>(&view).0;
         assert_eq!(lb.secondary, 1);
     }
 
@@ -74,7 +80,8 @@ mod tests {
         let dataview = DataView::<AccuracyTask>::from_dataset(&dataset, false);
         let difference_table = DifferenceTable::new(&dataview);
         let view = difference_table.view();
-        let improvement_lower_bound = improvement_lower_bound::<AccuracyTask>(&view);
+        let improvement_lower_bound =
+            improvement_lower_bound_with_feature_counts::<AccuracyTask>(&view).0;
         let pair_lower_bound = pair_lower_bound::<AccuracyTask>(&view);
 
         assert!(

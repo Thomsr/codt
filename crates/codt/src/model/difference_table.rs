@@ -242,25 +242,41 @@ impl<'a> DifferenceTableView<'a> {
     }
 
     pub fn min_size_based_cover(&self, target: usize) -> usize {
-        let mut counts = vec![0usize; self.n_columns()];
+        self.size_based_cover_feature_counts(target).0
+    }
 
-        for row in 0..self.n_rows() {
-            for column in 0..self.n_columns() {
-                counts[column] += self.diff(row, column) as usize;
-            }
+    pub fn size_based_cover_feature_counts(&self, target: usize) -> (usize, Vec<usize>) {
+        let n_features = (0..self.n_columns())
+            .map(|column| self.split_column(column).feature + 1)
+            .max()
+            .unwrap_or(0);
+        let mut feature_counts = vec![0usize; n_features];
+
+        if target == 0 {
+            return (0, feature_counts);
         }
 
-        counts.sort_unstable_by(|a, b| b.cmp(a));
+        let mut counts = (0..self.n_columns())
+            .map(|column| {
+                let count = (0..self.n_rows())
+                    .filter(|&row| self.diff(row, column))
+                    .count();
+                (column, count)
+            })
+            .collect::<Vec<_>>();
+
+        counts.sort_unstable_by(|a, b| b.1.cmp(&a.1));
 
         let mut covered = 0usize;
-        for (i, &count) in counts.iter().enumerate() {
+        for (i, &(column, count)) in counts.iter().enumerate() {
             covered += count;
+            feature_counts[self.split_column(column).feature] += 1;
             if covered >= target {
-                return i + 1;
+                return (i + 1, feature_counts);
             }
         }
 
-        counts.len()
+        (counts.len(), feature_counts)
     }
 
     pub fn one_off_witnesses(&self) -> HashMap<usize, (usize, usize)> {

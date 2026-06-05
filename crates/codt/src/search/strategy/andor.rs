@@ -25,6 +25,10 @@ impl SearchStrategy for AndOrSearchStrategy {
             .then(a.is_expanded().cmp(&b.is_expanded()).reverse())
             .then(a.split_points.len().cmp(&b.split_points.len()))
             .then(b.is_one_off_feature.cmp(&a.is_one_off_feature))
+            .then(
+                b.improvement_selection_count
+                    .cmp(&a.improvement_selection_count),
+            )
             .then(a.feature_rank.cmp(&b.feature_rank))
             .then(a.split_point.cmp(&b.split_point))
     }
