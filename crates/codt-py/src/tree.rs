@@ -3,12 +3,12 @@ use std::{collections::HashSet, convert::Infallible, marker::PhantomData, time::
 use codt::{
     model::{dataset::DataSet, dataview::DataView, instance::LabeledInstance, tree::Tree},
     search::solver::{
-        solver_with_strategy, LowerBoundStrategy, SearchStrategyEnum, SolveResult, SolverOptions,
-        UpperboundStrategy,
+        LowerBoundStrategy, SearchStrategyEnum, SolveResult, SolverOptions, UpperboundStrategy,
+        solver_with_strategy,
     },
-    tasks::{accuracy::AccuracyTask, OptimizationTask},
+    tasks::{OptimizationTask, accuracy::AccuracyTask},
 };
-use numpy::{ndarray::Axis, IntoPyArray, PyArray1, PyReadonlyArray1, PyReadonlyArray2};
+use numpy::{IntoPyArray, PyArray1, PyReadonlyArray1, PyReadonlyArray2, ndarray::Axis};
 use pyo3::{exceptions::PyValueError, prelude::*, types::PyList};
 
 const ERROR_FIT_NOT_CALLED: &str =

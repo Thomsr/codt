@@ -44,7 +44,8 @@ pub struct CliParams {
         default_values_t = [
             LowerBoundStrategy::ClassCount,
             LowerBoundStrategy::Improvement,
-            LowerBoundStrategy::Pair
+            LowerBoundStrategy::Pair,
+            LowerBoundStrategy::OneOff,
         ]
     )]
     pub lowerbound: Vec<LowerBoundStrategy>,

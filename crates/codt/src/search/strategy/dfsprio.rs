@@ -28,6 +28,7 @@ impl SearchStrategy for DfsPrioSearchStrategy {
                     .cmp(&b.cost_lower_bound.to_order()),
             )
             .then(a.split_points.len().cmp(&b.split_points.len()).reverse())
+            .then(b.is_one_off_feature.cmp(&a.is_one_off_feature))
             .then(a.feature_rank.cmp(&b.feature_rank))
             .then(a.split_point.cmp(&b.split_point))
     }

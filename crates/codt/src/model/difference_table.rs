@@ -96,6 +96,10 @@ impl DifferenceTable {
         self.view().min_size_based_cover(target)
     }
 
+    pub fn one_off_witnesses(&self) -> HashMap<usize, (usize, usize)> {
+        self.view().one_off_witnesses()
+    }
+
     pub fn print(&self) {
         println!("\n=== Difference Table ===");
 
@@ -189,9 +193,7 @@ impl<'a> DifferenceTableView<'a> {
             .pairs
             .iter()
             .enumerate()
-            .filter(|(_, (left, right))| {
-                active_instances[*left] && active_instances[*right]
-            })
+            .filter(|(_, (left, right))| active_instances[*left] && active_instances[*right])
             .map(|(row_idx, _)| row_idx)
             .collect();
 
@@ -259,6 +261,39 @@ impl<'a> DifferenceTableView<'a> {
         }
 
         counts.len()
+    }
+
+    pub fn one_off_witnesses(&self) -> HashMap<usize, (usize, usize)> {
+        let mut witnesses = HashMap::new();
+
+        for row in 0..self.n_rows() {
+            let mut one_off_feature = None;
+            let mut multiple_features = false;
+
+            for column in 0..self.n_columns() {
+                if !self.diff(row, column) {
+                    continue;
+                }
+
+                let feature = self.split_column(column).feature;
+                match one_off_feature {
+                    None => one_off_feature = Some(feature),
+                    Some(previous_feature) if previous_feature == feature => {}
+                    Some(_) => {
+                        multiple_features = true;
+                        break;
+                    }
+                }
+            }
+
+            if !multiple_features {
+                if let Some(feature) = one_off_feature {
+                    witnesses.entry(feature).or_insert_with(|| self.pair(row));
+                }
+            }
+        }
+
+        witnesses
     }
 
     pub fn print(&self) {

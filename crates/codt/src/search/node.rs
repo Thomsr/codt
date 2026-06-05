@@ -1,6 +1,13 @@
 use std::{
-    cmp::Ordering, collections::VecDeque, fmt::Debug, marker::PhantomData, ops::Range, sync::Arc,
+    cmp::Ordering,
+    collections::{HashMap, VecDeque},
+    fmt::Debug,
+    marker::PhantomData,
+    ops::Range,
+    sync::Arc,
 };
+
+use log::info;
 
 use crate::{
     model::{
@@ -113,6 +120,9 @@ pub struct FeatureTest<'a, OT: OptimizationTask, SS: SearchStrategy> {
     /// The rank of the feature based on the greedy heuristic value, used by some search strategies to prioritize items.
     pub feature_rank: i32,
 
+    /// Whether this split feature is currently a one-off feature.
+    pub is_one_off_feature: bool,
+
     /// The number of discrepancies from the heuristically best solution.
     /// This is the discrepancies of the parent + feature_rank + the number of subdivisions this interval has gone through.
     pub discrepancies: i32,
@@ -162,6 +172,7 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> FeatureTest<'a, OT, SS> {
         split_point: usize,
         support: usize,
         feature_rank: i32,
+        is_one_off_feature: bool,
         discrepancies: i32,
     ) -> Self {
         Self {
@@ -177,6 +188,7 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> FeatureTest<'a, OT, SS> {
                 0
             },
             feature_rank,
+            is_one_off_feature,
             discrepancies: discrepancies + feature_rank,
             _ss: PhantomData,
         }
@@ -203,6 +215,7 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> FeatureTest<'a, OT, SS> {
                     0
                 },
                 feature_rank: self.feature_rank,
+                is_one_off_feature: self.is_one_off_feature,
                 discrepancies: self.discrepancies + 1,
                 _ss: PhantomData,
             })
@@ -221,6 +234,7 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> FeatureTest<'a, OT, SS> {
                     0
                 },
                 feature_rank: self.feature_rank,
+                is_one_off_feature: self.is_one_off_feature,
                 discrepancies: self.discrepancies + 1,
                 _ss: PhantomData,
             })
@@ -318,6 +332,8 @@ pub struct Node<'a, OT: OptimizationTask, SS: SearchStrategy> {
     pub best: Arc<Tree<OT>>,
     /// Keeps track of found lower bounds for pruning similar items
     pruner: Pruner<OT>,
+    /// One-off features still forced below this node, with one witnessing opposite-label pair per feature.
+    one_off_witnesses: HashMap<usize, (usize, usize)>,
     /// The threshold range we are still interested in per feature. Initially the full range, but shrunk when a zero solution is found.
     pub interesting_solutions_range: Vec<Range<usize>>,
     ordering_mode: Option<MemoryAdaptiveMode>,
@@ -338,6 +354,7 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> Node<'a, OT, SS> {
         dataview: DataView<'a, OT>,
         discrepancies: i32,
         is_root: bool,
+        one_off_witnesses: HashMap<usize, (usize, usize)>,
     ) -> Self {
         let ordering_mode = SS::refresh_memory_mode(context.memory_limit);
 
@@ -360,6 +377,7 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> Node<'a, OT, SS> {
                 cost_lower_bound: OT::to_cost_type(0),
                 lowest_descendant_heuristic: 0.0,
                 pruner: Pruner::new(dataview.num_features()),
+                one_off_witnesses,
                 best,
                 dataview,
                 queue,
@@ -386,6 +404,7 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> Node<'a, OT, SS> {
                     n_splitpoints / 2,
                     dataview.num_instances(),
                     dataview.feature_ranking[feature],
+                    one_off_witnesses.contains_key(&feature),
                     discrepancies,
                 );
 
@@ -437,7 +456,8 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> Node<'a, OT, SS> {
             .lb_strategy
             .contains(&LowerBoundStrategy::Improvement);
 
-        let lb = match (queue.is_empty(), use_class_count_lb, use_improvement_lb) {
+        let one_off_lb = OT::to_cost_type(one_off_witnesses.len() as i64);
+        let mut lb = match (queue.is_empty(), use_class_count_lb, use_improvement_lb) {
             (true, _, _) => ub,
             (false, true, false) => class_count_lower_bound::<OT>(dataview.num_unique_labels()),
             (false, false, true) => {
@@ -464,6 +484,7 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> Node<'a, OT, SS> {
             }
             (false, false, false) => context.task.branching_cost(),
         };
+        OT::update_lowerbound(&mut lb, &one_off_lb);
 
         Node {
             cost_upper_bound: ub,
@@ -472,6 +493,7 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> Node<'a, OT, SS> {
                 .peek()
                 .map_or(f64::MAX, |item| item.lowest_descendant_heuristic()),
             pruner: Pruner::new(dataview.num_features()),
+            one_off_witnesses,
             best,
             dataview,
             queue,
@@ -635,6 +657,32 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> Node<'a, OT, SS> {
             // Child lower bounds could be computed in a similar way, but are useless.
             // Initial lower bounds are better for children, and other lower bounds for the parent are gained by backtracking the child.
         }
+    }
+
+    fn child_one_off_witnesses(
+        &self,
+        split_feature: usize,
+        split_point: usize,
+    ) -> [HashMap<usize, (usize, usize)>; 2] {
+        let mut left = HashMap::new();
+        let mut right = HashMap::new();
+        let threshold =
+            self.dataview.possible_split_values[split_feature][split_point].feature_value;
+
+        for (&feature, &pair) in &self.one_off_witnesses {
+            if feature == split_feature {
+                continue;
+            }
+
+            let goes_left = self.dataview.feature_value(split_feature, pair.0) <= threshold;
+            if goes_left {
+                left.insert(feature, pair);
+            } else {
+                right.insert(feature, pair);
+            }
+        }
+
+        [left, right]
     }
 
     /// Reinsert an updated item in the queue after expanding a descendant.
@@ -836,8 +884,23 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> Node<'a, OT, SS> {
 
         let (left_view, right_view) = self.dataview.split(item.feature, item.split_point);
 
-        let left = Self::new(context, left_view, item.discrepancies, false);
-        let right = Self::new(context, right_view, item.discrepancies, false);
+        let [left_one_off_witnesses, right_one_off_witnesses] =
+            self.child_one_off_witnesses(item.feature, item.split_point);
+
+        let left = Self::new(
+            context,
+            left_view,
+            item.discrepancies,
+            false,
+            left_one_off_witnesses,
+        );
+        let right = Self::new(
+            context,
+            right_view,
+            item.discrepancies,
+            false,
+            right_one_off_witnesses,
+        );
 
         let expanded = ExpandedQueueItem::Children([left, right]);
         item.expanded = Some(expanded);

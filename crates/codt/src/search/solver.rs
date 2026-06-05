@@ -146,6 +146,7 @@ pub enum LowerBoundStrategy {
     ClassCount,
     Pair,
     Improvement,
+    OneOff,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, EnumString, VariantNames, IntoStaticStr, Display)]
@@ -178,6 +179,7 @@ impl Default for SolverOptions {
                 LowerBoundStrategy::ClassCount,
                 LowerBoundStrategy::Improvement,
                 LowerBoundStrategy::Pair,
+                LowerBoundStrategy::OneOff,
             ]
             .into_iter()
             .collect(),

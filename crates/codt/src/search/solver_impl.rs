@@ -49,12 +49,14 @@ impl<OT: OptimizationTask, SS: SearchStrategy> Solver<OT> for SolverImpl<'_, OT,
         let use_improvement_lowerbound = options
             .lb_strategy
             .contains(&LowerBoundStrategy::Improvement);
+        let use_one_off_lowerbound = options.lb_strategy.contains(&LowerBoundStrategy::OneOff);
 
-        let difference_table = if use_pair_lowerbound || use_improvement_lowerbound {
-            Some(DifferenceTable::new(&dataview))
-        } else {
-            None
-        };
+        let difference_table =
+            if use_pair_lowerbound || use_improvement_lowerbound || use_one_off_lowerbound {
+                Some(DifferenceTable::new(&dataview))
+            } else {
+                None
+            };
 
         let context = SolveContext {
             task: &self.task,
@@ -66,6 +68,18 @@ impl<OT: OptimizationTask, SS: SearchStrategy> Solver<OT> for SolverImpl<'_, OT,
             difference_table: difference_table.as_ref(),
             _ss: PhantomData,
         };
+
+        let one_off_witnesses = if use_one_off_lowerbound {
+            context
+                .difference_table
+                .as_ref()
+                .map(|table| table.one_off_witnesses())
+                .unwrap_or_default()
+        } else {
+            Default::default()
+        };
+
+        info!("One off witnesses: {}", one_off_witnesses.len());
 
         let mut graph_expansions = 0;
 
@@ -83,7 +97,7 @@ impl<OT: OptimizationTask, SS: SearchStrategy> Solver<OT> for SolverImpl<'_, OT,
             None
         };
 
-        let mut root: Node<'_, OT, SS> = Node::new(&context, dataview, 0, true);
+        let mut root: Node<'_, OT, SS> = Node::new(&context, dataview, 0, true, one_off_witnesses);
 
         let mut intermediate_lbs = vec![(root.cost_lower_bound, graph_expansions, 0.0)];
         let mut intermediate_ubs = vec![(root.best.cost(), graph_expansions, 0.0)];
