@@ -1,0 +1,21 @@
+{
+  "branch_count": 18,
+  "cart_upperbound": "enabled",
+  "config": "pair",
+  "dataset": "diabetes",
+  "error": null,
+  "expansions": 67945,
+  "group": "lowerbound",
+  "is_perfect": true,
+  "lowerbound": "pair",
+  "memory_usage_bytes": 4295020349,
+  "n_classes": 2,
+  "n_examples": 100,
+  "n_features": 8,
+  "runtime_seconds": 1.9490695290005533,
+  "solver_status": "perfect-tree-found",
+  "status": "perfect-tree-found",
+  "strategy": "and-or",
+  "tree_size": 37,
+  "upperbound": "for-remaining-interval"
+}

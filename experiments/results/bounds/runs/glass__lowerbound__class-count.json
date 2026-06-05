@@ -1,0 +1,21 @@
+{
+  "branch_count": 16,
+  "cart_upperbound": "enabled",
+  "config": "class-count",
+  "dataset": "glass",
+  "error": null,
+  "expansions": 46346,
+  "group": "lowerbound",
+  "is_perfect": true,
+  "lowerbound": "class-count",
+  "memory_usage_bytes": 4295010197,
+  "n_classes": 2,
+  "n_examples": 100,
+  "n_features": 9,
+  "runtime_seconds": 1.5080021000003399,
+  "solver_status": "perfect-tree-found",
+  "status": "perfect-tree-found",
+  "strategy": "and-or",
+  "tree_size": 33,
+  "upperbound": "for-remaining-interval"
+}

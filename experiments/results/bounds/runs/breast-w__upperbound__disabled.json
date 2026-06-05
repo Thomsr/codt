@@ -1,0 +1,21 @@
+{
+  "branch_count": 5,
+  "cart_upperbound": "disabled",
+  "config": "disabled",
+  "dataset": "breast-w",
+  "error": null,
+  "expansions": 20395,
+  "group": "upperbound",
+  "is_perfect": true,
+  "lowerbound": "class-count,pair,improvement",
+  "memory_usage_bytes": 1224398715,
+  "n_classes": 2,
+  "n_examples": 100,
+  "n_features": 9,
+  "runtime_seconds": 0.8613421260006362,
+  "solver_status": "perfect-tree-found",
+  "status": "perfect-tree-found",
+  "strategy": "and-or",
+  "tree_size": 11,
+  "upperbound": "for-remaining-interval"
+}

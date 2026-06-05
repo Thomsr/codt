@@ -1,0 +1,21 @@
+{
+  "branch_count": 2,
+  "cart_upperbound": "disabled",
+  "config": "none",
+  "dataset": "divorce_prediction",
+  "error": null,
+  "expansions": 74,
+  "group": "bounds",
+  "is_perfect": true,
+  "lowerbound": "none",
+  "memory_usage_bytes": 21931665,
+  "n_classes": 2,
+  "n_examples": 100,
+  "n_features": 54,
+  "runtime_seconds": 0.01972419899993838,
+  "solver_status": "perfect-tree-found",
+  "status": "perfect-tree-found",
+  "strategy": "and-or-dfs-prio",
+  "tree_size": 5,
+  "upperbound": "for-remaining-interval"
+}

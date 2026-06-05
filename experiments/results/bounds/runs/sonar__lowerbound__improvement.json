@@ -1,0 +1,21 @@
+{
+  "branch_count": 2,
+  "cart_upperbound": "enabled",
+  "config": "improvement",
+  "dataset": "sonar",
+  "error": null,
+  "expansions": 117,
+  "group": "lowerbound",
+  "is_perfect": true,
+  "lowerbound": "improvement",
+  "memory_usage_bytes": 12923982,
+  "n_classes": 2,
+  "n_examples": 100,
+  "n_features": 60,
+  "runtime_seconds": 0.0482387000001836,
+  "solver_status": "perfect-tree-found",
+  "status": "perfect-tree-found",
+  "strategy": "and-or",
+  "tree_size": 5,
+  "upperbound": "for-remaining-interval"
+}

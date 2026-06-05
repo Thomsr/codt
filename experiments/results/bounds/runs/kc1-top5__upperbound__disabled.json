@@ -1,0 +1,21 @@
+{
+  "branch_count": 3,
+  "cart_upperbound": "disabled",
+  "config": "disabled",
+  "dataset": "kc1-top5",
+  "error": null,
+  "expansions": 1904,
+  "group": "upperbound",
+  "is_perfect": true,
+  "lowerbound": "class-count,pair,improvement",
+  "memory_usage_bytes": 1130456130,
+  "n_classes": 2,
+  "n_examples": 100,
+  "n_features": 94,
+  "runtime_seconds": 1.635032352000053,
+  "solver_status": "perfect-tree-found",
+  "status": "perfect-tree-found",
+  "strategy": "and-or-dfs-prio",
+  "tree_size": 7,
+  "upperbound": "for-remaining-interval"
+}

@@ -3,12 +3,12 @@ use std::{collections::HashSet, convert::Infallible, marker::PhantomData, time::
 use codt::{
     model::{dataset::DataSet, dataview::DataView, instance::LabeledInstance, tree::Tree},
     search::solver::{
-        LowerBoundStrategy, SearchStrategyEnum, SolveResult, SolverOptions, UpperboundStrategy,
-        solver_with_strategy,
+        solver_with_strategy, LowerBoundStrategy, SearchStrategyEnum, SolveResult, SolverOptions,
+        UpperboundStrategy,
     },
-    tasks::{OptimizationTask, accuracy::AccuracyTask},
+    tasks::{accuracy::AccuracyTask, OptimizationTask},
 };
-use numpy::{IntoPyArray, PyArray1, PyReadonlyArray1, PyReadonlyArray2, ndarray::Axis};
+use numpy::{ndarray::Axis, IntoPyArray, PyArray1, PyReadonlyArray1, PyReadonlyArray2};
 use pyo3::{exceptions::PyValueError, prelude::*, types::PyList};
 
 const ERROR_FIT_NOT_CALLED: &str =
@@ -98,24 +98,21 @@ macro_rules! impl_optimal_decision_tree_pyclass {
                     }
                 };
 
-                let lowerbound: HashSet<LowerBoundStrategy> = lowerbound
-                    .split(',')
-                    .map(str::trim)
-                    .filter(|s| !s.is_empty())
-                    .map(|s| {
-                        s.parse().map_err(|_| {
-                            PyValueError::new_err(format!(
-                                "Not a valid lower bounding strategy: {s}"
-                            ))
+                let lowerbound = match lowerbound.trim() {
+                    "none" | "disabled" | "false" | "0" => HashSet::new(),
+                    _ => lowerbound
+                        .split(',')
+                        .map(str::trim)
+                        .filter(|s| !s.is_empty())
+                        .map(|s| {
+                            s.parse().map_err(|_| {
+                                PyValueError::new_err(format!(
+                                    "Not a valid lower bounding strategy: {s}"
+                                ))
+                            })
                         })
-                    })
-                    .collect::<Result<_, _>>()?;
-
-                if lowerbound.is_empty() {
-                    return Err(PyValueError::new_err(
-                        "At least one lower bounding strategy is required",
-                    ));
-                }
+                        .collect::<Result<HashSet<LowerBoundStrategy>, _>>()?,
+                };
 
                 Ok(Self {
                     lowerbound,

@@ -1,0 +1,21 @@
+{
+  "branch_count": 9,
+  "cart_upperbound": "enabled",
+  "config": "none",
+  "dataset": "ionosphere",
+  "error": null,
+  "expansions": 12457,
+  "group": "lowerbound",
+  "is_perfect": true,
+  "lowerbound": "none",
+  "memory_usage_bytes": 4295305073,
+  "n_classes": 2,
+  "n_examples": 100,
+  "n_features": 34,
+  "runtime_seconds": 3.548387074999482,
+  "solver_status": "perfect-tree-found",
+  "status": "perfect-tree-found",
+  "strategy": "and-or",
+  "tree_size": 19,
+  "upperbound": "for-remaining-interval"
+}

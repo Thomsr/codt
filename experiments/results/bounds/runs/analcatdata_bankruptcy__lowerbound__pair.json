@@ -1,0 +1,21 @@
+{
+  "branch_count": 4,
+  "cart_upperbound": "enabled",
+  "config": "pair",
+  "dataset": "analcatdata_bankruptcy",
+  "error": null,
+  "expansions": 5248,
+  "group": "lowerbound",
+  "is_perfect": true,
+  "lowerbound": "pair",
+  "memory_usage_bytes": 83795134,
+  "n_classes": 2,
+  "n_examples": 50,
+  "n_features": 5,
+  "runtime_seconds": 0.32882628999959707,
+  "solver_status": "perfect-tree-found",
+  "status": "perfect-tree-found",
+  "strategy": "and-or-dfs-prio",
+  "tree_size": 9,
+  "upperbound": "for-remaining-interval"
+}

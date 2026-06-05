@@ -1,0 +1,21 @@
+{
+  "branch_count": null,
+  "cart_upperbound": "disabled",
+  "config": "none",
+  "dataset": "chscase_vine2",
+  "error": null,
+  "expansions": 310293,
+  "group": "bounds",
+  "is_perfect": false,
+  "lowerbound": "none",
+  "memory_usage_bytes": 4294982497,
+  "n_classes": 2,
+  "n_examples": 100,
+  "n_features": 2,
+  "runtime_seconds": 4.148994575999495,
+  "solver_status": "no-perfect-tree",
+  "status": "no-perfect-tree",
+  "strategy": "and-or",
+  "tree_size": null,
+  "upperbound": "for-remaining-interval"
+}

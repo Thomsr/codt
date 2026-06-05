@@ -1,0 +1,21 @@
+{
+  "branch_count": 2,
+  "cart_upperbound": "enabled",
+  "config": "pair",
+  "dataset": "analcatdata_election2000",
+  "error": null,
+  "expansions": 31,
+  "group": "lowerbound",
+  "is_perfect": true,
+  "lowerbound": "pair",
+  "memory_usage_bytes": 832943,
+  "n_classes": 2,
+  "n_examples": 67,
+  "n_features": 14,
+  "runtime_seconds": 0.019408500000281492,
+  "solver_status": "perfect-tree-found",
+  "status": "perfect-tree-found",
+  "strategy": "and-or-dfs-prio",
+  "tree_size": 5,
+  "upperbound": "for-remaining-interval"
+}

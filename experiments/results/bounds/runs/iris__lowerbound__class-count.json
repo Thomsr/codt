@@ -1,0 +1,21 @@
+{
+  "branch_count": 1,
+  "cart_upperbound": "enabled",
+  "config": "class-count",
+  "dataset": "iris",
+  "error": null,
+  "expansions": 0,
+  "group": "lowerbound",
+  "is_perfect": true,
+  "lowerbound": "class-count",
+  "memory_usage_bytes": 20501,
+  "n_classes": 2,
+  "n_examples": 100,
+  "n_features": 4,
+  "runtime_seconds": 0.0008022000001801644,
+  "solver_status": "perfect-tree-found",
+  "status": "perfect-tree-found",
+  "strategy": "and-or",
+  "tree_size": 3,
+  "upperbound": "for-remaining-interval"
+}

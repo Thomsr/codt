@@ -1,0 +1,21 @@
+{
+  "branch_count": 3,
+  "cart_upperbound": "enabled",
+  "config": "all",
+  "dataset": "wine",
+  "error": null,
+  "expansions": 63,
+  "group": "lowerbound",
+  "is_perfect": true,
+  "lowerbound": "class-count,pair,improvement",
+  "memory_usage_bytes": 5177107,
+  "n_classes": 2,
+  "n_examples": 100,
+  "n_features": 13,
+  "runtime_seconds": 0.2661787090000871,
+  "solver_status": "perfect-tree-found",
+  "status": "perfect-tree-found",
+  "strategy": "and-or",
+  "tree_size": 7,
+  "upperbound": "for-remaining-interval"
+}

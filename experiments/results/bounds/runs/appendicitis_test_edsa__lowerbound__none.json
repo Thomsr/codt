@@ -1,0 +1,21 @@
+{
+  "branch_count": 15,
+  "cart_upperbound": "enabled",
+  "config": "none",
+  "dataset": "appendicitis_test_edsa",
+  "error": null,
+  "expansions": 67966,
+  "group": "lowerbound",
+  "is_perfect": true,
+  "lowerbound": "none",
+  "memory_usage_bytes": 4295005873,
+  "n_classes": 2,
+  "n_examples": 100,
+  "n_features": 7,
+  "runtime_seconds": 1.6854498510001577,
+  "solver_status": "perfect-tree-found",
+  "status": "perfect-tree-found",
+  "strategy": "and-or",
+  "tree_size": 31,
+  "upperbound": "for-remaining-interval"
+}

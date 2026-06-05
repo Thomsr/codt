@@ -1,0 +1,21 @@
+{
+  "branch_count": 24,
+  "cart_upperbound": "enabled",
+  "config": "all",
+  "dataset": "heart-statlog-uci",
+  "error": null,
+  "expansions": 43280,
+  "group": "bounds",
+  "is_perfect": true,
+  "lowerbound": "class-count,pair,improvement",
+  "memory_usage_bytes": 4295018333,
+  "n_classes": 2,
+  "n_examples": 100,
+  "n_features": 13,
+  "runtime_seconds": 10.588762634999512,
+  "solver_status": "perfect-tree-found",
+  "status": "perfect-tree-found",
+  "strategy": "and-or",
+  "tree_size": 49,
+  "upperbound": "for-remaining-interval"
+}
