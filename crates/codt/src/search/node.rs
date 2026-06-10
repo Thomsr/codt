@@ -7,8 +7,6 @@ use std::{
     sync::Arc,
 };
 
-use log::info;
-
 use crate::{
     model::{
         dataview::DataView,
@@ -372,6 +370,7 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> Node<'a, OT, SS> {
 
         if OT::is_perfect_solution_cost(&leaf_cost) {
             // Node is a pure leaf, we are done.
+
             return Node {
                 cost_upper_bound: OT::to_cost_type(0),
                 cost_lower_bound: OT::to_cost_type(0),
@@ -381,6 +380,24 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> Node<'a, OT, SS> {
                 best,
                 dataview,
                 queue,
+                interesting_solutions_range,
+                ordering_mode,
+            };
+        }
+
+        let feasible_size_limit = 3;
+        if ub.strictly_less_than(&OT::to_cost_type(feasible_size_limit))
+            && !Self::dataview_feasible(&dataview, feasible_size_limit as usize)
+        {
+            return Node {
+                cost_upper_bound: OT::to_cost_type(999),
+                cost_lower_bound: OT::to_cost_type(999),
+                lowest_descendant_heuristic: f64::MAX,
+                pruner: Pruner::new(dataview.num_features()),
+                one_off_witnesses,
+                best,
+                dataview,
+                queue: BinaryHeapQueue::default(),
                 interesting_solutions_range,
                 ordering_mode,
             };
@@ -511,6 +528,33 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> Node<'a, OT, SS> {
                 .cost_lower_bound
                 .strictly_greater_than(&self.cost_upper_bound)
             || self.queue.is_empty() // When the queue is empty before best == lower, then lower == upper and lower < best.
+    }
+
+    fn dataview_feasible(dataview: &DataView<'a, OT>, k: usize) -> bool {
+        if OT::is_perfect_solution_cost(&dataview.cost_summer.cost()) {
+            return true;
+        }
+
+        if k == 0 || dataview.num_instances() <= 1 {
+            return false;
+        }
+
+        for feature in 0..dataview.num_features() {
+            for split_point in 0..dataview.possible_split_values[feature].len() {
+                let (left, right) = dataview.split(feature, split_point);
+
+                for left_budget in 0..k {
+                    let right_budget = k - 1 - left_budget;
+                    if Self::dataview_feasible(&left, left_budget)
+                        && Self::dataview_feasible(&right, right_budget)
+                    {
+                        return true;
+                    }
+                }
+            }
+        }
+
+        false
     }
 
     // Get the worst cost of the instances with feature value in the range.
