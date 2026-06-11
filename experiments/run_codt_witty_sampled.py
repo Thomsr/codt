@@ -16,6 +16,7 @@ from __future__ import annotations
 import argparse
 import csv
 import json
+import re
 import subprocess
 import time
 from dataclasses import dataclass
@@ -24,8 +25,6 @@ from typing import Any, Dict, Iterable, List, Optional
 
 import numpy as np
 import pandas as pd
-from codt_py import OptimalDecisionTreeClassifier
-from sklearn.metrics import accuracy_score
 
 
 @dataclass(frozen=True)
@@ -33,6 +32,7 @@ class RunConfig:
     sampled_dir: Path
     output_dir: Path
     witty_jar: Path
+    codt_cli_binary: Path
     codt_timeout_seconds: Optional[int]
     witty_timeout_seconds: int
     witty_algorithm_id: int
@@ -56,6 +56,12 @@ def parse_args() -> argparse.Namespace:
         type=Path,
         default=Path("experiments/results/codt-witty-sampled"),
         help="Directory for cached inputs, cached results, and the summary CSV.",
+    )
+    parser.add_argument(
+        "--codt-cli-binary",
+        type=Path,
+        default=Path("target/release/codt-cli"),
+        help="Path to the release-built CODT CLI binary.",
     )
     parser.add_argument(
         "--witty-jar",
@@ -103,6 +109,19 @@ def parse_args() -> argparse.Namespace:
 
 def load_sampled_dataset(path: Path) -> pd.DataFrame:
     return pd.read_csv(path, sep=r"\s+", header=None)
+
+
+def repo_root() -> Path:
+    return Path(__file__).resolve().parents[1]
+
+
+def resolve_codt_cli_binary(binary_path: Path) -> Path:
+    resolved = binary_path if binary_path.is_absolute() else repo_root() / binary_path
+    if not resolved.exists():
+        raise FileNotFoundError(
+            f"CODT release binary not found at {resolved}. Build it first with `cargo build --release -p codt-cli`."
+        )
+    return resolved
 
 
 def list_sampled_datasets(sampled_dir: Path) -> List[Path]:
@@ -165,46 +184,46 @@ def convert_for_witty(source_path: Path, destination_path: Path) -> Dict[str, An
     }
 
 
-def run_codt(dataset_path: Path, timeout_seconds: Optional[int]) -> Dict[str, Any]:
-    frame = load_sampled_dataset(dataset_path)
-    x = frame.iloc[:, 1:].to_numpy()
-    y = frame.iloc[:, 0].to_numpy()
-
-    model = OptimalDecisionTreeClassifier(strategy="and-or", timeout=timeout_seconds, memory_limit=4 * 1024 * 1024 * 1024)
-    started = time.perf_counter()
+def parse_codt_cli_output(output: str) -> Dict[str, Any]:
+    status = "no-perfect-tree"
+    solved = False
+    accuracy: Optional[float] = None
+    tree_size: Optional[int] = None
+    branch_count: Optional[int] = None
+    expansions: Optional[int] = None
+    memory_usage_bytes: Optional[int] = None
+    tree_repr: Optional[str] = None
     error: Optional[str] = None
 
-    try:
-        model.fit(x, y)
-        predictions = model.predict(x)
-        accuracy = float(accuracy_score(y, predictions))
-        status = str(model.status())
-        solved = bool(model.is_perfect())
-        tree_size = int(model.tree_size())
-        branch_count = int(model.branch_count())
-        expansions = int(model.expansions())
-        memory_usage_bytes = int(model.memory_usage_bytes())
-        tree_repr = str(model.tree())
-    except Exception as exc:  # pragma: no cover - the script records failures instead of hiding them
-        status = "error"
-        solved = False
-        accuracy = None
-        tree_size = None
-        branch_count = None
-        expansions = None
-        memory_usage_bytes = None
-        tree_repr = None
-        error = str(exc)
+    if "No perfect tree exists for the given data and constraints." not in output:
+        status = "perfect-tree-found"
+        solved = True
 
-    runtime_seconds = time.perf_counter() - started
+    accuracy_match = re.search(r"Accuracy:\s*([0-9.]+)%", output)
+    if accuracy_match:
+        accuracy = float(accuracy_match.group(1)) / 100.0
+
+    branch_match = re.search(r"Branch nodes:\s*(\d+)", output)
+    if branch_match:
+        branch_count = int(branch_match.group(1))
+        tree_size = 2 * branch_count + 1
+
+    expansion_match = re.search(r"Graph expansions:\s*(\d+)", output)
+    if expansion_match:
+        expansions = int(expansion_match.group(1))
+
+    memory_match = re.search(r"Max memory usage \(MB\):\s*([0-9.]+)", output)
+    if memory_match:
+        memory_usage_bytes = int(float(memory_match.group(1)) * 1024 * 1024)
+
+    tree_match = re.search(r"Tree:\s*(.+)", output)
+    if tree_match:
+        tree_repr = tree_match.group(1).strip()
+
+    if "timeout" in output.lower() and status == "no-perfect-tree":
+        error = "timeout"
 
     return {
-        "solver": "codt",
-        "dataset": dataset_path.name,
-        "dataset_path": str(dataset_path),
-        "n_examples": int(frame.shape[0]),
-        "n_features": int(frame.shape[1] - 1),
-        "runtime_seconds": runtime_seconds,
         "status": status,
         "solved": solved,
         "accuracy": accuracy,
@@ -214,6 +233,67 @@ def run_codt(dataset_path: Path, timeout_seconds: Optional[int]) -> Dict[str, An
         "memory_usage_bytes": memory_usage_bytes,
         "tree": tree_repr,
         "error": error,
+    }
+
+
+def run_codt(dataset_path: Path, timeout_seconds: Optional[int], codt_cli_binary: Path) -> Dict[str, Any]:
+    frame = load_sampled_dataset(dataset_path)
+
+    command = [
+        str(codt_cli_binary),
+        "--file",
+        str(dataset_path),
+        "--strategy",
+        "and-or-dfs-prio",
+        "--lowerbound",
+        "pair",
+        "--lowerbound",
+        "improvement",
+        "--lowerbound",
+        "class-count",
+        "--upperbound",
+        "for-remaining-interval",
+        "--cart-upperbound",
+        "true",
+        "--cart-upper-bound-patience",
+        "5",
+        "--data-reduction",
+        "true",
+        "--memory-limit",
+        str(4 * 1024 * 1024 * 1024),
+    ]
+    if timeout_seconds is not None:
+        command.extend(["--timeout", str(timeout_seconds)])
+
+    started = time.perf_counter()
+    completed = subprocess.run(
+        command,
+        capture_output=True,
+        text=True,
+        timeout=None if timeout_seconds is None else timeout_seconds + 30,
+    )
+    runtime_seconds = time.perf_counter() - started
+
+    output = "\n".join(part for part in (completed.stdout, completed.stderr) if part)
+    parsed = parse_codt_cli_output(output)
+
+    if completed.returncode != 0 and parsed["error"] is None:
+        parsed["status"] = "error"
+        parsed["solved"] = False
+        parsed["error"] = output.strip() or f"codt-cli exited with status {completed.returncode}"
+
+    frame_shape = frame.shape
+
+    return {
+        "solver": "codt",
+        "dataset": dataset_path.name,
+        "dataset_path": str(dataset_path),
+        "n_examples": int(frame_shape[0]),
+        "n_features": int(frame_shape[1] - 1),
+        "runtime_seconds": runtime_seconds,
+        **parsed,
+        "stdout": completed.stdout,
+        "stderr": completed.stderr,
     }
 
 
@@ -315,6 +395,7 @@ def main() -> int:
         sampled_dir=args.sampled_dir,
         output_dir=args.output_dir,
         witty_jar=args.witty_jar,
+        codt_cli_binary=args.codt_cli_binary,
         codt_timeout_seconds=args.codt_timeout_seconds,
         witty_timeout_seconds=args.witty_timeout_seconds,
         witty_algorithm_id=args.witty_algorithm_id,
@@ -322,6 +403,8 @@ def main() -> int:
         witty_upper_bound_time_ms=args.witty_upper_bound_time_ms,
         force=args.force,
     )
+
+    codt_cli_binary = resolve_codt_cli_binary(config.codt_cli_binary)
 
     datasets = list_sampled_datasets(config.sampled_dir)
     witty_input_dir = config.output_dir / "witty-inputs"
@@ -382,7 +465,7 @@ def main() -> int:
                 f"[{run_index}/{total_runs}] dataset={dataset_name} solver=codt running...",
                 flush=True,
             )
-            codt_result = run_codt(dataset_path, config.codt_timeout_seconds)
+            codt_result = run_codt(dataset_path, config.codt_timeout_seconds, codt_cli_binary)
             write_json(codt_cache_path, codt_result)
         else:
             codt_result = read_json(codt_cache_path)

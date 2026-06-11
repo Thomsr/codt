@@ -1,4 +1,4 @@
-accuracy,algorithm_id,dataset,dataset_name,max_memory_mib,max_tree_size_arg,n_examples,n_features,optimal,output_file,problem_id,raw_line,runtime_milliseconds,runtime_seconds,solver,stderr,stdout,subset_ratio,subset_seed,timed_out,timeout_seconds_arg,tree,tree_size,from_cache,source_dataset,dataset_path,status,solved,branch_count,expansions,memory_usage_bytes,error
+accuracy,algorithm_id,dataset,dataset_name,max_memory_mib,max_tree_size_arg,n_examples,n_features,optimal,output_file,problem_id,raw_line,runtime_milliseconds,runtime_seconds,solver,stderr,stdout,subset_ratio,subset_seed,timed_out,timeout_seconds_arg,tree,tree_size,from_cache,source_dataset,branch_count,dataset_path,error,expansions,memory_usage_bytes,solved,status
 1.0,5.0,analcatdata_bankruptcy.csv,analcatdata_bankruptcy.csv,21.0,-1.0,50,5,True,experiments/results/codt-witty-sampled/witty-cache/analcatdata_bankruptcy.txt,0.0,0;5;analcatdata_bankruptcy.csv;50;1.0;0;5;-1;1800;30174;21;false;true;4;1.00;10579;4877;11829;8;21;56;50;13;1;3;5;237;49;0;0;3520;0;0;0;0;3:r:-1:2:-4.9|0:r:-1:3:21.3|0:l:-1:1:-46.5|-1:-1:-1:4:0.698|1:l:true:-1:-1|2:r:false:-1:-1|1:r:false:-1:-1|2:l:true:-1:-1|3:l:true:-1:-1;,30174.0,0.4101130999997622,witty,,"Started problem 0
 Set parameter WLSAccessID
 Set parameter WLSSecret
@@ -8,7 +8,22 @@ Set parameter Threads to value 1
 Trying max size 4
 Finished problem 0
 ",1.0,0.0,False,1800.0,3:r:-1:2:-4.9|0:r:-1:3:21.3|0:l:-1:1:-46.5|-1:-1:-1:4:0.698|1:l:true:-1:-1|2:r:false:-1:-1|1:r:false:-1:-1|2:l:true:-1:-1|3:l:true:-1:-1,4,True,analcatdata_bankruptcy.txt,,,,,,,
-1.0,,analcatdata_bankruptcy.txt,,,,50,5,,,,,,9.004302454006393,codt,,,,,,,"[2, -3.75, [1, -45.7, 1, 0], [3, 21.35, 1, [4, 0.7015, 1, 0]]]",9,False,analcatdata_bankruptcy.txt,data/openml/sampled/analcatdata_bankruptcy.txt,perfect-tree-found,True,4.0,64205.0,636350.0,
+1.0,,analcatdata_bankruptcy.txt,,,,50,5,,,,,,0.03880610000123852,codt,"[2026-06-10T13:18:46Z INFO  codt_cli] Starting solve with options:
+    SolverOptions { lb_strategy: {Pair, ClassCount, Improvement}, ub_strategy: ForRemainingInterval, cart_ub: true, cart_ub_patience: 5, data_reduction: true, track_intermediates: false, timeout: Some(1800s), memory_limit: Some(4294967296) }
+    
+[2026-06-10T13:18:46Z INFO  codt::search::solver_impl] One off witnesses: 0
+[2026-06-10T13:18:46Z INFO  codt::search::solver_impl] Pair lower bound: (primary: 0, secondary: 4)
+[2026-06-10T13:18:46Z INFO  codt_cli] Read time (s): 0.0000379
+[2026-06-10T13:18:46Z INFO  codt_cli] Solve time (s): 0.0352015
+[2026-06-10T13:18:46Z INFO  codt_cli] Max memory usage (MB): 6.41
+[2026-06-10T13:18:46Z INFO  codt_cli] Graph expansions: 562
+[2026-06-10T13:18:46Z INFO  codt_cli] Tree: [4<=0.70:1,[2<=-3.75:[1<=-46.25:1,0],[3<=21.35:1,0]]]
+","Set parameter WLSAccessID
+Set parameter WLSSecret
+Set parameter LicenseID to value 2781812
+Academic license 2781812 - for non-commercial use only - registered to tt___@tudelft.nl
+Misclassifications: 0. Branch nodes: 4. Accuracy: 100%.
+",,,,,"[4<=0.70:1,[2<=-3.75:[1<=-46.25:1,0],[3<=21.35:1,0]]]",9,True,analcatdata_bankruptcy.txt,4.0,data/openml/sampled/analcatdata_bankruptcy.txt,,562.0,6721372.0,True,perfect-tree-found
 1.0,5.0,analcatdata_election2000.csv,analcatdata_election2000.csv,20.0,-1.0,67,14,True,experiments/results/codt-witty-sampled/witty-cache/analcatdata_election2000.txt,1.0,1;5;analcatdata_election2000.csv;67;1.0;0;14;-1;1800;30090;20;false;true;2;1.00;312;19;55;0;0;1;67;5;1;2;14;728;67;0;0;4;0;0;0;0;-1:-1:-1:11:40144.0|0:l:-1:2:305.0|1:l:true:-1:-1|0:r:false:-1:-1|1:r:false:-1:-1;,30090.0,0.3152424999998402,witty,,"Started problem 1
 Set parameter WLSAccessID
 Set parameter WLSSecret
@@ -18,7 +33,22 @@ Set parameter Threads to value 1
 Trying max size 2
 Finished problem 1
 ",1.0,0.0,False,1800.0,-1:-1:-1:11:40144.0|0:l:-1:2:305.0|1:l:true:-1:-1|0:r:false:-1:-1|1:r:false:-1:-1,2,True,analcatdata_election2000.txt,,,,,,,
-1.0,,analcatdata_election2000.txt,,,,67,14,,,,,,0.05584067400195636,codt,,,,,,,"[11, 36600.5, 1, [1, 34383.5, 1, 0]]",5,False,analcatdata_election2000.txt,data/openml/sampled/analcatdata_election2000.txt,perfect-tree-found,True,2.0,13.0,545377.0,
+1.0,,analcatdata_election2000.txt,,,,67,14,,,,,,0.028330299999652198,codt,"[2026-06-10T13:18:46Z INFO  codt_cli] Starting solve with options:
+    SolverOptions { lb_strategy: {Pair, Improvement, ClassCount}, ub_strategy: ForRemainingInterval, cart_ub: true, cart_ub_patience: 5, data_reduction: true, track_intermediates: false, timeout: Some(1800s), memory_limit: Some(4294967296) }
+    
+[2026-06-10T13:18:46Z INFO  codt::search::solver_impl] One off witnesses: 0
+[2026-06-10T13:18:46Z INFO  codt::search::solver_impl] Pair lower bound: (primary: 0, secondary: 2)
+[2026-06-10T13:18:46Z INFO  codt_cli] Read time (s): 0.000083
+[2026-06-10T13:18:46Z INFO  codt_cli] Solve time (s): 0.0251963
+[2026-06-10T13:18:46Z INFO  codt_cli] Max memory usage (MB): 0.81
+[2026-06-10T13:18:46Z INFO  codt_cli] Graph expansions: 31
+[2026-06-10T13:18:46Z INFO  codt_cli] Tree: [11<=40989.50:[2<=308.00:1,0],0]
+","Set parameter WLSAccessID
+Set parameter WLSSecret
+Set parameter LicenseID to value 2781812
+Academic license 2781812 - for non-commercial use only - registered to tt___@tudelft.nl
+Misclassifications: 0. Branch nodes: 2. Accuracy: 100%.
+",,,,,"[11<=40989.50:[2<=308.00:1,0],0]",5,True,analcatdata_election2000.txt,2.0,data/openml/sampled/analcatdata_election2000.txt,,31.0,849346.0,True,perfect-tree-found
 0.0,5.0,appendicitis_test_edsa.csv,appendicitis_test_edsa.csv,185.0,-1.0,100,7,False,experiments/results/codt-witty-sampled/witty-cache/appendicitis_test_edsa.txt,2.0,2;5;appendicitis_test_edsa.csv;100;1.0;0;7;-1;1800;1829999;185;true;false;-1;0.00;72231834;135128115;1815606419;4685;17403729;44693;100;-1;-1;-1;7;501;94;0;0;669399528;0;0;0;0;-1:-1:false:-1:-1;,1829999.0,1800.749581249,witty,,"Started problem 2
 Set parameter WLSAccessID
 Set parameter WLSSecret
@@ -29,7 +59,22 @@ Trying max size 7
 Trying max size 8
 Finished problem 2
 ",1.0,0.0,True,1800.0,-1:-1:false:-1:-1,-1,True,appendicitis_test_edsa.txt,,,,,,,
-1.0,,appendicitis_test_edsa.txt,,,,100,7,,,,,,1800.067778882003,codt,,,,,,,"[6, 0.1475, [5, 0.5874999999999999, [0, 0.2085, 1, 0], [4, 0.0165, 1, 0]], [6, 0.9185, [2, 0.4115, [5, 0.686, [1, 0.393, [1, 0.20500000000000002, 0, 1], 0], [5, 0.757, [6, 0.365, [1, 0.8125, 1, 0], 0], 0]], [2, 0.46950000000000003, [6, 0.432, 0, [2, 0.461, 0, 1]], 0]], 1]]",31,False,appendicitis_test_edsa.txt,data/openml/sampled/appendicitis_test_edsa.txt,perfect-tree-found,True,15.0,8485394.0,2030094.0,
+1.0,,appendicitis_test_edsa.txt,,,,100,7,,,,,,1800.5001809019996,codt,"[2026-06-10T13:18:46Z INFO  codt_cli] Starting solve with options:
+    SolverOptions { lb_strategy: {ClassCount, Improvement, Pair}, ub_strategy: ForRemainingInterval, cart_ub: true, cart_ub_patience: 5, data_reduction: true, track_intermediates: false, timeout: Some(1800s), memory_limit: Some(4294967296) }
+    
+[2026-06-10T13:18:46Z INFO  codt::search::solver_impl] One off witnesses: 0
+[2026-06-10T13:18:46Z INFO  codt::search::solver_impl] Pair lower bound: (primary: 0, secondary: 7)
+[2026-06-10T13:48:46Z INFO  codt_cli] Read time (s): 0.0000638
+[2026-06-10T13:48:46Z INFO  codt_cli] Solve time (s): 1800.323430401
+[2026-06-10T13:48:46Z INFO  codt_cli] Max memory usage (MB): 3074.56
+[2026-06-10T13:48:46Z INFO  codt_cli] Graph expansions: 98489320
+[2026-06-10T13:48:46Z INFO  codt_cli] Tree: [5<=0.73:[4<=0.11:[2<=0.23:1,[1<=0.76:0,1]],[3<=0.26:0,[4<=0.23:[0<=0.04:0,1],0]]],[6<=0.45:[6<=0.36:[5<=0.76:[0<=0.20:0,1],0],[5<=0.74:1,0]],[6<=0.92:0,1]]]
+","Set parameter WLSAccessID
+Set parameter WLSSecret
+Set parameter LicenseID to value 2781812
+Academic license 2781812 - for non-commercial use only - registered to tt___@tudelft.nl
+Misclassifications: 0. Branch nodes: 13. Accuracy: 100%.
+",,,,,"[5<=0.73:[4<=0.11:[2<=0.23:1,[1<=0.76:0,1]],[3<=0.26:0,[4<=0.23:[0<=0.04:0,1],0]]],[6<=0.45:[6<=0.36:[5<=0.76:[0<=0.20:0,1],0],[5<=0.74:1,0]],[6<=0.92:0,1]]]",27,True,appendicitis_test_edsa.txt,13.0,data/openml/sampled/appendicitis_test_edsa.txt,,98489320.0,3223909826.0,True,perfect-tree-found
 0.0,5.0,arcene_seed_0_nrows_2000_nclasses_10_ncols_100_stratify_true.csv,arcene_seed_0_nrows_2000_nclasses_10_ncols_100_stratify_true.csv,411.0,-1.0,100,100,False,experiments/results/codt-witty-sampled/witty-cache/arcene_seed_0_nrows_2000_nclasses_10_ncols_100_stratify_true.txt,3.0,3;5;arcene_seed_0_nrows_2000_nclasses_10_ncols_100_stratify_true.csv;100;1.0;0;100;-1;1800;1830000;411;true;false;-1;0.00;20892791;28710992;868343514;3255;274970;42065;100;-1;-1;-1;88;4774;92;0;0;262932164;0;0;0;0;-1:-1:false:-1:-1;,1830000.0,1800.6601727819998,witty,,"Started problem 3
 Set parameter WLSAccessID
 Set parameter WLSSecret
@@ -41,7 +86,22 @@ Trying max size 4
 Trying max size 5
 Finished problem 3
 ",1.0,0.0,True,1800.0,-1:-1:false:-1:-1,-1,True,arcene_seed_0_nrows_2000_nclasses_10_ncols_100_stratify_true.txt,,,,,,,
-1.0,,arcene_seed_0_nrows_2000_nclasses_10_ncols_100_stratify_true.txt,,,,100,100,,,,,,1802.9279650069948,codt,,,,,,,"[92, 427.0, [44, 74.0, [14, 62.5, [56, 110.0, [0, 150.0, [10, 29.0, 0, [65, 293.0, 0, 1]], [52, 532.5, 1, 0]], [8, 123.5, [37, 665.0, 1, 0], 1]], [23, 166.5, [16, 0.5, 0, 1], [12, 491.5, 0, [14, 153.0, [48, 358.0, 1, 0], 0]]]], 0], 0]",31,False,arcene_seed_0_nrows_2000_nclasses_10_ncols_100_stratify_true.txt,data/openml/sampled/arcene_seed_0_nrows_2000_nclasses_10_ncols_100_stratify_true.txt,perfect-tree-found,True,15.0,946724.0,21864675.0,
+1.0,,arcene_seed_0_nrows_2000_nclasses_10_ncols_100_stratify_true.txt,,,,100,100,,,,,,1800.6918148210007,codt,"[2026-06-10T13:48:47Z INFO  codt_cli] Starting solve with options:
+    SolverOptions { lb_strategy: {Pair, ClassCount, Improvement}, ub_strategy: ForRemainingInterval, cart_ub: true, cart_ub_patience: 5, data_reduction: true, track_intermediates: false, timeout: Some(1800s), memory_limit: Some(4294967296) }
+    
+[2026-06-10T13:48:47Z INFO  codt::search::solver_impl] One off witnesses: 0
+[2026-06-10T13:48:52Z INFO  codt::search::solver_impl] Pair lower bound: (primary: 0, secondary: 3)
+[2026-06-10T14:18:47Z INFO  codt_cli] Read time (s): 0.0007177
+[2026-06-10T14:18:47Z INFO  codt_cli] Solve time (s): 1800.520533019
+[2026-06-10T14:18:47Z INFO  codt_cli] Max memory usage (MB): 3082.78
+[2026-06-10T14:18:47Z INFO  codt_cli] Graph expansions: 13535844
+[2026-06-10T14:18:47Z INFO  codt_cli] Tree: [79<=60.50:[15<=6.00:[23<=211.50:[0<=148.50:[17<=21.50:[84<=49.50:[10<=29.00:0,1],0],1],[12<=132.50:1,0]],[2<=307.50:[86<=426.50:0,[14<=145.50:1,0]],[50<=31.00:[97<=5.00:1,0],0]]],0],1]
+","Set parameter WLSAccessID
+Set parameter WLSSecret
+Set parameter LicenseID to value 2781812
+Academic license 2781812 - for non-commercial use only - registered to tt___@tudelft.nl
+Misclassifications: 0. Branch nodes: 13. Accuracy: 100%.
+",,,,,"[79<=60.50:[15<=6.00:[23<=211.50:[0<=148.50:[17<=21.50:[84<=49.50:[10<=29.00:0,1],0],1],[12<=132.50:1,0]],[2<=307.50:[86<=426.50:0,[14<=145.50:1,0]],[50<=31.00:[97<=5.00:1,0],0]]],0],1]",27,True,arcene_seed_0_nrows_2000_nclasses_10_ncols_100_stratify_true.txt,13.0,data/openml/sampled/arcene_seed_0_nrows_2000_nclasses_10_ncols_100_stratify_true.txt,,13535844.0,3232529121.0,True,perfect-tree-found
 0.0,5.0,arcene_seed_3_nrows_2000_nclasses_10_ncols_100_stratify_true.csv,arcene_seed_3_nrows_2000_nclasses_10_ncols_100_stratify_true.csv,309.0,-1.0,100,100,False,experiments/results/codt-witty-sampled/witty-cache/arcene_seed_3_nrows_2000_nclasses_10_ncols_100_stratify_true.txt,4.0,4;5;arcene_seed_3_nrows_2000_nclasses_10_ncols_100_stratify_true.csv;100;1.0;0;100;-1;1800;1829999;309;true;false;-1;0.00;5517702;23058667;2143008693;1121;49994;13692;100;-1;-1;-1;85;4025;93;0;0;500186161;0;0;0;0;-1:-1:false:-1:-1;,1829999.0,1800.897964795,witty,,"Started problem 4
 Set parameter WLSAccessID
 Set parameter WLSSecret
@@ -53,7 +113,22 @@ Trying max size 4
 Trying max size 5
 Finished problem 4
 ",1.0,0.0,True,1800.0,-1:-1:false:-1:-1,-1,True,arcene_seed_3_nrows_2000_nclasses_10_ncols_100_stratify_true.txt,,,,,,,
-1.0,,arcene_seed_3_nrows_2000_nclasses_10_ncols_100_stratify_true.txt,,,,100,100,,,,,,1801.5418062200042,codt,,,,,,,"[34, 121.5, [53, 74.0, [52, 121.5, [69, 12.5, [41, 13.0, [30, 134.0, 1, [0, 336.0, [38, 5.5, [22, 34.0, [17, 79.0, 0, 1], 1], 1], 0]], [73, 22.0, 0, 1]], [46, 441.0, 1, 0]], 0], 0], [77, 80.0, [0, 430.0, [93, 127.0, 0, 1], [12, 55.0, 0, 1]], [66, 554.5, [84, 14.0, 0, 1], 1]]]",37,False,arcene_seed_3_nrows_2000_nclasses_10_ncols_100_stratify_true.txt,data/openml/sampled/arcene_seed_3_nrows_2000_nclasses_10_ncols_100_stratify_true.txt,perfect-tree-found,True,18.0,1126723.0,19135603.0,
+1.0,,arcene_seed_3_nrows_2000_nclasses_10_ncols_100_stratify_true.txt,,,,100,100,,,,,,1800.4866299000005,codt,"[2026-06-10T14:18:47Z INFO  codt_cli] Starting solve with options:
+    SolverOptions { lb_strategy: {Improvement, ClassCount, Pair}, ub_strategy: ForRemainingInterval, cart_ub: true, cart_ub_patience: 5, data_reduction: true, track_intermediates: false, timeout: Some(1800s), memory_limit: Some(4294967296) }
+    
+[2026-06-10T14:18:47Z INFO  codt::search::solver_impl] One off witnesses: 0
+[2026-06-10T14:18:52Z INFO  codt::search::solver_impl] Pair lower bound: (primary: 0, secondary: 3)
+[2026-06-10T14:48:48Z INFO  codt_cli] Read time (s): 0.000791
+[2026-06-10T14:48:48Z INFO  codt_cli] Solve time (s): 1800.3204886
+[2026-06-10T14:48:48Z INFO  codt_cli] Max memory usage (MB): 3081.91
+[2026-06-10T14:48:48Z INFO  codt_cli] Graph expansions: 15896956
+[2026-06-10T14:48:48Z INFO  codt_cli] Tree: [13<=84.00:[41<=21.50:[66<=402.00:[66<=151.50:[39<=32.50:0,[60<=49.50:0,1]],[87<=8.50:[90<=398.50:0,1],1]],[34<=160.50:[71<=27.50:[90<=189.00:0,1],0],[59<=28.00:0,[6<=10.00:1,0]]]],0],1]
+","Set parameter WLSAccessID
+Set parameter WLSSecret
+Set parameter LicenseID to value 2781812
+Academic license 2781812 - for non-commercial use only - registered to tt___@tudelft.nl
+Misclassifications: 0. Branch nodes: 13. Accuracy: 100%.
+",,,,,"[13<=84.00:[41<=21.50:[66<=402.00:[66<=151.50:[39<=32.50:0,[60<=49.50:0,1]],[87<=8.50:[90<=398.50:0,1],1]],[34<=160.50:[71<=27.50:[90<=189.00:0,1],0],[59<=28.00:0,[6<=10.00:1,0]]]],0],1]",27,True,arcene_seed_3_nrows_2000_nclasses_10_ncols_100_stratify_true.txt,13.0,data/openml/sampled/arcene_seed_3_nrows_2000_nclasses_10_ncols_100_stratify_true.txt,,15896956.0,3231616860.0,True,perfect-tree-found
 1.0,5.0,autoprice.csv,autoprice.csv,16.0,-1.0,100,15,True,experiments/results/codt-witty-sampled/witty-cache/autoprice.txt,5.0,5;5;autoprice.csv;100;1.0;0;15;-1;1800;30131;16;false;true;3;1.00;306;123;131;0;0;1;100;9;1;3;15;443;84;0;0;15;0;0;0;0;-1:-1:-1:4:64.6|0:r:-1:6:2425.0|1:l:-1:1:161.0|0:l:true:-1:-1|1:r:false:-1:-1|2:l:true:-1:-1|2:r:false:-1:-1;,30131.0,0.5365925950000019,witty,,"Started problem 5
 Set parameter WLSAccessID
 Set parameter WLSSecret
@@ -63,7 +138,22 @@ Set parameter Threads to value 1
 Trying max size 3
 Finished problem 5
 ",1.0,0.0,False,1800.0,-1:-1:-1:4:64.6|0:r:-1:6:2425.0|1:l:-1:1:161.0|0:l:true:-1:-1|1:r:false:-1:-1|2:l:true:-1:-1|2:r:false:-1:-1,3,True,autoprice.txt,,,,,,,
-1.0,,autoprice.txt,,,,100,15,,,,,,0.086856538997381,codt,,,,,,,"[14, 29.5, 0, [2, 95.5, 1, [1, 153.5, 1, 0]]]",7,False,autoprice.txt,data/openml/sampled/autoprice.txt,perfect-tree-found,True,3.0,12.0,976195.0,
+1.0,,autoprice.txt,,,,100,15,,,,,,0.2647862999983772,codt,"[2026-06-10T14:48:48Z INFO  codt_cli] Starting solve with options:
+    SolverOptions { lb_strategy: {ClassCount, Pair, Improvement}, ub_strategy: ForRemainingInterval, cart_ub: true, cart_ub_patience: 5, data_reduction: true, track_intermediates: false, timeout: Some(1800s), memory_limit: Some(4294967296) }
+    
+[2026-06-10T14:48:48Z INFO  codt::search::solver_impl] One off witnesses: 0
+[2026-06-10T14:48:48Z INFO  codt::search::solver_impl] Pair lower bound: (primary: 0, secondary: 3)
+[2026-06-10T14:48:48Z INFO  codt_cli] Read time (s): 0.0001144
+[2026-06-10T14:48:48Z INFO  codt_cli] Solve time (s): 0.261218
+[2026-06-10T14:48:48Z INFO  codt_cli] Max memory usage (MB): 3.70
+[2026-06-10T14:48:48Z INFO  codt_cli] Graph expansions: 72
+[2026-06-10T14:48:48Z INFO  codt_cli] Tree: [14<=29.50:0,[2<=98.95:1,[0<=-0.50:1,0]]]
+","Set parameter WLSAccessID
+Set parameter WLSSecret
+Set parameter LicenseID to value 2781812
+Academic license 2781812 - for non-commercial use only - registered to tt___@tudelft.nl
+Misclassifications: 0. Branch nodes: 3. Accuracy: 100%.
+",,,,,"[14<=29.50:0,[2<=98.95:1,[0<=-0.50:1,0]]]",7,True,autoprice.txt,3.0,data/openml/sampled/autoprice.txt,,72.0,3879731.0,True,perfect-tree-found
 1.0,5.0,breast-w.csv,breast-w.csv,26.0,-1.0,100,9,True,experiments/results/codt-witty-sampled/witty-cache/breast-w.txt,6.0,6;5;breast-w.csv;100;1.0;0;9;-1;1800;30188;26;false;true;5;1.00;6204;3398;4947;26;367;323;100;18;1;4;9;75;10;0;0;4195;0;0;0;0;-1:-1:-1:0:6.0|0:l:-1:3:2.0|1:l:-1:4:4.0|1:r:-1:7:2.0|3:l:-1:1:5.0|0:r:true:-1:-1|2:l:false:-1:-1|3:r:true:-1:-1|2:r:true:-1:-1|4:l:false:-1:-1|4:r:true:-1:-1;,30188.0,0.36480829599986464,witty,,"Started problem 6
 Set parameter WLSAccessID
 Set parameter WLSSecret
@@ -74,7 +164,22 @@ Trying max size 4
 Trying max size 5
 Finished problem 6
 ",1.0,0.0,False,1800.0,-1:-1:-1:0:6.0|0:l:-1:3:2.0|1:l:-1:4:4.0|1:r:-1:7:2.0|3:l:-1:1:5.0|0:r:true:-1:-1|2:l:false:-1:-1|3:r:true:-1:-1|2:r:true:-1:-1|4:l:false:-1:-1|4:r:true:-1:-1,5,True,breast-w.txt,,,,,,,
-1.0,,breast-w.txt,,,,100,9,,,,,,1800.0069400310022,codt,,,,,,,"[1, 3.5, [7, 2.5, [4, 3.5, 0, 1], 1], [6, 3.5, [0, 6.5, [3, 5.5, 0, 1], 1], 1]]",13,False,breast-w.txt,data/openml/sampled/breast-w.txt,perfect-tree-found,True,6.0,10264572.0,1156741.0,
+1.0,,breast-w.txt,,,,100,9,,,,,,1.2964235990002635,codt,"[2026-06-10T14:48:48Z INFO  codt_cli] Starting solve with options:
+    SolverOptions { lb_strategy: {Improvement, ClassCount, Pair}, ub_strategy: ForRemainingInterval, cart_ub: true, cart_ub_patience: 5, data_reduction: true, track_intermediates: false, timeout: Some(1800s), memory_limit: Some(4294967296) }
+    
+[2026-06-10T14:48:48Z INFO  codt::search::solver_impl] One off witnesses: 0
+[2026-06-10T14:48:48Z INFO  codt::search::solver_impl] Pair lower bound: (primary: 0, secondary: 4)
+[2026-06-10T14:48:49Z INFO  codt_cli] Read time (s): 0.0000655
+[2026-06-10T14:48:49Z INFO  codt_cli] Solve time (s): 1.2407422989999999
+[2026-06-10T14:48:49Z INFO  codt_cli] Max memory usage (MB): 1000.28
+[2026-06-10T14:48:49Z INFO  codt_cli] Graph expansions: 20429
+[2026-06-10T14:48:49Z INFO  codt_cli] Tree: [4<=7.50:[0<=6.50:[3<=1.50:[4<=3.50:0,1],[7<=2.50:0,1]],1],1]
+","Set parameter WLSAccessID
+Set parameter WLSSecret
+Set parameter LicenseID to value 2781812
+Academic license 2781812 - for non-commercial use only - registered to tt___@tudelft.nl
+Misclassifications: 0. Branch nodes: 5. Accuracy: 100%.
+",,,,,"[4<=7.50:[0<=6.50:[3<=1.50:[4<=3.50:0,1],[7<=2.50:0,1]],1],1]",11,True,breast-w.txt,5.0,data/openml/sampled/breast-w.txt,,20429.0,1048869601.0,True,perfect-tree-found
 1.0,5.0,chatfield_4.csv,chatfield_4.csv,377.0,-1.0,100,12,True,experiments/results/codt-witty-sampled/witty-cache/chatfield_4.txt,7.0,7;5;chatfield_4.csv;100;1.0;0;12;-1;1800;722311;377;false;true;6;1.00;58901659;66442677;585727839;2786;4465988;23152;100;25;1;5;12;1086;100;0;0;151360167;0;0;0;0;2:r:-1:1:72.7|3:r:-1:6:88.0|-1:-1:-1:10:32.6|0:l:-1:2:46.2|1:l:-1:11:51.0|3:l:-1:6:30.0|1:r:true:-1:-1|0:r:false:-1:-1|4:r:false:-1:-1|2:l:true:-1:-1|5:r:false:-1:-1|4:l:true:-1:-1|5:l:true:-1:-1;,722311.0,692.5625804930005,witty,,"Started problem 7
 Set parameter WLSAccessID
 Set parameter WLSSecret
@@ -85,7 +190,22 @@ Trying max size 5
 Trying max size 6
 Finished problem 7
 ",1.0,0.0,False,1800.0,2:r:-1:1:72.7|3:r:-1:6:88.0|-1:-1:-1:10:32.6|0:l:-1:2:46.2|1:l:-1:11:51.0|3:l:-1:6:30.0|1:r:true:-1:-1|0:r:false:-1:-1|4:r:false:-1:-1|2:l:true:-1:-1|5:r:false:-1:-1|4:l:true:-1:-1|5:l:true:-1:-1,6,True,chatfield_4.txt,,,,,,,
-1.0,,chatfield_4.txt,,,,100,12,,,,,,1800.0485249780031,codt,,,,,,,"[9, 50.45, [10, 33.05, 1, [2, 43.8, [3, 22.049999999999997, 1, 0], 1]], [10, 39.6, 1, [0, 1769.5, [2, 80.35, 0, 1], 0]]]",15,False,chatfield_4.txt,data/openml/sampled/chatfield_4.txt,perfect-tree-found,True,7.0,5551532.0,3518839.0,
+1.0,,chatfield_4.txt,,,,100,12,,,,,,1800.4937526070007,codt,"[2026-06-10T14:48:49Z INFO  codt_cli] Starting solve with options:
+    SolverOptions { lb_strategy: {Pair, ClassCount, Improvement}, ub_strategy: ForRemainingInterval, cart_ub: true, cart_ub_patience: 5, data_reduction: true, track_intermediates: false, timeout: Some(1800s), memory_limit: Some(4294967296) }
+    
+[2026-06-10T14:48:49Z INFO  codt::search::solver_impl] One off witnesses: 0
+[2026-06-10T14:48:50Z INFO  codt::search::solver_impl] Pair lower bound: (primary: 0, secondary: 5)
+[2026-06-10T15:18:50Z INFO  codt_cli] Read time (s): 0.0001087
+[2026-06-10T15:18:50Z INFO  codt_cli] Solve time (s): 1800.315972907
+[2026-06-10T15:18:50Z INFO  codt_cli] Max memory usage (MB): 3077.33
+[2026-06-10T15:18:50Z INFO  codt_cli] Graph expansions: 75459823
+[2026-06-10T15:18:50Z INFO  codt_cli] Tree: [3<=47.85:[11<=39.65:[11<=36.10:1,0],[4<=31.30:1,0]],[5<=87.05:[11<=49.60:1,0],[3<=82.65:1,0]]]
+","Set parameter WLSAccessID
+Set parameter WLSSecret
+Set parameter LicenseID to value 2781812
+Academic license 2781812 - for non-commercial use only - registered to tt___@tudelft.nl
+Misclassifications: 0. Branch nodes: 7. Accuracy: 100%.
+",,,,,"[3<=47.85:[11<=39.65:[11<=36.10:1,0],[4<=31.30:1,0]],[5<=87.05:[11<=49.60:1,0],[3<=82.65:1,0]]]",15,True,chatfield_4.txt,7.0,data/openml/sampled/chatfield_4.txt,,75459823.0,3226814382.0,True,perfect-tree-found
 1.0,5.0,chscase_adopt.csv,chscase_adopt.csv,125.0,-1.0,39,2,True,experiments/results/codt-witty-sampled/witty-cache/chscase_adopt.txt,8.0,8;5;chscase_adopt.csv;39;1.0;0;2;-1;1800;30197;125;false;true;8;1.00;6104;1296;8314;0;0;1;39;44;1;8;2;67;35;0;0;6176;0;0;0;0;-1:-1:-1:0:6.0|0:r:-1:1:5.0|1:r:-1:0:15.0|2:r:-1:0:17.0|3:r:-1:0:51.0|4:r:-1:0:52.0|5:r:-1:0:164.0|6:l:-1:1:178.0|0:l:true:-1:-1|1:l:false:-1:-1|2:l:true:-1:-1|3:l:false:-1:-1|4:l:true:-1:-1|5:l:false:-1:-1|7:l:true:-1:-1|6:r:false:-1:-1|7:r:false:-1:-1;,30197.0,0.3769060000004174,witty,,"Started problem 8
 Set parameter WLSAccessID
 Set parameter WLSSecret
@@ -95,7 +215,22 @@ Set parameter Threads to value 1
 Trying max size 8
 Finished problem 8
 ",1.0,0.0,False,1800.0,-1:-1:-1:0:6.0|0:r:-1:1:5.0|1:r:-1:0:15.0|2:r:-1:0:17.0|3:r:-1:0:51.0|4:r:-1:0:52.0|5:r:-1:0:164.0|6:l:-1:1:178.0|0:l:true:-1:-1|1:l:false:-1:-1|2:l:true:-1:-1|3:l:false:-1:-1|4:l:true:-1:-1|5:l:false:-1:-1|7:l:true:-1:-1|6:r:false:-1:-1|7:r:false:-1:-1,8,True,chscase_adopt.txt,,,,,,,
-1.0,,chscase_adopt.txt,,,,39,2,,,,,,0.019494426989695057,codt,,,,,,,"[0, 51.5, [1, 5.5, [0, 8.0, 1, 0], [0, 19.0, [0, 16.0, 1, 0], 1]], [1, 211.0, [0, 53.0, 0, [0, 186.5, 1, 0]], 0]]",17,False,chscase_adopt.txt,data/openml/sampled/chscase_adopt.txt,perfect-tree-found,True,8.0,211.0,161819.0,
+1.0,,chscase_adopt.txt,,,,39,2,,,,,,0.7035993980025523,codt,"[2026-06-10T15:18:50Z INFO  codt_cli] Starting solve with options:
+    SolverOptions { lb_strategy: {ClassCount, Pair, Improvement}, ub_strategy: ForRemainingInterval, cart_ub: true, cart_ub_patience: 5, data_reduction: true, track_intermediates: false, timeout: Some(1800s), memory_limit: Some(4294967296) }
+    
+[2026-06-10T15:18:50Z INFO  codt::search::solver_impl] One off witnesses: 0
+[2026-06-10T15:18:50Z INFO  codt::search::solver_impl] Pair lower bound: (primary: 0, secondary: 8)
+[2026-06-10T15:18:51Z INFO  codt_cli] Read time (s): 0.0000256
+[2026-06-10T15:18:51Z INFO  codt_cli] Solve time (s): 0.681757498
+[2026-06-10T15:18:51Z INFO  codt_cli] Max memory usage (MB): 294.05
+[2026-06-10T15:18:51Z INFO  codt_cli] Graph expansions: 22951
+[2026-06-10T15:18:51Z INFO  codt_cli] Tree: [0<=8.00:1,[1<=5.50:0,[1<=211.00:[0<=16.00:1,[0<=19.00:0,[0<=53.00:[0<=51.50:1,0],[0<=186.50:1,0]]]],0]]]
+","Set parameter WLSAccessID
+Set parameter WLSSecret
+Set parameter LicenseID to value 2781812
+Academic license 2781812 - for non-commercial use only - registered to tt___@tudelft.nl
+Misclassifications: 0. Branch nodes: 8. Accuracy: 100%.
+",,,,,"[0<=8.00:1,[1<=5.50:0,[1<=211.00:[0<=16.00:1,[0<=19.00:0,[0<=53.00:[0<=51.50:1,0],[0<=186.50:1,0]]]],0]]]",17,True,chscase_adopt.txt,8.0,data/openml/sampled/chscase_adopt.txt,,22951.0,308333772.0,True,perfect-tree-found
 0.0,5.0,chscase_census3.csv,chscase_census3.csv,317.0,-1.0,100,7,False,experiments/results/codt-witty-sampled/witty-cache/chscase_census3.txt,9.0,9;5;chscase_census3.csv;100;1.0;0;7;-1;1800;1830000;317;true;false;-1;0.00;17708954;292607738;419953951;3899;1999028;38708;100;-1;-1;-1;7;678;100;0;0;791824171;0;0;0;0;-1:-1:false:-1:-1;,1830000.0,1800.2044225179989,witty,,"Started problem 9
 Set parameter WLSAccessID
 Set parameter WLSSecret
@@ -106,7 +241,22 @@ Trying max size 6
 Trying max size 7
 Finished problem 9
 ",1.0,0.0,True,1800.0,-1:-1:false:-1:-1,-1,True,chscase_census3.txt,,,,,,,
-1.0,,chscase_census3.txt,,,,100,7,,,,,,1800.0514945920004,codt,,,,,,,"[3, 4.156750000000001, [2, 4.15555, [2, 4.114000000000001, 0, 1], [2, 4.3057, 0, [2, 4.3067, 1, 0]]], [0, 3.88895, 0, [3, 4.2165, [1, 4.2139500000000005, [6, 4.1998999999999995, 0, [4, 4.210100000000001, 1, [5, 4.22535, 1, [5, 4.25725, 0, 1]]]], 1], [2, 4.31005, [0, 4.22375, [1, 4.2071000000000005, [4, 4.2202, 0, 1], 1], [4, 4.2057, 0, [2, 4.2592, [4, 4.2503, [2, 4.1762, 1, 0], [3, 4.2661, 0, [6, 4.24655, [4, 4.2951, 0, 1], 1]]], 1]]], [4, 4.311999999999999, [5, 4.31745, 0, 1], 1]]]]]",51,False,chscase_census3.txt,data/openml/sampled/chscase_census3.txt,perfect-tree-found,True,25.0,7710652.0,2982955.0,
+1.0,,chscase_census3.txt,,,,100,7,,,,,,1800.3996963190002,codt,"[2026-06-10T15:18:51Z INFO  codt_cli] Starting solve with options:
+    SolverOptions { lb_strategy: {ClassCount, Pair, Improvement}, ub_strategy: ForRemainingInterval, cart_ub: true, cart_ub_patience: 5, data_reduction: true, track_intermediates: false, timeout: Some(1800s), memory_limit: Some(4294967296) }
+    
+[2026-06-10T15:18:51Z INFO  codt::search::solver_impl] One off witnesses: 0
+[2026-06-10T15:18:51Z INFO  codt::search::solver_impl] Pair lower bound: (primary: 0, secondary: 6)
+[2026-06-10T15:48:51Z INFO  codt_cli] Read time (s): 0.0000784
+[2026-06-10T15:48:51Z INFO  codt_cli] Solve time (s): 1800.220912118
+[2026-06-10T15:48:51Z INFO  codt_cli] Max memory usage (MB): 3074.29
+[2026-06-10T15:48:51Z INFO  codt_cli] Graph expansions: 94657905
+[2026-06-10T15:48:51Z INFO  codt_cli] Tree: [3<=4.24:[3<=4.18:[0<=4.45:[4<=4.25:[0<=4.17:0,1],[4<=4.26:0,1]],0],[1<=4.20:[5<=4.23:0,1],[0<=4.38:[4<=4.21:0,1],1]]],[5<=4.24:[1<=4.36:[5<=4.21:0,[2<=4.18:1,[6<=4.26:0,1]]],1],[3<=4.33:[0<=4.39:[5<=4.27:1,0],0],[0<=4.28:0,1]]]]
+","Set parameter WLSAccessID
+Set parameter WLSSecret
+Set parameter LicenseID to value 2781812
+Academic license 2781812 - for non-commercial use only - registered to tt___@tudelft.nl
+Misclassifications: 0. Branch nodes: 19. Accuracy: 100%.
+",,,,,"[3<=4.24:[3<=4.18:[0<=4.45:[4<=4.25:[0<=4.17:0,1],[4<=4.26:0,1]],0],[1<=4.20:[5<=4.23:0,1],[0<=4.38:[4<=4.21:0,1],1]]],[5<=4.24:[1<=4.36:[5<=4.21:0,[2<=4.18:1,[6<=4.26:0,1]]],1],[3<=4.33:[0<=4.39:[5<=4.27:1,0],0],[0<=4.28:0,1]]]]",39,True,chscase_census3.txt,19.0,data/openml/sampled/chscase_census3.txt,,94657905.0,3223626711.0,True,perfect-tree-found
 0.0,5.0,chscase_census5.csv,chscase_census5.csv,301.0,-1.0,100,7,False,experiments/results/codt-witty-sampled/witty-cache/chscase_census5.txt,10.0,10;5;chscase_census5.csv;100;1.0;0;7;-1;1800;1830000;301;true;false;-1;0.00;8147213;277480030;133219139;2277;691390;24154;100;-1;-1;-1;7;674;100;0;0;792405002;0;0;0;0;-1:-1:false:-1:-1;,1830000.0,1800.2221661029998,witty,,"Started problem 10
 Set parameter WLSAccessID
 Set parameter WLSSecret
@@ -118,7 +268,22 @@ Trying max size 6
 Trying max size 7
 Finished problem 10
 ",1.0,0.0,True,1800.0,-1:-1:false:-1:-1,-1,True,chscase_census5.txt,,,,,,,
-1.0,,chscase_census5.txt,,,,100,7,,,,,,1800.0520456849918,codt,,,,,,,"[5, 4.24345, [0, 4.6259999999999994, [1, 4.14555, [1, 4.0386, [2, 4.18095, [3, 4.1674, 1, 0], 1], 0], [6, 4.20195, [4, 4.24525, 1, [4, 4.2816, 0, 1]], [4, 4.1922, [2, 4.2209, [2, 4.0953, 1, 0], 1], [6, 4.2346, [3, 4.1531, [6, 4.2194, 1, 0], 0], [1, 4.26845, 1, [3, 4.1602, 0, [1, 4.37415, [1, 4.3131, 1, 0], 1]]]]]]], 0], [1, 4.324949999999999, [5, 4.25215, 0, [0, 4.255, [1, 4.06355, 0, [3, 4.0261, 0, 1]], [5, 4.25455, 1, 0]]], [3, 4.306, 0, 1]]]",53,False,chscase_census5.txt,data/openml/sampled/chscase_census5.txt,perfect-tree-found,True,26.0,7372297.0,3024783.0,
+1.0,,chscase_census5.txt,,,,100,7,,,,,,1800.3979701610006,codt,"[2026-06-10T15:48:51Z INFO  codt_cli] Starting solve with options:
+    SolverOptions { lb_strategy: {Improvement, Pair, ClassCount}, ub_strategy: ForRemainingInterval, cart_ub: true, cart_ub_patience: 5, data_reduction: true, track_intermediates: false, timeout: Some(1800s), memory_limit: Some(4294967296) }
+    
+[2026-06-10T15:48:51Z INFO  codt::search::solver_impl] One off witnesses: 0
+[2026-06-10T15:48:52Z INFO  codt::search::solver_impl] Pair lower bound: (primary: 0, secondary: 5)
+[2026-06-10T16:18:51Z INFO  codt_cli] Read time (s): 0.0000675
+[2026-06-10T16:18:51Z INFO  codt_cli] Solve time (s): 1800.22026016
+[2026-06-10T16:18:51Z INFO  codt_cli] Max memory usage (MB): 3074.35
+[2026-06-10T16:18:51Z INFO  codt_cli] Graph expansions: 90855713
+[2026-06-10T16:18:51Z INFO  codt_cli] Tree: [0<=4.23:[1<=4.26:[4<=4.27:[0<=4.07:[2<=4.21:0,1],[5<=4.21:0,1]],0],[4<=4.21:[3<=4.14:0,[1<=4.47:1,0]],[1<=4.40:0,1]]],[2<=4.26:[1<=4.36:[1<=4.20:[5<=4.16:1,0],[1<=4.32:1,0]],[6<=4.25:0,1]],[1<=4.42:[0<=4.24:0,[5<=4.27:1,0]],0]]]
+","Set parameter WLSAccessID
+Set parameter WLSSecret
+Set parameter LicenseID to value 2781812
+Academic license 2781812 - for non-commercial use only - registered to tt___@tudelft.nl
+Misclassifications: 0. Branch nodes: 19. Accuracy: 100%.
+",,,,,"[0<=4.23:[1<=4.26:[4<=4.27:[0<=4.07:[2<=4.21:0,1],[5<=4.21:0,1]],0],[4<=4.21:[3<=4.14:0,[1<=4.47:1,0]],[1<=4.40:0,1]]],[2<=4.26:[1<=4.36:[1<=4.20:[5<=4.16:1,0],[1<=4.32:1,0]],[6<=4.25:0,1]],[1<=4.42:[0<=4.24:0,[5<=4.27:1,0]],0]]]",39,True,chscase_census5.txt,19.0,data/openml/sampled/chscase_census5.txt,,90855713.0,3223689625.0,True,perfect-tree-found
 0.0,5.0,chscase_census6.csv,chscase_census6.csv,222.0,-1.0,100,6,False,experiments/results/codt-witty-sampled/witty-cache/chscase_census6.txt,11.0,11;5;chscase_census6.csv;100;1.0;0;6;-1;1800;1830000;222;true;false;-1;0.00;9635727;338998825;-216854298;1885;1045019;20643;100;-1;-1;-1;6;593;100;0;0;755583550;0;0;0;0;-1:-1:false:-1:-1;,1830000.0,1800.4109027129998,witty,,"Started problem 11
 Set parameter WLSAccessID
 Set parameter WLSSecret
@@ -130,7 +295,22 @@ Trying max size 7
 Trying max size 8
 Finished problem 11
 ",1.0,0.0,True,1800.0,-1:-1:false:-1:-1,-1,True,chscase_census6.txt,,,,,,,
-1.0,,chscase_census6.txt,,,,100,6,,,,,,1800.0694875699992,codt,,,,,,,"[1, 13.51025, [2, 5.9899000000000004, [1, 12.1796, 1, 0], [2, 6.6164000000000005, 0, [1, 9.19265, [0, 9.2974, [5, 10.0614, [5, 8.3175, 1, [3, 8.80385, [4, 8.157, 1, 0], 0]], [1, 2.9388500000000004, 0, [3, 10.31945, [4, 8.9727, 0, [1, 5.3148, [2, 7.8354, 1, 0], [0, 7.425000000000001, 1, 0]]], 1]]], 1], [1, 9.650749999999999, 0, [2, 7.5968, 0, [1, 11.06465, [2, 14.57205, [3, 11.89125, 1, 0], 0], [1, 12.492799999999999, 0, 1]]]]]]], [2, 6.5015, 0, [0, 25.142249999999997, 1, [4, 11.21475, 0, 1]]]]",51,False,chscase_census6.txt,data/openml/sampled/chscase_census6.txt,perfect-tree-found,True,25.0,8592509.0,2399843.0,
+1.0,,chscase_census6.txt,,,,100,6,,,,,,1800.4034696939998,codt,"[2026-06-10T16:18:51Z INFO  codt_cli] Starting solve with options:
+    SolverOptions { lb_strategy: {Pair, ClassCount, Improvement}, ub_strategy: ForRemainingInterval, cart_ub: true, cart_ub_patience: 5, data_reduction: true, track_intermediates: false, timeout: Some(1800s), memory_limit: Some(4294967296) }
+    
+[2026-06-10T16:18:51Z INFO  codt::search::solver_impl] One off witnesses: 0
+[2026-06-10T16:18:52Z INFO  codt::search::solver_impl] Pair lower bound: (primary: 0, secondary: 6)
+[2026-06-10T16:48:52Z INFO  codt_cli] Read time (s): 0.0000611
+[2026-06-10T16:48:52Z INFO  codt_cli] Solve time (s): 1800.226644694
+[2026-06-10T16:48:52Z INFO  codt_cli] Max memory usage (MB): 3074.04
+[2026-06-10T16:48:52Z INFO  codt_cli] Graph expansions: 97787266
+[2026-06-10T16:48:52Z INFO  codt_cli] Tree: [4<=10.45:[0<=6.87:[4<=9.19:[0<=3.26:[4<=8.37:1,0],[0<=5.55:1,0]],[3<=9.03:0,1]],[2<=9.34:[1<=7.10:0,1],[3<=9.22:0,1]]],[1<=8.10:[3<=8.95:[2<=8.88:1,0],[5<=9.61:0,1]],[3<=9.06:[3<=8.50:0,1],[4<=13.34:[3<=9.48:0,[0<=7.26:1,0]],1]]]]
+","Set parameter WLSAccessID
+Set parameter WLSSecret
+Set parameter LicenseID to value 2781812
+Academic license 2781812 - for non-commercial use only - registered to tt___@tudelft.nl
+Misclassifications: 0. Branch nodes: 19. Accuracy: 100%.
+",,,,,"[4<=10.45:[0<=6.87:[4<=9.19:[0<=3.26:[4<=8.37:1,0],[0<=5.55:1,0]],[3<=9.03:0,1]],[2<=9.34:[1<=7.10:0,1],[3<=9.22:0,1]]],[1<=8.10:[3<=8.95:[2<=8.88:1,0],[5<=9.61:0,1]],[3<=9.06:[3<=8.50:0,1],[4<=13.34:[3<=9.48:0,[0<=7.26:1,0]],1]]]]",39,True,chscase_census6.txt,19.0,data/openml/sampled/chscase_census6.txt,,97787266.0,3223364567.0,True,perfect-tree-found
 1.0,5.0,chscase_vine1.csv,chscase_vine1.csv,139.0,-1.0,52,9,True,experiments/results/codt-witty-sampled/witty-cache/chscase_vine1.txt,12.0,12;5;chscase_vine1.csv;52;1.0;0;9;-1;1800;30690;139;false;true;5;1.00;86497;34362;67608;35;1656;253;52;19;1;4;9;185;52;0;0;29996;0;0;0;0;-1:-1:-1:0:3.0|0:r:-1:0:26.0|1:r:-1:6:10.0|2:r:-1:5:9.0|2:l:-1:5:18.0|0:l:true:-1:-1|1:l:false:-1:-1|4:l:true:-1:-1|3:l:false:-1:-1|3:r:true:-1:-1|4:r:false:-1:-1;,30690.0,1.0813257990012062,witty,,"Started problem 12
 Set parameter WLSAccessID
 Set parameter WLSSecret
@@ -141,7 +321,22 @@ Trying max size 4
 Trying max size 5
 Finished problem 12
 ",1.0,0.0,False,1800.0,-1:-1:-1:0:3.0|0:r:-1:0:26.0|1:r:-1:6:10.0|2:r:-1:5:9.0|2:l:-1:5:18.0|0:l:true:-1:-1|1:l:false:-1:-1|4:l:true:-1:-1|3:l:false:-1:-1|3:r:true:-1:-1|4:r:false:-1:-1,5,True,chscase_vine1.txt,,,,,,,
-1.0,,chscase_vine1.txt,,,,52,9,,,,,,1800.0150888920034,codt,,,,,,,"[0, 24.5, [0, 3.5, 1, 0], [5, 8.25, [6, 10.5, 1, 0], [2, 13.5, 1, 0]]]",11,False,chscase_vine1.txt,data/openml/sampled/chscase_vine1.txt,perfect-tree-found,True,5.0,9942388.0,1190087.0,
+1.0,,chscase_vine1.txt,,,,52,9,,,,,,0.6283884000004036,codt,"[2026-06-10T16:48:52Z INFO  codt_cli] Starting solve with options:
+    SolverOptions { lb_strategy: {Pair, Improvement, ClassCount}, ub_strategy: ForRemainingInterval, cart_ub: true, cart_ub_patience: 5, data_reduction: true, track_intermediates: false, timeout: Some(1800s), memory_limit: Some(4294967296) }
+    
+[2026-06-10T16:48:52Z INFO  codt::search::solver_impl] One off witnesses: 0
+[2026-06-10T16:48:52Z INFO  codt::search::solver_impl] Pair lower bound: (primary: 0, secondary: 4)
+[2026-06-10T16:48:52Z INFO  codt_cli] Read time (s): 0.0000765
+[2026-06-10T16:48:52Z INFO  codt_cli] Solve time (s): 0.6076838
+[2026-06-10T16:48:52Z INFO  codt_cli] Max memory usage (MB): 304.61
+[2026-06-10T16:48:52Z INFO  codt_cli] Graph expansions: 4730
+[2026-06-10T16:48:52Z INFO  codt_cli] Tree: [0<=3.50:1,[0<=26.50:0,[6<=10.50:[5<=19.00:1,0],[5<=8.75:0,1]]]]
+","Set parameter WLSAccessID
+Set parameter WLSSecret
+Set parameter LicenseID to value 2781812
+Academic license 2781812 - for non-commercial use only - registered to tt___@tudelft.nl
+Misclassifications: 0. Branch nodes: 5. Accuracy: 100%.
+",,,,,"[0<=3.50:1,[0<=26.50:0,[6<=10.50:[5<=19.00:1,0],[5<=8.75:0,1]]]]",11,True,chscase_vine1.txt,5.0,data/openml/sampled/chscase_vine1.txt,,4730.0,319406735.0,True,perfect-tree-found
 1.0,5.0,chscase_vine2.csv,chscase_vine2.csv,316.0,-1.0,100,2,True,experiments/results/codt-witty-sampled/witty-cache/chscase_vine2.txt,13.0,13;5;chscase_vine2.csv;100;1.0;0;2;-1;1800;100792;316;false;true;24;1.00;453023;42627;1417601;6;239638;86;100;219;1;17;2;52;52;0;0;4459265;0;0;0;0;-1:-1:-1:1:1.0|0:r:-1:0:1983.0|1:r:-1:1:2.0|2:r:-1:1:4.0|1:l:-1:1:10.0|3:r:-1:1:5.0|5:r:-1:1:11.0|4:r:-1:1:14.0|7:r:-1:1:16.0|8:r:-1:1:17.0|6:r:-1:1:12.0|10:r:-1:1:13.0|11:r:-1:1:15.0|9:r:-1:1:19.0|13:r:-1:1:21.0|12:r:-1:1:18.0|15:r:-1:1:19.0|16:r:-1:1:35.0|17:r:-1:1:36.0|18:r:-1:1:38.0|19:r:-1:1:40.0|20:r:-1:1:41.0|21:r:-1:1:44.0|14:r:-1:1:45.0|0:l:true:-1:-1|4:l:false:-1:-1|2:l:true:-1:-1|3:l:false:-1:-1|5:l:true:-1:-1|7:l:true:-1:-1|6:l:false:-1:-1|10:l:true:-1:-1|8:l:false:-1:-1|9:l:true:-1:-1|13:l:false:-1:-1|11:l:false:-1:-1|12:l:true:-1:-1|15:l:false:-1:-1|14:l:true:-1:-1|23:l:false:-1:-1|16:l:true:-1:-1|17:l:false:-1:-1|18:l:true:-1:-1|19:l:false:-1:-1|20:l:true:-1:-1|21:l:false:-1:-1|22:l:true:-1:-1|22:r:false:-1:-1|23:r:true:-1:-1;,100792.0,70.9788596390008,witty,,"Started problem 13
 Set parameter WLSAccessID
 Set parameter WLSSecret
@@ -152,7 +347,22 @@ Trying max size 23
 Trying max size 24
 Finished problem 13
 ",1.0,0.0,False,1800.0,-1:-1:-1:1:1.0|0:r:-1:0:1983.0|1:r:-1:1:2.0|2:r:-1:1:4.0|1:l:-1:1:10.0|3:r:-1:1:5.0|5:r:-1:1:11.0|4:r:-1:1:14.0|7:r:-1:1:16.0|8:r:-1:1:17.0|6:r:-1:1:12.0|10:r:-1:1:13.0|11:r:-1:1:15.0|9:r:-1:1:19.0|13:r:-1:1:21.0|12:r:-1:1:18.0|15:r:-1:1:19.0|16:r:-1:1:35.0|17:r:-1:1:36.0|18:r:-1:1:38.0|19:r:-1:1:40.0|20:r:-1:1:41.0|21:r:-1:1:44.0|14:r:-1:1:45.0|0:l:true:-1:-1|4:l:false:-1:-1|2:l:true:-1:-1|3:l:false:-1:-1|5:l:true:-1:-1|7:l:true:-1:-1|6:l:false:-1:-1|10:l:true:-1:-1|8:l:false:-1:-1|9:l:true:-1:-1|13:l:false:-1:-1|11:l:false:-1:-1|12:l:true:-1:-1|15:l:false:-1:-1|14:l:true:-1:-1|23:l:false:-1:-1|16:l:true:-1:-1|17:l:false:-1:-1|18:l:true:-1:-1|19:l:false:-1:-1|20:l:true:-1:-1|21:l:false:-1:-1|22:l:true:-1:-1|22:r:false:-1:-1|23:r:true:-1:-1,24,True,chscase_vine2.txt,,,,,,,
-1.0,,chscase_vine2.txt,,,,100,2,,,,,,1800.0050934970059,codt,,,,,,,"[1, 25.5, [1, 1.5, 1, [1, 19.5, [0, 1983.5, [1, 10.5, 0, [1, 14.5, 1, [1, 17.5, [1, 16.5, 0, 1], 0]]], [1, 4.5, [1, 2.5, 1, 0], [1, 12.5, [1, 5.5, 1, [1, 11.5, 0, 1]], [1, 13.5, 0, [1, 15.5, 1, [1, 18.5, 0, 1]]]]]], [1, 21.5, [0, 1983.5, 1, 0], 0]]], [1, 35.5, 0, [0, 1983.5, [1, 45.5, 0, 1], [1, 36.5, 1, [1, 38.5, 0, [1, 41.5, [1, 40.5, 1, 0], [1, 44.5, 1, 0]]]]]]]",53,False,chscase_vine2.txt,data/openml/sampled/chscase_vine2.txt,perfect-tree-found,True,26.0,16542824.0,581051.0,
+1.0,,chscase_vine2.txt,,,,100,2,,,,,,1800.9169431629998,codt,"[2026-06-10T16:48:52Z INFO  codt_cli] Starting solve with options:
+    SolverOptions { lb_strategy: {ClassCount, Pair, Improvement}, ub_strategy: ForRemainingInterval, cart_ub: true, cart_ub_patience: 5, data_reduction: true, track_intermediates: false, timeout: Some(1800s), memory_limit: Some(4294967296) }
+    
+[2026-06-10T16:48:52Z INFO  codt::search::solver_impl] One off witnesses: 0
+[2026-06-10T16:48:52Z INFO  codt::search::solver_impl] Pair lower bound: (primary: 0, secondary: 23)
+[2026-06-10T17:18:53Z INFO  codt_cli] Read time (s): 0.0000265
+[2026-06-10T17:18:53Z INFO  codt_cli] Solve time (s): 1800.736038662
+[2026-06-10T17:18:53Z INFO  codt_cli] Max memory usage (MB): 3072.86
+[2026-06-10T17:18:53Z INFO  codt_cli] Graph expansions: 121714651
+[2026-06-10T17:18:53Z INFO  codt_cli] Tree: [1<=13.50:[1<=1.50:1,[0<=1983.50:[1<=10.50:0,1],[1<=2.50:1,[1<=4.50:0,[1<=12.50:[1<=5.50:1,[1<=11.50:0,1]],0]]]]],[1<=14.50:1,[0<=1983.50:[1<=19.50:[1<=17.50:[1<=16.50:0,1],0],[1<=21.50:1,[1<=45.50:0,1]]],[1<=40.50:[1<=18.50:[1<=15.50:1,0],[1<=35.50:[1<=19.50:1,0],[1<=38.50:[1<=36.50:1,0],1]]],[1<=44.50:[1<=41.50:0,1],0]]]]]
+","Set parameter WLSAccessID
+Set parameter WLSSecret
+Set parameter LicenseID to value 2781812
+Academic license 2781812 - for non-commercial use only - registered to tt___@tudelft.nl
+Misclassifications: 0. Branch nodes: 25. Accuracy: 100%.
+",,,,,"[1<=13.50:[1<=1.50:1,[0<=1983.50:[1<=10.50:0,1],[1<=2.50:1,[1<=4.50:0,[1<=12.50:[1<=5.50:1,[1<=11.50:0,1]],0]]]]],[1<=14.50:1,[0<=1983.50:[1<=19.50:[1<=17.50:[1<=16.50:0,1],0],[1<=21.50:1,[1<=45.50:0,1]]],[1<=40.50:[1<=18.50:[1<=15.50:1,0],[1<=35.50:[1<=19.50:1,0],[1<=38.50:[1<=36.50:1,0],1]]],[1<=44.50:[1<=41.50:0,1],0]]]]]",51,True,chscase_vine2.txt,25.0,data/openml/sampled/chscase_vine2.txt,,121714651.0,3222127247.0,True,perfect-tree-found
 1.0,5.0,climate-model-simulation-crashes.csv,climate-model-simulation-crashes.csv,278.0,-1.0,100,18,True,experiments/results/codt-witty-sampled/witty-cache/climate-model-simulation-crashes.txt,14.0,14;5;climate-model-simulation-crashes.csv;100;1.0;0;18;-1;1800;41099;278;false;true;4;1.00;1092005;951930;3570521;113;3238;1408;100;14;1;4;18;1782;100;0;0;500025;0;0;0;0;-1:-1:-1:1:0.581643588722|0:r:-1:3:0.0954276823853|1:r:-1:0:0.671586865597|2:r:-1:12:0.4419438341|0:l:true:-1:-1|1:l:false:-1:-1|2:l:true:-1:-1|3:r:false:-1:-1|3:l:true:-1:-1;,41099.0,11.385074965000967,witty,,"Started problem 14
 Set parameter WLSAccessID
 Set parameter WLSSecret
@@ -163,7 +373,22 @@ Trying max size 3
 Trying max size 4
 Finished problem 14
 ",1.0,0.0,False,1800.0,-1:-1:-1:1:0.581643588722|0:r:-1:3:0.0954276823853|1:r:-1:0:0.671586865597|2:r:-1:12:0.4419438341|0:l:true:-1:-1|1:l:false:-1:-1|2:l:true:-1:-1|3:r:false:-1:-1|3:l:true:-1:-1,4,True,climate-model-simulation-crashes.txt,,,,,,,
-1.0,,climate-model-simulation-crashes.txt,,,,100,18,,,,,,1800.0832334019942,codt,,,,,,,"[0, 0.5847048775270001, [3, 0.0169733196995, 0, 1], [1, 0.5894306643285, 1, [4, 0.09896289756985, 1, [4, 0.6488255085385, 0, 1]]]]",11,False,climate-model-simulation-crashes.txt,data/openml/sampled/climate-model-simulation-crashes.txt,perfect-tree-found,True,5.0,2733902.0,5874078.0,
+1.0,,climate-model-simulation-crashes.txt,,,,100,18,,,,,,1.9614565060001041,codt,"[2026-06-10T17:18:53Z INFO  codt_cli] Starting solve with options:
+    SolverOptions { lb_strategy: {ClassCount, Pair, Improvement}, ub_strategy: ForRemainingInterval, cart_ub: true, cart_ub_patience: 5, data_reduction: true, track_intermediates: false, timeout: Some(1800s), memory_limit: Some(4294967296) }
+    
+[2026-06-10T17:18:53Z INFO  codt::search::solver_impl] One off witnesses: 0
+[2026-06-10T17:18:54Z INFO  codt::search::solver_impl] Pair lower bound: (primary: 0, secondary: 3)
+[2026-06-10T17:18:55Z INFO  codt_cli] Read time (s): 0.0001666
+[2026-06-10T17:18:55Z INFO  codt_cli] Solve time (s): 1.927635306
+[2026-06-10T17:18:55Z INFO  codt_cli] Max memory usage (MB): 432.37
+[2026-06-10T17:18:55Z INFO  codt_cli] Graph expansions: 3438
+[2026-06-10T17:18:55Z INFO  codt_cli] Tree: [1<=0.59:1,[3<=0.10:0,[0<=0.67:1,[14<=0.23:1,0]]]]
+","Set parameter WLSAccessID
+Set parameter WLSSecret
+Set parameter LicenseID to value 2781812
+Academic license 2781812 - for non-commercial use only - registered to tt___@tudelft.nl
+Misclassifications: 0. Branch nodes: 4. Accuracy: 100%.
+",,,,,"[1<=0.59:1,[3<=0.10:0,[0<=0.67:1,[14<=0.23:1,0]]]]",9,True,climate-model-simulation-crashes.txt,4.0,data/openml/sampled/climate-model-simulation-crashes.txt,,3438.0,453372805.0,True,perfect-tree-found
 0.0,5.0,costamadre1.csv,costamadre1.csv,308.0,-1.0,100,37,False,experiments/results/codt-witty-sampled/witty-cache/costamadre1.txt,15.0,15;5;costamadre1.csv;100;1.0;0;37;-1;1800;1829999;308;true;false;-1;0.00;26355348;67105153;1444268311;6017;5159935;70653;100;-1;-1;-1;37;1533;100;0;0;742245550;0;0;0;0;-1:-1:false:-1:-1;,1829999.0,1800.287606763999,witty,,"Started problem 15
 Set parameter WLSAccessID
 Set parameter WLSSecret
@@ -174,7 +399,22 @@ Trying max size 5
 Trying max size 6
 Finished problem 15
 ",1.0,0.0,True,1800.0,-1:-1:false:-1:-1,-1,True,costamadre1.txt,,,,,,,
-1.0,,costamadre1.txt,,,,100,37,,,,,,1801.6163328790135,codt,,,,,,,"[36, 54.5, [35, 24.064999999999998, [29, 0.18, 0, [11, 0.895, 0, [28, 11.5, 1, 0]]], [29, 0.135, [28, 12.5, [15, 16.5, 0, [34, 36.5, 0, [3, 3.5, 1, 0]]], 0], 1]], [13, 8.0, [28, 81.0, [18, 45.24, 1, [25, 0.035, 1, 0]], 0], [0, 28.5, 0, [3, 5.5, 0, 1]]]]",33,False,costamadre1.txt,data/openml/sampled/costamadre1.txt,perfect-tree-found,True,16.0,3792945.0,5001023.0,
+1.0,,costamadre1.txt,,,,100,37,,,,,,1800.520483575001,codt,"[2026-06-10T17:18:55Z INFO  codt_cli] Starting solve with options:
+    SolverOptions { lb_strategy: {Pair, ClassCount, Improvement}, ub_strategy: ForRemainingInterval, cart_ub: true, cart_ub_patience: 5, data_reduction: true, track_intermediates: false, timeout: Some(1800s), memory_limit: Some(4294967296) }
+    
+[2026-06-10T17:18:55Z INFO  codt::search::solver_impl] One off witnesses: 0
+[2026-06-10T17:18:56Z INFO  codt::search::solver_impl] Pair lower bound: (primary: 0, secondary: 5)
+[2026-06-10T17:48:56Z INFO  codt_cli] Read time (s): 0.0002663
+[2026-06-10T17:48:56Z INFO  codt_cli] Solve time (s): 1800.368069175
+[2026-06-10T17:48:56Z INFO  codt_cli] Max memory usage (MB): 3078.26
+[2026-06-10T17:48:56Z INFO  codt_cli] Graph expansions: 38708810
+[2026-06-10T17:48:56Z INFO  codt_cli] Tree: [36<=54.50:[35<=24.06:[29<=0.18:0,[11<=0.90:0,[28<=11.50:1,0]]],[29<=0.14:[28<=12.50:[15<=16.50:0,[34<=36.50:0,[3<=3.50:1,0]]],0],1]],[13<=8.00:[28<=81.00:[18<=45.24:1,[25<=0.04:1,0]],0],[0<=28.50:0,[3<=5.50:0,1]]]]
+","Set parameter WLSAccessID
+Set parameter WLSSecret
+Set parameter LicenseID to value 2781812
+Academic license 2781812 - for non-commercial use only - registered to tt___@tudelft.nl
+Misclassifications: 0. Branch nodes: 16. Accuracy: 100%.
+",,,,,"[36<=54.50:[35<=24.06:[29<=0.18:0,[11<=0.90:0,[28<=11.50:1,0]]],[29<=0.14:[28<=12.50:[15<=16.50:0,[34<=36.50:0,[3<=3.50:1,0]]],0],1]],[13<=8.00:[28<=81.00:[18<=45.24:1,[25<=0.04:1,0]],0],[0<=28.50:0,[3<=5.50:0,1]]]]",33,True,costamadre1.txt,16.0,data/openml/sampled/costamadre1.txt,,38708810.0,3227789557.0,True,perfect-tree-found
 0.0,5.0,credit_approval_classification.csv,credit_approval_classification.csv,172.0,-1.0,100,50,False,experiments/results/codt-witty-sampled/witty-cache/credit_approval_classification.txt,16.0,16;5;credit_approval_classification.csv;100;1.0;0;50;-1;1800;1830000;172;true;false;-1;0.00;15776585;85980198;511185347;4560;2517386;63050;100;-1;-1;-1;28;214;98;0;0;365384371;0;0;0;0;-1:-1:false:-1:-1;,1830000.0,1800.2232243180006,witty,,"Started problem 16
 Set parameter WLSAccessID
 Set parameter WLSSecret
@@ -187,7 +427,22 @@ Trying max size 7
 Trying max size 8
 Finished problem 16
 ",1.0,0.0,True,1800.0,-1:-1:false:-1:-1,-1,True,credit_approval_classification.txt,,,,,,,
-1.0,,credit_approval_classification.txt,,,,100,50,,,,,,1800.3936025969888,codt,,,,,,,"[34, 0.5, [1, 28.5, [2, 2040.5, [1, 16.5, [7, 36.5, [4, 0.5, 1, [2, 1306.5, 0, 1]], 1], [2, 1288.5, 0, 1]], [6, 2.5, [7, 34.5, 1, 0], 1]], [1, 39.0, [4, 3.5, 1, 0], [7, 34.5, 0, 1]]], [11, 0.5, [7, 35.5, 1, 0], [2, 6126.5, 1, 0]]]",33,False,credit_approval_classification.txt,data/openml/sampled/credit_approval_classification.txt,perfect-tree-found,True,16.0,6602441.0,3814624.0,
+1.0,,credit_approval_classification.txt,,,,100,50,,,,,,1800.3894125869992,codt,"[2026-06-10T17:48:56Z INFO  codt_cli] Starting solve with options:
+    SolverOptions { lb_strategy: {Pair, ClassCount, Improvement}, ub_strategy: ForRemainingInterval, cart_ub: true, cart_ub_patience: 5, data_reduction: true, track_intermediates: false, timeout: Some(1800s), memory_limit: Some(4294967296) }
+    
+[2026-06-10T17:48:56Z INFO  codt::search::solver_impl] One off witnesses: 0
+[2026-06-10T17:48:56Z INFO  codt::search::solver_impl] Pair lower bound: (primary: 0, secondary: 5)
+[2026-06-10T18:18:56Z INFO  codt_cli] Read time (s): 0.0002261
+[2026-06-10T18:18:56Z INFO  codt_cli] Solve time (s): 1800.234961087
+[2026-06-10T18:18:56Z INFO  codt_cli] Max memory usage (MB): 3075.70
+[2026-06-10T18:18:56Z INFO  codt_cli] Graph expansions: 47427921
+[2026-06-10T18:18:56Z INFO  codt_cli] Tree: [39<=0.50:[0<=1.50:[34<=0.50:[1<=43.50:[2<=1306.50:[45<=0.50:[22<=0.50:[41<=0.50:1,0],0],0],[2<=3898.50:1,[1<=28.50:1,[4<=1.50:1,[7<=25.50:1,0]]]]],0],0],[31<=0.50:[0<=2.50:[13<=0.50:1,0],1],[25<=0.50:1,[3<=3.50:1,[33<=0.50:[46<=0.50:0,1],0]]]]],[7<=35.50:1,[2<=1531.50:1,[31<=0.50:1,0]]]]
+","Set parameter WLSAccessID
+Set parameter WLSSecret
+Set parameter LicenseID to value 2781812
+Academic license 2781812 - for non-commercial use only - registered to tt___@tudelft.nl
+Misclassifications: 0. Branch nodes: 22. Accuracy: 100%.
+",,,,,"[39<=0.50:[0<=1.50:[34<=0.50:[1<=43.50:[2<=1306.50:[45<=0.50:[22<=0.50:[41<=0.50:1,0],0],0],[2<=3898.50:1,[1<=28.50:1,[4<=1.50:1,[7<=25.50:1,0]]]]],0],0],[31<=0.50:[0<=2.50:[13<=0.50:1,0],1],[25<=0.50:1,[3<=3.50:1,[33<=0.50:[46<=0.50:0,1],0]]]]],[7<=35.50:1,[2<=1531.50:1,[31<=0.50:1,0]]]]",45,True,credit_approval_classification.txt,22.0,data/openml/sampled/credit_approval_classification.txt,,47427921.0,3225105203.0,True,perfect-tree-found
 0.0,5.0,dataset_credit-approval.csv,dataset_credit-approval.csv,174.0,-1.0,100,15,False,experiments/results/codt-witty-sampled/witty-cache/dataset_credit-approval.txt,17.0,17;5;dataset_credit-approval.csv;100;1.0;0;15;-1;1800;1830000;174;true;false;-1;0.00;11752133;246797721;1652076684;3077;1067990;36434;100;-1;-1;-1;14;354;91;0;0;710750887;0;0;0;0;-1:-1:false:-1:-1;,1830000.0,1800.1894058709986,witty,,"Started problem 17
 Set parameter WLSAccessID
 Set parameter WLSSecret
@@ -200,7 +455,22 @@ Trying max size 7
 Trying max size 8
 Finished problem 17
 ",1.0,0.0,True,1800.0,-1:-1:false:-1:-1,-1,True,dataset_credit-approval.txt,,,,,,,
-1.0,,dataset_credit-approval.txt,,,,100,15,,,,,,1800.0364778270014,codt,,,,,,,"[10, 2.5, [6, 2.5, [8, 0.5, 0, 1], [4, 1.5, [14, 69.0, [2, 4.3325, [1, 26.96, 0, [12, 1.0, [1, 27.335, 1, [1, 44.58, 0, 1]], 1]], [5, 11.5, [13, 15.0, [14, 0.5, 0, 1], 1], 0]], [10, 1.5, 0, [1, 23.085, 0, 1]]], [14, 235.0, 1, 0]]], 0]",33,False,dataset_credit-approval.txt,data/openml/sampled/dataset_credit-approval.txt,perfect-tree-found,True,16.0,8222906.0,2075335.0,
+1.0,,dataset_credit-approval.txt,,,,100,15,,,,,,1800.422067738,codt,"[2026-06-10T18:18:56Z INFO  codt_cli] Starting solve with options:
+    SolverOptions { lb_strategy: {Improvement, Pair, ClassCount}, ub_strategy: ForRemainingInterval, cart_ub: true, cart_ub_patience: 5, data_reduction: true, track_intermediates: false, timeout: Some(1800s), memory_limit: Some(4294967296) }
+    
+[2026-06-10T18:18:56Z INFO  codt::search::solver_impl] One off witnesses: 0
+[2026-06-10T18:18:58Z INFO  codt::search::solver_impl] Pair lower bound: (primary: 0, secondary: 5)
+[2026-06-10T18:48:56Z INFO  codt_cli] Read time (s): 0.000131
+[2026-06-10T18:48:56Z INFO  codt_cli] Solve time (s): 1800.248065838
+[2026-06-10T18:48:56Z INFO  codt_cli] Max memory usage (MB): 3073.56
+[2026-06-10T18:48:56Z INFO  codt_cli] Graph expansions: 83063709
+[2026-06-10T18:48:56Z INFO  codt_cli] Tree: [10<=2.50:[6<=2.50:[8<=0.50:0,1],[4<=1.50:[14<=69.00:[2<=4.33:[1<=26.96:0,[12<=1.00:[1<=27.34:1,[1<=44.58:0,1]],1]],[5<=11.50:[13<=15.00:[14<=0.50:0,1],1],0]],[10<=1.50:0,[1<=23.09:0,1]]],[14<=235.00:1,0]]],0]
+","Set parameter WLSAccessID
+Set parameter WLSSecret
+Set parameter LicenseID to value 2781812
+Academic license 2781812 - for non-commercial use only - registered to tt___@tudelft.nl
+Misclassifications: 0. Branch nodes: 16. Accuracy: 100%.
+",,,,,"[10<=2.50:[6<=2.50:[8<=0.50:0,1],[4<=1.50:[14<=69.00:[2<=4.33:[1<=26.96:0,[12<=1.00:[1<=27.34:1,[1<=44.58:0,1]],1]],[5<=11.50:[13<=15.00:[14<=0.50:0,1],1],0]],[10<=1.50:0,[1<=23.09:0,1]]],[14<=235.00:1,0]]],0]",33,True,dataset_credit-approval.txt,16.0,data/openml/sampled/dataset_credit-approval.txt,,83063709.0,3222861250.0,True,perfect-tree-found
 0.0,5.0,dataset_credit-g.csv,dataset_credit-g.csv,170.0,-1.0,100,20,False,experiments/results/codt-witty-sampled/witty-cache/dataset_credit-g.txt,18.0,18;5;dataset_credit-g.csv;100;1.0;0;20;-1;1800;1829999;170;true;false;-1;0.00;16878404;146968700;922000044;6361;3356922;85666;100;-1;-1;-1;19;204;98;0;0;555367327;0;0;0;0;-1:-1:false:-1:-1;,1829999.0,1800.1728423729983,witty,,"Started problem 18
 Set parameter WLSAccessID
 Set parameter WLSSecret
@@ -214,7 +484,22 @@ Trying max size 8
 Trying max size 9
 Finished problem 18
 ",1.0,0.0,True,1800.0,-1:-1:false:-1:-1,-1,True,dataset_credit-g.txt,,,,,,,
-1.0,,dataset_credit-g.txt,,,,100,20,,,,,,1800.0237796489964,codt,,,,,,,"[4, 11072.5, [1, 33.0, [3, 3.5, 1, [3, 8.0, [1, 11.5, 1, [6, 3.5, [18, 0.5, [0, 1.5, [8, 2.5, [8, 0.5, [1, 13.5, 0, [16, 1.5, 1, 0]], 1], 0], [12, 30.5, 1, [10, 3.5, [12, 38.0, 0, 1], 1]]], [1, 19.0, 1, [4, 5212.0, 1, 0]]], 0]], 1]], [17, 1.5, [3, 4.5, [6, 1.5, [13, 0.5, 1, 0], 0], [14, 0.5, 0, [10, 3.5, [0, 1.5, [12, 34.5, 0, 1], 1], 1]]], 1]], 0]",51,False,dataset_credit-g.txt,data/openml/sampled/dataset_credit-g.txt,perfect-tree-found,True,25.0,7788832.0,2175810.0,
+1.0,,dataset_credit-g.txt,,,,100,20,,,,,,1800.3324127489977,codt,"[2026-06-10T18:48:57Z INFO  codt_cli] Starting solve with options:
+    SolverOptions { lb_strategy: {Pair, ClassCount, Improvement}, ub_strategy: ForRemainingInterval, cart_ub: true, cart_ub_patience: 5, data_reduction: true, track_intermediates: false, timeout: Some(1800s), memory_limit: Some(4294967296) }
+    
+[2026-06-10T18:48:57Z INFO  codt::search::solver_impl] One off witnesses: 0
+[2026-06-10T18:48:57Z INFO  codt::search::solver_impl] Pair lower bound: (primary: 0, secondary: 5)
+[2026-06-10T19:18:57Z INFO  codt_cli] Read time (s): 0.0001166
+[2026-06-10T19:18:57Z INFO  codt_cli] Solve time (s): 1800.179007349
+[2026-06-10T19:18:57Z INFO  codt_cli] Max memory usage (MB): 3074.04
+[2026-06-10T19:18:57Z INFO  codt_cli] Graph expansions: 71135066
+[2026-06-10T19:18:57Z INFO  codt_cli] Tree: [4<=2307.00:[4<=1500.00:[12<=36.50:[4<=1306.50:[14<=1.50:[12<=27.50:1,0],0],1],[1<=16.50:1,0]],[4<=1994.50:[4<=1811.50:1,[8<=2.50:1,0]],[1<=13.50:1,[4<=2233.00:0,1]]]],[4<=5550.00:[4<=3404.00:1,[4<=4527.00:[1<=33.00:1,0],[1<=28.50:[12<=51.50:1,0],0]]],[12<=36.50:[12<=25.50:[1<=33.00:1,0],1],[12<=45.50:[6<=1.50:1,0],0]]]]
+","Set parameter WLSAccessID
+Set parameter WLSSecret
+Set parameter LicenseID to value 2781812
+Academic license 2781812 - for non-commercial use only - registered to tt___@tudelft.nl
+Misclassifications: 0. Branch nodes: 23. Accuracy: 100%.
+",,,,,"[4<=2307.00:[4<=1500.00:[12<=36.50:[4<=1306.50:[14<=1.50:[12<=27.50:1,0],0],1],[1<=16.50:1,0]],[4<=1994.50:[4<=1811.50:1,[8<=2.50:1,0]],[1<=13.50:1,[4<=2233.00:0,1]]]],[4<=5550.00:[4<=3404.00:1,[4<=4527.00:[1<=33.00:1,0],[1<=28.50:[12<=51.50:1,0],0]]],[12<=36.50:[12<=25.50:[1<=33.00:1,0],1],[12<=45.50:[6<=1.50:1,0],0]]]]",47,True,dataset_credit-g.txt,23.0,data/openml/sampled/dataset_credit-g.txt,,71135066.0,3223364567.0,True,perfect-tree-found
 1.0,5.0,datatrieve.csv,datatrieve.csv,14.0,-1.0,100,8,True,experiments/results/codt-witty-sampled/witty-cache/datatrieve.txt,19.0,19;5;datatrieve.csv;100;1.0;0;8;-1;1800;30058;14;false;true;3;1.00;905;62;401;0;0;1;100;8;2;2;8;531;98;0;0;9;0;0;0;0;-1:-1:-1:1:605.0|0:l:-1:1:544.0|0:r:-1:4:95.0|1:r:true:-1:-1|2:l:false:-1:-1|1:l:false:-1:-1|2:r:true:-1:-1;,30058.0,3.490940658000909,witty,,"Started problem 19
 Set parameter WLSAccessID
 Set parameter WLSSecret
@@ -224,7 +509,22 @@ Set parameter Threads to value 1
 Trying max size 3
 Finished problem 19
 ",1.0,0.0,False,1800.0,-1:-1:-1:1:605.0|0:l:-1:1:544.0|0:r:-1:4:95.0|1:r:true:-1:-1|2:l:false:-1:-1|1:l:false:-1:-1|2:r:true:-1:-1,3,True,datatrieve.txt,,,,,,,
-1.0,,datatrieve.txt,,,,100,8,,,,,,0.881752139001037,codt,,,,,,,"[4, 95.5, [1, 608.0, [1, 557.5, 0, 1], 0], 1]",7,False,datatrieve.txt,data/openml/sampled/datatrieve.txt,perfect-tree-found,True,3.0,58.0,420555.0,
+1.0,,datatrieve.txt,,,,100,8,,,,,,0.2345500000010361,codt,"[2026-06-10T19:18:57Z INFO  codt_cli] Starting solve with options:
+    SolverOptions { lb_strategy: {ClassCount, Improvement, Pair}, ub_strategy: ForRemainingInterval, cart_ub: true, cart_ub_patience: 5, data_reduction: true, track_intermediates: false, timeout: Some(1800s), memory_limit: Some(4294967296) }
+    
+[2026-06-10T19:18:57Z INFO  codt::search::solver_impl] One off witnesses: 0
+[2026-06-10T19:18:57Z INFO  codt::search::solver_impl] Pair lower bound: (primary: 0, secondary: 3)
+[2026-06-10T19:18:57Z INFO  codt_cli] Read time (s): 0.0000705
+[2026-06-10T19:18:57Z INFO  codt_cli] Solve time (s): 0.2312089
+[2026-06-10T19:18:57Z INFO  codt_cli] Max memory usage (MB): 1.73
+[2026-06-10T19:18:57Z INFO  codt_cli] Graph expansions: 56
+[2026-06-10T19:18:57Z INFO  codt_cli] Tree: [1<=557.50:0,[4<=95.50:[1<=608.00:1,0],1]]
+","Set parameter WLSAccessID
+Set parameter WLSSecret
+Set parameter LicenseID to value 2781812
+Academic license 2781812 - for non-commercial use only - registered to tt___@tudelft.nl
+Misclassifications: 0. Branch nodes: 3. Accuracy: 100%.
+",,,,,"[1<=557.50:0,[4<=95.50:[1<=608.00:1,0],1]]",7,True,datatrieve.txt,3.0,data/openml/sampled/datatrieve.txt,,56.0,1814036.0,True,perfect-tree-found
 0.0,5.0,diabetes.csv,diabetes.csv,186.0,-1.0,100,8,False,experiments/results/codt-witty-sampled/witty-cache/diabetes.txt,20.0,20;5;diabetes.csv;100;1.0;0;8;-1;1800;1829999;186;true;false;-1;0.00;13377304;242124819;-1568464530;4901;1870206;56091;100;-1;-1;-1;8;398;95;0;0;840310764;0;0;0;0;-1:-1:false:-1:-1;,1829999.0,1800.193446608002,witty,,"Started problem 20
 Set parameter WLSAccessID
 Set parameter WLSSecret
@@ -236,7 +536,22 @@ Trying max size 7
 Trying max size 8
 Finished problem 20
 ",1.0,0.0,True,1800.0,-1:-1:false:-1:-1,-1,True,diabetes.txt,,,,,,,
-1.0,,diabetes.txt,,,,100,8,,,,,,1800.0255782390013,codt,,,,,,,"[5, 27.1, 0, [3, 33.5, [1, 123.5, [0, 7.5, [2, 83.0, 0, [0, 0.5, 1, 0]], [7, 40.5, 1, [1, 92.5, 1, 0]]], [7, 46.5, [7, 36.5, 1, [5, 31.450000000000003, 0, [1, 130.0, 0, 1]]], [7, 66.0, 0, 1]]], [1, 151.0, [6, 0.7215, [7, 23.5, 1, [4, 155.0, 0, [3, 42.5, 0, 1]]], 1], 1]]]",37,False,diabetes.txt,data/openml/sampled/diabetes.txt,perfect-tree-found,True,18.0,8460959.0,2093263.0,
+1.0,,diabetes.txt,,,,100,8,,,,,,1800.4649960200004,codt,"[2026-06-10T19:18:57Z INFO  codt_cli] Starting solve with options:
+    SolverOptions { lb_strategy: {ClassCount, Improvement, Pair}, ub_strategy: ForRemainingInterval, cart_ub: true, cart_ub_patience: 5, data_reduction: true, track_intermediates: false, timeout: Some(1800s), memory_limit: Some(4294967296) }
+    
+[2026-06-10T19:18:57Z INFO  codt::search::solver_impl] One off witnesses: 0
+[2026-06-10T19:18:57Z INFO  codt::search::solver_impl] Pair lower bound: (primary: 0, secondary: 6)
+[2026-06-10T19:48:57Z INFO  codt_cli] Read time (s): 0.0000846
+[2026-06-10T19:48:57Z INFO  codt_cli] Solve time (s): 1800.284306855
+[2026-06-10T19:48:57Z INFO  codt_cli] Max memory usage (MB): 3074.15
+[2026-06-10T19:48:57Z INFO  codt_cli] Graph expansions: 95940835
+[2026-06-10T19:48:57Z INFO  codt_cli] Tree: [1<=124.50:[4<=26.00:[7<=40.50:[7<=35.00:0,1],0],[4<=195.00:[3<=36.50:[2<=83.00:0,1],1],1]],[5<=34.40:[5<=27.10:0,[6<=0.34:[2<=64.50:1,0],1]],[2<=77.00:[0<=3.50:1,0],[0<=1.50:0,1]]]]
+","Set parameter WLSAccessID
+Set parameter WLSSecret
+Set parameter LicenseID to value 2781812
+Academic license 2781812 - for non-commercial use only - registered to tt___@tudelft.nl
+Misclassifications: 0. Branch nodes: 14. Accuracy: 100%.
+",,,,,"[1<=124.50:[4<=26.00:[7<=40.50:[7<=35.00:0,1],0],[4<=195.00:[3<=36.50:[2<=83.00:0,1],1],1]],[5<=34.40:[5<=27.10:0,[6<=0.34:[2<=64.50:1,0],1]],[2<=77.00:[0<=3.50:1,0],[0<=1.50:0,1]]]]",29,True,diabetes.txt,14.0,data/openml/sampled/diabetes.txt,,95940835.0,3223479910.0,True,perfect-tree-found
 1.0,5.0,diggle_table_a1.csv,diggle_table_a1.csv,152.0,-1.0,48,4,True,experiments/results/codt-witty-sampled/witty-cache/diggle_table_a1.txt,21.0,21;5;diggle_table_a1.csv;48;1.0;0;4;-1;1800;901474;152;false;true;10;1.00;79014446;88410862;354509013;874;14583337;4287;48;47;2;6;4;110;48;0;0;222286956;0;0;0;0;5:r:-1:0:26.0|3:r:-1:0:11.0|1:l:-1:3:2.0|-1:-1:-1:2:4.4|3:l:-1:1:2.3|8:r:-1:1:2.9|5:l:-1:3:1.8|6:r:-1:3:2.6|1:r:-1:3:1.7|0:r:-1:3:3.4|0:l:true:-1:-1|9:l:false:-1:-1|2:l:false:-1:-1|2:r:true:-1:-1|4:l:false:-1:-1|4:r:true:-1:-1|6:l:false:-1:-1|7:l:true:-1:-1|7:r:false:-1:-1|8:l:true:-1:-1|9:r:true:-1:-1;,901474.0,871.6503140299974,witty,,"Started problem 21
 Set parameter WLSAccessID
 Set parameter WLSSecret
@@ -249,7 +564,22 @@ Trying max size 9
 Trying max size 10
 Finished problem 21
 ",1.0,0.0,False,1800.0,5:r:-1:0:26.0|3:r:-1:0:11.0|1:l:-1:3:2.0|-1:-1:-1:2:4.4|3:l:-1:1:2.3|8:r:-1:1:2.9|5:l:-1:3:1.8|6:r:-1:3:2.6|1:r:-1:3:1.7|0:r:-1:3:3.4|0:l:true:-1:-1|9:l:false:-1:-1|2:l:false:-1:-1|2:r:true:-1:-1|4:l:false:-1:-1|4:r:true:-1:-1|6:l:false:-1:-1|7:l:true:-1:-1|7:r:false:-1:-1|8:l:true:-1:-1|9:r:true:-1:-1,10,True,diggle_table_a1.txt,,,,,,,
-1.0,,diggle_table_a1.txt,,,,48,4,,,,,,1800.0035319250019,codt,,,,,,,"[3, 2.45, [0, 5.5, 1, [2, 4.35, 0, [1, 3.75, [2, 4.85, 1, [0, 11.5, 0, [0, 21.5, 1, 0]]], [3, 2.05, 1, 0]]]], [2, 4.75, [2, 4.15, 1, 0], [0, 9.5, 1, [2, 4.85, 1, 0]]]]",25,False,diggle_table_a1.txt,data/openml/sampled/diggle_table_a1.txt,perfect-tree-found,True,12.0,17796056.0,654885.0,
+1.0,,diggle_table_a1.txt,,,,48,4,,,,,,1800.623918571,codt,"[2026-06-10T19:48:58Z INFO  codt_cli] Starting solve with options:
+    SolverOptions { lb_strategy: {Improvement, ClassCount, Pair}, ub_strategy: ForRemainingInterval, cart_ub: true, cart_ub_patience: 5, data_reduction: true, track_intermediates: false, timeout: Some(1800s), memory_limit: Some(4294967296) }
+    
+[2026-06-10T19:48:58Z INFO  codt::search::solver_impl] One off witnesses: 0
+[2026-06-10T19:48:58Z INFO  codt::search::solver_impl] Pair lower bound: (primary: 0, secondary: 7)
+[2026-06-10T20:18:58Z INFO  codt_cli] Read time (s): 0.000033202
+[2026-06-10T20:18:58Z INFO  codt_cli] Solve time (s): 1800.444618111
+[2026-06-10T20:18:58Z INFO  codt_cli] Max memory usage (MB): 3073.21
+[2026-06-10T20:18:58Z INFO  codt_cli] Graph expansions: 130985513
+[2026-06-10T20:18:58Z INFO  codt_cli] Tree: [0<=15.50:[2<=5.30:[1<=1.85:0,1],[0<=9.50:1,0]],[1<=3.15:[3<=1.85:0,[3<=2.25:1,[2<=4.15:1,0]]],[2<=4.75:1,[0<=26.50:1,[0<=40.50:0,1]]]]]
+","Set parameter WLSAccessID
+Set parameter WLSSecret
+Set parameter LicenseID to value 2781812
+Academic license 2781812 - for non-commercial use only - registered to tt___@tudelft.nl
+Misclassifications: 0. Branch nodes: 11. Accuracy: 100%.
+",,,,,"[0<=15.50:[2<=5.30:[1<=1.85:0,1],[0<=9.50:1,0]],[1<=3.15:[3<=1.85:0,[3<=2.25:1,[2<=4.15:1,0]]],[2<=4.75:1,[0<=26.50:1,[0<=40.50:0,1]]]]]",23,True,diggle_table_a1.txt,11.0,data/openml/sampled/diggle_table_a1.txt,,130985513.0,3222494248.0,True,perfect-tree-found
 0.0,5.0,disclosure_x_noise.csv,disclosure_x_noise.csv,164.0,-1.0,100,3,False,experiments/results/codt-witty-sampled/witty-cache/disclosure_x_noise.txt,22.0,22;5;disclosure_x_noise.csv;100;1.0;0;3;-1;1800;1829999;164;true;false;-1;0.00;225468;320056284;10374213;82;139889;1104;100;-1;-1;-1;3;297;100;0;0;815843556;0;0;0;0;-1:-1:false:-1:-1;,1829999.0,1800.1703000019988,witty,,"Started problem 22
 Set parameter WLSAccessID
 Set parameter WLSSecret
@@ -259,7 +589,22 @@ Set parameter Threads to value 1
 Trying max size 10
 Finished problem 22
 ",1.0,0.0,True,1800.0,-1:-1:false:-1:-1,-1,True,disclosure_x_noise.txt,,,,,,,
-1.0,,disclosure_x_noise.txt,,,,100,3,,,,,,1800.0195321109932,codt,,,,,,,"[0, 22.924970000000002, 0, [0, 25.1693845, 1, [2, 7.8103645, [2, 3.6133240000000004, [2, 2.0222695, 0, 1], [2, 5.107554, 0, [2, 5.641312, [2, 5.2947109999999995, [0, 63.360699999999994, 0, 1], 1], [1, 0.849435, 1, [1, 22.651282000000002, 0, [1, 22.7333065, 1, 0]]]]]], [1, 15.4662605, [0, 63.6257985, [1, 8.319604, [0, 48.530619, 1, 0], [0, 32.2347345, [0, 30.70844, 0, 1], 0]], 1], [0, 33.354185, [2, 14.2675895, 1, 0], [1, 29.0546695, [2, 17.2068975, [2, 8.340477, [0, 45.1444015, [1, 16.538054000000002, 0, 1], 1], [0, 52.529702, [0, 38.387711, [1, 17.592253, 1, 0], [2, 11.429141999999999, 0, [2, 12.3424405, 1, 0]]], [1, 16.1465975, 0, [2, 8.6532245, 0, [0, 63.8734685, 1, 0]]]]], 1], 0]]]]]]",67,False,disclosure_x_noise.txt,data/openml/sampled/disclosure_x_noise.txt,perfect-tree-found,True,33.0,11426222.0,1404033.0,
+1.0,,disclosure_x_noise.txt,,,,100,3,,,,,,1800.4502643100059,codt,"[2026-06-10T20:18:58Z INFO  codt_cli] Starting solve with options:
+    SolverOptions { lb_strategy: {Pair, ClassCount, Improvement}, ub_strategy: ForRemainingInterval, cart_ub: true, cart_ub_patience: 5, data_reduction: true, track_intermediates: false, timeout: Some(1800s), memory_limit: Some(4294967296) }
+    
+[2026-06-10T20:18:58Z INFO  codt::search::solver_impl] One off witnesses: 0
+[2026-06-10T20:18:59Z INFO  codt::search::solver_impl] Pair lower bound: (primary: 0, secondary: 10)
+[2026-06-10T20:48:59Z INFO  codt_cli] Read time (s): 0.000049202
+[2026-06-10T20:48:59Z INFO  codt_cli] Solve time (s): 1800.275286754
+[2026-06-10T20:48:59Z INFO  codt_cli] Max memory usage (MB): 3073.38
+[2026-06-10T20:48:59Z INFO  codt_cli] Graph expansions: 117338027
+[2026-06-10T20:48:59Z INFO  codt_cli] Tree: [0<=43.66:[1<=17.76:[2<=9.32:[0<=31.33:0,[0<=35.03:1,0]],[0<=30.71:[1<=15.23:0,1],[2<=13.82:0,1]]],[0<=30.43:[2<=5.45:1,0],[0<=33.24:1,[1<=20.55:0,[1<=24.32:1,0]]]]],[2<=8.65:[1<=22.65:[1<=12.32:0,[1<=15.12:1,0]],[2<=3.61:1,[2<=7.53:[1<=22.73:1,0],1]]],[0<=53.38:[1<=8.32:1,[0<=43.94:1,0]],[1<=16.15:[0<=64.22:0,1],[0<=63.87:1,0]]]]]
+","Set parameter WLSAccessID
+Set parameter WLSSecret
+Set parameter LicenseID to value 2781812
+Academic license 2781812 - for non-commercial use only - registered to tt___@tudelft.nl
+Misclassifications: 0. Branch nodes: 26. Accuracy: 100%.
+",,,,,"[0<=43.66:[1<=17.76:[2<=9.32:[0<=31.33:0,[0<=35.03:1,0]],[0<=30.71:[1<=15.23:0,1],[2<=13.82:0,1]]],[0<=30.43:[2<=5.45:1,0],[0<=33.24:1,[1<=20.55:0,[1<=24.32:1,0]]]]],[2<=8.65:[1<=22.65:[1<=12.32:0,[1<=15.12:1,0]],[2<=3.61:1,[2<=7.53:[1<=22.73:1,0],1]]],[0<=53.38:[1<=8.32:1,[0<=43.94:1,0]],[1<=16.15:[0<=64.22:0,1],[0<=63.87:1,0]]]]]",53,True,disclosure_x_noise.txt,26.0,data/openml/sampled/disclosure_x_noise.txt,,117338027.0,3222672506.0,True,perfect-tree-found
 0.0,5.0,disclosure_z.csv,disclosure_z.csv,165.0,-1.0,100,3,False,experiments/results/codt-witty-sampled/witty-cache/disclosure_z.txt,23.0,23;5;disclosure_z.csv;100;1.0;0;3;-1;1800;1829999;165;true;false;-1;0.00;280642;392423164;-1317072913;67;96673;817;100;-1;-1;-1;3;297;100;0;0;810523059;0;0;0;0;-1:-1:false:-1:-1;,1829999.0,1800.3967822740015,witty,,"Started problem 23
 Set parameter WLSAccessID
 Set parameter WLSSecret
@@ -269,7 +614,22 @@ Set parameter Threads to value 1
 Trying max size 12
 Finished problem 23
 ",1.0,0.0,True,1800.0,-1:-1:false:-1:-1,-1,True,disclosure_z.txt,,,,,,,
-1.0,,disclosure_z.txt,,,,100,3,,,,,,1800.0225299079902,codt,,,,,,,"[0, 25.87653, 0, [2, 11.143125999999999, [1, 10.940805000000001, 1, [1, 16.979635000000002, [2, 4.937106, [1, 12.245995, 0, 1], 0], [1, 21.943162, [1, 18.20841, [2, 9.171026, 1, [2, 9.6064, 0, 1]], [2, 10.171778499999999, [1, 19.585345, [2, 9.7317015, [1, 19.238535, [1, 18.334609999999998, 0, [0, 37.57761, 1, 0]], 0], 1], [0, 30.13904, 0, [2, 9.67256, [1, 20.58737, 1, [1, 21.15559, 0, [2, 6.5727695, 1, [2, 7.691998, 0, [1, 21.525475, 1, [2, 9.525102, 0, 1]]]]]], 0]]], 0]], [2, 4.4717835, 1, [2, 8.118937500000001, [2, 6.179943, 0, [1, 23.274845, 0, 1]], 0]]]]], [0, 45.294045, [0, 30.277905, [1, 18.89173, 0, 1], [1, 21.62084, 1, 0]], [2, 11.9263345, 0, [0, 52.10463, 0, 1]]]]]",69,False,disclosure_z.txt,data/openml/sampled/disclosure_z.txt,perfect-tree-found,True,34.0,11379501.0,1469319.0,
+1.0,,disclosure_z.txt,,,,100,3,,,,,,1800.4486795090052,codt,"[2026-06-10T20:48:59Z INFO  codt_cli] Starting solve with options:
+    SolverOptions { lb_strategy: {Improvement, Pair, ClassCount}, ub_strategy: ForRemainingInterval, cart_ub: true, cart_ub_patience: 5, data_reduction: true, track_intermediates: false, timeout: Some(1800s), memory_limit: Some(4294967296) }
+    
+[2026-06-10T20:48:59Z INFO  codt::search::solver_impl] One off witnesses: 0
+[2026-06-10T20:48:59Z INFO  codt::search::solver_impl] Pair lower bound: (primary: 0, secondary: 12)
+[2026-06-10T21:18:59Z INFO  codt_cli] Read time (s): 0.000046701
+[2026-06-10T21:18:59Z INFO  codt_cli] Solve time (s): 1800.271364319
+[2026-06-10T21:18:59Z INFO  codt_cli] Max memory usage (MB): 3073.32
+[2026-06-10T21:18:59Z INFO  codt_cli] Graph expansions: 118013653
+[2026-06-10T21:18:59Z INFO  codt_cli] Tree: [1<=19.47:[1<=16.99:[1<=16.11:[0<=35.50:[1<=10.94:1,0],[0<=46.04:1,[0<=53.32:0,1]]],[1<=16.98:0,1]],[1<=19.28:[1<=18.21:[1<=17.30:0,1],[1<=18.89:[0<=27.35:1,0],1]],[1<=19.41:0,1]]],[1<=21.62:[1<=21.18:[2<=7.74:[0<=43.15:0,1],[2<=8.80:1,[2<=10.76:0,1]]],[0<=60.14:1,0]],[2<=8.31:[0<=48.89:[2<=4.47:1,0],[2<=6.18:0,1]],[0<=52.10:[1<=21.94:1,0],[2<=11.31:0,1]]]]]
+","Set parameter WLSAccessID
+Set parameter WLSSecret
+Set parameter LicenseID to value 2781812
+Academic license 2781812 - for non-commercial use only - registered to tt___@tudelft.nl
+Misclassifications: 0. Branch nodes: 28. Accuracy: 100%.
+",,,,,"[1<=19.47:[1<=16.99:[1<=16.11:[0<=35.50:[1<=10.94:1,0],[0<=46.04:1,[0<=53.32:0,1]]],[1<=16.98:0,1]],[1<=19.28:[1<=18.21:[1<=17.30:0,1],[1<=18.89:[0<=27.35:1,0],1]],[1<=19.41:0,1]]],[1<=21.62:[1<=21.18:[2<=7.74:[0<=43.15:0,1],[2<=8.80:1,[2<=10.76:0,1]]],[0<=60.14:1,0]],[2<=8.31:[0<=48.89:[2<=4.47:1,0],[2<=6.18:0,1]],[0<=52.10:[1<=21.94:1,0],[2<=11.31:0,1]]]]]",57,True,disclosure_z.txt,28.0,data/openml/sampled/disclosure_z.txt,,118013653.0,3222609592.0,True,perfect-tree-found
 1.0,5.0,divorce_prediction.csv,divorce_prediction.csv,23.0,-1.0,100,54,True,experiments/results/codt-witty-sampled/witty-cache/divorce_prediction.txt,24.0,24;5;divorce_prediction.csv;100;1.0;0;54;-1;1800;30077;23;false;true;2;1.00;33;4;0;0;0;1;100;5;1;2;54;216;5;0;0;1;0;0;0;0;-1:-1:-1:2:0.0|0:r:-1:48:0.0|1:r:true:-1:-1|0:l:false:-1:-1|1:l:false:-1:-1;,30077.0,2.380635120000079,witty,,"Started problem 24
 Set parameter WLSAccessID
 Set parameter WLSSecret
@@ -279,7 +639,22 @@ Set parameter Threads to value 1
 Trying max size 2
 Finished problem 24
 ",1.0,0.0,False,1800.0,-1:-1:-1:2:0.0|0:r:-1:48:0.0|1:r:true:-1:-1|0:l:false:-1:-1|1:l:false:-1:-1,2,True,divorce_prediction.txt,,,,,,,
-1.0,,divorce_prediction.txt,,,,100,54,,,,,,0.52450022699486,codt,,,,,,,"[39, 0.5, [10, 0.5, 0, 1], 1]",5,False,divorce_prediction.txt,data/openml/sampled/divorce_prediction.txt,perfect-tree-found,True,2.0,0.0,487415.0,
+1.0,,divorce_prediction.txt,,,,100,54,,,,,,0.3092009660031181,codt,"[2026-06-10T21:18:59Z INFO  codt_cli] Starting solve with options:
+    SolverOptions { lb_strategy: {Improvement, ClassCount, Pair}, ub_strategy: ForRemainingInterval, cart_ub: true, cart_ub_patience: 5, data_reduction: true, track_intermediates: false, timeout: Some(1800s), memory_limit: Some(4294967296) }
+    
+[2026-06-10T21:18:59Z INFO  codt::search::solver_impl] One off witnesses: 0
+[2026-06-10T21:19:00Z INFO  codt::search::solver_impl] Pair lower bound: (primary: 0, secondary: 2)
+[2026-06-10T21:19:00Z INFO  codt_cli] Read time (s): 0.000255604
+[2026-06-10T21:19:00Z INFO  codt_cli] Solve time (s): 0.305180905
+[2026-06-10T21:19:00Z INFO  codt_cli] Max memory usage (MB): 0.47
+[2026-06-10T21:19:00Z INFO  codt_cli] Graph expansions: 0
+[2026-06-10T21:19:00Z INFO  codt_cli] Tree: [39<=0.50:[10<=0.50:0,1],1]
+","Set parameter WLSAccessID
+Set parameter WLSSecret
+Set parameter LicenseID to value 2781812
+Academic license 2781812 - for non-commercial use only - registered to tt___@tudelft.nl
+Misclassifications: 0. Branch nodes: 2. Accuracy: 100%.
+",,,,,"[39<=0.50:[10<=0.50:0,1],1]",5,True,divorce_prediction.txt,2.0,data/openml/sampled/divorce_prediction.txt,,0.0,492830.0,True,perfect-tree-found
 1.0,5.0,german-credit-data-creditability-2.csv,german-credit-data-creditability-2.csv,150.0,-1.0,100,20,True,experiments/results/codt-witty-sampled/witty-cache/german-credit-data-creditability-2.txt,25.0,25;5;german-credit-data-creditability-2.csv;100;1.0;0;20;-1;1800;31350;150;false;true;5;1.00;99052;70128;151749;247;5982;3067;100;18;1;4;18;198;100;0;0;75988;0;0;0;0;-1:-1:-1:10:3.0|0:l:-1:3:2.0|1:l:-1:12:23.0|1:r:-1:12:29.0|3:r:-1:12:33.0|0:r:true:-1:-1|2:l:false:-1:-1|3:l:true:-1:-1|2:r:true:-1:-1|4:l:false:-1:-1|4:r:true:-1:-1;,31350.0,1.5475720080030442,witty,,"Started problem 25
 Set parameter WLSAccessID
 Set parameter WLSSecret
@@ -290,7 +665,22 @@ Trying max size 4
 Trying max size 5
 Finished problem 25
 ",1.0,0.0,False,1800.0,-1:-1:-1:10:3.0|0:l:-1:3:2.0|1:l:-1:12:23.0|1:r:-1:12:29.0|3:r:-1:12:33.0|0:r:true:-1:-1|2:l:false:-1:-1|3:l:true:-1:-1|2:r:true:-1:-1|4:l:false:-1:-1|4:r:true:-1:-1,5,True,german-credit-data-creditability-2.txt,,,,,,,
-1.0,,german-credit-data-creditability-2.txt,,,,100,20,,,,,,1800.0161734990106,codt,,,,,,,"[3, 4.5, [12, 25.5, [3, 0.5, 0, 1], 1], [6, 1.5, 1, [12, 28.5, 1, [12, 33.5, 0, 1]]]]",13,False,german-credit-data-creditability-2.txt,data/openml/sampled/german-credit-data-creditability-2.txt,perfect-tree-found,True,6.0,8770594.0,2402507.0,
+1.0,,german-credit-data-creditability-2.txt,,,,100,20,,,,,,1800.3560800300038,codt,"[2026-06-10T21:19:00Z INFO  codt_cli] Starting solve with options:
+    SolverOptions { lb_strategy: {Pair, Improvement, ClassCount}, ub_strategy: ForRemainingInterval, cart_ub: true, cart_ub_patience: 5, data_reduction: true, track_intermediates: false, timeout: Some(1800s), memory_limit: Some(4294967296) }
+    
+[2026-06-10T21:19:00Z INFO  codt::search::solver_impl] One off witnesses: 0
+[2026-06-10T21:19:00Z INFO  codt::search::solver_impl] Pair lower bound: (primary: 0, secondary: 4)
+[2026-06-10T21:49:00Z INFO  codt_cli] Read time (s): 0.000130202
+[2026-06-10T21:49:00Z INFO  codt_cli] Solve time (s): 1800.203376438
+[2026-06-10T21:49:00Z INFO  codt_cli] Max memory usage (MB): 3073.91
+[2026-06-10T21:49:00Z INFO  codt_cli] Graph expansions: 69881836
+[2026-06-10T21:49:00Z INFO  codt_cli] Tree: [4<=1738.00:[12<=27.50:[3<=0.50:0,1],1],[3<=3.50:1,[3<=7.50:0,[8<=1.50:0,1]]]]
+","Set parameter WLSAccessID
+Set parameter WLSSecret
+Set parameter LicenseID to value 2781812
+Academic license 2781812 - for non-commercial use only - registered to tt___@tudelft.nl
+Misclassifications: 0. Branch nodes: 6. Accuracy: 100%.
+",,,,,"[4<=1738.00:[12<=27.50:[3<=0.50:0,1],1],[3<=3.50:1,[3<=7.50:0,[8<=1.50:0,1]]]]",13,True,german-credit-data-creditability-2.txt,6.0,data/openml/sampled/german-credit-data-creditability-2.txt,,69881836.0,3223228252.0,True,perfect-tree-found
 1.0,5.0,german-credit-data-creditability.csv,german-credit-data-creditability.csv,149.0,-1.0,100,71,True,experiments/results/codt-witty-sampled/witty-cache/german-credit-data-creditability.txt,26.0,26;5;german-credit-data-creditability.csv;100;1.0;0;71;-1;1800;32496;149;false;true;5;1.00;132260;40381;110836;87;6673;1311;100;17;2;4;33;215;100;0;0;43485;0;0;0;0;-1:-1:-1:12:0.0|0:r:-1:2:26.0|0:l:-1:2:29.0|2:r:-1:2:30.0|3:r:-1:17:0.0|2:l:true:-1:-1|1:l:false:-1:-1|1:r:true:-1:-1|3:l:false:-1:-1|4:l:true:-1:-1|4:r:false:-1:-1;,32496.0,2.7469598419993417,witty,,"Started problem 26
 Set parameter WLSAccessID
 Set parameter WLSSecret
@@ -301,7 +691,22 @@ Trying max size 4
 Trying max size 5
 Finished problem 26
 ",1.0,0.0,False,1800.0,-1:-1:-1:12:0.0|0:r:-1:2:26.0|0:l:-1:2:29.0|2:r:-1:2:30.0|3:r:-1:17:0.0|2:l:true:-1:-1|1:l:false:-1:-1|1:r:true:-1:-1|3:l:false:-1:-1|4:l:true:-1:-1|4:r:false:-1:-1,5,True,german-credit-data-creditability.txt,,,,,,,
-1.0,,german-credit-data-creditability.txt,,,,100,71,,,,,,1801.2363509139977,codt,,,,,,,"[17, 0.5, [18, 0.5, [1, 1220.0, [1, 1189.5, 1, 0], [36, 0.5, 1, 0]], [1, 1248.5, 1, 0]], [0, 16.5, 1, 0]]",15,False,german-credit-data-creditability.txt,data/openml/sampled/german-credit-data-creditability.txt,perfect-tree-found,True,7.0,4654568.0,6087271.0,
+1.0,,german-credit-data-creditability.txt,,,,100,71,,,,,,1800.4046017939982,codt,"[2026-06-10T21:49:00Z INFO  codt_cli] Starting solve with options:
+    SolverOptions { lb_strategy: {Pair, Improvement, ClassCount}, ub_strategy: ForRemainingInterval, cart_ub: true, cart_ub_patience: 5, data_reduction: true, track_intermediates: false, timeout: Some(1800s), memory_limit: Some(4294967296) }
+    
+[2026-06-10T21:49:00Z INFO  codt::search::solver_impl] One off witnesses: 0
+[2026-06-10T21:49:00Z INFO  codt::search::solver_impl] Pair lower bound: (primary: 0, secondary: 4)
+[2026-06-10T22:19:00Z INFO  codt_cli] Read time (s): 0.000334602
+[2026-06-10T22:19:00Z INFO  codt_cli] Solve time (s): 1800.245386764
+[2026-06-10T22:19:00Z INFO  codt_cli] Max memory usage (MB): 3075.11
+[2026-06-10T22:19:00Z INFO  codt_cli] Graph expansions: 36264239
+[2026-06-10T22:19:00Z INFO  codt_cli] Tree: [64<=0.50:[2<=33.50:[18<=0.50:[2<=32.50:[1<=1220.00:[12<=0.50:1,0],1],[62<=0.50:1,0]],0],1],[29<=0.50:1,0]]
+","Set parameter WLSAccessID
+Set parameter WLSSecret
+Set parameter LicenseID to value 2781812
+Academic license 2781812 - for non-commercial use only - registered to tt___@tudelft.nl
+Misclassifications: 0. Branch nodes: 8. Accuracy: 100%.
+",,,,,"[64<=0.50:[2<=33.50:[18<=0.50:[2<=32.50:[1<=1220.00:[12<=0.50:1,0],1],[62<=0.50:1,0]],0],1],[29<=0.50:1,0]]",17,True,german-credit-data-creditability.txt,8.0,data/openml/sampled/german-credit-data-creditability.txt,,36264239.0,3224486543.0,True,perfect-tree-found
 0.0,5.0,glass.csv,glass.csv,254.0,-1.0,100,9,False,experiments/results/codt-witty-sampled/witty-cache/glass.txt,27.0,27;5;glass.csv;100;1.0;0;9;-1;1800;1829999;254;true;false;-1;0.00;29551870;229602361;-1710485507;3168;1870819;35579;100;-1;-1;-1;9;529;89;0;0;860204883;0;0;0;0;-1:-1:false:-1:-1;,1829999.0,1800.1973316939984,witty,,"Started problem 27
 Set parameter WLSAccessID
 Set parameter WLSSecret
@@ -313,7 +718,22 @@ Trying max size 7
 Trying max size 8
 Finished problem 27
 ",1.0,0.0,True,1800.0,-1:-1:false:-1:-1,-1,True,glass.txt,,,,,,,
-1.0,,glass.txt,,,,100,9,,,,,,1800.0406652989914,codt,,,,,,,"[5, 0.28, [2, 0.39, [1, 12.675, 1, 0], 0], [2, 3.705, [5, 0.45999999999999996, 1, [5, 0.605, [7, 0.03, [0, 1.521715, [6, 8.135, [4, 72.845, 1, 0], 0], 1], 1], [0, 1.517465, [6, 6.865, 0, [4, 72.88, 1, [0, 1.5160049999999998, [1, 12.995000000000001, 0, 1], 1]]], [2, 0.39, 1, 0]]]], 1]]",33,False,glass.txt,data/openml/sampled/glass.txt,perfect-tree-found,True,16.0,7460135.0,2592727.0,
+1.0,,glass.txt,,,,100,9,,,,,,1800.605291242,codt,"[2026-06-10T23:17:09Z INFO  codt_cli] Starting solve with options:
+    SolverOptions { lb_strategy: {Pair, Improvement, ClassCount}, ub_strategy: ForRemainingInterval, cart_ub: true, cart_ub_patience: 5, data_reduction: true, track_intermediates: false, timeout: Some(1800s), memory_limit: Some(4294967296) }
+    
+[2026-06-10T23:17:09Z INFO  codt::search::solver_impl] One off witnesses: 0
+[2026-06-10T23:17:09Z INFO  codt::search::solver_impl] Pair lower bound: (primary: 0, secondary: 6)
+[2026-06-10T23:47:09Z INFO  codt_cli] Read time (s): 0.0000812
+[2026-06-10T23:47:09Z INFO  codt_cli] Solve time (s): 1800.268892171
+[2026-06-10T23:47:09Z INFO  codt_cli] Max memory usage (MB): 3073.77
+[2026-06-10T23:47:09Z INFO  codt_cli] Graph expansions: 78211052
+[2026-06-10T23:47:09Z INFO  codt_cli] Tree: [0<=1.52:[3<=1.48:[6<=8.66:[3<=1.40:0,1],1],[8<=0.06:[2<=2.70:0,1],0]],[2<=3.54:[4<=72.77:[6<=9.98:0,1],[7<=0.03:0,1]],[5<=0.28:0,1]]]
+","Set parameter WLSAccessID
+Set parameter WLSSecret
+Set parameter LicenseID to value 2781812
+Academic license 2781812 - for non-commercial use only - registered to tt___@tudelft.nl
+Misclassifications: 0. Branch nodes: 11. Accuracy: 100%.
+",,,,,"[0<=1.52:[3<=1.48:[6<=8.66:[3<=1.40:0,1],1],[8<=0.06:[2<=2.70:0,1],0]],[2<=3.54:[4<=72.77:[6<=9.98:0,1],[7<=0.03:0,1]],[5<=0.28:0,1]]]",23,False,glass.txt,11.0,data/openml/sampled/glass.txt,,78211052.0,3223081451.0,True,perfect-tree-found
 0.0,5.0,heart-statlog-uci.csv,heart-statlog-uci.csv,172.0,-1.0,100,13,False,experiments/results/codt-witty-sampled/witty-cache/heart-statlog-uci.txt,28.0,28;5;heart-statlog-uci.csv;100;1.0;0;13;-1;1800;1829999;172;true;false;-1;0.00;11123722;241655640;1311431852;3203;879251;42039;100;-1;-1;-1;13;241;75;0;0;705597499;0;0;0;0;-1:-1:false:-1:-1;,1829999.0,1800.7625451960012,witty,,"Started problem 28
 Set parameter WLSAccessID
 Set parameter WLSSecret
@@ -326,7 +746,22 @@ Trying max size 7
 Trying max size 8
 Finished problem 28
 ",1.0,0.0,True,1800.0,-1:-1:false:-1:-1,-1,True,heart-statlog-uci.txt,,,,,,,
-1.0,,heart-statlog-uci.txt,,,,100,13,,,,,,1800.025079665007,codt,,,,,,,"[12, 4.5, [3, 158.0, [11, 0.5, [4, 307.5, [3, 109.0, [4, 208.5, 0, 1], 0], [3, 121.0, 0, 1]], [1, 0.5, [7, 153.0, [4, 269.5, 0, 1], 0], [7, 177.5, 1, 0]]], 1], [0, 62.5, [9, 3.8, [11, 0.5, [4, 234.5, [2, 2.5, 0, [9, 1.55, [3, 143.0, 0, 1], 1]], 1], [9, 0.25, [0, 48.5, 1, [2, 3.5, 0, 1]], 1]], 0], [7, 129.5, [4, 247.5, 1, 0], [11, 0.5, 0, 1]]]]",49,False,heart-statlog-uci.txt,data/openml/sampled/heart-statlog-uci.txt,perfect-tree-found,True,24.0,7924536.0,1970935.0,
+1.0,,heart-statlog-uci.txt,,,,100,13,,,,,,1800.4014304839998,codt,"[2026-06-10T23:47:09Z INFO  codt_cli] Starting solve with options:
+    SolverOptions { lb_strategy: {ClassCount, Improvement, Pair}, ub_strategy: ForRemainingInterval, cart_ub: true, cart_ub_patience: 5, data_reduction: true, track_intermediates: false, timeout: Some(1800s), memory_limit: Some(4294967296) }
+    
+[2026-06-10T23:47:09Z INFO  codt::search::solver_impl] One off witnesses: 0
+[2026-06-10T23:47:10Z INFO  codt::search::solver_impl] Pair lower bound: (primary: 0, secondary: 5)
+[2026-06-11T00:17:10Z INFO  codt_cli] Read time (s): 0.0001002
+[2026-06-11T00:17:10Z INFO  codt_cli] Solve time (s): 1800.227009814
+[2026-06-11T00:17:10Z INFO  codt_cli] Max memory usage (MB): 3073.87
+[2026-06-11T00:17:10Z INFO  codt_cli] Graph expansions: 80951203
+[2026-06-11T00:17:10Z INFO  codt_cli] Tree: [4<=239.50:[4<=210.00:[6<=1.50:[0<=36.00:1,0],[4<=207.50:1,0]],[4<=225.50:[12<=4.50:0,1],[11<=0.50:0,1]]],[0<=57.50:[12<=4.50:[3<=111.00:1,0],1],[0<=63.50:[4<=284.50:[7<=143.50:1,0],1],[11<=1.50:0,1]]]]
+","Set parameter WLSAccessID
+Set parameter WLSSecret
+Set parameter LicenseID to value 2781812
+Academic license 2781812 - for non-commercial use only - registered to tt___@tudelft.nl
+Misclassifications: 0. Branch nodes: 15. Accuracy: 100%.
+",,,,,"[4<=239.50:[4<=210.00:[6<=1.50:[0<=36.00:1,0],[4<=207.50:1,0]],[4<=225.50:[12<=4.50:0,1],[11<=0.50:0,1]]],[0<=57.50:[12<=4.50:[3<=111.00:1,0],1],[0<=63.50:[4<=284.50:[7<=143.50:1,0],1],[11<=1.50:0,1]]]]",31,False,heart-statlog-uci.txt,15.0,data/openml/sampled/heart-statlog-uci.txt,,80951203.0,3223186309.0,True,perfect-tree-found
 1.0,5.0,hutsof99_child_witness.csv,hutsof99_child_witness.csv,150.0,-1.0,42,15,True,experiments/results/codt-witty-sampled/witty-cache/hutsof99_child_witness.txt,29.0,29;5;hutsof99_child_witness.csv;42;1.0;0;15;-1;1800;62397;150;false;true;6;1.00;3822521;3449475;2977919;187;48623;1084;42;22;2;4;15;296;39;0;0;1402150;0;0;0;0;3:r:-1:4:3.7|0:l:-1:9:2.5|1:l:-1:11:2.6|-1:-1:-1:6:2.3|3:l:-1:6:2.1|1:r:-1:12:1.8|0:r:true:-1:-1|5:r:false:-1:-1|2:l:true:-1:-1|2:r:false:-1:-1|4:r:false:-1:-1|4:l:true:-1:-1|5:l:true:-1:-1;,62397.0,32.59313583800031,witty,,"Started problem 29
 Set parameter WLSAccessID
 Set parameter WLSSecret
@@ -338,7 +773,22 @@ Trying max size 5
 Trying max size 6
 Finished problem 29
 ",1.0,0.0,False,1800.0,3:r:-1:4:3.7|0:l:-1:9:2.5|1:l:-1:11:2.6|-1:-1:-1:6:2.3|3:l:-1:6:2.1|1:r:-1:12:1.8|0:r:true:-1:-1|5:r:false:-1:-1|2:l:true:-1:-1|2:r:false:-1:-1|4:r:false:-1:-1|4:l:true:-1:-1|5:l:true:-1:-1,6,True,hutsof99_child_witness.txt,,,,,,,
-1.0,,hutsof99_child_witness.txt,,,,42,15,,,,,,1800.023455677001,codt,,,,,,,"[11, 2.45, [12, 1.85, [6, 2.45, [11, 1.65, 1, 0], 1], [3, 3.6500000000000004, 1, 0]], [4, 3.25, [11, 2.55, 1, 0], [4, 3.75, 0, 1]]]",17,False,hutsof99_child_witness.txt,data/openml/sampled/hutsof99_child_witness.txt,perfect-tree-found,True,8.0,6748953.0,1547441.0,
+1.0,,hutsof99_child_witness.txt,,,,42,15,,,,,,1800.5092507530007,codt,"[2026-06-11T00:17:10Z INFO  codt_cli] Starting solve with options:
+    SolverOptions { lb_strategy: {Improvement, ClassCount, Pair}, ub_strategy: ForRemainingInterval, cart_ub: true, cart_ub_patience: 5, data_reduction: true, track_intermediates: false, timeout: Some(1800s), memory_limit: Some(4294967296) }
+    
+[2026-06-11T00:17:10Z INFO  codt::search::solver_impl] One off witnesses: 0
+[2026-06-11T00:17:10Z INFO  codt::search::solver_impl] Pair lower bound: (primary: 0, secondary: 4)
+[2026-06-11T00:47:10Z INFO  codt_cli] Read time (s): 0.0000568
+[2026-06-11T00:47:10Z INFO  codt_cli] Solve time (s): 1800.335410653
+[2026-06-11T00:47:10Z INFO  codt_cli] Max memory usage (MB): 3075.75
+[2026-06-11T00:47:10Z INFO  codt_cli] Graph expansions: 81818978
+[2026-06-11T00:47:10Z INFO  codt_cli] Tree: [12<=1.55:[5<=4.55:1,0],[11<=2.55:[9<=2.55:1,[2<=1.75:1,0]],[4<=3.75:0,1]]]
+","Set parameter WLSAccessID
+Set parameter WLSSecret
+Set parameter LicenseID to value 2781812
+Academic license 2781812 - for non-commercial use only - registered to tt___@tudelft.nl
+Misclassifications: 0. Branch nodes: 6. Accuracy: 100%.
+",,,,,"[12<=1.55:[5<=4.55:1,0],[11<=2.55:[9<=2.55:1,[2<=1.75:1,0]],[4<=3.75:0,1]]]",13,False,hutsof99_child_witness.txt,6.0,data/openml/sampled/hutsof99_child_witness.txt,,81818978.0,3225157632.0,True,perfect-tree-found
 0.0,5.0,ilpd-numeric.csv,ilpd-numeric.csv,172.0,-1.0,100,10,False,experiments/results/codt-witty-sampled/witty-cache/ilpd-numeric.txt,30.0,30;5;ilpd-numeric.csv;100;1.0;0;10;-1;1800;1830000;172;true;false;-1;0.00;16066668;270844774;1555540276;3830;1846747;42226;100;-1;-1;-1;10;399;76;0;0;799884114;0;0;0;0;-1:-1:false:-1:-1;,1830000.0,1800.1853644720031,witty,,"Started problem 30
 Set parameter WLSAccessID
 Set parameter WLSSecret
@@ -350,7 +800,22 @@ Trying max size 7
 Trying max size 8
 Finished problem 30
 ",1.0,0.0,True,1800.0,-1:-1:false:-1:-1,-1,True,ilpd-numeric.txt,,,,,,,
-1.0,,ilpd-numeric.txt,,,,100,10,,,,,,1800.0332424740045,codt,,,,,,,"[6, 58.5, [0, 79.5, [6, 35.0, [5, 26.5, [0, 20.5, 1, [9, 1.32, [1, 0.5, 0, [4, 222.5, [9, 0.935, 1, [5, 25.5, [5, 19.5, [7, 5.45, 1, 0], 0], 1]], 0]], 1]], 0], [1, 0.5, 1, [4, 291.5, [5, 58.5, [0, 61.5, 0, [4, 194.5, 1, 0]], 1], 1]]], 1], [5, 49.5, [9, 0.835, 0, [5, 34.0, 0, 1]], 0]]",41,False,ilpd-numeric.txt,data/openml/sampled/ilpd-numeric.txt,perfect-tree-found,True,20.0,8950136.0,1570395.0,
+1.0,,ilpd-numeric.txt,,,,100,10,,,,,,1800.3956144980002,codt,"[2026-06-11T00:47:10Z INFO  codt_cli] Starting solve with options:
+    SolverOptions { lb_strategy: {ClassCount, Improvement, Pair}, ub_strategy: ForRemainingInterval, cart_ub: true, cart_ub_patience: 5, data_reduction: true, track_intermediates: false, timeout: Some(1800s), memory_limit: Some(4294967296) }
+    
+[2026-06-11T00:47:10Z INFO  codt::search::solver_impl] One off witnesses: 0
+[2026-06-11T00:47:11Z INFO  codt::search::solver_impl] Pair lower bound: (primary: 0, secondary: 6)
+[2026-06-11T01:17:10Z INFO  codt_cli] Read time (s): 0.0001055
+[2026-06-11T01:17:10Z INFO  codt_cli] Solve time (s): 1800.232297982
+[2026-06-11T01:17:10Z INFO  codt_cli] Max memory usage (MB): 3073.81
+[2026-06-11T01:17:10Z INFO  codt_cli] Graph expansions: 88105362
+[2026-06-11T01:17:10Z INFO  codt_cli] Tree: [4<=234.00:[0<=48.50:[3<=0.75:[6<=16.50:0,[9<=0.97:1,[7<=6.65:0,1]]],0],[9<=1.05:[6<=17.50:1,0],[0<=54.50:0,1]]],[4<=303.00:[0<=43.50:[0<=34.50:0,[0<=36.00:1,0]],0],[6<=67.00:[4<=486.00:[6<=35.00:0,1],[3<=3.10:0,1]],0]]]
+","Set parameter WLSAccessID
+Set parameter WLSSecret
+Set parameter LicenseID to value 2781812
+Academic license 2781812 - for non-commercial use only - registered to tt___@tudelft.nl
+Misclassifications: 0. Branch nodes: 17. Accuracy: 100%.
+",,,,,"[4<=234.00:[0<=48.50:[3<=0.75:[6<=16.50:0,[9<=0.97:1,[7<=6.65:0,1]]],0],[9<=1.05:[6<=17.50:1,0],[0<=54.50:0,1]]],[4<=303.00:[0<=43.50:[0<=34.50:0,[0<=36.00:1,0]],0],[6<=67.00:[4<=486.00:[6<=35.00:0,1],[3<=3.10:0,1]],0]]]",35,False,ilpd-numeric.txt,17.0,data/openml/sampled/ilpd-numeric.txt,,88105362.0,3223123394.0,True,perfect-tree-found
 0.0,5.0,ionosphere.csv,ionosphere.csv,245.0,-1.0,100,34,False,experiments/results/codt-witty-sampled/witty-cache/ionosphere.txt,31.0,31;5;ionosphere.csv;100;1.0;0;34;-1;1800;1829999;245;true;false;-1;0.00;96043712;96244540;821225391;3475;817701;40286;100;-1;-1;-1;33;2039;78;0;0;143777345;0;0;0;0;-1:-1:false:-1:-1;,1829999.0,1800.6548499860037,witty,,"Started problem 31
 Set parameter WLSAccessID
 Set parameter WLSSecret
@@ -362,7 +827,22 @@ Trying max size 5
 Trying max size 6
 Finished problem 31
 ",1.0,0.0,True,1800.0,-1:-1:false:-1:-1,-1,True,ionosphere.txt,,,,,,,
-1.0,,ionosphere.txt,,,,100,34,,,,,,1800.2019825780008,codt,,,,,,,"[6, 0.308065, 0, [3, -0.43309, 0, [8, 0.39734, [30, 0.398905, 0, [24, 0.9004000000000001, 1, 0]], [5, -0.219335, 0, [9, -0.53267, 0, [28, 0.426865, [32, 0.400005, 1, 0], 1]]]]]]",19,False,ionosphere.txt,data/openml/sampled/ionosphere.txt,perfect-tree-found,True,9.0,1731150.0,10076898.0,
+1.0,,ionosphere.txt,,,,100,34,,,,,,1800.321034912,codt,"[2026-06-11T01:17:11Z INFO  codt_cli] Starting solve with options:
+    SolverOptions { lb_strategy: {ClassCount, Pair, Improvement}, ub_strategy: ForRemainingInterval, cart_ub: true, cart_ub_patience: 5, data_reduction: true, track_intermediates: false, timeout: Some(1800s), memory_limit: Some(4294967296) }
+    
+[2026-06-11T01:17:11Z INFO  codt::search::solver_impl] One off witnesses: 0
+[2026-06-11T01:17:13Z INFO  codt::search::solver_impl] Pair lower bound: (primary: 0, secondary: 4)
+[2026-06-11T01:47:11Z INFO  codt_cli] Read time (s): 0.0002654
+[2026-06-11T01:47:11Z INFO  codt_cli] Solve time (s): 1800.171197097
+[2026-06-11T01:47:11Z INFO  codt_cli] Max memory usage (MB): 3078.11
+[2026-06-11T01:47:11Z INFO  codt_cli] Graph expansions: 34994519
+[2026-06-11T01:47:11Z INFO  codt_cli] Tree: [6<=0.31:0,[3<=-0.43:0,[8<=0.40:[30<=0.40:0,[24<=0.90:1,0]],[5<=-0.22:0,[9<=-0.53:0,[28<=0.43:[32<=0.40:1,0],1]]]]]]
+","Set parameter WLSAccessID
+Set parameter WLSSecret
+Set parameter LicenseID to value 2781812
+Academic license 2781812 - for non-commercial use only - registered to tt___@tudelft.nl
+Misclassifications: 0. Branch nodes: 9. Accuracy: 100%.
+",,,,,"[6<=0.31:0,[3<=-0.43:0,[8<=0.40:[30<=0.40:0,[24<=0.90:1,0]],[5<=-0.22:0,[9<=-0.53:0,[28<=0.43:[32<=0.40:1,0],1]]]]]]",19,False,ionosphere.txt,9.0,data/openml/sampled/ionosphere.txt,,34994519.0,3227632271.0,True,perfect-tree-found
 1.0,5.0,iris.csv,iris.csv,10.0,-1.0,100,4,True,experiments/results/codt-witty-sampled/witty-cache/iris.txt,32.0,32;5;iris.csv;100;1.0;0;4;-1;1800;30025;10;false;true;1;1.00;4;0;0;0;0;1;100;2;1;1;4;90;28;0;0;0;0;0;0;0;-1:-1:-1:3:0.6|0:l:true:-1:-1|0:r:false:-1:-1;,30025.0,0.19440622099500615,witty,,"Started problem 32
 Set parameter WLSAccessID
 Set parameter WLSSecret
@@ -372,7 +852,22 @@ Set parameter Threads to value 1
 Trying max size 1
 Finished problem 32
 ",1.0,0.0,False,1800.0,-1:-1:-1:3:0.6|0:l:true:-1:-1|0:r:false:-1:-1,1,True,iris.txt,,,,,,,
-1.0,,iris.txt,,,,100,4,,,,,,0.2413823870010674,codt,,,,,,,"[3, 0.8, 1, 0]",3,False,iris.txt,data/openml/sampled/iris.txt,perfect-tree-found,True,1.0,0.0,82046.0,
+1.0,,iris.txt,,,,100,4,,,,,,0.2532809259992064,codt,"[2026-06-11T01:47:11Z INFO  codt_cli] Starting solve with options:
+    SolverOptions { lb_strategy: {ClassCount, Improvement, Pair}, ub_strategy: ForRemainingInterval, cart_ub: true, cart_ub_patience: 5, data_reduction: true, track_intermediates: false, timeout: Some(1800s), memory_limit: Some(4294967296) }
+    
+[2026-06-11T01:47:11Z INFO  codt::search::solver_impl] One off witnesses: 0
+[2026-06-11T01:47:11Z INFO  codt::search::solver_impl] Pair lower bound: (primary: 0, secondary: 1)
+[2026-06-11T01:47:11Z INFO  codt_cli] Read time (s): 0.0000399
+[2026-06-11T01:47:11Z INFO  codt_cli] Solve time (s): 0.250337826
+[2026-06-11T01:47:11Z INFO  codt_cli] Max memory usage (MB): 0.08
+[2026-06-11T01:47:11Z INFO  codt_cli] Graph expansions: 0
+[2026-06-11T01:47:11Z INFO  codt_cli] Tree: [3<=0.80:1,0]
+","Set parameter WLSAccessID
+Set parameter WLSSecret
+Set parameter LicenseID to value 2781812
+Academic license 2781812 - for non-commercial use only - registered to tt___@tudelft.nl
+Misclassifications: 0. Branch nodes: 1. Accuracy: 100%.
+",,,,,"[3<=0.80:1,0]",3,False,iris.txt,1.0,data/openml/sampled/iris.txt,,0.0,83886.0,True,perfect-tree-found
 0.0,5.0,jedit_4_2_4_3.csv,jedit_4_2_4_3.csv,165.0,-1.0,100,8,False,experiments/results/codt-witty-sampled/witty-cache/jedit_4_2_4_3.txt,33.0,33;5;jedit_4_2_4_3.csv;100;1.0;0;8;-1;1800;1829999;165;true;false;-1;0.00;16689934;205436464;1860427682;1174;5065663;14560;100;-1;-1;-1;8;251;73;0;0;856657446;0;0;0;0;-1:-1:false:-1:-1;,1829999.0,1800.1795883800005,witty,,"Started problem 33
 Set parameter WLSAccessID
 Set parameter WLSSecret
@@ -384,7 +879,22 @@ Trying max size 9
 Trying max size 10
 Finished problem 33
 ",1.0,0.0,True,1800.0,-1:-1:false:-1:-1,-1,True,jedit_4_2_4_3.txt,,,,,,,
-1.0,,jedit_4_2_4_3.txt,,,,100,8,,,,,,1800.0371266360162,codt,,,,,,,"[4, 29.0, [6, 1.5, [4, 1.0, [7, 70.0, 0, 1], [0, 8.5, 0, 1]], [2, 0.5, [7, 14.0, 1, [7, 46.0, 0, [1, 1.5, [7, 65.5, 1, [6, 2.5, 1, 0]], 1]]], [7, 7.5, [6, 2.5, 1, 0], 1]]], [3, 5.5, [1, 2.5, [7, 17.5, 1, [1, 1.5, 0, 1]], [0, 3.5, [3, 3.5, 0, 1], 0]], [7, 161.0, [4, 39.5, 1, [5, 4.5, 1, 0]], [3, 7.5, 0, [1, 1.5, 1, [4, 40.5, 1, 0]]]]]]",51,False,jedit_4_2_4_3.txt,data/openml/sampled/jedit_4_2_4_3.txt,perfect-tree-found,True,25.0,7108944.0,1696675.0,
+1.0,,jedit_4_2_4_3.txt,,,,100,8,,,,,,1800.4700524670006,codt,"[2026-06-11T01:47:11Z INFO  codt_cli] Starting solve with options:
+    SolverOptions { lb_strategy: {Improvement, ClassCount, Pair}, ub_strategy: ForRemainingInterval, cart_ub: true, cart_ub_patience: 5, data_reduction: true, track_intermediates: false, timeout: Some(1800s), memory_limit: Some(4294967296) }
+    
+[2026-06-11T01:47:11Z INFO  codt::search::solver_impl] One off witnesses: 0
+[2026-06-11T01:47:11Z INFO  codt::search::solver_impl] Pair lower bound: (primary: 0, secondary: 8)
+[2026-06-11T02:17:12Z INFO  codt_cli] Read time (s): 0.0000647
+[2026-06-11T02:17:12Z INFO  codt_cli] Solve time (s): 1800.293660948
+[2026-06-11T02:17:12Z INFO  codt_cli] Max memory usage (MB): 3073.51
+[2026-06-11T02:17:12Z INFO  codt_cli] Graph expansions: 97117059
+[2026-06-11T02:17:12Z INFO  codt_cli] Tree: [7<=80.50:[7<=40.00:[0<=2.50:[1<=2.50:1,0],[2<=1.50:[3<=5.50:[4<=15.50:1,[1<=3.50:0,1]],1],0]],[7<=55.50:[3<=5.50:0,1],[7<=74.00:[6<=2.50:0,1],1]]],[7<=207.00:[4<=26.50:[2<=1.50:[5<=4.50:1,0],1],[3<=11.50:[3<=8.50:0,1],1]],[4<=50.00:[6<=11.50:1,[7<=399.00:0,1]],[1<=1.50:1,[3<=4.50:1,0]]]]]
+","Set parameter WLSAccessID
+Set parameter WLSSecret
+Set parameter LicenseID to value 2781812
+Academic license 2781812 - for non-commercial use only - registered to tt___@tudelft.nl
+Misclassifications: 0. Branch nodes: 23. Accuracy: 100%.
+",,,,,"[7<=80.50:[7<=40.00:[0<=2.50:[1<=2.50:1,0],[2<=1.50:[3<=5.50:[4<=15.50:1,[1<=3.50:0,1]],1],0]],[7<=55.50:[3<=5.50:0,1],[7<=74.00:[6<=2.50:0,1],1]]],[7<=207.00:[4<=26.50:[2<=1.50:[5<=4.50:1,0],1],[3<=11.50:[3<=8.50:0,1],1]],[4<=50.00:[6<=11.50:1,[7<=399.00:0,1]],[1<=1.50:1,[3<=4.50:1,0]]]]]",47,False,jedit_4_2_4_3.txt,23.0,data/openml/sampled/jedit_4_2_4_3.txt,,97117059.0,3222808821.0,True,perfect-tree-found
 0.0,5.0,kc1-binary.csv,kc1-binary.csv,457.0,-1.0,100,94,False,experiments/results/codt-witty-sampled/witty-cache/kc1-binary.txt,34.0,34;5;kc1-binary.csv;100;1.0;0;94;-1;1800;1829999;457;true;false;-1;0.00;36266796;31452779;940677032;2756;1428579;22329;100;-1;-1;-1;85;4620;97;0;0;493917690;0;0;0;0;-1:-1:false:-1:-1;,1829999.0,1800.5524779929983,witty,,"Started problem 34
 Set parameter WLSAccessID
 Set parameter WLSSecret
@@ -394,7 +904,22 @@ Set parameter Threads to value 1
 Trying max size 5
 Finished problem 34
 ",1.0,0.0,True,1800.0,-1:-1:false:-1:-1,-1,True,kc1-binary.txt,,,,,,,
-1.0,,kc1-binary.txt,,,,100,94,,,,,,1822.4102693560126,codt,,,,,,,"[88, 1270.81, [51, 38.5, [57, 1.527778, 0, [88, 13.75, [8, 5.5, 1, 0], 0]], [72, 11.1746035, 1, [4, 12.5, 1, 0]]], [61, 4.0973205, [47, 46.5, 0, 1], [7, 0.5, 1, [92, 110.0, [45, 1119.37, 0, [80, 250.0, [77, 37.5, 1, [93, 255.0, 0, 1]], 0]], [40, 45.785, [37, 18.5, 1, 0], 0]]]]]",35,False,kc1-binary.txt,data/openml/sampled/kc1-binary.txt,perfect-tree-found,True,17.0,1018587.0,15122153.0,
+1.0,,kc1-binary.txt,,,,100,94,,,,,,1802.388635874,codt,"[2026-06-11T02:17:12Z INFO  codt_cli] Starting solve with options:
+    SolverOptions { lb_strategy: {Improvement, ClassCount, Pair}, ub_strategy: ForRemainingInterval, cart_ub: true, cart_ub_patience: 5, data_reduction: true, track_intermediates: false, timeout: Some(1800s), memory_limit: Some(4294967296) }
+    
+[2026-06-11T02:17:14Z INFO  codt::search::solver_impl] One off witnesses: 0
+[2026-06-11T02:17:17Z INFO  codt::search::solver_impl] Pair lower bound: (primary: 0, secondary: 5)
+[2026-06-11T02:47:14Z INFO  codt_cli] Read time (s): 0.0006375
+[2026-06-11T02:47:14Z INFO  codt_cli] Solve time (s): 1802.232483074
+[2026-06-11T02:47:14Z INFO  codt_cli] Max memory usage (MB): 3082.12
+[2026-06-11T02:47:14Z INFO  codt_cli] Graph expansions: 20636071
+[2026-06-11T02:47:14Z INFO  codt_cli] Tree: [88<=1270.81:[51<=38.50:[57<=1.53:0,[88<=13.75:[8<=5.50:1,0],0]],[72<=11.17:1,[4<=12.50:1,0]]],[61<=4.10:[47<=46.50:0,1],[7<=0.50:1,[92<=110.00:[45<=1119.37:0,[80<=250.00:[77<=37.50:1,[93<=255.00:0,1]],0]],[40<=45.78:[37<=18.50:1,0],0]]]]]
+","Set parameter WLSAccessID
+Set parameter WLSSecret
+Set parameter LicenseID to value 2781812
+Academic license 2781812 - for non-commercial use only - registered to tt___@tudelft.nl
+Misclassifications: 0. Branch nodes: 17. Accuracy: 100%.
+",,,,,"[88<=1270.81:[51<=38.50:[57<=1.53:0,[88<=13.75:[8<=5.50:1,0],0]],[72<=11.17:1,[4<=12.50:1,0]]],[61<=4.10:[47<=46.50:0,1],[7<=0.50:1,[92<=110.00:[45<=1119.37:0,[80<=250.00:[77<=37.50:1,[93<=255.00:0,1]],0]],[40<=45.78:[37<=18.50:1,0],0]]]]]",35,False,kc1-binary.txt,17.0,data/openml/sampled/kc1-binary.txt,,20636071.0,3231837061.0,True,perfect-tree-found
 1.0,5.0,kc1-top5.csv,kc1-top5.csv,165.0,-1.0,100,94,True,experiments/results/codt-witty-sampled/witty-cache/kc1-top5.txt,35.0,35;5;kc1-top5.csv;100;1.0;0;94;-1;1800;34188;165;false;true;3;1.00;849166;30619;691808;56;2513;564;100;9;1;3;85;4620;97;0;0;60158;0;0;0;0;2:r:-1:91:551.0|0:l:-1:48:128.0|-1:-1:-1:45:1363.97|1:r:true:-1:-1|0:r:false:-1:-1|1:l:false:-1:-1|2:l:true:-1:-1;,34188.0,4.59307004600123,witty,,"Started problem 35
 Set parameter WLSAccessID
 Set parameter WLSSecret
@@ -404,7 +929,22 @@ Set parameter Threads to value 1
 Trying max size 3
 Finished problem 35
 ",1.0,0.0,False,1800.0,2:r:-1:91:551.0|0:l:-1:48:128.0|-1:-1:-1:45:1363.97|1:r:true:-1:-1|0:r:false:-1:-1|1:l:false:-1:-1|2:l:true:-1:-1,3,True,kc1-top5.txt,,,,,,,
-1.0,,kc1-top5.txt,,,,100,94,,,,,,1808.1925804069906,codt,,,,,,,"[91, 69.5, 1, [58, 1.465079, 1, [0, 83.5, [9, 36.5, 1, 0], 0]]]",9,False,kc1-top5.txt,data/openml/sampled/kc1-top5.txt,perfect-tree-found,True,4.0,704399.0,8274144.0,
+1.0,,kc1-top5.txt,,,,100,94,,,,,,11.540505159999157,codt,"[2026-06-11T02:47:14Z INFO  codt_cli] Starting solve with options:
+    SolverOptions { lb_strategy: {Pair, ClassCount, Improvement}, ub_strategy: ForRemainingInterval, cart_ub: true, cart_ub_patience: 5, data_reduction: true, track_intermediates: false, timeout: Some(1800s), memory_limit: Some(4294967296) }
+    
+[2026-06-11T02:47:15Z INFO  codt::search::solver_impl] One off witnesses: 0
+[2026-06-11T02:47:24Z INFO  codt::search::solver_impl] Pair lower bound: (primary: 0, secondary: 3)
+[2026-06-11T02:47:26Z INFO  codt_cli] Read time (s): 0.0011837
+[2026-06-11T02:47:26Z INFO  codt_cli] Solve time (s): 11.48368336
+[2026-06-11T02:47:26Z INFO  codt_cli] Max memory usage (MB): 1125.47
+[2026-06-11T02:47:26Z INFO  codt_cli] Graph expansions: 1904
+[2026-06-11T02:47:26Z INFO  codt_cli] Tree: [45<=1370.45:1,[91<=609.50:[48<=129.00:0,1],0]]
+","Set parameter WLSAccessID
+Set parameter WLSSecret
+Set parameter LicenseID to value 2781812
+Academic license 2781812 - for non-commercial use only - registered to tt___@tudelft.nl
+Misclassifications: 0. Branch nodes: 3. Accuracy: 100%.
+",,,,,"[45<=1370.45:1,[91<=609.50:[48<=129.00:0,1],0]]",7,False,kc1-top5.txt,3.0,data/openml/sampled/kc1-top5.txt,,1904.0,1180140830.0,True,perfect-tree-found
 1.0,5.0,kc2.csv,kc2.csv,9.0,-1.0,100,21,True,experiments/results/codt-witty-sampled/witty-cache/kc2.txt,36.0,36;5;kc2.csv;100;1.0;0;21;-1;1800;30088;9;false;true;2;1.00;409;0;2;0;0;1;100;5;1;2;21;780;76;0;0;1;0;0;0;0;-1:-1:-1:0:1.0|0:r:-1:19:111.0|0:l:true:-1:-1|1:l:false:-1:-1|1:r:true:-1:-1;,30088.0,0.32910002899734536,witty,,"Started problem 36
 Set parameter WLSAccessID
 Set parameter WLSSecret
@@ -414,7 +954,22 @@ Set parameter Threads to value 1
 Trying max size 2
 Finished problem 36
 ",1.0,0.0,False,1800.0,-1:-1:-1:0:1.0|0:r:-1:19:111.0|0:l:true:-1:-1|1:l:false:-1:-1|1:r:true:-1:-1,2,True,kc2.txt,,,,,,,
-1.0,,kc2.txt,,,,100,21,,,,,,0.48730257898569107,codt,,,,,,,"[19, 143.5, [0, 1.05, 1, 0], 1]",5,False,kc2.txt,data/openml/sampled/kc2.txt,perfect-tree-found,True,2.0,0.0,422727.0,
+1.0,,kc2.txt,,,,100,21,,,,,,0.08991579999928945,codt,"[2026-06-11T02:47:26Z INFO  codt_cli] Starting solve with options:
+    SolverOptions { lb_strategy: {Improvement, Pair, ClassCount}, ub_strategy: ForRemainingInterval, cart_ub: true, cart_ub_patience: 5, data_reduction: true, track_intermediates: false, timeout: Some(1800s), memory_limit: Some(4294967296) }
+    
+[2026-06-11T02:47:26Z INFO  codt::search::solver_impl] One off witnesses: 0
+[2026-06-11T02:47:26Z INFO  codt::search::solver_impl] Pair lower bound: (primary: 0, secondary: 2)
+[2026-06-11T02:47:26Z INFO  codt_cli] Read time (s): 0.0001505
+[2026-06-11T02:47:26Z INFO  codt_cli] Solve time (s): 0.0878211
+[2026-06-11T02:47:26Z INFO  codt_cli] Max memory usage (MB): 0.41
+[2026-06-11T02:47:26Z INFO  codt_cli] Graph expansions: 0
+[2026-06-11T02:47:26Z INFO  codt_cli] Tree: [19<=143.50:[0<=1.05:1,0],1]
+","Set parameter WLSAccessID
+Set parameter WLSSecret
+Set parameter LicenseID to value 2781812
+Academic license 2781812 - for non-commercial use only - registered to tt___@tudelft.nl
+Misclassifications: 0. Branch nodes: 2. Accuracy: 100%.
+",,,,,"[19<=143.50:[0<=1.05:1,0],1]",5,False,kc2.txt,2.0,data/openml/sampled/kc2.txt,,0.0,429916.0,True,perfect-tree-found
 1.0,5.0,kc3.csv,kc3.csv,149.0,-1.0,100,39,True,experiments/results/codt-witty-sampled/witty-cache/kc3.txt,37.0,37;5;kc3.csv;100;1.0;0;39;-1;1800;38342;149;false;true;6;1.00;892678;317821;1665224;475;101367;3869;100;25;1;5;39;1131;76;0;0;854584;0;0;0;0;-1:-1:-1:2:3.0|3:r:-1:7:0.19|1:l:-1:31:0.12|5:l:-1:18:0.79|3:l:-1:19:35.69|0:r:-1:14:0.38|2:r:true:-1:-1|0:l:false:-1:-1|1:r:false:-1:-1|2:l:false:-1:-1|4:r:false:-1:-1|4:l:true:-1:-1|5:r:false:-1:-1;,38342.0,8.60083534399746,witty,,"Started problem 37
 Set parameter WLSAccessID
 Set parameter WLSSecret
@@ -426,7 +981,22 @@ Trying max size 5
 Trying max size 6
 Finished problem 37
 ",1.0,0.0,False,1800.0,-1:-1:-1:2:3.0|3:r:-1:7:0.19|1:l:-1:31:0.12|5:l:-1:18:0.79|3:l:-1:19:35.69|0:r:-1:14:0.38|2:r:true:-1:-1|0:l:false:-1:-1|1:r:false:-1:-1|2:l:false:-1:-1|4:r:false:-1:-1|4:l:true:-1:-1|5:r:false:-1:-1,6,True,kc3.txt,,,,,,,
-1.0,,kc3.txt,,,,100,39,,,,,,1800.9423881080002,codt,,,,,,,"[34, 24.5, [1, 6.5, [19, 29.93, 0, [19, 32.775000000000006, 1, 0]], [0, 5.5, 0, 1]], [18, 0.77, 0, [29, 9.0, 1, 0]]]",15,False,kc3.txt,data/openml/sampled/kc3.txt,perfect-tree-found,True,7.0,3733956.0,3867449.0,
+1.0,,kc3.txt,,,,100,39,,,,,,1800.449519287,codt,"[2026-06-11T02:47:26Z INFO  codt_cli] Starting solve with options:
+    SolverOptions { lb_strategy: {Pair, Improvement, ClassCount}, ub_strategy: ForRemainingInterval, cart_ub: true, cart_ub_patience: 5, data_reduction: true, track_intermediates: false, timeout: Some(1800s), memory_limit: Some(4294967296) }
+    
+[2026-06-11T02:47:26Z INFO  codt::search::solver_impl] One off witnesses: 0
+[2026-06-11T02:47:26Z INFO  codt::search::solver_impl] Pair lower bound: (primary: 0, secondary: 4)
+[2026-06-11T03:17:26Z INFO  codt_cli] Read time (s): 0.0003067
+[2026-06-11T03:17:26Z INFO  codt_cli] Solve time (s): 1800.310092887
+[2026-06-11T03:17:26Z INFO  codt_cli] Max memory usage (MB): 3075.54
+[2026-06-11T03:17:26Z INFO  codt_cli] Graph expansions: 50957368
+[2026-06-11T03:17:26Z INFO  codt_cli] Tree: [3<=0.50:[34<=99.50:[34<=12.50:0,[36<=7.50:1,[20<=14.14:[30<=17.50:0,[34<=25.50:1,0]],0]]],1],[37<=4.71:1,[7<=0.30:0,1]]]
+","Set parameter WLSAccessID
+Set parameter WLSSecret
+Set parameter LicenseID to value 2781812
+Academic license 2781812 - for non-commercial use only - registered to tt___@tudelft.nl
+Misclassifications: 0. Branch nodes: 9. Accuracy: 100%.
+",,,,,"[3<=0.50:[34<=99.50:[34<=12.50:0,[36<=7.50:1,[20<=14.14:[30<=17.50:0,[34<=25.50:1,0]],0]]],1],[37<=4.71:1,[7<=0.30:0,1]]]",19,False,kc3.txt,9.0,data/openml/sampled/kc3.txt,,50957368.0,3224937431.0,True,perfect-tree-found
 0.0,5.0,megawatt1.csv,megawatt1.csv,230.0,-1.0,100,37,False,experiments/results/codt-witty-sampled/witty-cache/megawatt1.txt,38.0,38;5;megawatt1.csv;100;1.0;0;37;-1;1800;1829999;230;true;false;-1;0.00;92559250;81733761;471104372;2771;5769662;29400;100;-1;-1;-1;37;1377;99;0;0;217401195;0;0;0;0;-1:-1:false:-1:-1;,1829999.0,1800.2521012750003,witty,,"Started problem 38
 Set parameter WLSAccessID
 Set parameter WLSSecret
@@ -437,7 +1007,22 @@ Trying max size 5
 Trying max size 6
 Finished problem 38
 ",1.0,0.0,True,1800.0,-1:-1:false:-1:-1,-1,True,megawatt1.txt,,,,,,,
-1.0,,megawatt1.txt,,,,100,37,,,,,,1801.3574825290125,codt,,,,,,,"[32, 51.5, [0, 3.5, [34, 28.5, [12, 12.5, 0, [4, 1.5, [23, 96.77000000000001, [17, 28.295, 0, [31, 24.5, 0, 1]], 0], 0]], [34, 39.5, 1, 0]], 0], [9, 2.0549999999999997, 0, [4, 5.5, 0, 1]]]",23,False,megawatt1.txt,data/openml/sampled/megawatt1.txt,perfect-tree-found,True,11.0,2718339.0,4780867.0,
+1.0,,megawatt1.txt,,,,100,37,,,,,,1800.470328464,codt,"[2026-06-11T03:17:26Z INFO  codt_cli] Starting solve with options:
+    SolverOptions { lb_strategy: {ClassCount, Pair, Improvement}, ub_strategy: ForRemainingInterval, cart_ub: true, cart_ub_patience: 5, data_reduction: true, track_intermediates: false, timeout: Some(1800s), memory_limit: Some(4294967296) }
+    
+[2026-06-11T03:17:26Z INFO  codt::search::solver_impl] One off witnesses: 0
+[2026-06-11T03:17:28Z INFO  codt::search::solver_impl] Pair lower bound: (primary: 0, secondary: 5)
+[2026-06-11T03:47:27Z INFO  codt_cli] Read time (s): 0.0002642
+[2026-06-11T03:47:27Z INFO  codt_cli] Solve time (s): 1800.324955764
+[2026-06-11T03:47:27Z INFO  codt_cli] Max memory usage (MB): 3075.94
+[2026-06-11T03:47:27Z INFO  codt_cli] Graph expansions: 44168340
+[2026-06-11T03:47:27Z INFO  codt_cli] Tree: [32<=51.50:[0<=3.50:[34<=28.50:[12<=12.50:0,[4<=1.50:[23<=96.77:[17<=28.30:0,[31<=24.50:0,1]],0],0]],[34<=39.50:1,0]],0],[9<=2.05:0,[4<=5.50:0,1]]]
+","Set parameter WLSAccessID
+Set parameter WLSSecret
+Set parameter LicenseID to value 2781812
+Academic license 2781812 - for non-commercial use only - registered to tt___@tudelft.nl
+Misclassifications: 0. Branch nodes: 11. Accuracy: 100%.
+",,,,,"[32<=51.50:[0<=3.50:[34<=28.50:[12<=12.50:0,[4<=1.50:[23<=96.77:[17<=28.30:0,[31<=24.50:0,1]],0],0]],[34<=39.50:1,0]],0],[9<=2.05:0,[4<=5.50:0,1]]]",23,False,megawatt1.txt,11.0,data/openml/sampled/megawatt1.txt,,44168340.0,3225356861.0,True,perfect-tree-found
 0.0,5.0,mindcave2.csv,mindcave2.csv,392.0,-1.0,100,39,False,experiments/results/codt-witty-sampled/witty-cache/mindcave2.txt,39.0,39;5;mindcave2.csv;100;1.0;0;39;-1;1800;1829999;392;true;false;-1;0.00;18387624;56255062;1656650144;2994;4916499;30409;100;-1;-1;-1;39;1744;100;0;0;680881222;0;0;0;0;-1:-1:false:-1:-1;,1829999.0,1800.2869022039959,witty,,"Started problem 39
 Set parameter WLSAccessID
 Set parameter WLSSecret
@@ -448,7 +1033,22 @@ Trying max size 6
 Trying max size 7
 Finished problem 39
 ",1.0,0.0,True,1800.0,-1:-1:false:-1:-1,-1,True,mindcave2.txt,,,,,,,
-1.0,,mindcave2.txt,,,,100,39,,,,,,1802.364418696001,codt,,,,,,,"[35, 17.5, [36, 135.5, [30, 31.5, [25, 1135.685, [7, 0.185, 0, [34, 10.5, [7, 0.225, [38, 14.5, 1, 0], [32, 6.5, [35, 7.5, 0, 1], 0]], [14, 0.53, [7, 0.32, [19, 15.735, 1, 0], 1], 1]]], 0], 1], 1], [14, 0.53, [13, 7.5, [7, 0.235, [25, 5751.585, [31, 0.065, [33, 226.5, 1, 0], 0], 1], [17, 4.5, 0, 1]], 0], [18, 0.985, 1, [7, 0.175, 0, 1]]]]",45,False,mindcave2.txt,data/openml/sampled/mindcave2.txt,perfect-tree-found,True,22.0,3652484.0,6720259.0,
+1.0,,mindcave2.txt,,,,100,39,,,,,,1800.5704545629997,codt,"[2026-06-11T03:47:27Z INFO  codt_cli] Starting solve with options:
+    SolverOptions { lb_strategy: {Improvement, ClassCount, Pair}, ub_strategy: ForRemainingInterval, cart_ub: true, cart_ub_patience: 5, data_reduction: true, track_intermediates: false, timeout: Some(1800s), memory_limit: Some(4294967296) }
+    
+[2026-06-11T03:47:27Z INFO  codt::search::solver_impl] One off witnesses: 0
+[2026-06-11T03:47:28Z INFO  codt::search::solver_impl] Pair lower bound: (primary: 0, secondary: 6)
+[2026-06-11T04:17:27Z INFO  codt_cli] Read time (s): 0.00029
+[2026-06-11T04:17:27Z INFO  codt_cli] Solve time (s): 1800.413836764
+[2026-06-11T04:17:27Z INFO  codt_cli] Max memory usage (MB): 3076.34
+[2026-06-11T04:17:27Z INFO  codt_cli] Graph expansions: 43733476
+[2026-06-11T04:17:27Z INFO  codt_cli] Tree: [36<=163.00:[19<=25.47:[19<=16.58:[8<=13.00:[30<=6.50:[20<=8.50:0,1],[19<=15.46:0,1]],1],[11<=0.39:[7<=0.21:0,1],0]],[25<=1450.50:[11<=0.46:[13<=4.50:0,1],[14<=0.07:0,1]],[37<=23.57:[25<=6830.60:0,1],[3<=9.50:1,0]]]],[19<=67.69:1,[11<=0.35:1,0]]]
+","Set parameter WLSAccessID
+Set parameter WLSSecret
+Set parameter LicenseID to value 2781812
+Academic license 2781812 - for non-commercial use only - registered to tt___@tudelft.nl
+Misclassifications: 0. Branch nodes: 18. Accuracy: 100%.
+",,,,,"[36<=163.00:[19<=25.47:[19<=16.58:[8<=13.00:[30<=6.50:[20<=8.50:0,1],[19<=15.46:0,1]],1],[11<=0.39:[7<=0.21:0,1],0]],[25<=1450.50:[11<=0.46:[13<=4.50:0,1],[14<=0.07:0,1]],[37<=23.57:[25<=6830.60:0,1],[3<=9.50:1,0]]]],[19<=67.69:1,[11<=0.35:1,0]]]",37,False,mindcave2.txt,18.0,data/openml/sampled/mindcave2.txt,,43733476.0,3225776291.0,True,perfect-tree-found
 0.0,5.0,no2.csv,no2.csv,250.0,-1.0,100,7,False,experiments/results/codt-witty-sampled/witty-cache/no2.txt,40.0,40;5;no2.csv;100;1.0;0;7;-1;1800;1830000;250;true;false;-1;0.00;4326795;304837501;-1572100465;1253;668048;15845;100;-1;-1;-1;7;476;98;0;0;852275100;0;0;0;0;-1:-1:false:-1:-1;,1830000.0,1800.204430079997,witty,,"Started problem 40
 Set parameter WLSAccessID
 Set parameter WLSSecret
@@ -460,7 +1060,22 @@ Trying max size 7
 Trying max size 8
 Finished problem 40
 ",1.0,0.0,True,1800.0,-1:-1:false:-1:-1,-1,True,no2.txt,,,,,,,
-1.0,,no2.txt,,,,100,7,,,,,,1800.0740298320015,codt,,,,,,,"[1, 4.94944, 0, [0, 3.94931, [2, 10.85, [3, 5.0, [2, 0.4, [0, 3.2088200000000002, 0, [3, 3.05, 1, [2, -13.05, 1, 0]]], [2, 8.85, 1, [1, 7.59432, 1, 0]]], [3, 6.65, 0, [3, 7.0, 1, [5, 213.95, 0, 1]]]], 0], [4, 1.05, [2, -1.85, 0, [2, 1.9, [0, 4.3509150000000005, [6, 5.5, 0, 1], 0], [3, 4.05, [1, 6.5941399999999994, [5, 89.45, 1, 0], 0], [4, 0.35, 1, 0]]]], [4, 2.6500000000000004, 1, 0]]]]",47,False,no2.txt,data/openml/sampled/no2.txt,perfect-tree-found,True,23.0,7193605.0,2424206.0,
+1.0,,no2.txt,,,,100,7,,,,,,1800.4230301629977,codt,"[2026-06-11T04:17:27Z INFO  codt_cli] Starting solve with options:
+    SolverOptions { lb_strategy: {Pair, ClassCount, Improvement}, ub_strategy: ForRemainingInterval, cart_ub: true, cart_ub_patience: 5, data_reduction: true, track_intermediates: false, timeout: Some(1800s), memory_limit: Some(4294967296) }
+    
+[2026-06-11T04:17:27Z INFO  codt::search::solver_impl] One off witnesses: 0
+[2026-06-11T04:17:31Z INFO  codt::search::solver_impl] Pair lower bound: (primary: 0, secondary: 6)
+[2026-06-11T04:47:28Z INFO  codt_cli] Read time (s): 0.0000816
+[2026-06-11T04:47:28Z INFO  codt_cli] Solve time (s): 1800.250268233
+[2026-06-11T04:47:28Z INFO  codt_cli] Max memory usage (MB): 3073.65
+[2026-06-11T04:47:28Z INFO  codt_cli] Graph expansions: 97939942
+[2026-06-11T04:47:28Z INFO  codt_cli] Tree: [0<=3.79:[1<=6.85:[1<=4.95:0,[0<=3.02:[2<=0.40:0,1],[3<=3.95:1,0]]],[1<=7.80:[0<=3.13:1,[5<=64.55:0,[2<=8.85:1,0]]],0]],[3<=2.55:[0<=3.97:1,[4<=0.95:[2<=-1.40:0,[2<=1.90:1,0]],[4<=2.65:1,0]]],[0<=3.82:1,[3<=4.35:[0<=4.33:0,1],[3<=5.95:1,0]]]]]
+","Set parameter WLSAccessID
+Set parameter WLSSecret
+Set parameter LicenseID to value 2781812
+Academic license 2781812 - for non-commercial use only - registered to tt___@tudelft.nl
+Misclassifications: 0. Branch nodes: 20. Accuracy: 100%.
+",,,,,"[0<=3.79:[1<=6.85:[1<=4.95:0,[0<=3.02:[2<=0.40:0,1],[3<=3.95:1,0]]],[1<=7.80:[0<=3.13:1,[5<=64.55:0,[2<=8.85:1,0]]],0]],[3<=2.55:[0<=3.97:1,[4<=0.95:[2<=-1.40:0,[2<=1.90:1,0]],[4<=2.65:1,0]]],[0<=3.82:1,[3<=4.35:[0<=4.33:0,1],[3<=5.95:1,0]]]]]",41,False,no2.txt,20.0,data/openml/sampled/no2.txt,,97939942.0,3222955622.0,True,perfect-tree-found
 1.0,5.0,oil_spill.csv,oil_spill.csv,71.0,-1.0,100,49,True,experiments/results/codt-witty-sampled/witty-cache/oil_spill.txt,41.0,41;5;oil_spill.csv;100;1.0;0;49;-1;1800;30473;71;false;true;3;1.00;6131;575;19456;2;1;42;100;9;1;3;47;2626;100;0;0;7752;0;0;0;0;-1:-1:-1:2:902.43|0:r:-1:46:15763.52|1:r:-1:37:17.92|2:r:true:-1:-1|0:l:false:-1:-1|1:l:false:-1:-1|2:l:false:-1:-1;,30473.0,1.0496395390000544,witty,,"Started problem 41
 Set parameter WLSAccessID
 Set parameter WLSSecret
@@ -470,7 +1085,22 @@ Set parameter Threads to value 1
 Trying max size 3
 Finished problem 41
 ",1.0,0.0,False,1800.0,-1:-1:-1:2:902.43|0:r:-1:46:15763.52|1:r:-1:37:17.92|2:r:true:-1:-1|0:l:false:-1:-1|1:l:false:-1:-1|2:l:false:-1:-1,3,True,oil_spill.txt,,,,,,,
-1.0,,oil_spill.txt,,,,100,49,,,,,,1.937999204004882,codt,,,,,,,"[3, 673.095, [20, 0.165, 0, 1], [29, -3.525, 1, 0]]",7,False,oil_spill.txt,data/openml/sampled/oil_spill.txt,perfect-tree-found,True,3.0,0.0,2114459.0,
+1.0,,oil_spill.txt,,,,100,49,,,,,,0.6099925710004754,codt,"[2026-06-11T04:47:28Z INFO  codt_cli] Starting solve with options:
+    SolverOptions { lb_strategy: {ClassCount, Pair, Improvement}, ub_strategy: ForRemainingInterval, cart_ub: true, cart_ub_patience: 5, data_reduction: true, track_intermediates: false, timeout: Some(1800s), memory_limit: Some(4294967296) }
+    
+[2026-06-11T04:47:28Z INFO  codt::search::solver_impl] One off witnesses: 0
+[2026-06-11T04:47:28Z INFO  codt::search::solver_impl] Pair lower bound: (primary: 0, secondary: 3)
+[2026-06-11T04:47:28Z INFO  codt_cli] Read time (s): 0.000353404
+[2026-06-11T04:47:28Z INFO  codt_cli] Solve time (s): 0.597358743
+[2026-06-11T04:47:28Z INFO  codt_cli] Max memory usage (MB): 2.02
+[2026-06-11T04:47:28Z INFO  codt_cli] Graph expansions: 0
+[2026-06-11T04:47:28Z INFO  codt_cli] Tree: [3<=673.10:[20<=0.17:0,1],[29<=-3.52:1,0]]
+","Set parameter WLSAccessID
+Set parameter WLSSecret
+Set parameter LicenseID to value 2781812
+Academic license 2781812 - for non-commercial use only - registered to tt___@tudelft.nl
+Misclassifications: 0. Branch nodes: 3. Accuracy: 100%.
+",,,,,"[3<=673.10:[20<=0.17:0,1],[29<=-3.52:1,0]]",7,False,oil_spill.txt,3.0,data/openml/sampled/oil_spill.txt,,0.0,2118123.0,True,perfect-tree-found
 1.0,5.0,parkinsons.csv,parkinsons.csv,73.0,-1.0,100,22,True,experiments/results/codt-witty-sampled/witty-cache/parkinsons.txt,42.0,42;5;parkinsons.csv;100;1.0;0;22;-1;1800;30409;73;false;true;3;1.00;153;7;148;0;0;1;100;9;1;3;22;2026;100;0;0;2;0;0;0;0;-1:-1:-1:0:187.733|0:l:-1:0:129.336|1:l:-1:18:-6.439398|1:r:true:-1:-1|0:r:false:-1:-1|2:l:false:-1:-1|2:r:true:-1:-1;,30409.0,0.668706595999538,witty,,"Started problem 42
 Set parameter WLSAccessID
 Set parameter WLSSecret
@@ -480,7 +1110,22 @@ Set parameter Threads to value 1
 Trying max size 3
 Finished problem 42
 ",1.0,0.0,False,1800.0,-1:-1:-1:0:187.733|0:l:-1:0:129.336|1:l:-1:18:-6.439398|1:r:true:-1:-1|0:r:false:-1:-1|2:l:false:-1:-1|2:r:true:-1:-1,3,True,parkinsons.txt,,,,,,,
-1.0,,parkinsons.txt,,,,100,22,,,,,,0.9337496949883644,codt,,,,,,,"[21, 0.1072535, 0, [18, -6.428419, [13, 0.024335000000000002, 1, 0], 1]]",7,False,parkinsons.txt,data/openml/sampled/parkinsons.txt,perfect-tree-found,True,3.0,115.0,3048939.0,
+1.0,,parkinsons.txt,,,,100,22,,,,,,0.3676894189993618,codt,"[2026-06-11T04:47:28Z INFO  codt_cli] Starting solve with options:
+    SolverOptions { lb_strategy: {Improvement, Pair, ClassCount}, ub_strategy: ForRemainingInterval, cart_ub: true, cart_ub_patience: 5, data_reduction: true, track_intermediates: false, timeout: Some(1800s), memory_limit: Some(4294967296) }
+    
+[2026-06-11T04:47:28Z INFO  codt::search::solver_impl] One off witnesses: 0
+[2026-06-11T04:47:29Z INFO  codt::search::solver_impl] Pair lower bound: (primary: 0, secondary: 3)
+[2026-06-11T04:47:29Z INFO  codt_cli] Read time (s): 0.000219303
+[2026-06-11T04:47:29Z INFO  codt_cli] Solve time (s): 0.355454995
+[2026-06-11T04:47:29Z INFO  codt_cli] Max memory usage (MB): 17.11
+[2026-06-11T04:47:29Z INFO  codt_cli] Graph expansions: 103
+[2026-06-11T04:47:29Z INFO  codt_cli] Tree: [1<=148.74:[21<=0.15:0,1],[0<=192.40:1,0]]
+","Set parameter WLSAccessID
+Set parameter WLSSecret
+Set parameter LicenseID to value 2781812
+Academic license 2781812 - for non-commercial use only - registered to tt___@tudelft.nl
+Misclassifications: 0. Branch nodes: 3. Accuracy: 100%.
+",,,,,"[1<=148.74:[21<=0.15:0,1],[0<=192.40:1,0]]",7,False,parkinsons.txt,3.0,data/openml/sampled/parkinsons.txt,,103.0,17941135.0,True,perfect-tree-found
 1.0,5.0,pc1.csv,pc1.csv,169.0,-1.0,100,21,True,experiments/results/codt-witty-sampled/witty-cache/pc1.txt,43.0,43;5;pc1.csv;100;1.0;0;21;-1;1800;293264;169;false;true;6;1.00;19817077;12852005;78649400;616;1781249;4482;100;20;2;3;21;1045;81;0;0;37234202;0;0;0;0;1:r:-1:13:1.0|3:l:-1:6:0.08|1:l:-1:13:2.0|-1:-1:-1:8:32.35|3:r:-1:16:29.0|4:r:-1:7:44.27|0:l:true:-1:-1|0:r:false:-1:-1|2:l:false:-1:-1|2:r:true:-1:-1|4:l:true:-1:-1|5:l:false:-1:-1|5:r:true:-1:-1;,293264.0,263.5150422719962,witty,,"Started problem 43
 Set parameter WLSAccessID
 Set parameter WLSSecret
@@ -491,7 +1136,22 @@ Trying max size 5
 Trying max size 6
 Finished problem 43
 ",1.0,0.0,False,1800.0,1:r:-1:13:1.0|3:l:-1:6:0.08|1:l:-1:13:2.0|-1:-1:-1:8:32.35|3:r:-1:16:29.0|4:r:-1:7:44.27|0:l:true:-1:-1|0:r:false:-1:-1|2:l:false:-1:-1|2:r:true:-1:-1|4:l:true:-1:-1|5:l:false:-1:-1|5:r:true:-1:-1,6,True,pc1.txt,,,,,,,
-1.0,,pc1.txt,,,,100,21,,,,,,1800.8053715370188,codt,,,,,,,"[17, 36.5, [17, 23.0, [17, 11.5, [6, 0.195, 0, [13, 1.5, 1, 0]], [1, 3.5, 1, [13, 2.5, 0, 1]]], 1], [16, 30.0, 1, [7, 44.685, 0, 1]]]",19,False,pc1.txt,data/openml/sampled/pc1.txt,perfect-tree-found,True,9.0,5580293.0,3019273.0,
+1.0,,pc1.txt,,,,100,21,,,,,,1800.4621689769992,codt,"[2026-06-11T04:47:29Z INFO  codt_cli] Starting solve with options:
+    SolverOptions { lb_strategy: {ClassCount, Improvement, Pair}, ub_strategy: ForRemainingInterval, cart_ub: true, cart_ub_patience: 5, data_reduction: true, track_intermediates: false, timeout: Some(1800s), memory_limit: Some(4294967296) }
+    
+[2026-06-11T04:47:29Z INFO  codt::search::solver_impl] One off witnesses: 0
+[2026-06-11T04:47:29Z INFO  codt::search::solver_impl] Pair lower bound: (primary: 0, secondary: 5)
+[2026-06-11T05:17:29Z INFO  codt_cli] Read time (s): 0.000157402
+[2026-06-11T05:17:29Z INFO  codt_cli] Solve time (s): 1800.30648272
+[2026-06-11T05:17:29Z INFO  codt_cli] Max memory usage (MB): 3076.19
+[2026-06-11T05:17:29Z INFO  codt_cli] Graph expansions: 62230392
+[2026-06-11T05:17:29Z INFO  codt_cli] Tree: [8<=43.86:[8<=32.12:[6<=0.08:[13<=2.50:0,1],[13<=1.50:1,0]],1],[7<=22.87:1,[7<=29.74:1,[19<=197.00:[16<=28.50:1,0],1]]]]
+","Set parameter WLSAccessID
+Set parameter WLSSecret
+Set parameter LicenseID to value 2781812
+Academic license 2781812 - for non-commercial use only - registered to tt___@tudelft.nl
+Misclassifications: 0. Branch nodes: 9. Accuracy: 100%.
+",,,,,"[8<=43.86:[8<=32.12:[6<=0.08:[13<=2.50:0,1],[13<=1.50:1,0]],1],[7<=22.87:1,[7<=29.74:1,[19<=197.00:[16<=28.50:1,0],1]]]]",19,False,pc1.txt,9.0,data/openml/sampled/pc1.txt,,62230392.0,3225619005.0,True,perfect-tree-found
 1.0,5.0,piechart2.csv,piechart2.csv,17.0,-1.0,100,36,True,experiments/results/codt-witty-sampled/witty-cache/piechart2.txt,44.0,44;5;piechart2.csv;100;1.0;0;36;-1;1800;30061;17;false;true;3;1.00;36;14;49;1;0;14;100;9;1;3;36;1176;98;0;0;65;0;0;0;0;-1:-1:-1:1:2.0|0:r:-1:14:2.0|1:l:-1:22:238.98|2:r:true:-1:-1|0:l:false:-1:-1|1:r:false:-1:-1|2:l:false:-1:-1;,30061.0,0.6434485339996172,witty,,"Started problem 44
 Set parameter WLSAccessID
 Set parameter WLSSecret
@@ -501,7 +1161,22 @@ Set parameter Threads to value 1
 Trying max size 3
 Finished problem 44
 ",1.0,0.0,False,1800.0,-1:-1:-1:1:2.0|0:r:-1:14:2.0|1:l:-1:22:238.98|2:r:true:-1:-1|0:l:false:-1:-1|1:r:false:-1:-1|2:l:false:-1:-1,3,True,piechart2.txt,,,,,,,
-1.0,,piechart2.txt,,,,100,36,,,,,,2.345468051993521,codt,,,,,,,"[3, 6.5, 0, [14, 2.5, [32, 13.5, 0, 1], 0]]",7,False,piechart2.txt,data/openml/sampled/piechart2.txt,perfect-tree-found,True,3.0,2879.0,2082479.0,
+1.0,,piechart2.txt,,,,100,36,,,,,,4.804596449997916,codt,"[2026-06-11T05:17:29Z INFO  codt_cli] Starting solve with options:
+    SolverOptions { lb_strategy: {ClassCount, Pair, Improvement}, ub_strategy: ForRemainingInterval, cart_ub: true, cart_ub_patience: 5, data_reduction: true, track_intermediates: false, timeout: Some(1800s), memory_limit: Some(4294967296) }
+    
+[2026-06-11T05:17:29Z INFO  codt::search::solver_impl] One off witnesses: 0
+[2026-06-11T05:17:34Z INFO  codt::search::solver_impl] Pair lower bound: (primary: 0, secondary: 3)
+[2026-06-11T05:17:34Z INFO  codt_cli] Read time (s): 0.000255202
+[2026-06-11T05:17:34Z INFO  codt_cli] Solve time (s): 4.801000323
+[2026-06-11T05:17:34Z INFO  codt_cli] Max memory usage (MB): 3.17
+[2026-06-11T05:17:34Z INFO  codt_cli] Graph expansions: 375
+[2026-06-11T05:17:34Z INFO  codt_cli] Tree: [14<=2.50:[20<=70.00:0,[1<=2.50:0,1]],0]
+","Set parameter WLSAccessID
+Set parameter WLSSecret
+Set parameter LicenseID to value 2781812
+Academic license 2781812 - for non-commercial use only - registered to tt___@tudelft.nl
+Misclassifications: 0. Branch nodes: 3. Accuracy: 100%.
+",,,,,"[14<=2.50:[20<=70.00:0,[1<=2.50:0,1]],0]",7,False,piechart2.txt,3.0,data/openml/sampled/piechart2.txt,,375.0,3323985.0,True,perfect-tree-found
 0.0,5.0,pizzacutter1.csv,pizzacutter1.csv,261.0,-1.0,100,37,False,experiments/results/codt-witty-sampled/witty-cache/pizzacutter1.txt,45.0,45;5;pizzacutter1.csv;100;1.0;0;37;-1;1800;1829999;261;true;false;-1;0.00;26427451;55377136;1355189897;16210;4105230;143368;100;-1;-1;-1;37;1450;100;0;0;759979236;0;0;0;0;-1:-1:false:-1:-1;,1829999.0,1800.2960155039982,witty,,"Started problem 45
 Set parameter WLSAccessID
 Set parameter WLSSecret
@@ -513,7 +1188,22 @@ Trying max size 5
 Trying max size 6
 Finished problem 45
 ",1.0,0.0,True,1800.0,-1:-1:false:-1:-1,-1,True,pizzacutter1.txt,,,,,,,
-1.0,,pizzacutter1.txt,,,,100,37,,,,,,1801.2716833439772,codt,,,,,,,"[31, 51.5, [33, 14.5, 0, [31, 27.0, 1, 0]], [22, 0.065, [3, 18.0, [33, 67.0, [27, 7.5, [24, 523.0550000000001, 1, [28, 12.5, 1, [11, 0.59, 1, 0]]], 0], 1], 1], [33, 13.5, 0, [30, 41.5, 1, [0, 7.5, 0, 1]]]]]",27,False,pizzacutter1.txt,data/openml/sampled/pizzacutter1.txt,perfect-tree-found,True,13.0,3641252.0,4158755.0,
+1.0,,pizzacutter1.txt,,,,100,37,,,,,,1800.4746801420006,codt,"[2026-06-11T05:17:34Z INFO  codt_cli] Starting solve with options:
+    SolverOptions { lb_strategy: {Pair, Improvement, ClassCount}, ub_strategy: ForRemainingInterval, cart_ub: true, cart_ub_patience: 5, data_reduction: true, track_intermediates: false, timeout: Some(1800s), memory_limit: Some(4294967296) }
+    
+[2026-06-11T05:17:34Z INFO  codt::search::solver_impl] One off witnesses: 0
+[2026-06-11T05:17:34Z INFO  codt::search::solver_impl] Pair lower bound: (primary: 0, secondary: 4)
+[2026-06-11T05:47:34Z INFO  codt_cli] Read time (s): 0.000260202
+[2026-06-11T05:47:34Z INFO  codt_cli] Solve time (s): 1800.32928474
+[2026-06-11T05:47:34Z INFO  codt_cli] Max memory usage (MB): 3076.58
+[2026-06-11T05:47:34Z INFO  codt_cli] Graph expansions: 41934845
+[2026-06-11T05:47:34Z INFO  codt_cli] Tree: [31<=51.50:[33<=14.50:0,[31<=27.00:1,0]],[22<=0.07:[3<=18.00:[33<=67.00:[27<=7.50:[24<=523.06:1,[28<=12.50:1,[11<=0.59:1,0]]],0],1],1],[33<=13.50:0,[30<=41.50:1,[0<=7.50:0,1]]]]]
+","Set parameter WLSAccessID
+Set parameter WLSSecret
+Set parameter LicenseID to value 2781812
+Academic license 2781812 - for non-commercial use only - registered to tt___@tudelft.nl
+Misclassifications: 0. Branch nodes: 13. Accuracy: 100%.
+",,,,,"[31<=51.50:[33<=14.50:0,[31<=27.00:1,0]],[22<=0.07:[3<=18.00:[33<=67.00:[27<=7.50:[24<=523.06:1,[28<=12.50:1,[11<=0.59:1,0]]],0],1],1],[33<=13.50:0,[30<=41.50:1,[0<=7.50:0,1]]]]]",27,False,pizzacutter1.txt,13.0,data/openml/sampled/pizzacutter1.txt,,41934845.0,3226027950.0,True,perfect-tree-found
 1.0,5.0,pyrim.csv,pyrim.csv,136.0,-1.0,74,27,True,experiments/results/codt-witty-sampled/witty-cache/pyrim.txt,46.0,46;5;pyrim.csv;74;1.0;0;27;-1;1800;31284;136;false;true;7;1.00;46782;32313;40289;35;5007;322;74;35;1;7;22;80;8;0;0;70670;0;0;0;0;-1:-1:-1:18:0.1|0:r:-1:7:0.633|4:l:-1:26:0.1|2:l:-1:10:0.1|1:l:-1:5:0.5|3:r:-1:1:0.1|5:r:-1:0:0.7|3:l:true:-1:-1|0:l:false:-1:-1|1:r:false:-1:-1|2:r:false:-1:-1|6:l:false:-1:-1|4:r:true:-1:-1|5:l:true:-1:-1|6:r:true:-1:-1;,31284.0,1.5186423839986674,witty,,"Started problem 46
 Set parameter WLSAccessID
 Set parameter WLSSecret
@@ -523,7 +1213,22 @@ Set parameter Threads to value 1
 Trying max size 7
 Finished problem 46
 ",1.0,0.0,False,1800.0,-1:-1:-1:18:0.1|0:r:-1:7:0.633|4:l:-1:26:0.1|2:l:-1:10:0.1|1:l:-1:5:0.5|3:r:-1:1:0.1|5:r:-1:0:0.7|3:l:true:-1:-1|0:l:false:-1:-1|1:r:false:-1:-1|2:r:false:-1:-1|6:l:false:-1:-1|4:r:true:-1:-1|5:l:true:-1:-1|6:r:true:-1:-1,7,True,pyrim.txt,,,,,,,
-1.0,,pyrim.txt,,,,74,27,,,,,,1800.0514660280023,codt,,,,,,,"[1, 0.18, 1, [10, 0.18, [19, 0.5, [5, 0.3, 1, [18, 0.23349999999999999, 0, [7, 0.7665, 1, 0]]], [5, 0.3, 1, 0]], [6, 0.7, [3, 0.3, 0, 1], 1]]]",19,False,pyrim.txt,data/openml/sampled/pyrim.txt,perfect-tree-found,True,9.0,7577677.0,1980999.0,
+1.0,,pyrim.txt,,,,74,27,,,,,,1800.366183176,codt,"[2026-06-11T05:47:34Z INFO  codt_cli] Starting solve with options:
+    SolverOptions { lb_strategy: {Improvement, Pair, ClassCount}, ub_strategy: ForRemainingInterval, cart_ub: true, cart_ub_patience: 5, data_reduction: true, track_intermediates: false, timeout: Some(1800s), memory_limit: Some(4294967296) }
+    
+[2026-06-11T05:47:34Z INFO  codt::search::solver_impl] One off witnesses: 0
+[2026-06-11T05:47:35Z INFO  codt::search::solver_impl] Pair lower bound: (primary: 0, secondary: 7)
+[2026-06-11T06:17:35Z INFO  codt_cli] Read time (s): 0.0001436
+[2026-06-11T06:17:35Z INFO  codt_cli] Solve time (s): 1800.207704093
+[2026-06-11T06:17:35Z INFO  codt_cli] Max memory usage (MB): 3073.88
+[2026-06-11T06:17:35Z INFO  codt_cli] Graph expansions: 63571651
+[2026-06-11T06:17:35Z INFO  codt_cli] Tree: [1<=0.18:1,[10<=0.18:[19<=0.50:[5<=0.30:1,[18<=0.23:0,[7<=0.77:1,0]]],[5<=0.30:1,0]],[6<=0.70:[3<=0.30:0,1],1]]]
+","Set parameter WLSAccessID
+Set parameter WLSSecret
+Set parameter LicenseID to value 2781812
+Academic license 2781812 - for non-commercial use only - registered to tt___@tudelft.nl
+Misclassifications: 0. Branch nodes: 9. Accuracy: 100%.
+",,,,,"[1<=0.18:1,[10<=0.18:[19<=0.50:[5<=0.30:1,[18<=0.23:0,[7<=0.77:1,0]]],[5<=0.30:1,0]],[6<=0.70:[3<=0.30:0,1],1]]]",19,False,pyrim.txt,9.0,data/openml/sampled/pyrim.txt,,63571651.0,3223196794.0,True,perfect-tree-found
 0.0,5.0,rabe_265.csv,rabe_265.csv,158.0,-1.0,51,6,False,experiments/results/codt-witty-sampled/witty-cache/rabe_265.txt,47.0,47;5;rabe_265.csv;51;1.0;0;6;-1;1800;1829999;158;true;false;-1;0.00;137981235;184698484;1482058544;4115;13616233;21431;51;-1;-1;-1;6;235;51;0;0;516126383;0;0;0;0;-1:-1:false:-1:-1;,1829999.0,1800.4136730980026,witty,,"Started problem 47
 Set parameter WLSAccessID
 Set parameter WLSSecret
@@ -536,7 +1241,22 @@ Trying max size 7
 Trying max size 8
 Finished problem 47
 ",1.0,0.0,True,1800.0,-1:-1:false:-1:-1,-1,True,rabe_265.txt,,,,,,,
-1.0,,rabe_265.txt,,,,51,6,,,,,,1800.0074228320154,codt,,,,,,,"[2, 3688.5, [5, 33.1, 0, [1, 53.9, 1, [4, 50.849999999999994, 1, 0]]], [5, 34.55, 0, [3, 12.2, [2, 3909.0, 1, [0, 29.299999999999997, [2, 4593.0, [3, 2.4000000000000004, 1, 0], 1], 1]], 0]]]",21,False,rabe_265.txt,data/openml/sampled/rabe_265.txt,perfect-tree-found,True,10.0,14080264.0,961981.0,
+1.0,,rabe_265.txt,,,,51,6,,,,,,1800.5096935320034,codt,"[2026-06-11T06:17:35Z INFO  codt_cli] Starting solve with options:
+    SolverOptions { lb_strategy: {ClassCount, Improvement, Pair}, ub_strategy: ForRemainingInterval, cart_ub: true, cart_ub_patience: 5, data_reduction: true, track_intermediates: false, timeout: Some(1800s), memory_limit: Some(4294967296) }
+    
+[2026-06-11T06:17:35Z INFO  codt::search::solver_impl] One off witnesses: 0
+[2026-06-11T06:17:35Z INFO  codt::search::solver_impl] Pair lower bound: (primary: 0, secondary: 5)
+[2026-06-11T06:47:35Z INFO  codt_cli] Read time (s): 0.0000371
+[2026-06-11T06:47:35Z INFO  codt_cli] Solve time (s): 1800.337853174
+[2026-06-11T06:47:35Z INFO  codt_cli] Max memory usage (MB): 3073.37
+[2026-06-11T06:47:35Z INFO  codt_cli] Graph expansions: 120823291
+[2026-06-11T06:47:35Z INFO  codt_cli] Tree: [2<=3688.50:[5<=33.10:0,[1<=53.90:1,[4<=50.85:1,0]]],[5<=34.55:0,[3<=12.20:[2<=3909.00:1,[0<=29.30:[2<=4593.00:[3<=2.40:1,0],1],1]],0]]]
+","Set parameter WLSAccessID
+Set parameter WLSSecret
+Set parameter LicenseID to value 2781812
+Academic license 2781812 - for non-commercial use only - registered to tt___@tudelft.nl
+Misclassifications: 0. Branch nodes: 10. Accuracy: 100%.
+",,,,,"[2<=3688.50:[5<=33.10:0,[1<=53.90:1,[4<=50.85:1,0]]],[5<=34.55:0,[3<=12.20:[2<=3909.00:1,[0<=29.30:[2<=4593.00:[3<=2.40:1,0],1],1]],0]]]",21,False,rabe_265.txt,10.0,data/openml/sampled/rabe_265.txt,,120823291.0,3222662021.0,True,perfect-tree-found
 1.0,5.0,rabe_266.csv,rabe_266.csv,10.0,-1.0,100,2,True,experiments/results/codt-witty-sampled/witty-cache/rabe_266.txt,48.0,48;5;rabe_266.csv;100;1.0;0;2;-1;1800;30036;10;false;true;9;1.00;10;2;0;0;0;1;100;54;1;9;2;19;12;0;0;43;0;0;0;0;-1:-1:-1:0:-50.0|0:r:-1:1:5.0|1:r:-1:0:-30.0|2:r:-1:1:10.0|3:r:-1:0:-20.0|4:r:-1:1:15.0|5:r:-1:0:-10.0|6:r:-1:1:30.0|7:r:-1:0:0.0|0:l:true:-1:-1|1:l:false:-1:-1|2:l:true:-1:-1|3:l:false:-1:-1|4:l:true:-1:-1|5:l:false:-1:-1|6:l:true:-1:-1|7:l:false:-1:-1|8:l:true:-1:-1|8:r:false:-1:-1;,30036.0,0.2408597280009417,witty,,"Started problem 48
 Set parameter WLSAccessID
 Set parameter WLSSecret
@@ -546,7 +1266,22 @@ Set parameter Threads to value 1
 Trying max size 9
 Finished problem 48
 ",1.0,0.0,False,1800.0,-1:-1:-1:0:-50.0|0:r:-1:1:5.0|1:r:-1:0:-30.0|2:r:-1:1:10.0|3:r:-1:0:-20.0|4:r:-1:1:15.0|5:r:-1:0:-10.0|6:r:-1:1:30.0|7:r:-1:0:0.0|0:l:true:-1:-1|1:l:false:-1:-1|2:l:true:-1:-1|3:l:false:-1:-1|4:l:true:-1:-1|5:l:false:-1:-1|6:l:true:-1:-1|7:l:false:-1:-1|8:l:true:-1:-1|8:r:false:-1:-1,9,True,rabe_266.txt,,,,,,,
-1.0,,rabe_266.txt,,,,100,2,,,,,,0.007627971994224936,codt,,,,,,,"[0, -5.0, [1, 12.5, [0, -25.0, [1, 7.5, [0, -45.0, 1, 0], 1], 0], [1, 17.5, [0, -15.0, 1, 0], 1]], [1, 32.5, 0, [0, 5.0, 1, 0]]]",19,False,rabe_266.txt,data/openml/sampled/rabe_266.txt,perfect-tree-found,True,9.0,0.0,66127.0,
+1.0,,rabe_266.txt,,,,100,2,,,,,,3.3477028039997094,codt,"[2026-06-11T06:47:35Z INFO  codt_cli] Starting solve with options:
+    SolverOptions { lb_strategy: {ClassCount, Pair, Improvement}, ub_strategy: ForRemainingInterval, cart_ub: true, cart_ub_patience: 5, data_reduction: true, track_intermediates: false, timeout: Some(1800s), memory_limit: Some(4294967296) }
+    
+[2026-06-11T06:47:35Z INFO  codt::search::solver_impl] One off witnesses: 0
+[2026-06-11T06:47:39Z INFO  codt::search::solver_impl] Pair lower bound: (primary: 0, secondary: 9)
+[2026-06-11T06:47:39Z INFO  codt_cli] Read time (s): 0.0000286
+[2026-06-11T06:47:39Z INFO  codt_cli] Solve time (s): 3.3446829
+[2026-06-11T06:47:39Z INFO  codt_cli] Max memory usage (MB): 0.06
+[2026-06-11T06:47:39Z INFO  codt_cli] Graph expansions: 0
+[2026-06-11T06:47:39Z INFO  codt_cli] Tree: [0<=-5.00:[1<=12.50:[0<=-25.00:[1<=7.50:[0<=-45.00:1,0],1],0],[1<=17.50:[0<=-15.00:1,0],1]],[1<=32.50:0,[0<=5.00:1,0]]]
+","Set parameter WLSAccessID
+Set parameter WLSSecret
+Set parameter LicenseID to value 2781812
+Academic license 2781812 - for non-commercial use only - registered to tt___@tudelft.nl
+Misclassifications: 0. Branch nodes: 9. Accuracy: 100%.
+",,,,,"[0<=-5.00:[1<=12.50:[0<=-25.00:[1<=7.50:[0<=-45.00:1,0],1],0],[1<=17.50:[0<=-15.00:1,0],1]],[1<=32.50:0,[0<=5.00:1,0]]]",19,False,rabe_266.txt,9.0,data/openml/sampled/rabe_266.txt,,0.0,62914.0,True,perfect-tree-found
 0.0,5.0,sleuth_ex2015.csv,sleuth_ex2015.csv,155.0,-1.0,60,7,False,experiments/results/codt-witty-sampled/witty-cache/sleuth_ex2015.txt,49.0,49;5;sleuth_ex2015.csv;60;1.0;0;7;-1;1800;1830000;155;true;false;-1;0.00;106085896;122732501;1673547362;2623;36047972;15728;60;-1;-1;-1;7;369;59;0;0;454229067;0;0;0;0;-1:-1:false:-1:-1;,1830000.0,1800.2172202699949,witty,,"Started problem 49
 Set parameter WLSAccessID
 Set parameter WLSSecret
@@ -558,7 +1293,22 @@ Trying max size 8
 Trying max size 9
 Finished problem 49
 ",1.0,0.0,True,1800.0,-1:-1:false:-1:-1,-1,True,sleuth_ex2015.txt,,,,,,,
-1.0,,sleuth_ex2015.txt,,,,60,7,,,,,,1800.0116928259959,codt,,,,,,,"[4, 55.75, [0, 50.5, 0, [1, 48.55, 1, 0]], [1, 65.85, [2, 49.15, 0, [6, 65.45, [6, 33.75, 0, 1], 0]], [6, 75.0, [1, 91.80000000000001, [4, 78.2, [2, 69.6, [5, 69.55, 0, 1], [0, 64.5, 0, 1]], 1], [2, 83.4, 0, 1]], 0]]]",29,False,sleuth_ex2015.txt,data/openml/sampled/sleuth_ex2015.txt,perfect-tree-found,True,14.0,11277178.0,1242503.0,
+1.0,,sleuth_ex2015.txt,,,,60,7,,,,,,1800.4788904399975,codt,"[2026-06-11T06:47:39Z INFO  codt_cli] Starting solve with options:
+    SolverOptions { lb_strategy: {ClassCount, Pair, Improvement}, ub_strategy: ForRemainingInterval, cart_ub: true, cart_ub_patience: 5, data_reduction: true, track_intermediates: false, timeout: Some(1800s), memory_limit: Some(4294967296) }
+    
+[2026-06-11T06:47:39Z INFO  codt::search::solver_impl] One off witnesses: 0
+[2026-06-11T06:47:39Z INFO  codt::search::solver_impl] Pair lower bound: (primary: 0, secondary: 7)
+[2026-06-11T07:17:39Z INFO  codt_cli] Read time (s): 0.0000429
+[2026-06-11T07:17:39Z INFO  codt_cli] Solve time (s): 1800.303988012
+[2026-06-11T07:17:39Z INFO  codt_cli] Max memory usage (MB): 3073.72
+[2026-06-11T07:17:39Z INFO  codt_cli] Graph expansions: 111885000
+[2026-06-11T07:17:39Z INFO  codt_cli] Tree: [4<=55.75:[1<=48.55:[0<=50.50:0,1],0],[2<=72.10:[0<=72.50:[5<=65.10:1,0],[5<=66.40:0,1]],[4<=78.80:[0<=73.50:0,1],[2<=83.95:[1<=90.05:1,0],1]]]]
+","Set parameter WLSAccessID
+Set parameter WLSSecret
+Set parameter LicenseID to value 2781812
+Academic license 2781812 - for non-commercial use only - registered to tt___@tudelft.nl
+Misclassifications: 0. Branch nodes: 11. Accuracy: 100%.
+",,,,,"[4<=55.75:[1<=48.55:[0<=50.50:0,1],0],[2<=72.10:[0<=72.50:[5<=65.10:1,0],[5<=66.40:0,1]],[4<=78.80:[0<=73.50:0,1],[2<=83.95:[1<=90.05:1,0],1]]]]",23,False,sleuth_ex2015.txt,11.0,data/openml/sampled/sleuth_ex2015.txt,,111885000.0,3223029022.0,True,perfect-tree-found
 1.0,5.0,sonar.csv,sonar.csv,30.0,-1.0,100,60,True,experiments/results/codt-witty-sampled/witty-cache/sonar.txt,50.0,50;5;sonar.csv;100;1.0;0;60;-1;1800;30215;30;false;true;2;1.00;497;82;1359;1;0;25;100;5;1;2;60;5585;100;0;0;367;0;0;0;0;-1:-1:-1:3:0.0774|0:r:-1:20:0.3264|0:l:true:-1:-1|1:l:false:-1:-1|1:r:true:-1:-1;,30215.0,0.6614305740004056,witty,,"Started problem 50
 Set parameter WLSAccessID
 Set parameter WLSSecret
@@ -568,7 +1318,22 @@ Set parameter Threads to value 1
 Trying max size 2
 Finished problem 50
 ",1.0,0.0,False,1800.0,-1:-1:-1:3:0.0774|0:r:-1:20:0.3264|0:l:true:-1:-1|1:l:false:-1:-1|1:r:true:-1:-1,2,True,sonar.txt,,,,,,,
-1.0,,sonar.txt,,,,100,60,,,,,,0.2963462890184019,codt,,,,,,,"[59, 0.02055, [57, 0.021150000000000002, 1, 0], 0]",5,False,sonar.txt,data/openml/sampled/sonar.txt,perfect-tree-found,True,2.0,16.0,2670992.0,
+1.0,,sonar.txt,,,,100,60,,,,,,0.3696254790011153,codt,"[2026-06-11T07:17:39Z INFO  codt_cli] Starting solve with options:
+    SolverOptions { lb_strategy: {Improvement, Pair, ClassCount}, ub_strategy: ForRemainingInterval, cart_ub: true, cart_ub_patience: 5, data_reduction: true, track_intermediates: false, timeout: Some(1800s), memory_limit: Some(4294967296) }
+    
+[2026-06-11T07:17:39Z INFO  codt::search::solver_impl] One off witnesses: 0
+[2026-06-11T07:17:40Z INFO  codt::search::solver_impl] Pair lower bound: (primary: 0, secondary: 2)
+[2026-06-11T07:17:40Z INFO  codt_cli] Read time (s): 0.000514901
+[2026-06-11T07:17:40Z INFO  codt_cli] Solve time (s): 0.363557772
+[2026-06-11T07:17:40Z INFO  codt_cli] Max memory usage (MB): 12.59
+[2026-06-11T07:17:40Z INFO  codt_cli] Graph expansions: 117
+[2026-06-11T07:17:40Z INFO  codt_cli] Tree: [57<=0.02:[59<=0.02:1,0],0]
+","Set parameter WLSAccessID
+Set parameter WLSSecret
+Set parameter LicenseID to value 2781812
+Academic license 2781812 - for non-commercial use only - registered to tt___@tudelft.nl
+Misclassifications: 0. Branch nodes: 2. Accuracy: 100%.
+",,,,,"[57<=0.02:[59<=0.02:1,0],0]",5,False,sonar.txt,2.0,data/openml/sampled/sonar.txt,,117.0,13201571.0,True,perfect-tree-found
 1.0,5.0,strikes.csv,strikes.csv,18.0,-1.0,100,6,True,experiments/results/codt-witty-sampled/witty-cache/strikes.txt,51.0,51;5;strikes.csv;100;1.0;0;6;-1;1800;30160;18;false;true;1;1.00;2;0;0;0;0;1;100;2;1;1;6;269;87;0;0;0;0;0;0;0;-1:-1:-1:0:1.0|0:l:true:-1:-1|0:r:false:-1:-1;,30160.0,0.3935140249959659,witty,,"Started problem 51
 Set parameter WLSAccessID
 Set parameter WLSSecret
@@ -578,7 +1343,22 @@ Set parameter Threads to value 1
 Trying max size 1
 Finished problem 51
 ",1.0,0.0,False,1800.0,-1:-1:-1:0:1.0|0:l:true:-1:-1|0:r:false:-1:-1,1,True,strikes.txt,,,,,,,
-1.0,,strikes.txt,,,,100,6,,,,,,0.09556940000038594,codt,,,,,,,"[0, 1.5, 1, 0]",3,False,strikes.txt,data/openml/sampled/strikes.txt,perfect-tree-found,True,1.0,0.0,749083.0,
+1.0,,strikes.txt,,,,100,6,,,,,,0.06246658099917113,codt,"[2026-06-11T07:17:40Z INFO  codt_cli] Starting solve with options:
+    SolverOptions { lb_strategy: {Improvement, ClassCount, Pair}, ub_strategy: ForRemainingInterval, cart_ub: true, cart_ub_patience: 5, data_reduction: true, track_intermediates: false, timeout: Some(1800s), memory_limit: Some(4294967296) }
+    
+[2026-06-11T07:17:40Z INFO  codt::search::solver_impl] One off witnesses: 0
+[2026-06-11T07:17:40Z INFO  codt::search::solver_impl] Pair lower bound: (primary: 0, secondary: 1)
+[2026-06-11T07:17:40Z INFO  codt_cli] Read time (s): 0.0000526
+[2026-06-11T07:17:40Z INFO  codt_cli] Solve time (s): 0.059586077
+[2026-06-11T07:17:40Z INFO  codt_cli] Max memory usage (MB): 0.72
+[2026-06-11T07:17:40Z INFO  codt_cli] Graph expansions: 0
+[2026-06-11T07:17:40Z INFO  codt_cli] Tree: [0<=1.50:1,0]
+","Set parameter WLSAccessID
+Set parameter WLSSecret
+Set parameter LicenseID to value 2781812
+Academic license 2781812 - for non-commercial use only - registered to tt___@tudelft.nl
+Misclassifications: 0. Branch nodes: 1. Accuracy: 100%.
+",,,,,"[0<=1.50:1,0]",3,False,strikes.txt,1.0,data/openml/sampled/strikes.txt,,0.0,754974.0,True,perfect-tree-found
 0.0,5.0,tuningsvms.csv,tuningsvms.csv,645.0,-1.0,100,80,False,experiments/results/codt-witty-sampled/witty-cache/tuningsvms.txt,52.0,52;5;tuningsvms.csv;100;1.0;0;80;-1;1800;1829998;645;true;false;-1;0.00;62621209;35077259;822033119;3700;1548564;40029;100;-1;-1;-1;79;5314;100;0;0;214533293;0;0;0;0;-1:-1:false:-1:-1;,1829998.0,1800.8645445420116,witty,,"Started problem 52
 Set parameter WLSAccessID
 Set parameter WLSSecret
@@ -589,7 +1369,22 @@ Trying max size 4
 Trying max size 5
 Finished problem 52
 ",1.0,0.0,True,1800.0,-1:-1:false:-1:-1,-1,True,tuningsvms.txt,,,,,,,
-1.0,,tuningsvms.txt,,,,100,80,,,,,,1807.3690303110052,codt,,,,,,,"[72, 12.152222, 0, [25, 0.9188149999999999, [62, 0.0375, [17, 0.9311885, 0, 1], [31, 9.071268499999999, [10, 2.25, 0, 1], 1]], [9, 3.25, [25, 0.9810479999999999, 0, [60, 0.0345, 1, [1, 6.5, [5, 0.0245, 1, 0], 0]]], [62, 0.457, [65, 0.8055, [40, 1.957427, 1, [78, 0.8309545, 0, 1]], 0], 0]]]]",31,False,tuningsvms.txt,data/openml/sampled/tuningsvms.txt,perfect-tree-found,True,15.0,1203993.0,20247828.0,
+1.0,,tuningsvms.txt,,,,100,80,,,,,,1801.1691160509981,codt,"[2026-06-11T07:17:40Z INFO  codt_cli] Starting solve with options:
+    SolverOptions { lb_strategy: {ClassCount, Improvement, Pair}, ub_strategy: ForRemainingInterval, cart_ub: true, cart_ub_patience: 5, data_reduction: true, track_intermediates: false, timeout: Some(1800s), memory_limit: Some(4294967296) }
+    
+[2026-06-11T07:17:41Z INFO  codt::search::solver_impl] One off witnesses: 0
+[2026-06-11T07:17:44Z INFO  codt::search::solver_impl] Pair lower bound: (primary: 0, secondary: 4)
+[2026-06-11T07:47:41Z INFO  codt_cli] Read time (s): 0.000651301
+[2026-06-11T07:47:41Z INFO  codt_cli] Solve time (s): 1801.006901604
+[2026-06-11T07:47:41Z INFO  codt_cli] Max memory usage (MB): 3083.02
+[2026-06-11T07:47:41Z INFO  codt_cli] Graph expansions: 16071041
+[2026-06-11T07:47:41Z INFO  codt_cli] Tree: [20<=48.20:[38<=12.00:[58<=1.21:[40<=1.79:[48<=0.50:1,[77<=0.36:[51<=0.70:0,1],0]],[5<=0.02:1,0]],[76<=172.11:[35<=0.01:[35<=0.01:1,0],[53<=0.06:1,0]],[13<=0.18:1,0]]],1],1]
+","Set parameter WLSAccessID
+Set parameter WLSSecret
+Set parameter LicenseID to value 2781812
+Academic license 2781812 - for non-commercial use only - registered to tt___@tudelft.nl
+Misclassifications: 0. Branch nodes: 13. Accuracy: 100%.
+",,,,,"[20<=48.20:[38<=12.00:[58<=1.21:[40<=1.79:[48<=0.50:1,[77<=0.36:[51<=0.70:0,1],0]],[5<=0.02:1,0]],[76<=172.11:[35<=0.01:[35<=0.01:1,0],[53<=0.06:1,0]],[13<=0.18:1,0]]],1],1]",27,False,tuningsvms.txt,13.0,data/openml/sampled/tuningsvms.txt,,16071041.0,3232780779.0,True,perfect-tree-found
 1.0,5.0,vehicle.csv,vehicle.csv,89.0,-1.0,100,18,True,experiments/results/codt-witty-sampled/witty-cache/vehicle.txt,53.0,53;5;vehicle.csv;100;1.0;0;18;-1;1800;30873;89;false;true;4;1.00;51065;25366;42094;71;1092;1057;100;12;2;3;18;684;94;0;0;23740;0;0;0;0;-1:-1:-1:5:7.0|0:l:-1:9:135.0|1:r:-1:14:13.0|0:r:-1:16:180.0|2:l:true:-1:-1|3:r:false:-1:-1|1:l:false:-1:-1|2:r:false:-1:-1|3:l:true:-1:-1;,30873.0,1.5023374559823424,witty,,"Started problem 53
 Set parameter WLSAccessID
 Set parameter WLSSecret
@@ -599,7 +1394,22 @@ Set parameter Threads to value 1
 Trying max size 4
 Finished problem 53
 ",1.0,0.0,False,1800.0,-1:-1:-1:5:7.0|0:l:-1:9:135.0|1:r:-1:14:13.0|0:r:-1:16:180.0|2:l:true:-1:-1|3:r:false:-1:-1|1:l:false:-1:-1|2:r:false:-1:-1|3:l:true:-1:-1,4,True,vehicle.txt,,,,,,,
-1.0,,vehicle.txt,,,,100,18,,,,,,1800.1612746749888,codt,,,,,,,"[9, 135.5, 0, [17, 192.5, [9, 141.5, [15, 13.5, 0, 1], [9, 159.5, 1, [6, 163.5, 0, 1]]], [5, 7.5, 1, 0]]]",15,False,vehicle.txt,data/openml/sampled/vehicle.txt,perfect-tree-found,True,7.0,4944253.0,3697380.0,
+1.0,,vehicle.txt,,,,100,18,,,,,,0.9927486919987132,codt,"[2026-06-11T07:47:41Z INFO  codt_cli] Starting solve with options:
+    SolverOptions { lb_strategy: {Pair, ClassCount, Improvement}, ub_strategy: ForRemainingInterval, cart_ub: true, cart_ub_patience: 5, data_reduction: true, track_intermediates: false, timeout: Some(1800s), memory_limit: Some(4294967296) }
+    
+[2026-06-11T07:47:41Z INFO  codt::search::solver_impl] One off witnesses: 0
+[2026-06-11T07:47:41Z INFO  codt::search::solver_impl] Pair lower bound: (primary: 0, secondary: 4)
+[2026-06-11T07:47:42Z INFO  codt_cli] Read time (s): 0.0001279
+[2026-06-11T07:47:42Z INFO  codt_cli] Solve time (s): 0.981232782
+[2026-06-11T07:47:42Z INFO  codt_cli] Max memory usage (MB): 151.86
+[2026-06-11T07:47:42Z INFO  codt_cli] Graph expansions: 921
+[2026-06-11T07:47:42Z INFO  codt_cli] Tree: [5<=7.50:[9<=135.50:0,[14<=13.50:1,0]],[16<=180.50:1,0]]
+","Set parameter WLSAccessID
+Set parameter WLSSecret
+Set parameter LicenseID to value 2781812
+Academic license 2781812 - for non-commercial use only - registered to tt___@tudelft.nl
+Misclassifications: 0. Branch nodes: 4. Accuracy: 100%.
+",,,,,"[5<=7.50:[9<=135.50:0,[14<=13.50:1,0]],[16<=180.50:1,0]]",9,False,vehicle.txt,4.0,data/openml/sampled/vehicle.txt,,921.0,159236751.0,True,perfect-tree-found
 0.0,5.0,visualizing_environmental.csv,visualizing_environmental.csv,161.0,-1.0,100,3,False,experiments/results/codt-witty-sampled/witty-cache/visualizing_environmental.txt,54.0,54;5;visualizing_environmental.csv;100;1.0;0;3;-1;1800;1829999;161;true;false;-1;0.00;2694590;282296401;-2105139827;982;1023976;9700;100;-1;-1;-1;3;186;86;0;0;734594877;0;0;0;0;-1:-1:false:-1:-1;,1829999.0,1800.3732747330214,witty,,"Started problem 54
 Set parameter WLSAccessID
 Set parameter WLSSecret
@@ -609,7 +1419,22 @@ Set parameter Threads to value 1
 Trying max size 15
 Finished problem 54
 ",1.0,0.0,True,1800.0,-1:-1:false:-1:-1,-1,True,visualizing_environmental.txt,,,,,,,
-1.0,,visualizing_environmental.txt,,,,100,3,,,,,,1800.0131815760105,codt,,,,,,,"[0, 45.5, [0, 5.0, 1, [1, 303.0, [0, 10.5, 0, [1, 284.5, [1, 87.5, [1, 74.0, [1, 46.0, [1, 31.5, [1, 10.5, 1, 0], 1], 0], 1], [1, 113.5, 0, [0, 21.5, [2, 70.0, [2, 68.5, 0, 1], 0], [2, 77.5, [0, 36.5, 1, [1, 281.5, 1, 0]], [1, 148.5, 1, [1, 236.5, [0, 44.5, [1, 221.5, 0, [0, 33.0, 1, 0]], 1], 0]]]]]], 1]], 0]], [1, 82.5, [2, 79.5, 1, 0], [1, 287.5, [1, 217.5, 1, [2, 84.5, 1, [0, 90.0, [1, 229.5, 0, 1], 1]]], [1, 292.5, 0, 1]]]]",61,False,visualizing_environmental.txt,data/openml/sampled/visualizing_environmental.txt,perfect-tree-found,True,30.0,11910792.0,1163007.0,
+1.0,,visualizing_environmental.txt,,,,100,3,,,,,,1800.555381958995,codt,"[2026-06-11T07:47:42Z INFO  codt_cli] Starting solve with options:
+    SolverOptions { lb_strategy: {Pair, Improvement, ClassCount}, ub_strategy: ForRemainingInterval, cart_ub: true, cart_ub_patience: 5, data_reduction: true, track_intermediates: false, timeout: Some(1800s), memory_limit: Some(4294967296) }
+    
+[2026-06-11T07:47:42Z INFO  codt::search::solver_impl] One off witnesses: 0
+[2026-06-11T07:47:42Z INFO  codt::search::solver_impl] Pair lower bound: (primary: 0, secondary: 15)
+[2026-06-11T08:17:42Z INFO  codt_cli] Read time (s): 0.0000482
+[2026-06-11T08:17:42Z INFO  codt_cli] Solve time (s): 1800.381202319
+[2026-06-11T08:17:42Z INFO  codt_cli] Max memory usage (MB): 3073.16
+[2026-06-11T08:17:42Z INFO  codt_cli] Graph expansions: 116890922
+[2026-06-11T08:17:42Z INFO  codt_cli] Tree: [1<=200.00:[1<=97.00:[1<=49.50:[1<=21.50:[1<=10.50:1,0],[2<=65.50:1,0]],[2<=77.50:0,[2<=82.50:1,[1<=93.50:0,1]]]],[1<=162.00:[0<=19.50:0,1],[0<=44.50:[2<=67.50:1,0],1]]],[1<=255.50:[1<=217.50:1,[1<=233.00:[0<=90.00:0,1],[0<=45.50:[1<=241.00:[0<=33.00:1,0],0],1]]],[1<=284.50:[2<=73.50:[1<=259.50:1,0],[0<=35.50:0,1]],[2<=86.50:[1<=303.00:1,0],0]]]]
+","Set parameter WLSAccessID
+Set parameter WLSSecret
+Set parameter LicenseID to value 2781812
+Academic license 2781812 - for non-commercial use only - registered to tt___@tudelft.nl
+Misclassifications: 0. Branch nodes: 26. Accuracy: 100%.
+",,,,,"[1<=200.00:[1<=97.00:[1<=49.50:[1<=21.50:[1<=10.50:1,0],[2<=65.50:1,0]],[2<=77.50:0,[2<=82.50:1,[1<=93.50:0,1]]]],[1<=162.00:[0<=19.50:0,1],[0<=44.50:[2<=67.50:1,0],1]]],[1<=255.50:[1<=217.50:1,[1<=233.00:[0<=90.00:0,1],[0<=45.50:[1<=241.00:[0<=33.00:1,0],0],1]]],[1<=284.50:[2<=73.50:[1<=259.50:1,0],[0<=35.50:0,1]],[2<=86.50:[1<=303.00:1,0],0]]]]",53,False,visualizing_environmental.txt,26.0,data/openml/sampled/visualizing_environmental.txt,,116890922.0,3222441820.0,True,perfect-tree-found
 0.0,5.0,visualizing_hamster.csv,visualizing_hamster.csv,162.0,-1.0,73,5,False,experiments/results/codt-witty-sampled/witty-cache/visualizing_hamster.txt,55.0,55;5;visualizing_hamster.csv;73;1.0;0;5;-1;1800;1829999;162;true;false;-1;0.00;90710050;175629359;-1544727117;1631;35230713;9542;73;-1;-1;-1;5;356;73;0;0;777802909;0;0;0;0;-1:-1:false:-1:-1;,1829999.0,1801.229113186011,witty,,"Started problem 55
 Set parameter WLSAccessID
 Set parameter WLSSecret
@@ -621,7 +1446,22 @@ Trying max size 8
 Trying max size 9
 Finished problem 55
 ",1.0,0.0,True,1800.0,-1:-1:false:-1:-1,-1,True,visualizing_hamster.txt,,,,,,,
-1.0,,visualizing_hamster.txt,,,,73,5,,,,,,1800.0146378070058,codt,,,,,,,"[2, 9.255798500000001, [4, 1.1732529999999999, [3, 0.0686, [3, 0.0489, 1, [1, 0.41635, 0, [4, 1.011003, 0, 1]]], [4, 0.8969005000000001, 1, 0]], [1, 1.701103, [3, 0.05815, 0, [2, 8.2366045, 1, [1, 1.1739525, [3, 0.1031, [2, 8.346055, 0, 1], 0], 1]]], 0]], [4, 1.616453, 0, 1]]",29,False,visualizing_hamster.txt,data/openml/sampled/visualizing_hamster.txt,perfect-tree-found,True,14.0,11564348.0,1414947.0,
+1.0,,visualizing_hamster.txt,,,,73,5,,,,,,1800.456675911002,codt,"[2026-06-11T08:17:42Z INFO  codt_cli] Starting solve with options:
+    SolverOptions { lb_strategy: {ClassCount, Pair, Improvement}, ub_strategy: ForRemainingInterval, cart_ub: true, cart_ub_patience: 5, data_reduction: true, track_intermediates: false, timeout: Some(1800s), memory_limit: Some(4294967296) }
+    
+[2026-06-11T08:17:42Z INFO  codt::search::solver_impl] One off witnesses: 0
+[2026-06-11T08:17:43Z INFO  codt::search::solver_impl] Pair lower bound: (primary: 0, secondary: 7)
+[2026-06-11T08:47:43Z INFO  codt_cli] Read time (s): 0.0000435
+[2026-06-11T08:47:43Z INFO  codt_cli] Solve time (s): 1800.281891189
+[2026-06-11T08:47:43Z INFO  codt_cli] Max memory usage (MB): 3073.63
+[2026-06-11T08:47:43Z INFO  codt_cli] Graph expansions: 112392972
+[2026-06-11T08:47:43Z INFO  codt_cli] Tree: [2<=6.68:[4<=1.12:[2<=3.26:[3<=0.06:1,0],[0<=1.01:1,0]],[3<=0.06:0,[4<=1.17:0,1]]],[4<=1.37:[0<=0.87:[1<=1.27:0,1],[2<=8.58:1,0]],[2<=12.28:[0<=1.07:1,0],0]]]
+","Set parameter WLSAccessID
+Set parameter WLSSecret
+Set parameter LicenseID to value 2781812
+Academic license 2781812 - for non-commercial use only - registered to tt___@tudelft.nl
+Misclassifications: 0. Branch nodes: 13. Accuracy: 100%.
+",,,,,"[2<=6.68:[4<=1.12:[2<=3.26:[3<=0.06:1,0],[0<=1.01:1,0]],[3<=0.06:0,[4<=1.17:0,1]]],[4<=1.37:[0<=0.87:[1<=1.27:0,1],[2<=8.58:1,0]],[2<=12.28:[0<=1.07:1,0],0]]]",27,False,visualizing_hamster.txt,13.0,data/openml/sampled/visualizing_hamster.txt,,112392972.0,3222934650.0,True,perfect-tree-found
 1.0,5.0,wind_correlations.csv,wind_correlations.csv,30.0,-1.0,45,46,True,experiments/results/codt-witty-sampled/witty-cache/wind_correlations.txt,56.0,56;5;wind_correlations.csv;45;1.0;0;46;-1;1800;30284;30;false;true;3;1.00;23520;849;6438;0;0;1;45;8;2;2;46;1963;45;0;0;267;0;0;0;0;1:r:-1:3:0.601|-1:-1:-1:4:0.562|1:l:-1:28:0.466|0:l:true:-1:-1|0:r:false:-1:-1|2:l:true:-1:-1|2:r:false:-1:-1;,30284.0,0.8068784780043643,witty,,"Started problem 56
 Set parameter WLSAccessID
 Set parameter WLSSecret
@@ -631,7 +1471,22 @@ Set parameter Threads to value 1
 Trying max size 3
 Finished problem 56
 ",1.0,0.0,False,1800.0,1:r:-1:3:0.601|-1:-1:-1:4:0.562|1:l:-1:28:0.466|0:l:true:-1:-1|0:r:false:-1:-1|2:l:true:-1:-1|2:r:false:-1:-1,3,True,wind_correlations.txt,,,,,,,
-1.0,,wind_correlations.txt,,,,45,46,,,,,,0.7824647210072726,codt,,,,,,,"[28, 0.4645, [6, 0.9385, 1, 0], [38, 0.456, 1, 0]]",7,False,wind_correlations.txt,data/openml/sampled/wind_correlations.txt,perfect-tree-found,True,3.0,13.0,2025211.0,
+1.0,,wind_correlations.txt,,,,45,46,,,,,,0.44466951100184815,codt,"[2026-06-11T08:47:43Z INFO  codt_cli] Starting solve with options:
+    SolverOptions { lb_strategy: {Improvement, Pair, ClassCount}, ub_strategy: ForRemainingInterval, cart_ub: true, cart_ub_patience: 5, data_reduction: true, track_intermediates: false, timeout: Some(1800s), memory_limit: Some(4294967296) }
+    
+[2026-06-11T08:47:43Z INFO  codt::search::solver_impl] One off witnesses: 0
+[2026-06-11T08:47:43Z INFO  codt::search::solver_impl] Pair lower bound: (primary: 0, secondary: 3)
+[2026-06-11T08:47:43Z INFO  codt_cli] Read time (s): 0.0001624
+[2026-06-11T08:47:43Z INFO  codt_cli] Solve time (s): 0.437894707
+[2026-06-11T08:47:43Z INFO  codt_cli] Max memory usage (MB): 39.83
+[2026-06-11T08:47:43Z INFO  codt_cli] Graph expansions: 234
+[2026-06-11T08:47:43Z INFO  codt_cli] Tree: [13<=0.54:1,[28<=0.47:[6<=0.44:1,0],0]]
+","Set parameter WLSAccessID
+Set parameter WLSSecret
+Set parameter LicenseID to value 2781812
+Academic license 2781812 - for non-commercial use only - registered to tt___@tudelft.nl
+Misclassifications: 0. Branch nodes: 3. Accuracy: 100%.
+",,,,,"[13<=0.54:1,[28<=0.47:[6<=0.44:1,0],0]]",7,False,wind_correlations.txt,3.0,data/openml/sampled/wind_correlations.txt,,234.0,41764782.0,True,perfect-tree-found
 1.0,5.0,wine.csv,wine.csv,78.0,-1.0,100,13,True,experiments/results/codt-witty-sampled/witty-cache/wine.txt,57.0,57;5;wine.csv;100;1.0;0;13;-1;1800;30619;78;false;true;3;1.00;23705;6978;26343;5;226;84;100;9;1;3;13;831;85;0;0;5540;0;0;0;0;-1:-1:-1:4:88.0|0:r:-1:11:2.48|1:r:-1:9:3.4|0:l:true:-1:-1|2:r:false:-1:-1|1:l:true:-1:-1|2:l:true:-1:-1;,30619.0,0.8550053069775458,witty,,"Started problem 57
 Set parameter WLSAccessID
 Set parameter WLSSecret
@@ -641,7 +1496,22 @@ Set parameter Threads to value 1
 Trying max size 3
 Finished problem 57
 ",1.0,0.0,False,1800.0,-1:-1:-1:4:88.0|0:r:-1:11:2.48|1:r:-1:9:3.4|0:l:true:-1:-1|2:r:false:-1:-1|1:l:true:-1:-1|2:l:true:-1:-1,3,True,wine.txt,,,,,,,
-1.0,,wine.txt,,,,100,13,,,,,,0.4308147480187472,codt,,,,,,,"[12, 716.0, [1, 3.925, 1, 0], [9, 3.46, 1, 0]]",7,False,wine.txt,data/openml/sampled/wine.txt,perfect-tree-found,True,3.0,64.0,2280329.0,
+1.0,,wine.txt,,,,100,13,,,,,,0.3298697310019634,codt,"[2026-06-11T08:47:43Z INFO  codt_cli] Starting solve with options:
+    SolverOptions { lb_strategy: {Pair, ClassCount, Improvement}, ub_strategy: ForRemainingInterval, cart_ub: true, cart_ub_patience: 5, data_reduction: true, track_intermediates: false, timeout: Some(1800s), memory_limit: Some(4294967296) }
+    
+[2026-06-11T08:47:43Z INFO  codt::search::solver_impl] One off witnesses: 0
+[2026-06-11T08:47:44Z INFO  codt::search::solver_impl] Pair lower bound: (primary: 0, secondary: 3)
+[2026-06-11T08:47:44Z INFO  codt_cli] Read time (s): 0.0001143
+[2026-06-11T08:47:44Z INFO  codt_cli] Solve time (s): 0.325782128
+[2026-06-11T08:47:44Z INFO  codt_cli] Max memory usage (MB): 5.03
+[2026-06-11T08:47:44Z INFO  codt_cli] Graph expansions: 63
+[2026-06-11T08:47:44Z INFO  codt_cli] Tree: [12<=716.00:[1<=3.92:1,0],[9<=3.46:1,0]]
+","Set parameter WLSAccessID
+Set parameter WLSSecret
+Set parameter LicenseID to value 2781812
+Academic license 2781812 - for non-commercial use only - registered to tt___@tudelft.nl
+Misclassifications: 0. Branch nodes: 3. Accuracy: 100%.
+",,,,,"[12<=716.00:[1<=3.92:1,0],[9<=3.46:1,0]]",7,False,wine.txt,3.0,data/openml/sampled/wine.txt,,63.0,5274337.0,True,perfect-tree-found
 0.0,5.0,wisconsin.csv,wisconsin.csv,725.0,-1.0,100,32,False,experiments/results/codt-witty-sampled/witty-cache/wisconsin.txt,58.0,58;5;wisconsin.csv;100;1.0;0;32;-1;1800;1829999;725;true;false;-1;0.00;5350726;61810065;-773973524;998;83572;12168;100;-1;-1;-1;32;2940;100;0;0;828076068;0;0;0;0;-1:-1:false:-1:-1;,1829999.0,1800.3807466349972,witty,,"Started problem 58
 Set parameter WLSAccessID
 Set parameter WLSSecret
@@ -651,4 +1521,19 @@ Set parameter Threads to value 1
 Trying max size 5
 Finished problem 58
 ",1.0,0.0,True,1800.0,-1:-1:false:-1:-1,-1,True,wisconsin.txt,,,,,,,
-1.0,,wisconsin.txt,,,,100,32,,,,,,1801.3177703690017,codt,,,,,,,"[30, 0.11465, [13, 3.8, [8, 0.028014999999999998, 1, [29, 0.47425, [30, 0.096695, [22, 38.36, 0, 1], [25, 0.17045, [2, 16.785, [8, 0.098585, 1, 0], [17, 0.041234999999999994, 0, 1]], 1]], 1]], [6, 0.16205, [25, 0.14125, [7, 0.15105, [12, 1.3595000000000002, [19, 0.014345, [5, 0.08429500000000001, 0, 1], 0], [30, 0.058075, 0, 1]], 1], [10, 0.059635, 1, 0]], [14, 105.45, [14, 43.665, 0, 1], [7, 0.2383, 0, 1]]]], [18, 0.010905, [29, 0.42410000000000003, 1, 0], 0]]",47,False,wisconsin.txt,data/openml/sampled/wisconsin.txt,perfect-tree-found,True,23.0,2758473.0,10535279.0,
+1.0,,wisconsin.txt,,,,100,32,,,,,,1800.5091187619983,codt,"[2026-06-11T08:47:44Z INFO  codt_cli] Starting solve with options:
+    SolverOptions { lb_strategy: {ClassCount, Improvement, Pair}, ub_strategy: ForRemainingInterval, cart_ub: true, cart_ub_patience: 5, data_reduction: true, track_intermediates: false, timeout: Some(1800s), memory_limit: Some(4294967296) }
+    
+[2026-06-11T08:47:44Z INFO  codt::search::solver_impl] One off witnesses: 0
+[2026-06-11T08:47:46Z INFO  codt::search::solver_impl] Pair lower bound: (primary: 0, secondary: 5)
+[2026-06-11T09:17:44Z INFO  codt_cli] Read time (s): 0.0002451
+[2026-06-11T09:17:44Z INFO  codt_cli] Solve time (s): 1800.328903635
+[2026-06-11T09:17:44Z INFO  codt_cli] Max memory usage (MB): 3079.07
+[2026-06-11T09:17:44Z INFO  codt_cli] Graph expansions: 34398819
+[2026-06-11T09:17:44Z INFO  codt_cli] Tree: [27<=0.67:[29<=0.32:[27<=0.34:[24<=1151.50:[13<=1.97:1,0],[22<=25.88:0,1]],[31<=2.90:0,[13<=3.80:0,1]]],[4<=773.80:[23<=115.35:[3<=83.33:1,0],[15<=0.01:0,1]],[28<=0.19:[25<=0.13:1,0],[12<=1.04:0,1]]]],[6<=0.21:[10<=0.07:1,[5<=0.11:[0<=0.50:1,0],0]],[5<=0.11:[5<=0.11:[1<=14.34:0,1],0],0]]]
+","Set parameter WLSAccessID
+Set parameter WLSSecret
+Set parameter LicenseID to value 2781812
+Academic license 2781812 - for non-commercial use only - registered to tt___@tudelft.nl
+Misclassifications: 0. Branch nodes: 22. Accuracy: 100%.
+",,,,,"[27<=0.67:[29<=0.32:[27<=0.34:[24<=1151.50:[13<=1.97:1,0],[22<=25.88:0,1]],[31<=2.90:0,[13<=3.80:0,1]]],[4<=773.80:[23<=115.35:[3<=83.33:1,0],[15<=0.01:0,1]],[28<=0.19:[25<=0.13:1,0],[12<=1.04:0,1]]]],[6<=0.21:[10<=0.07:1,[5<=0.11:[0<=0.50:1,0],0]],[5<=0.11:[5<=0.11:[1<=14.34:0,1],0],0]]]",45,False,wisconsin.txt,22.0,data/openml/sampled/wisconsin.txt,,34398819.0,3228638904.0,True,perfect-tree-found

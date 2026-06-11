@@ -1,7 +1,5 @@
 use std::{cell::Cell, cmp::Ordering};
 
-use log::info;
-
 use crate::{
     allocator::current_thread_memory_usage,
     search::{
@@ -80,16 +78,6 @@ impl SearchStrategy for AndOrDfsPrioSearchStrategy {
 
     fn refresh_memory_mode(memory_limit: Option<u64>) -> Option<MemoryAdaptiveMode> {
         let mode = mode_for_memory_limit(memory_limit);
-        let previous_mode = current_mode();
-        if previous_mode != mode {
-            info!(
-                "Switching search strategy from {:?} to {:?} at {} bytes current memory (limit: {:?})",
-                previous_mode,
-                mode,
-                current_thread_memory_usage().bytes_current,
-                memory_limit,
-            );
-        }
         set_current_mode(mode);
         Some(mode)
     }

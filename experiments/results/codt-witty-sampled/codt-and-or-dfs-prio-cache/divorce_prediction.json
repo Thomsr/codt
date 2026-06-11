@@ -5,13 +5,15 @@
   "dataset_path": "data/openml/sampled/divorce_prediction.txt",
   "error": null,
   "expansions": 0,
-  "memory_usage_bytes": 487415,
+  "memory_usage_bytes": 492830,
   "n_examples": 100,
   "n_features": 54,
-  "runtime_seconds": 7.20308622399898,
+  "runtime_seconds": 0.3092009660031181,
   "solved": true,
   "solver": "codt",
   "status": "perfect-tree-found",
-  "tree": "[39, 0.5, [10, 0.5, 0, 1], 1]",
+  "stderr": "[2026-06-10T21:18:59Z INFO  codt_cli] Starting solve with options:\n    SolverOptions { lb_strategy: {Improvement, ClassCount, Pair}, ub_strategy: ForRemainingInterval, cart_ub: true, cart_ub_patience: 5, data_reduction: true, track_intermediates: false, timeout: Some(1800s), memory_limit: Some(4294967296) }\n    \n[2026-06-10T21:18:59Z INFO  codt::search::solver_impl] One off witnesses: 0\n[2026-06-10T21:19:00Z INFO  codt::search::solver_impl] Pair lower bound: (primary: 0, secondary: 2)\n[2026-06-10T21:19:00Z INFO  codt_cli] Read time (s): 0.000255604\n[2026-06-10T21:19:00Z INFO  codt_cli] Solve time (s): 0.305180905\n[2026-06-10T21:19:00Z INFO  codt_cli] Max memory usage (MB): 0.47\n[2026-06-10T21:19:00Z INFO  codt_cli] Graph expansions: 0\n[2026-06-10T21:19:00Z INFO  codt_cli] Tree: [39<=0.50:[10<=0.50:0,1],1]\n",
+  "stdout": "Set parameter WLSAccessID\nSet parameter WLSSecret\nSet parameter LicenseID to value 2781812\nAcademic license 2781812 - for non-commercial use only - registered to tt___@tudelft.nl\nMisclassifications: 0. Branch nodes: 2. Accuracy: 100%.\n",
+  "tree": "[39<=0.50:[10<=0.50:0,1],1]",
   "tree_size": 5
 }

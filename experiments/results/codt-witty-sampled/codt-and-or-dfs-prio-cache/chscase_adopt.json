@@ -5,13 +5,15 @@
   "dataset_path": "data/openml/sampled/chscase_adopt.txt",
   "error": null,
   "expansions": 22951,
-  "memory_usage_bytes": 301480467,
+  "memory_usage_bytes": 308333772,
   "n_examples": 39,
   "n_features": 2,
-  "runtime_seconds": 2.744994673000292,
+  "runtime_seconds": 0.7035993980025523,
   "solved": true,
   "solver": "codt",
   "status": "perfect-tree-found",
-  "tree": "[0, 8.0, 1, [1, 5.5, 0, [1, 211.0, [0, 16.0, 1, [0, 19.0, 0, [0, 53.0, [0, 51.5, 1, 0], [0, 186.5, 1, 0]]]], 0]]]",
+  "stderr": "[2026-06-10T15:18:50Z INFO  codt_cli] Starting solve with options:\n    SolverOptions { lb_strategy: {ClassCount, Pair, Improvement}, ub_strategy: ForRemainingInterval, cart_ub: true, cart_ub_patience: 5, data_reduction: true, track_intermediates: false, timeout: Some(1800s), memory_limit: Some(4294967296) }\n    \n[2026-06-10T15:18:50Z INFO  codt::search::solver_impl] One off witnesses: 0\n[2026-06-10T15:18:50Z INFO  codt::search::solver_impl] Pair lower bound: (primary: 0, secondary: 8)\n[2026-06-10T15:18:51Z INFO  codt_cli] Read time (s): 0.0000256\n[2026-06-10T15:18:51Z INFO  codt_cli] Solve time (s): 0.681757498\n[2026-06-10T15:18:51Z INFO  codt_cli] Max memory usage (MB): 294.05\n[2026-06-10T15:18:51Z INFO  codt_cli] Graph expansions: 22951\n[2026-06-10T15:18:51Z INFO  codt_cli] Tree: [0<=8.00:1,[1<=5.50:0,[1<=211.00:[0<=16.00:1,[0<=19.00:0,[0<=53.00:[0<=51.50:1,0],[0<=186.50:1,0]]]],0]]]\n",
+  "stdout": "Set parameter WLSAccessID\nSet parameter WLSSecret\nSet parameter LicenseID to value 2781812\nAcademic license 2781812 - for non-commercial use only - registered to tt___@tudelft.nl\nMisclassifications: 0. Branch nodes: 8. Accuracy: 100%.\n",
+  "tree": "[0<=8.00:1,[1<=5.50:0,[1<=211.00:[0<=16.00:1,[0<=19.00:0,[0<=53.00:[0<=51.50:1,0],[0<=186.50:1,0]]]],0]]]",
   "tree_size": 17
 }
