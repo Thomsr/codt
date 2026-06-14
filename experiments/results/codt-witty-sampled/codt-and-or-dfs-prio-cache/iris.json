@@ -5,13 +5,15 @@
   "dataset_path": "data/openml/sampled/iris.txt",
   "error": null,
   "expansions": 0,
-  "memory_usage_bytes": 82046,
+  "memory_usage_bytes": 83886,
   "n_examples": 100,
   "n_features": 4,
-  "runtime_seconds": 0.8308009469983517,
+  "runtime_seconds": 0.007871904999774415,
   "solved": true,
   "solver": "codt",
   "status": "perfect-tree-found",
-  "tree": "[3, 0.8, 1, 0]",
+  "stderr": "[2026-06-11T11:31:49Z INFO  codt_cli] Starting solve with options:\n    SolverOptions { lb_strategy: {Improvement, ClassCount, Pair}, ub_strategy: ForRemainingInterval, cart_ub: true, cart_ub_patience: 5, data_reduction: true, track_intermediates: false, timeout: Some(1800s), memory_limit: Some(4294967296) }\n    \n[2026-06-11T11:31:49Z INFO  codt::search::solver_impl] One off witnesses: 0\n[2026-06-11T11:31:49Z INFO  codt::search::solver_impl] Pair lower bound: (primary: 0, secondary: 1)\n[2026-06-11T11:31:49Z INFO  codt_cli] Read time (s): 0.0000392\n[2026-06-11T11:31:49Z INFO  codt_cli] Solve time (s): 0.005295603\n[2026-06-11T11:31:49Z INFO  codt_cli] Max memory usage (MB): 0.08\n[2026-06-11T11:31:49Z INFO  codt_cli] Graph expansions: 0\n[2026-06-11T11:31:49Z INFO  codt_cli] Tree: [3<=0.80:1,0]\n",
+  "stdout": "Set parameter WLSAccessID\nSet parameter WLSSecret\nSet parameter LicenseID to value 2781812\nAcademic license 2781812 - for non-commercial use only - registered to tt___@tudelft.nl\nMisclassifications: 0. Branch nodes: 1. Accuracy: 100%.\n",
+  "tree": "[3<=0.80:1,0]",
   "tree_size": 3
 }
