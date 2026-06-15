@@ -8,11 +8,11 @@
   "memory_usage_bytes": 41764782,
   "n_examples": 45,
   "n_features": 46,
-  "runtime_seconds": 0.44466951100184815,
+  "runtime_seconds": 0.23673015299573308,
   "solved": true,
   "solver": "codt",
   "status": "perfect-tree-found",
-  "stderr": "[2026-06-11T08:47:43Z INFO  codt_cli] Starting solve with options:\n    SolverOptions { lb_strategy: {Improvement, Pair, ClassCount}, ub_strategy: ForRemainingInterval, cart_ub: true, cart_ub_patience: 5, data_reduction: true, track_intermediates: false, timeout: Some(1800s), memory_limit: Some(4294967296) }\n    \n[2026-06-11T08:47:43Z INFO  codt::search::solver_impl] One off witnesses: 0\n[2026-06-11T08:47:43Z INFO  codt::search::solver_impl] Pair lower bound: (primary: 0, secondary: 3)\n[2026-06-11T08:47:43Z INFO  codt_cli] Read time (s): 0.0001624\n[2026-06-11T08:47:43Z INFO  codt_cli] Solve time (s): 0.437894707\n[2026-06-11T08:47:43Z INFO  codt_cli] Max memory usage (MB): 39.83\n[2026-06-11T08:47:43Z INFO  codt_cli] Graph expansions: 234\n[2026-06-11T08:47:43Z INFO  codt_cli] Tree: [13<=0.54:1,[28<=0.47:[6<=0.44:1,0],0]]\n",
+  "stderr": "[2026-06-11T11:32:23Z INFO  codt_cli] Starting solve with options:\n    SolverOptions { lb_strategy: {ClassCount, Improvement, Pair}, ub_strategy: ForRemainingInterval, cart_ub: true, cart_ub_patience: 5, data_reduction: true, track_intermediates: false, timeout: Some(1800s), memory_limit: Some(4294967296) }\n    \n[2026-06-11T11:32:23Z INFO  codt::search::solver_impl] One off witnesses: 0\n[2026-06-11T11:32:23Z INFO  codt::search::solver_impl] Pair lower bound: (primary: 0, secondary: 3)\n[2026-06-11T11:32:23Z INFO  codt_cli] Read time (s): 0.0001952\n[2026-06-11T11:32:23Z INFO  codt_cli] Solve time (s): 0.229747648\n[2026-06-11T11:32:23Z INFO  codt_cli] Max memory usage (MB): 39.83\n[2026-06-11T11:32:23Z INFO  codt_cli] Graph expansions: 234\n[2026-06-11T11:32:23Z INFO  codt_cli] Tree: [13<=0.54:1,[28<=0.47:[6<=0.44:1,0],0]]\n",
   "stdout": "Set parameter WLSAccessID\nSet parameter WLSSecret\nSet parameter LicenseID to value 2781812\nAcademic license 2781812 - for non-commercial use only - registered to tt___@tudelft.nl\nMisclassifications: 0. Branch nodes: 3. Accuracy: 100%.\n",
   "tree": "[13<=0.54:1,[28<=0.47:[6<=0.44:1,0],0]]",
   "tree_size": 7
