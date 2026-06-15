@@ -5,13 +5,15 @@
   "dataset_path": "data/openml/sampled/sonar.txt",
   "error": null,
   "expansions": 16,
-  "memory_usage_bytes": 2670992,
+  "memory_usage_bytes": 2411724,
   "n_examples": 100,
   "n_features": 60,
-  "runtime_seconds": 0.2963462890184019,
+  "runtime_seconds": 0.1160013299959246,
   "solved": true,
   "solver": "codt",
   "status": "perfect-tree-found",
-  "tree": "[59, 0.02055, [57, 0.021150000000000002, 1, 0], 0]",
+  "stderr": "[2026-06-15T18:29:08Z INFO  codt_cli] Starting solve with options:\n    SolverOptions { lb_strategy: {OneOff, ClassCount, Pair, Improvement}, ub_strategy: ForRemainingInterval, cart_ub: true, cart_ub_patience: 5, cache_max_branch_budget: Some(3), data_reduction: true, track_intermediates: false, timeout: Some(1800s), memory_limit: Some(4294967296) }\n    \n[2026-06-15T18:29:08Z INFO  codt::search::solver_impl] One off witnesses: 0\n[2026-06-15T18:29:08Z INFO  codt::search::solver_impl] Pair lower bound: (primary: 0, secondary: 2)\n[2026-06-15T18:29:08Z INFO  codt::search::solver_impl] Final root bounds: lower (primary: 0, secondary: 2), upper (primary: 0, secondary: 2), best (primary: 0, secondary: 2), complete true\n[2026-06-15T18:29:08Z INFO  codt::search::solver_impl] Solution cache: 0 useful hits / 27 lookups (0.0%), 3 entries\n[2026-06-15T18:29:08Z INFO  codt_cli] Read time (s): 0.000409501\n[2026-06-15T18:29:08Z INFO  codt_cli] Solve time (s): 0.110244423\n[2026-06-15T18:29:08Z INFO  codt_cli] Max memory usage (MB): 2.30\n[2026-06-15T18:29:08Z INFO  codt_cli] Graph expansions: 16\n[2026-06-15T18:29:08Z INFO  codt_cli] Tree: [59<=0.02:[57<=0.02:1,0],0]\n",
+  "stdout": "Set parameter WLSAccessID\nSet parameter WLSSecret\nSet parameter LicenseID to value 2781812\nAcademic license 2781812 - for non-commercial use only - registered to tt___@tudelft.nl\nMisclassifications: 0. Branch nodes: 2. Accuracy: 100%.\n",
+  "tree": "[59<=0.02:[57<=0.02:1,0],0]",
   "tree_size": 5
 }

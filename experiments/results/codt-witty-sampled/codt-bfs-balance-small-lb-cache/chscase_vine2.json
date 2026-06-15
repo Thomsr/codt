@@ -1,17 +1,19 @@
 {
   "accuracy": 1.0,
-  "branch_count": 26,
+  "branch_count": 28,
   "dataset": "chscase_vine2.txt",
   "dataset_path": "data/openml/sampled/chscase_vine2.txt",
   "error": null,
-  "expansions": 16542824,
-  "memory_usage_bytes": 581051,
+  "expansions": 131839836,
+  "memory_usage_bytes": 1258291,
   "n_examples": 100,
   "n_features": 2,
-  "runtime_seconds": 1800.0050934970059,
+  "runtime_seconds": 1800.00390862301,
   "solved": true,
   "solver": "codt",
   "status": "perfect-tree-found",
-  "tree": "[1, 25.5, [1, 1.5, 1, [1, 19.5, [0, 1983.5, [1, 10.5, 0, [1, 14.5, 1, [1, 17.5, [1, 16.5, 0, 1], 0]]], [1, 4.5, [1, 2.5, 1, 0], [1, 12.5, [1, 5.5, 1, [1, 11.5, 0, 1]], [1, 13.5, 0, [1, 15.5, 1, [1, 18.5, 0, 1]]]]]], [1, 21.5, [0, 1983.5, 1, 0], 0]]], [1, 35.5, 0, [0, 1983.5, [1, 45.5, 0, 1], [1, 36.5, 1, [1, 38.5, 0, [1, 41.5, [1, 40.5, 1, 0], [1, 44.5, 1, 0]]]]]]]",
-  "tree_size": 53
+  "stderr": "[2026-06-15T16:58:07Z INFO  codt_cli] Starting solve with options:\n    SolverOptions { lb_strategy: {OneOff, Improvement, ClassCount, Pair}, ub_strategy: ForRemainingInterval, cart_ub: true, cart_ub_patience: 5, cache_max_branch_budget: Some(3), data_reduction: true, track_intermediates: false, timeout: Some(1800s), memory_limit: Some(4294967296) }\n    \n[2026-06-15T16:58:07Z INFO  codt::search::solver_impl] One off witnesses: 2\n[2026-06-15T16:58:07Z INFO  codt::search::solver_impl] Pair lower bound: (primary: 0, secondary: 23)\n[2026-06-15T17:28:07Z INFO  codt::search::solver_impl] Final root bounds: lower (primary: 0, secondary: 23), upper (primary: 0, secondary: 28), best (primary: 0, secondary: 28), complete false\n[2026-06-15T17:28:07Z INFO  codt::search::solver_impl] Solution cache: 65193553 useful hits / 77708440 lookups (83.9%), 1078 entries\n[2026-06-15T17:28:07Z INFO  codt_cli] Read time (s): 0.0000254\n[2026-06-15T17:28:07Z INFO  codt_cli] Solve time (s): 1800.000687019\n[2026-06-15T17:28:07Z INFO  codt_cli] Max memory usage (MB): 1.20\n[2026-06-15T17:28:07Z INFO  codt_cli] Graph expansions: 131839836\n[2026-06-15T17:28:07Z INFO  codt_cli] Tree: [1<=25.50:[0<=1983.50:[1<=13.50:[1<=1.50:1,[1<=10.50:0,1]],[1<=19.50:[1<=16.50:[1<=14.50:1,0],[1<=17.50:1,0]],[1<=21.50:1,0]]],[1<=13.50:[1<=4.50:[1<=2.50:1,0],[1<=5.50:1,[1<=11.50:0,[1<=12.50:1,0]]]],[1<=19.50:[1<=15.50:1,[1<=18.50:0,1]],0]]],[0<=1983.50:[1<=45.50:0,1],[1<=34.50:0,[1<=44.50:[1<=41.50:[1<=38.50:[1<=36.50:[1<=35.50:0,1],0],[1<=40.50:1,0]],1],0]]]]\n",
+  "stdout": "Set parameter WLSAccessID\nSet parameter WLSSecret\nSet parameter LicenseID to value 2781812\nAcademic license 2781812 - for non-commercial use only - registered to tt___@tudelft.nl\nMisclassifications: 0. Branch nodes: 28. Accuracy: 100%.\n",
+  "tree": "[1<=25.50:[0<=1983.50:[1<=13.50:[1<=1.50:1,[1<=10.50:0,1]],[1<=19.50:[1<=16.50:[1<=14.50:1,0],[1<=17.50:1,0]],[1<=21.50:1,0]]],[1<=13.50:[1<=4.50:[1<=2.50:1,0],[1<=5.50:1,[1<=11.50:0,[1<=12.50:1,0]]]],[1<=19.50:[1<=15.50:1,[1<=18.50:0,1]],0]]],[0<=1983.50:[1<=45.50:0,1],[1<=34.50:0,[1<=44.50:[1<=41.50:[1<=38.50:[1<=36.50:[1<=35.50:0,1],0],[1<=40.50:1,0]],1],0]]]]",
+  "tree_size": 57
 }

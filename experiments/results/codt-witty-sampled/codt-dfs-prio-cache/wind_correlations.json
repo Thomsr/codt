@@ -5,13 +5,15 @@
   "dataset_path": "data/openml/sampled/wind_correlations.txt",
   "error": null,
   "expansions": 953,
-  "memory_usage_bytes": 2756475,
+  "memory_usage_bytes": 2852126,
   "n_examples": 45,
   "n_features": 46,
-  "runtime_seconds": 1.4407209990022238,
+  "runtime_seconds": 0.2380870620108908,
   "solved": true,
   "solver": "codt",
   "status": "perfect-tree-found",
-  "tree": "[33, 0.3865, [28, 0.46950000000000003, 1, 0], [13, 0.536, 1, 0]]",
+  "stderr": "[2026-06-15T18:38:18Z INFO  codt_cli] Starting solve with options:\n    SolverOptions { lb_strategy: {Improvement, ClassCount, OneOff, Pair}, ub_strategy: ForRemainingInterval, cart_ub: true, cart_ub_patience: 5, cache_max_branch_budget: Some(3), data_reduction: true, track_intermediates: false, timeout: Some(1800s), memory_limit: Some(4294967296) }\n    \n[2026-06-15T18:38:18Z INFO  codt::search::solver_impl] One off witnesses: 0\n[2026-06-15T18:38:18Z INFO  codt::search::solver_impl] Pair lower bound: (primary: 0, secondary: 3)\n[2026-06-15T18:38:18Z INFO  codt::search::solver_impl] Final root bounds: lower (primary: 0, secondary: 3), upper (primary: 0, secondary: 3), best (primary: 0, secondary: 3), complete true\n[2026-06-15T18:38:18Z INFO  codt::search::solver_impl] Solution cache: 6 useful hits / 4757 lookups (0.1%), 19 entries\n[2026-06-15T18:38:18Z INFO  codt_cli] Read time (s): 0.0001834\n[2026-06-15T18:38:18Z INFO  codt_cli] Solve time (s): 0.231083254\n[2026-06-15T18:38:18Z INFO  codt_cli] Max memory usage (MB): 2.72\n[2026-06-15T18:38:18Z INFO  codt_cli] Graph expansions: 953\n[2026-06-15T18:38:18Z INFO  codt_cli] Tree: [33<=0.39:[28<=0.47:1,0],[13<=0.54:1,0]]\n",
+  "stdout": "Set parameter WLSAccessID\nSet parameter WLSSecret\nSet parameter LicenseID to value 2781812\nAcademic license 2781812 - for non-commercial use only - registered to tt___@tudelft.nl\nMisclassifications: 0. Branch nodes: 3. Accuracy: 100%.\n",
+  "tree": "[33<=0.39:[28<=0.47:1,0],[13<=0.54:1,0]]",
   "tree_size": 7
 }

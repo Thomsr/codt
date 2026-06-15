@@ -5,13 +5,15 @@
   "dataset_path": "data/openml/sampled/analcatdata_election2000.txt",
   "error": null,
   "expansions": 80,
-  "memory_usage_bytes": 562473,
+  "memory_usage_bytes": 534773,
   "n_examples": 67,
   "n_features": 14,
-  "runtime_seconds": 0.10439981300442014,
+  "runtime_seconds": 0.02871063099883031,
   "solved": true,
   "solver": "codt",
   "status": "perfect-tree-found",
-  "tree": "[11, 36600.5, 1, [7, 480.0, 0, 1]]",
+  "stderr": "[2026-06-15T18:31:37Z INFO  codt_cli] Starting solve with options:\n    SolverOptions { lb_strategy: {Improvement, Pair, ClassCount, OneOff}, ub_strategy: ForRemainingInterval, cart_ub: true, cart_ub_patience: 5, cache_max_branch_budget: Some(3), data_reduction: true, track_intermediates: false, timeout: Some(1800s), memory_limit: Some(4294967296) }\n    \n[2026-06-15T18:31:37Z INFO  codt::search::solver_impl] One off witnesses: 0\n[2026-06-15T18:31:37Z INFO  codt::search::solver_impl] Pair lower bound: (primary: 0, secondary: 2)\n[2026-06-15T18:31:37Z INFO  codt::search::solver_impl] Final root bounds: lower (primary: 0, secondary: 2), upper (primary: 0, secondary: 2), best (primary: 0, secondary: 2), complete true\n[2026-06-15T18:31:37Z INFO  codt::search::solver_impl] Solution cache: 0 useful hits / 154 lookups (0.0%), 2 entries\n[2026-06-15T18:31:37Z INFO  codt_cli] Read time (s): 0.0000819\n[2026-06-15T18:31:37Z INFO  codt_cli] Solve time (s): 0.026044329\n[2026-06-15T18:31:37Z INFO  codt_cli] Max memory usage (MB): 0.51\n[2026-06-15T18:31:37Z INFO  codt_cli] Graph expansions: 80\n[2026-06-15T18:31:37Z INFO  codt_cli] Tree: [11<=36600.50:1,[7<=480.00:0,1]]\n",
+  "stdout": "Set parameter WLSAccessID\nSet parameter WLSSecret\nSet parameter LicenseID to value 2781812\nAcademic license 2781812 - for non-commercial use only - registered to tt___@tudelft.nl\nMisclassifications: 0. Branch nodes: 2. Accuracy: 100%.\n",
+  "tree": "[11<=36600.50:1,[7<=480.00:0,1]]",
   "tree_size": 5
 }
