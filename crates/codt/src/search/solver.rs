@@ -166,6 +166,9 @@ pub struct SolverOptions {
     pub ub_strategy: UpperboundStrategy,
     pub cart_ub: bool,
     pub cart_ub_patience: usize,
+    /// Cache subproblems whose bound gap permits at most this many more branch nodes.
+    /// None disables caching.
+    pub cache_max_branch_budget: Option<usize>,
     pub data_reduction: bool,
     pub track_intermediates: bool,
     pub timeout: Option<Duration>,
@@ -186,6 +189,7 @@ impl Default for SolverOptions {
             ub_strategy: UpperboundStrategy::ForRemainingInterval,
             cart_ub: true,
             cart_ub_patience: 5,
+            cache_max_branch_budget: Some(3),
             data_reduction: true,
             track_intermediates: false,
             timeout: None,

@@ -1,14 +1,17 @@
 use std::{
+    cell::{Cell, RefCell},
     collections::{HashSet, VecDeque},
     marker::PhantomData,
+    sync::Arc,
     time::{Duration, Instant},
 };
 
 use log::{info, trace};
+use rustc_hash::FxHashMap;
 
 use crate::{
     allocator::{current_thread_memory_usage, reset_current_thread_max_memory_usage},
-    model::{dataview::DataView, difference_table::DifferenceTable},
+    model::{dataview::DataView, difference_table::DifferenceTable, tree::Tree},
     search::{
         lower_bounds::pair::pair_lower_bound,
         node::Node,
@@ -36,7 +39,48 @@ pub struct SolveContext<'a, OT: OptimizationTask, SS: SearchStrategy> {
     pub cart_ub_patience: usize,
     pub memory_limit: Option<u64>,
     pub difference_table: Option<&'a DifferenceTable>,
+    cache_max_branch_budget: Option<usize>,
+    solution_cache: RefCell<FxHashMap<Vec<usize>, Arc<Tree<OT>>>>,
+    cache_lookups: Cell<usize>,
+    cache_useful_hits: Cell<usize>,
     _ss: PhantomData<SS>,
+}
+
+impl<OT: OptimizationTask, SS: SearchStrategy> SolveContext<'_, OT, SS> {
+    fn cache_key(dataview: &DataView<OT>) -> Vec<usize> {
+        let mut key = dataview.instance_ids.clone();
+        key.sort_unstable();
+        key
+    }
+
+    pub fn cached_solution(&self, dataview: &DataView<OT>) -> Option<Arc<Tree<OT>>> {
+        self.cache_lookups.set(self.cache_lookups.get() + 1);
+        let solution = self
+            .solution_cache
+            .borrow()
+            .get(&Self::cache_key(dataview))
+            .cloned();
+        if solution.is_some() {
+            self.cache_useful_hits.set(self.cache_useful_hits.get() + 1);
+        }
+        solution
+    }
+
+    pub fn cache_solution(&self, dataview: &DataView<OT>, solution: Arc<Tree<OT>>) {
+        self.solution_cache
+            .borrow_mut()
+            .insert(Self::cache_key(dataview), solution);
+    }
+
+    pub fn cache_eligible(&self, lower_bound: &OT::CostType, upper_bound: &OT::CostType) -> bool {
+        if self.cache_max_branch_budget.is_some_and(|max_budget| {
+            OT::remaining_branch_budget(lower_bound, upper_bound)
+                .is_some_and(|budget| budget <= max_budget)
+        }) {
+            return true;
+        }
+        false
+    }
 }
 
 impl<OT: OptimizationTask, SS: SearchStrategy> Solver<OT> for SolverImpl<'_, OT, SS> {
@@ -66,6 +110,10 @@ impl<OT: OptimizationTask, SS: SearchStrategy> Solver<OT> for SolverImpl<'_, OT,
             cart_ub_patience: options.cart_ub_patience,
             memory_limit: options.memory_limit,
             difference_table: difference_table.as_ref(),
+            cache_max_branch_budget: options.cache_max_branch_budget,
+            solution_cache: RefCell::default(),
+            cache_lookups: Cell::default(),
+            cache_useful_hits: Cell::default(),
             _ss: PhantomData,
         };
 
@@ -198,6 +246,13 @@ impl<OT: OptimizationTask, SS: SearchStrategy> Solver<OT> for SolverImpl<'_, OT,
             }
         }
 
+        info!(
+            "Final root bounds: lower {}, upper {}, best {}, complete {}",
+            root.cost_lower_bound,
+            root.cost_upper_bound,
+            root.best.cost(),
+            root.is_complete()
+        );
         let solution = root.best;
         let status = if OT::is_perfect_solution_cost(&solution.cost()) {
             SolveStatus::PerfectTreeFound
@@ -209,6 +264,17 @@ impl<OT: OptimizationTask, SS: SearchStrategy> Solver<OT> for SolverImpl<'_, OT,
         self.dataview = Some(root.dataview);
 
         let memory_usage_bytes = current_thread_memory_usage().bytes_max;
+        info!(
+            "Solution cache: {} useful hits / {} lookups ({:.1}%), {} entries",
+            context.cache_useful_hits.get(),
+            context.cache_lookups.get(),
+            if context.cache_lookups.get() == 0 {
+                0.0
+            } else {
+                context.cache_useful_hits.get() as f64 / context.cache_lookups.get() as f64 * 100.0
+            },
+            context.solution_cache.borrow().len(),
+        );
 
         SolveResult {
             status,
@@ -240,12 +306,76 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> SolverImpl<'a, OT, SS> {
 
 #[cfg(test)]
 mod tests {
+    use std::{cell::RefCell, collections::HashSet, sync::Arc};
+
+    use rustc_hash::FxHashMap;
+
+    use super::SolveContext;
     use crate::{
-        model::{dataset::DataSet, dataview::DataView, instance::LabeledInstance, tree::Tree},
-        search::solver::{SearchStrategyEnum, SolveStatus, SolverOptions, solver_with_strategy},
+        model::{
+            dataset::DataSet,
+            dataview::DataView,
+            instance::LabeledInstance,
+            tree::{LeafNode, Tree},
+        },
+        search::{
+            solver::{
+                SearchStrategyEnum, SolveStatus, SolverOptions, UpperboundStrategy,
+                solver_with_strategy,
+            },
+            strategy::dfs::DfsSearchStrategy,
+        },
         tasks::{LexicographicCost, accuracy::AccuracyTask},
         test_support::{read_from_file, repo_root},
     };
+
+    #[test]
+    fn solution_cache_uses_branch_budget_and_subset_ids() {
+        let mut dataset = DataSet::<LabeledInstance<i32>>::default();
+        dataset.add_instance(LabeledInstance::new(0), [0.0]);
+        dataset.add_instance(LabeledInstance::new(1), [1.0]);
+        dataset.preprocess_after_adding_instances();
+
+        let view = DataView::from_dataset(&dataset, false);
+        let mut reordered_view = DataView::from_dataset(&dataset, false);
+        reordered_view.instance_ids.reverse();
+
+        let task = AccuracyTask::new();
+        let context: SolveContext<'_, AccuracyTask, DfsSearchStrategy> = SolveContext {
+            task: &task,
+            lb_strategy: HashSet::new(),
+            ub_strategy: UpperboundStrategy::SolutionsOnly,
+            cart_ub: false,
+            cart_ub_patience: 0,
+            memory_limit: None,
+            difference_table: None,
+            cache_max_branch_budget: Some(3),
+            solution_cache: RefCell::new(FxHashMap::default()),
+            cache_lookups: Default::default(),
+            cache_useful_hits: Default::default(),
+            _ss: Default::default(),
+        };
+        let solution = Arc::new(Tree::Leaf(LeafNode {
+            cost: LexicographicCost::new(1, 0),
+            label: 0,
+        }));
+
+        assert!(
+            context.cache_eligible(&LexicographicCost::new(1, 2), &LexicographicCost::new(1, 5))
+        );
+        assert!(
+            !context.cache_eligible(&LexicographicCost::new(1, 2), &LexicographicCost::new(1, 6))
+        );
+        assert!(
+            !context.cache_eligible(&LexicographicCost::new(0, 2), &LexicographicCost::new(1, 2))
+        );
+
+        context.cache_solution(&view, solution.clone());
+        assert!(Arc::ptr_eq(
+            &context.cached_solution(&reordered_view).unwrap(),
+            &solution
+        ));
+    }
 
     #[test]
     fn perfect_tree_pure_dataset_is_single_leaf() {
@@ -302,6 +432,33 @@ mod tests {
         assert!(matches!(tree.as_ref(), Tree::Branch(_)));
         assert_eq!(tree.branch_count(), 1);
         assert_eq!(tree.cost(), LexicographicCost::new(0, 1));
+    }
+
+    #[test]
+    fn cached_search_finds_minimum_size_xor_tree() {
+        let mut dataset = DataSet::<LabeledInstance<i32>>::default();
+        dataset.add_instance(LabeledInstance::new(0), [0.0, 0.0]);
+        dataset.add_instance(LabeledInstance::new(1), [0.0, 1.0]);
+        dataset.add_instance(LabeledInstance::new(1), [1.0, 0.0]);
+        dataset.add_instance(LabeledInstance::new(0), [1.0, 1.0]);
+        dataset.preprocess_after_adding_instances();
+
+        let full_view = DataView::from_dataset(&dataset, false);
+        let mut solver = solver_with_strategy(
+            AccuracyTask::new(),
+            full_view,
+            SearchStrategyEnum::AndOrDfsPrio,
+        );
+        let result = solver.solve(SolverOptions {
+            cart_ub: false,
+            cache_max_branch_budget: Some(3),
+            ..SolverOptions::default()
+        });
+
+        assert_eq!(result.status, SolveStatus::PerfectTreeFound);
+        let tree = result.tree.expect("Expected a perfect XOR tree");
+        assert_eq!(tree.cost(), LexicographicCost::new(0, 3));
+        assert_eq!(tree.branch_count(), 3);
     }
 
     #[test]

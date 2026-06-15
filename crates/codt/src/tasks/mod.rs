@@ -208,6 +208,15 @@ pub trait OptimizationTask {
 
     fn branching_cost(&self) -> Self::CostType;
 
+    /// Returns the maximum number of branch nodes between these bounds, when the
+    /// task's cost representation makes that quantity well-defined.
+    fn remaining_branch_budget(
+        _lower_bound: &Self::CostType,
+        _upper_bound: &Self::CostType,
+    ) -> Option<usize> {
+        None
+    }
+
     fn greedy_value(left_costsum: &Self::CostSumType, right_costsum: &Self::CostSumType) -> f32;
 
     fn init_extra_dataview_data(

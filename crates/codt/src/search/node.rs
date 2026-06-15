@@ -336,6 +336,7 @@ pub struct Node<'a, OT: OptimizationTask, SS: SearchStrategy> {
     one_off_witnesses: HashMap<usize, (usize, usize)>,
     /// The threshold range we are still interested in per feature. Initially the full range, but shrunk when a zero solution is found.
     pub interesting_solutions_range: Vec<Range<usize>>,
+    cache_eligible: bool,
     ordering_mode: Option<MemoryAdaptiveMode>,
 }
 
@@ -382,6 +383,7 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> Node<'a, OT, SS> {
                 dataview,
                 queue,
                 interesting_solutions_range,
+                cache_eligible: false,
                 ordering_mode,
             };
         }
@@ -486,7 +488,7 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> Node<'a, OT, SS> {
         };
         OT::update_lowerbound(&mut lb, &one_off_lb);
 
-        Node {
+        let mut node = Node {
             cost_upper_bound: ub,
             cost_lower_bound: lb,
             lowest_descendant_heuristic: queue
@@ -498,7 +500,46 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> Node<'a, OT, SS> {
             dataview,
             queue,
             interesting_solutions_range,
+            cache_eligible: false,
             ordering_mode,
+        };
+        node.try_apply_cached_solution(context);
+        node
+    }
+
+    fn try_apply_cached_solution(&mut self, context: &SolveContext<OT, SS>) -> bool {
+        // Completed nodes cannot benefit from another lookup. In particular,
+        // cached nodes have an empty queue and are revisited often while their
+        // parent bounds are recalculated.
+        if self.is_complete() {
+            return false;
+        }
+
+        self.cache_eligible |=
+            context.cache_eligible(&self.cost_lower_bound, &self.cost_upper_bound);
+        if !self.cache_eligible {
+            return false;
+        }
+
+        let Some(best) = context.cached_solution(&self.dataview) else {
+            return false;
+        };
+        let cost = best.cost();
+        OT::update_upperbound(&mut self.cost_upper_bound, &cost);
+        self.cost_lower_bound = cost;
+        self.lowest_descendant_heuristic = f64::MAX;
+        self.best = best;
+        self.queue.clear();
+        true
+    }
+
+    fn cache_if_solved(&self, context: &SolveContext<OT, SS>) {
+        if self.cache_eligible
+            && self
+                .cost_lower_bound
+                .greater_or_not_much_less_than(&self.best.cost())
+        {
+            context.cache_solution(&self.dataview, self.best.clone());
         }
     }
 
@@ -654,6 +695,8 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> Node<'a, OT, SS> {
 
             self.compute_child_upper_bound(context, &mut children[0], child1_lb, margin);
             self.compute_child_upper_bound(context, &mut children[1], child0_lb, margin);
+            children[0].try_apply_cached_solution(context);
+            children[1].try_apply_cached_solution(context);
             // Child lower bounds could be computed in a similar way, but are useless.
             // Initial lower bounds are better for children, and other lower bounds for the parent are gained by backtracking the child.
         }
@@ -697,6 +740,10 @@ impl<'a, OT: OptimizationTask, SS: SearchStrategy> Node<'a, OT, SS> {
             .expanded
             .as_ref()
             .expect("An item can only be backtracked if it has been expanded.");
+        if let ExpandedQueueItem::Children(children) = expanded {
+            children[0].cache_if_solved(context);
+            children[1].cache_if_solved(context);
+        }
         // No actual LB update here, add the solution to the pruner. The LB of the item will be updated by the pruner later.
         self.pruner.insert_left_subtree(
             item.feature,
