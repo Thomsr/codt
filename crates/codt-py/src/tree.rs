@@ -50,6 +50,7 @@ macro_rules! impl_optimal_decision_tree_pyclass {
             lowerbound: HashSet<LowerBoundStrategy>,
             upperbound: UpperboundStrategy,
             cart_upperbound: bool,
+            cache_max_branch_budget: Option<usize>,
             timeout: Option<Duration>,
             memory_limit: Option<u64>,
             intermediates: bool,
@@ -69,6 +70,7 @@ macro_rules! impl_optimal_decision_tree_pyclass {
                                                                 lowerbound="class-count,improvement,pair",
                                                                 upperbound="for-remaining-interval",
                                                                 cart_upperbound="enabled",
+                                                                cache_max_branch_budget=3,
                                                                 intermediates=false,
                                                                 memory_limit=None
                                                             ))]
@@ -78,6 +80,7 @@ macro_rules! impl_optimal_decision_tree_pyclass {
                 lowerbound: &str,
                 upperbound: &str,
                 cart_upperbound: &str,
+                cache_max_branch_budget: Option<usize>,
                 intermediates: bool,
                 memory_limit: Option<u64>,
             ) -> Result<Self, PyErr> {
@@ -118,6 +121,7 @@ macro_rules! impl_optimal_decision_tree_pyclass {
                     lowerbound,
                     upperbound,
                     cart_upperbound,
+                    cache_max_branch_budget,
                     strategy,
                     intermediates,
                     timeout: timeout.map(Duration::from_secs),
@@ -155,6 +159,7 @@ macro_rules! impl_optimal_decision_tree_pyclass {
                     ub_strategy: self.upperbound,
                     cart_ub: self.cart_upperbound,
                     cart_ub_patience: 5,
+                    cache_max_branch_budget: self.cache_max_branch_budget,
                     data_reduction: true,
                     timeout: self.timeout,
                     track_intermediates: self.intermediates,

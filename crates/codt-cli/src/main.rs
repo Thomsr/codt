@@ -78,6 +78,7 @@ fn main() {
         ub_strategy: args.upperbound,
         cart_ub: args.cart_upperbound,
         cart_ub_patience: args.cart_upper_bound_patience,
+        cache_max_branch_budget: args.cache.then_some(args.cache_max_branch_budget).flatten(),
         data_reduction: args.data_reduction,
         memory_limit: Some(args.memory_limit),
         timeout: Some(Duration::from_secs(args.timeout)),

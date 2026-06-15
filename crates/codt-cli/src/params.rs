@@ -59,6 +59,14 @@ pub struct CliParams {
     #[arg(long, default_value_t = 5)]
     pub cart_upper_bound_patience: usize,
 
+    /// Cache subproblems when their bound gap allows at most this many more branch nodes.
+    #[arg(long, default_value = "3")]
+    pub cache_max_branch_budget: Option<usize>,
+
+    /// Whether solved subproblems should be cached.
+    #[arg(long, action=ArgAction::Set, default_value_t=true)]
+    pub cache: bool,
+
     #[arg(long, action=ArgAction::Set, default_value_t=true)]
     pub data_reduction: bool,
 

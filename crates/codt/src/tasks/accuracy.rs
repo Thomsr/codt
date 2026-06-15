@@ -154,6 +154,20 @@ impl OptimizationTask for AccuracyTask {
         LexicographicCost::new(0, 1)
     }
 
+    fn remaining_branch_budget(
+        lower_bound: &Self::CostType,
+        upper_bound: &Self::CostType,
+    ) -> Option<usize> {
+        if lower_bound.primary != upper_bound.primary {
+            return None;
+        }
+
+        upper_bound
+            .secondary
+            .checked_sub(lower_bound.secondary)
+            .and_then(|budget| usize::try_from(budget).ok())
+    }
+
     fn to_cost_type(size: i64) -> Self::CostType {
         LexicographicCost::new(0, size)
     }
