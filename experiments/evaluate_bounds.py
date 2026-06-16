@@ -16,6 +16,8 @@ from __future__ import annotations
 import argparse
 import json
 import math
+import re
+import subprocess
 import time
 from dataclasses import dataclass
 from pathlib import Path
@@ -24,11 +26,8 @@ from typing import Any, Dict, List, Optional
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-from codt_py import (
-    OptimalDecisionTreeClassifier,
-    all_cart_upperbounds,
-    all_lowerbounds,
-)
+
+from plot_style import tab10_colors
 
 
 DEFAULT_DATASETS = [
@@ -36,19 +35,36 @@ DEFAULT_DATASETS = [
     "analcatdata_election2000",
     "appendicitis_test_edsa",
     "breast-w",
-    "chscase_adopt"
-    "diggle_table_a1",
+    "chscase_adopt",
     "divorce_prediction",
     "kc1-top5",
     "wine",
 ]
 
-DEFAULT_STRATEGY = "and-or-dfs-prio"
 DEFAULT_UPPERBOUND = "for-remaining-interval"
 DEFAULT_CART_UPPERBOUND = "enabled"
 DEFAULT_MEMORY_LIMIT_BYTES = 4 * 1024 * 1024 * 1024
-
-
+BOUND_EXPERIMENT_STRATEGY = "and-or-dfs-prio"
+LOWERBOUNDS = ["class-count", "one-off", "pair", "improvement"]
+CART_UPPERBOUNDS = ["disabled", "enabled"]
+LEGEND_LABELS = {
+    "bounds": {
+        "none": "No bounds",
+        "all": "All bounds",
+    },
+    "lowerbound": {
+        "none": "No lower bound",
+        "class-count": "Class count",
+        "pair": "Pair",
+        "improvement": "Pair-size",
+        "one-off": "One-off",
+        "all": "All lower bounds",
+    },
+    "upperbound": {
+        "disabled": "CART disabled",
+        "enabled": "CART enabled",
+    },
+}
 @dataclass(frozen=True)
 class BoundConfig:
     group: str
@@ -75,6 +91,12 @@ def parse_args() -> argparse.Namespace:
         help="Directory for cached runs, CSV summaries, and figures.",
     )
     parser.add_argument(
+        "--codt-cli-binary",
+        type=Path,
+        default=Path("target/release/codt-cli"),
+        help="Path to the release-built CODT CLI binary.",
+    )
+    parser.add_argument(
         "--datasets",
         nargs="+",
         default=DEFAULT_DATASETS,
@@ -82,7 +104,8 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument(
         "--strategy",
-        default=DEFAULT_STRATEGY,
+        default=BOUND_EXPERIMENT_STRATEGY,
+        choices=[BOUND_EXPERIMENT_STRATEGY],
         help="CODT search strategy to use for every bound comparison.",
     )
     parser.add_argument(
@@ -110,19 +133,30 @@ def parse_args() -> argparse.Namespace:
     return parser.parse_args()
 
 
-def load_dataset(path: Path) -> tuple[np.ndarray, np.ndarray, Dict[str, int]]:
+def load_dataset_metadata(path: Path) -> Dict[str, int]:
     frame = pd.read_csv(path, sep=r"\s+", header=None)
     if frame.shape[1] < 2:
         raise ValueError(f"Expected labels plus at least one feature in {path}")
 
-    y = frame.iloc[:, 0].to_numpy()
-    x = frame.iloc[:, 1:].to_numpy()
-    metadata = {
-        "n_examples": int(x.shape[0]),
-        "n_features": int(x.shape[1]),
-        "n_classes": int(pd.Series(y).nunique()),
+    return {
+        "n_examples": int(frame.shape[0]),
+        "n_features": int(frame.shape[1] - 1),
+        "n_classes": int(frame.iloc[:, 0].nunique()),
     }
-    return x, y, metadata
+
+
+def repo_root() -> Path:
+    return Path(__file__).resolve().parents[1]
+
+
+def resolve_codt_cli_binary(binary_path: Path) -> Path:
+    resolved = binary_path if binary_path.is_absolute() else repo_root() / binary_path
+    if not resolved.exists():
+        raise FileNotFoundError(
+            f"CODT release binary not found at {resolved}. "
+            "Build it first with `cargo build --release -p codt-cli`."
+        )
+    return resolved
 
 
 def canonical_name(value: str) -> str:
@@ -155,8 +189,7 @@ def write_json(path: Path, payload: Dict[str, Any]) -> None:
 
 
 def build_configs(skip_pair: bool) -> List[BoundConfig]:
-    lowerbounds = list(all_lowerbounds())
-    cart_upperbounds = list(all_cart_upperbounds())
+    lowerbounds = list(LOWERBOUNDS)
 
     if skip_pair:
         lowerbounds = [lb for lb in lowerbounds if lb != "pair"]
@@ -195,7 +228,7 @@ def build_configs(skip_pair: bool) -> List[BoundConfig]:
         )
     )
 
-    for cart_upperbound in cart_upperbounds:
+    for cart_upperbound in CART_UPPERBOUNDS:
         configs.append(
             BoundConfig(
                 group="upperbound",
@@ -255,40 +288,84 @@ def classify_status(
 
 def run_one(
     dataset_name: str,
-    x: np.ndarray,
-    y: np.ndarray,
+    dataset_path: Path,
     metadata: Dict[str, int],
     config: BoundConfig,
     strategy: str,
     timeout: int,
     memory_limit: int,
+    codt_cli_binary: Path,
 ) -> Dict[str, Any]:
-    started = time.perf_counter()
-    error: Optional[str] = None
+    command = [
+        str(codt_cli_binary),
+        "--file",
+        str(dataset_path),
+        "--strategy",
+        strategy,
+        "--lowerbound",
+    ]
+    if config.lowerbound != "none":
+        command.append(config.lowerbound)
+    command.extend(
+        [
+            "--upperbound",
+            config.upperbound,
+            "--cart-upperbound",
+            str(config.cart_upperbound == "enabled").lower(),
+            "--cart-upper-bound-patience",
+            "5",
+            "--cache",
+            "true",
+            "--cache-max-branch-budget",
+            "3",
+            "--data-reduction",
+            "true",
+            "--memory-limit",
+            str(memory_limit),
+            "--timeout",
+            str(timeout),
+        ]
+    )
 
+    started = time.perf_counter()
     try:
-        model = OptimalDecisionTreeClassifier(
-            strategy=strategy,
-            timeout=timeout,
-            lowerbound=config.lowerbound,
-            upperbound=config.upperbound,
-            cart_upperbound=config.cart_upperbound,
-            intermediates=False,
-            memory_limit=memory_limit,
+        completed = subprocess.run(
+            command,
+            capture_output=True,
+            text=True,
+            timeout=timeout + 30,
         )
-        model.fit(x, y)
-        solver_status = str(model.status())
-        is_perfect = bool(model.is_perfect())
-        expansions = int(model.expansions())
-        memory_usage_bytes = int(model.memory_usage_bytes())
-        if is_perfect:
-            tree_size = int(model.tree_size())
-            branch_count = int(model.branch_count())
-        else:
+        stdout = completed.stdout
+        stderr = completed.stderr
+        output = "\n".join(part for part in (stdout, stderr) if part)
+        is_perfect = "No perfect tree exists for the given data and constraints." not in output
+        solver_status = "perfect-tree-found" if is_perfect else "no-perfect-tree"
+        error = None
+
+        branch_match = re.search(r"Branch nodes:\s*(\d+)", output)
+        branch_count = int(branch_match.group(1)) if branch_match else None
+        tree_size = 2 * branch_count + 1 if branch_count is not None else None
+
+        expansion_match = re.search(r"Graph expansions:\s*(\d+)", output)
+        expansions = int(expansion_match.group(1)) if expansion_match else None
+
+        memory_match = re.search(r"Max memory usage \(MB\):\s*([0-9.]+)", output)
+        memory_usage_bytes = (
+            int(float(memory_match.group(1)) * 1024 * 1024)
+            if memory_match
+            else None
+        )
+
+        if completed.returncode != 0:
+            error = output.strip() or f"codt-cli exited with status {completed.returncode}"
+            solver_status = "error"
+            is_perfect = False
             tree_size = None
             branch_count = None
-    except Exception as exc:  # pragma: no cover - experiments record failures.
-        error = str(exc)
+    except subprocess.TimeoutExpired as exc:  # pragma: no cover - records hung runs.
+        stdout = exc.stdout or ""
+        stderr = exc.stderr or ""
+        error = f"codt-cli exceeded its {timeout + 30}s process timeout"
         solver_status = "error"
         is_perfect = False
         tree_size = None
@@ -317,10 +394,17 @@ def run_one(
         "expansions": expansions,
         "runtime_seconds": runtime_seconds,
         "memory_usage_bytes": memory_usage_bytes,
+        "command": command,
+        "stdout": stdout,
+        "stderr": stderr,
     }
 
 
-def run_experiment(args: argparse.Namespace, configs: List[BoundConfig]) -> List[Dict[str, Any]]:
+def run_experiment(
+    args: argparse.Namespace,
+    configs: List[BoundConfig],
+    codt_cli_binary: Path,
+) -> List[Dict[str, Any]]:
     results: List[Dict[str, Any]] = []
 
     for dataset_name in args.datasets:
@@ -329,7 +413,7 @@ def run_experiment(args: argparse.Namespace, configs: List[BoundConfig]) -> List
             print(f"Skipping {dataset_name}: missing {dataset_path}")
             continue
 
-        x, y, metadata = load_dataset(dataset_path)
+        metadata = load_dataset_metadata(dataset_path)
         print(
             f"\nDataset {dataset_name}: "
             f"{metadata['n_examples']} rows, {metadata['n_features']} features"
@@ -338,6 +422,8 @@ def run_experiment(args: argparse.Namespace, configs: List[BoundConfig]) -> List
         for config in configs:
             path = cache_path(args.output_dir, dataset_name, config)
             cached = None if args.force else read_json(path)
+            if cached is not None and cached.get("strategy") != args.strategy:
+                cached = None
             if cached is not None:
                 results.append(cached)
                 print(f"  cached {config.group}/{config.name}")
@@ -346,13 +432,13 @@ def run_experiment(args: argparse.Namespace, configs: List[BoundConfig]) -> List
             print(f"  running {config.group}/{config.name}...", end=" ", flush=True)
             result = run_one(
                 dataset_name=dataset_name,
-                x=x,
-                y=y,
+                dataset_path=dataset_path,
                 metadata=metadata,
                 config=config,
                 strategy=args.strategy,
                 timeout=args.timeout,
                 memory_limit=args.memory_limit,
+                codt_cli_binary=codt_cli_binary,
             )
             write_json(path, result)
             results.append(result)
@@ -434,9 +520,9 @@ def plot_grouped_expansions(frame: pd.DataFrame, output_dir: Path) -> None:
         configs = list(dict.fromkeys(plot_frame["config"].tolist()))
         x = np.arange(len(datasets))
         width = min(0.8 / max(len(configs), 1), 0.22)
+        colors = tab10_colors(max(3, len(configs)))
 
-        fig_width = max(7.0, 1.2 * len(datasets) + 1.1 * len(configs))
-        fig, ax = plt.subplots(figsize=(fig_width, 4.5))
+        fig, ax = plt.subplots(figsize=(10, 4))
 
         for idx, config in enumerate(configs):
             subset = plot_frame[plot_frame["config"] == config].set_index("dataset")
@@ -445,15 +531,27 @@ def plot_grouped_expansions(frame: pd.DataFrame, output_dir: Path) -> None:
                 for dataset in datasets
             ]
             offset = (idx - (len(configs) - 1) / 2) * width
-            ax.bar(x + offset, values, width=width, label=config)
+            ax.bar(
+                x + offset,
+                values,
+                width=width,
+                color=colors[idx % len(colors)],
+                label=LEGEND_LABELS[group].get(config, config),
+            )
 
-        ax.set_title(f"{group}: expanded search nodes")
         ax.set_ylabel("Expanded search nodes")
         ax.set_yscale("symlog", linthresh=1)
         ax.set_xticks(x)
         ax.set_xticklabels(datasets, rotation=30, ha="right")
         ax.grid(axis="y", which="both", alpha=0.3)
-        ax.legend(title="Configuration", frameon=False)
+        ax.legend(
+            loc="lower center",
+            bbox_to_anchor=(0.5, 1.01),
+            ncol=len(configs),
+            frameon=False,
+            columnspacing=1.4,
+            handlelength=1.8,
+        )
         fig.tight_layout()
         fig.savefig(figures_dir / f"{group}_expansions.png", dpi=200)
         plt.close(fig)
@@ -508,6 +606,7 @@ def print_summary(frame: pd.DataFrame) -> None:
 
 def main() -> None:
     args = parse_args()
+    codt_cli_binary = resolve_codt_cli_binary(args.codt_cli_binary)
     configs = build_configs(skip_pair=args.skip_pair)
 
     print(f"Using {len(configs)} bound configurations:")
@@ -518,7 +617,7 @@ def main() -> None:
             f"cart={config.cart_upperbound}"
         )
 
-    results = run_experiment(args, configs)
+    results = run_experiment(args, configs, codt_cli_binary)
     frame = save_tables(results, args.output_dir)
     plot_grouped_expansions(frame, args.output_dir)
     print_summary(frame)

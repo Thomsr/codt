@@ -7,8 +7,6 @@ use std::{
     sync::Arc,
 };
 
-use log::info;
-
 use crate::{
     model::{
         dataview::DataView,

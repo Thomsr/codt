@@ -40,7 +40,7 @@ pub struct CliParams {
         long,
         value_parser = clap_enum_variants!(LowerBoundStrategy),
         value_delimiter = ',',
-        num_args = 1..,
+        num_args = 0..,
         default_values_t = [
             LowerBoundStrategy::ClassCount,
             LowerBoundStrategy::Improvement,

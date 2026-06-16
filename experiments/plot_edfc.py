@@ -12,7 +12,8 @@ from typing import Dict, List, Tuple
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
-import seaborn as sns
+
+from plot_style import tab10_colors
 
 
 def load_solver_results(cache_dir: Path, solver_name: str) -> Dict[str, Dict]:
@@ -134,7 +135,7 @@ def plot_edfc(all_results: Dict[str, Dict[str, Dict]],
 
     # Prepare colors
     solver_names = list(all_results.keys())
-    colors = sns.color_palette("tab10", n_colors=max(3, len(solver_names)))
+    colors = tab10_colors(max(3, len(solver_names)))
 
     # Figure
     fig, ax1 = plt.subplots(1, 1, figsize=(5, 4))
@@ -252,7 +253,7 @@ def plot_edfc(all_results: Dict[str, Dict[str, Dict]],
 def plot_search_nodes(all_results: Dict[str, Dict[str, Dict]], output_path: Path = None):
     """Plot search effort (expansions / nodes checked) for all solvers."""
     solver_names = list(all_results.keys())
-    colors = sns.color_palette("tab10", n_colors=max(3, len(solver_names)))
+    colors = tab10_colors(max(3, len(solver_names)))
 
     fig, ax = plt.subplots(1, 1, figsize=(5, 4))
 

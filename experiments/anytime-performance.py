@@ -19,6 +19,7 @@ from matplotlib.ticker import FuncFormatter
 from pathlib import Path
 from collections import defaultdict
 from codt_py import OptimalDecisionTreeClassifier, all_search_strategies
+from plot_style import TAB10_COLORS, tab10_colors
 
 WITTY_RESULTS_DIR = Path("experiments/results/codt-witty-sampled/witty-cache")
 
@@ -29,7 +30,7 @@ def set_style():
     plt.rc('pdf', fonttype=42)
     plt.rc('ps', fonttype=42)
     plt.rc('text', usetex=False)
-    sns.set_palette("tab10")
+    sns.set_palette(TAB10_COLORS)
 
 
 def find_data_dir():
@@ -339,7 +340,7 @@ def plot_anytime_performance(results_list, output_dir, x_key="time"):
             continue
         
         fig, ax = plt.subplots(figsize=(5, 4))
-        strategy_colors = sns.color_palette("tab10", n_colors=max(3, len(group_results)))
+        strategy_colors = tab10_colors(max(3, len(group_results)))
         
         for idx, result in enumerate(group_results):
             ubs = result["intermediate_ubs"]
@@ -411,18 +412,10 @@ def main():
     # Select a subset for testing
     datasets_to_use = ["diggle_table_a1", "pc1", "german-credit-data-creditability"]
     
-    # Get available strategies from the library
     available_strategies = all_search_strategies()
     print(f"Available strategies: {available_strategies}")
-    
-    # # Select strategies to compare
-    # strategies_to_use = [
-    #     "dfs-prio",
-    #     # "bfs-balance-small-lb",
-    #     "and-or",
-    # ]
-    # strategies_to_use = [s for s in strategies_to_use if s in available_strategies]
-    strategies_to_use = available_strategies  # Use all available strategies
+
+    strategies_to_use = available_strategies
     print(f"Using strategies: {strategies_to_use}")
     
     all_results = []

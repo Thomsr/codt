@@ -147,13 +147,17 @@ impl<OT: OptimizationTask, SS: SearchStrategy> Solver<OT> for SolverImpl<'_, OT,
 
         let mut root: Node<'_, OT, SS> = Node::new(&context, dataview, 0, true, one_off_witnesses);
 
-        let mut intermediate_lbs = vec![(root.cost_lower_bound, graph_expansions, 0.0)];
-        let mut intermediate_ubs = vec![(root.best.cost(), graph_expansions, 0.0)];
-
         if let Some(pair_lb) = root_pair_lower_bound {
             info!("Pair lower bound: {}", pair_lb);
             OT::update_lowerbound(&mut root.cost_lower_bound, &pair_lb);
+            info!(
+                "Root lower bound after pair lower bound: {}",
+                root.cost_lower_bound
+            );
         }
+
+        let mut intermediate_lbs = vec![(root.cost_lower_bound, graph_expansions, 0.0)];
+        let mut intermediate_ubs = vec![(root.best.cost(), graph_expansions, 0.0)];
 
         // Ignore memory usage of previous invocations.
         reset_current_thread_max_memory_usage();

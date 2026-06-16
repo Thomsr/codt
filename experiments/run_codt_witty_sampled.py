@@ -244,7 +244,7 @@ def run_codt(dataset_path: Path, timeout_seconds: Optional[int], codt_cli_binary
         "--file",
         str(dataset_path),
         "--strategy",
-        "dfs-prio",
+        "and-or-dfs-prio",
         "--lowerbound",
         "pair",
         "--lowerbound",

@@ -4,9 +4,7 @@ import argparse
 import matplotlib.pyplot as plt
 import pandas as pd
 
-
-# Color scheme
-BLUE_COLOR = "#00A6D6"
+from plot_style import TAB10_COLORS
 
 
 def main() -> None:
@@ -58,7 +56,7 @@ def main() -> None:
         counts.index.astype(int),
         counts.values,
         width=0.85,
-        color=BLUE_COLOR,
+        color=TAB10_COLORS[0],
         edgecolor="none",
         alpha=0.9,
     )
@@ -88,4 +86,3 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-
