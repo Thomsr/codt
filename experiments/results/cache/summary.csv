@@ -1,0 +1,3 @@
+config,runs,perfect_runs,median_runtime_seconds,median_expansions,median_memory_mib,median_runtime_ratio_to_no_cache,median_expansion_ratio_to_no_cache,median_memory_ratio_to_no_cache,median_cache_hit_rate,median_cache_entries
+cache-disabled,35,35,0.3571435859776102,562.0,6.409999847412109,1.0,1.0,1.0,0.0,0.0
+cache-enabled,35,35,0.3521141759993043,562.0,6.409999847412109,1.0041651318907774,1.0,1.0,0.0,1.0

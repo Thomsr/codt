@@ -15,6 +15,7 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
+from matplotlib.lines import Line2D
 from matplotlib.ticker import FuncFormatter
 from pathlib import Path
 from collections import defaultdict
@@ -387,6 +388,30 @@ def plot_anytime_performance(results_list, output_dir, x_key="time"):
         ax.grid(True, which='minor', alpha=0.4, linestyle=':')
         ax.tick_params(axis='y')
         ax.tick_params(axis='x')
+        if x_key == "expansions" and strategy == "and-or":
+            legend_handles = [
+                Line2D([0], [0], color="black", marker="o", linewidth=3, drawstyle="steps-post", label="Upper bound"),
+                Line2D([0], [0], color="black", marker="s", linewidth=3, linestyle="--", drawstyle="steps-post", label="Lower bound"),
+                Line2D([0], [0], color="black", linewidth=1.5, linestyle="--", alpha=0.8, label="Solution size"),
+            ]
+            legend_handles.extend(
+                Line2D(
+                    [0],
+                    [0],
+                    color=strategy_colors[idx % len(strategy_colors)],
+                    linewidth=3,
+                    label=result["dataset"],
+                )
+                for idx, result in enumerate(group_results)
+            )
+            ax.legend(
+                handles=legend_handles,
+                loc="upper right",
+                frameon=True,
+                facecolor="white",
+                framealpha=0.9,
+                edgecolor="none",
+            )
         
         filename = f"fig-anytime-{x_key}-{strategy}.png"
         plt.tight_layout()

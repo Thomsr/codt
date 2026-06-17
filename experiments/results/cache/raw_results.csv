@@ -1,0 +1,1331 @@
+branch_count,cache_enabled,cache_entries,cache_hit_rate,cache_lookups,cache_max_branch_budget,cache_useful_hits,cart_upperbound,command,config,dataset,error,expansions,is_perfect,lowerbound,memory_usage_bytes,n_classes,n_examples,n_features,repetition,runtime_seconds,solver_status,status,stderr,stdout,strategy,tree_size,upperbound,baseline_runtime_seconds,baseline_expansions,baseline_memory_usage_bytes,runtime_ratio_to_no_cache,expansion_ratio_to_no_cache,memory_ratio_to_no_cache
+4,False,0,0.0,0,3,0,true,"['/home/thoams/Documents/TUDelft/thesis/codt/target/release/codt-cli', '--file', 'data/openml/sampled/analcatdata_bankruptcy.txt', '--strategy', 'and-or-dfs-prio', '--lowerbound', 'class-count', 'improvement', 'pair', 'one-off', '--upperbound', 'for-remaining-interval', '--cart-upperbound', 'true', '--cart-upper-bound-patience', '5', '--cache', 'false', '--cache-max-branch-budget', '3', '--data-reduction', 'true', '--memory-limit', '4294967296', '--timeout', '600']",cache-disabled,analcatdata_bankruptcy,,562,True,"class-count,improvement,pair,one-off",6721372,2,50,5,0,0.4782173550047446,perfect-tree-found,perfect-tree-found,"[2026-06-16T20:41:23Z INFO  codt_cli] Starting solve with options:
+    SolverOptions { lb_strategy: {Pair, Improvement, ClassCount, OneOff}, ub_strategy: ForRemainingInterval, cart_ub: true, cart_ub_patience: 5, cache_max_branch_budget: None, data_reduction: true, track_intermediates: false, timeout: Some(600s), memory_limit: Some(4294967296) }
+    
+[2026-06-16T20:41:23Z INFO  codt::search::solver_impl] One off witnesses: 0
+[2026-06-16T20:41:24Z INFO  codt::search::solver_impl] Pair lower bound: (primary: 0, secondary: 4)
+[2026-06-16T20:41:24Z INFO  codt::search::solver_impl] Root lower bound after pair lower bound: (primary: 0, secondary: 4)
+[2026-06-16T20:41:24Z INFO  codt::search::solver_impl] Final root bounds: lower (primary: 0, secondary: 4), upper (primary: 0, secondary: 4), best (primary: 0, secondary: 4), complete true
+[2026-06-16T20:41:24Z INFO  codt::search::solver_impl] Solution cache: 0 useful hits / 0 lookups (0.0%), 0 entries
+[2026-06-16T20:41:24Z INFO  codt_cli] Read time (s): 0.0000442
+[2026-06-16T20:41:24Z INFO  codt_cli] Solve time (s): 0.280460119
+[2026-06-16T20:41:24Z INFO  codt_cli] Max memory usage (MB): 6.41
+[2026-06-16T20:41:24Z INFO  codt_cli] Graph expansions: 562
+[2026-06-16T20:41:24Z INFO  codt_cli] Tree: [4<=0.70:1,[2<=-3.75:[1<=-46.25:1,0],[3<=21.35:1,0]]]
+","Set parameter WLSAccessID
+Set parameter WLSSecret
+Set parameter LicenseID to value 2781812
+Academic license 2781812 - for non-commercial use only - registered to tt___@tudelft.nl
+Misclassifications: 0. Branch nodes: 4. Accuracy: 100%.
+",and-or-dfs-prio,9,for-remaining-interval,0.4782173550047446,562,6721372,1.0,1.0,1.0
+4,True,3,0.0,907,3,0,true,"['/home/thoams/Documents/TUDelft/thesis/codt/target/release/codt-cli', '--file', 'data/openml/sampled/analcatdata_bankruptcy.txt', '--strategy', 'and-or-dfs-prio', '--lowerbound', 'class-count', 'improvement', 'pair', 'one-off', '--upperbound', 'for-remaining-interval', '--cart-upperbound', 'true', '--cart-upper-bound-patience', '5', '--cache', 'true', '--cache-max-branch-budget', '3', '--data-reduction', 'true', '--memory-limit', '4294967296', '--timeout', '600']",cache-enabled,analcatdata_bankruptcy,,562,True,"class-count,improvement,pair,one-off",6721372,2,50,5,0,0.042035493010189384,perfect-tree-found,perfect-tree-found,"[2026-06-16T20:41:24Z INFO  codt_cli] Starting solve with options:
+    SolverOptions { lb_strategy: {ClassCount, OneOff, Improvement, Pair}, ub_strategy: ForRemainingInterval, cart_ub: true, cart_ub_patience: 5, cache_max_branch_budget: Some(3), data_reduction: true, track_intermediates: false, timeout: Some(600s), memory_limit: Some(4294967296) }
+    
+[2026-06-16T20:41:24Z INFO  codt::search::solver_impl] One off witnesses: 0
+[2026-06-16T20:41:24Z INFO  codt::search::solver_impl] Pair lower bound: (primary: 0, secondary: 4)
+[2026-06-16T20:41:24Z INFO  codt::search::solver_impl] Root lower bound after pair lower bound: (primary: 0, secondary: 4)
+[2026-06-16T20:41:24Z INFO  codt::search::solver_impl] Final root bounds: lower (primary: 0, secondary: 4), upper (primary: 0, secondary: 4), best (primary: 0, secondary: 4), complete true
+[2026-06-16T20:41:24Z INFO  codt::search::solver_impl] Solution cache: 0 useful hits / 907 lookups (0.0%), 3 entries
+[2026-06-16T20:41:24Z INFO  codt_cli] Read time (s): 0.0000388
+[2026-06-16T20:41:24Z INFO  codt_cli] Solve time (s): 0.038575385
+[2026-06-16T20:41:24Z INFO  codt_cli] Max memory usage (MB): 6.41
+[2026-06-16T20:41:24Z INFO  codt_cli] Graph expansions: 562
+[2026-06-16T20:41:24Z INFO  codt_cli] Tree: [4<=0.70:1,[2<=-3.75:[1<=-46.25:1,0],[3<=21.35:1,0]]]
+","Set parameter WLSAccessID
+Set parameter WLSSecret
+Set parameter LicenseID to value 2781812
+Academic license 2781812 - for non-commercial use only - registered to tt___@tudelft.nl
+Misclassifications: 0. Branch nodes: 4. Accuracy: 100%.
+",and-or-dfs-prio,9,for-remaining-interval,0.4782173550047446,562,6721372,0.08790039209215302,1.0,1.0
+4,True,3,0.0,907,3,0,true,"['/home/thoams/Documents/TUDelft/thesis/codt/target/release/codt-cli', '--file', 'data/openml/sampled/analcatdata_bankruptcy.txt', '--strategy', 'and-or-dfs-prio', '--lowerbound', 'class-count', 'improvement', 'pair', 'one-off', '--upperbound', 'for-remaining-interval', '--cart-upperbound', 'true', '--cart-upper-bound-patience', '5', '--cache', 'true', '--cache-max-branch-budget', '3', '--data-reduction', 'true', '--memory-limit', '4294967296', '--timeout', '600']",cache-enabled,analcatdata_bankruptcy,,562,True,"class-count,improvement,pair,one-off",6721372,2,50,5,1,0.15317553802742623,perfect-tree-found,perfect-tree-found,"[2026-06-16T20:42:42Z INFO  codt_cli] Starting solve with options:
+    SolverOptions { lb_strategy: {Pair, Improvement, OneOff, ClassCount}, ub_strategy: ForRemainingInterval, cart_ub: true, cart_ub_patience: 5, cache_max_branch_budget: Some(3), data_reduction: true, track_intermediates: false, timeout: Some(600s), memory_limit: Some(4294967296) }
+    
+[2026-06-16T20:42:42Z INFO  codt::search::solver_impl] One off witnesses: 0
+[2026-06-16T20:42:42Z INFO  codt::search::solver_impl] Pair lower bound: (primary: 0, secondary: 4)
+[2026-06-16T20:42:42Z INFO  codt::search::solver_impl] Root lower bound after pair lower bound: (primary: 0, secondary: 4)
+[2026-06-16T20:42:42Z INFO  codt::search::solver_impl] Final root bounds: lower (primary: 0, secondary: 4), upper (primary: 0, secondary: 4), best (primary: 0, secondary: 4), complete true
+[2026-06-16T20:42:42Z INFO  codt::search::solver_impl] Solution cache: 0 useful hits / 907 lookups (0.0%), 3 entries
+[2026-06-16T20:42:42Z INFO  codt_cli] Read time (s): 0.000049801
+[2026-06-16T20:42:42Z INFO  codt_cli] Solve time (s): 0.046616203
+[2026-06-16T20:42:42Z INFO  codt_cli] Max memory usage (MB): 6.41
+[2026-06-16T20:42:42Z INFO  codt_cli] Graph expansions: 562
+[2026-06-16T20:42:42Z INFO  codt_cli] Tree: [4<=0.70:1,[2<=-3.75:[1<=-46.25:1,0],[3<=21.35:1,0]]]
+","Set parameter WLSAccessID
+Set parameter WLSSecret
+Set parameter LicenseID to value 2781812
+Academic license 2781812 - for non-commercial use only - registered to tt___@tudelft.nl
+Misclassifications: 0. Branch nodes: 4. Accuracy: 100%.
+",and-or-dfs-prio,9,for-remaining-interval,0.043583196005783975,562,6721372,3.5145549676324364,1.0,1.0
+4,False,0,0.0,0,3,0,true,"['/home/thoams/Documents/TUDelft/thesis/codt/target/release/codt-cli', '--file', 'data/openml/sampled/analcatdata_bankruptcy.txt', '--strategy', 'and-or-dfs-prio', '--lowerbound', 'class-count', 'improvement', 'pair', 'one-off', '--upperbound', 'for-remaining-interval', '--cart-upperbound', 'true', '--cart-upper-bound-patience', '5', '--cache', 'false', '--cache-max-branch-budget', '3', '--data-reduction', 'true', '--memory-limit', '4294967296', '--timeout', '600']",cache-disabled,analcatdata_bankruptcy,,562,True,"class-count,improvement,pair,one-off",6721372,2,50,5,1,0.043583196005783975,perfect-tree-found,perfect-tree-found,"[2026-06-16T20:42:42Z INFO  codt_cli] Starting solve with options:
+    SolverOptions { lb_strategy: {Improvement, Pair, OneOff, ClassCount}, ub_strategy: ForRemainingInterval, cart_ub: true, cart_ub_patience: 5, cache_max_branch_budget: None, data_reduction: true, track_intermediates: false, timeout: Some(600s), memory_limit: Some(4294967296) }
+    
+[2026-06-16T20:42:42Z INFO  codt::search::solver_impl] One off witnesses: 0
+[2026-06-16T20:42:42Z INFO  codt::search::solver_impl] Pair lower bound: (primary: 0, secondary: 4)
+[2026-06-16T20:42:42Z INFO  codt::search::solver_impl] Root lower bound after pair lower bound: (primary: 0, secondary: 4)
+[2026-06-16T20:42:42Z INFO  codt::search::solver_impl] Final root bounds: lower (primary: 0, secondary: 4), upper (primary: 0, secondary: 4), best (primary: 0, secondary: 4), complete true
+[2026-06-16T20:42:42Z INFO  codt::search::solver_impl] Solution cache: 0 useful hits / 0 lookups (0.0%), 0 entries
+[2026-06-16T20:42:42Z INFO  codt_cli] Read time (s): 0.0000447
+[2026-06-16T20:42:42Z INFO  codt_cli] Solve time (s): 0.039941889
+[2026-06-16T20:42:42Z INFO  codt_cli] Max memory usage (MB): 6.41
+[2026-06-16T20:42:42Z INFO  codt_cli] Graph expansions: 562
+[2026-06-16T20:42:42Z INFO  codt_cli] Tree: [4<=0.70:1,[2<=-3.75:[1<=-46.25:1,0],[3<=21.35:1,0]]]
+","Set parameter WLSAccessID
+Set parameter WLSSecret
+Set parameter LicenseID to value 2781812
+Academic license 2781812 - for non-commercial use only - registered to tt___@tudelft.nl
+Misclassifications: 0. Branch nodes: 4. Accuracy: 100%.
+",and-or-dfs-prio,9,for-remaining-interval,0.043583196005783975,562,6721372,1.0,1.0,1.0
+4,False,0,0.0,0,3,0,true,"['/home/thoams/Documents/TUDelft/thesis/codt/target/release/codt-cli', '--file', 'data/openml/sampled/analcatdata_bankruptcy.txt', '--strategy', 'and-or-dfs-prio', '--lowerbound', 'class-count', 'improvement', 'pair', 'one-off', '--upperbound', 'for-remaining-interval', '--cart-upperbound', 'true', '--cart-upper-bound-patience', '5', '--cache', 'false', '--cache-max-branch-budget', '3', '--data-reduction', 'true', '--memory-limit', '4294967296', '--timeout', '600']",cache-disabled,analcatdata_bankruptcy,,562,True,"class-count,improvement,pair,one-off",6721372,2,50,5,2,0.04313959498540498,perfect-tree-found,perfect-tree-found,"[2026-06-16T20:42:42Z INFO  codt_cli] Starting solve with options:
+    SolverOptions { lb_strategy: {ClassCount, OneOff, Improvement, Pair}, ub_strategy: ForRemainingInterval, cart_ub: true, cart_ub_patience: 5, cache_max_branch_budget: None, data_reduction: true, track_intermediates: false, timeout: Some(600s), memory_limit: Some(4294967296) }
+    
+[2026-06-16T20:42:42Z INFO  codt::search::solver_impl] One off witnesses: 0
+[2026-06-16T20:42:42Z INFO  codt::search::solver_impl] Pair lower bound: (primary: 0, secondary: 4)
+[2026-06-16T20:42:42Z INFO  codt::search::solver_impl] Root lower bound after pair lower bound: (primary: 0, secondary: 4)
+[2026-06-16T20:42:42Z INFO  codt::search::solver_impl] Final root bounds: lower (primary: 0, secondary: 4), upper (primary: 0, secondary: 4), best (primary: 0, secondary: 4), complete true
+[2026-06-16T20:42:42Z INFO  codt::search::solver_impl] Solution cache: 0 useful hits / 0 lookups (0.0%), 0 entries
+[2026-06-16T20:42:42Z INFO  codt_cli] Read time (s): 0.0000384
+[2026-06-16T20:42:42Z INFO  codt_cli] Solve time (s): 0.039547388
+[2026-06-16T20:42:42Z INFO  codt_cli] Max memory usage (MB): 6.41
+[2026-06-16T20:42:42Z INFO  codt_cli] Graph expansions: 562
+[2026-06-16T20:42:42Z INFO  codt_cli] Tree: [4<=0.70:1,[2<=-3.75:[1<=-46.25:1,0],[3<=21.35:1,0]]]
+","Set parameter WLSAccessID
+Set parameter WLSSecret
+Set parameter LicenseID to value 2781812
+Academic license 2781812 - for non-commercial use only - registered to tt___@tudelft.nl
+Misclassifications: 0. Branch nodes: 4. Accuracy: 100%.
+",and-or-dfs-prio,9,for-remaining-interval,0.04313959498540498,562,6721372,1.0,1.0,1.0
+4,True,3,0.0,907,3,0,true,"['/home/thoams/Documents/TUDelft/thesis/codt/target/release/codt-cli', '--file', 'data/openml/sampled/analcatdata_bankruptcy.txt', '--strategy', 'and-or-dfs-prio', '--lowerbound', 'class-count', 'improvement', 'pair', 'one-off', '--upperbound', 'for-remaining-interval', '--cart-upperbound', 'true', '--cart-upper-bound-patience', '5', '--cache', 'true', '--cache-max-branch-budget', '3', '--data-reduction', 'true', '--memory-limit', '4294967296', '--timeout', '600']",cache-enabled,analcatdata_bankruptcy,,562,True,"class-count,improvement,pair,one-off",6721372,2,50,5,2,0.0415510919992812,perfect-tree-found,perfect-tree-found,"[2026-06-16T20:42:42Z INFO  codt_cli] Starting solve with options:
+    SolverOptions { lb_strategy: {ClassCount, Improvement, Pair, OneOff}, ub_strategy: ForRemainingInterval, cart_ub: true, cart_ub_patience: 5, cache_max_branch_budget: Some(3), data_reduction: true, track_intermediates: false, timeout: Some(600s), memory_limit: Some(4294967296) }
+    
+[2026-06-16T20:42:42Z INFO  codt::search::solver_impl] One off witnesses: 0
+[2026-06-16T20:42:42Z INFO  codt::search::solver_impl] Pair lower bound: (primary: 0, secondary: 4)
+[2026-06-16T20:42:42Z INFO  codt::search::solver_impl] Root lower bound after pair lower bound: (primary: 0, secondary: 4)
+[2026-06-16T20:42:42Z INFO  codt::search::solver_impl] Final root bounds: lower (primary: 0, secondary: 4), upper (primary: 0, secondary: 4), best (primary: 0, secondary: 4), complete true
+[2026-06-16T20:42:42Z INFO  codt::search::solver_impl] Solution cache: 0 useful hits / 907 lookups (0.0%), 3 entries
+[2026-06-16T20:42:42Z INFO  codt_cli] Read time (s): 0.0000451
+[2026-06-16T20:42:42Z INFO  codt_cli] Solve time (s): 0.038158685
+[2026-06-16T20:42:42Z INFO  codt_cli] Max memory usage (MB): 6.41
+[2026-06-16T20:42:42Z INFO  codt_cli] Graph expansions: 562
+[2026-06-16T20:42:42Z INFO  codt_cli] Tree: [4<=0.70:1,[2<=-3.75:[1<=-46.25:1,0],[3<=21.35:1,0]]]
+","Set parameter WLSAccessID
+Set parameter WLSSecret
+Set parameter LicenseID to value 2781812
+Academic license 2781812 - for non-commercial use only - registered to tt___@tudelft.nl
+Misclassifications: 0. Branch nodes: 4. Accuracy: 100%.
+",and-or-dfs-prio,9,for-remaining-interval,0.04313959498540498,562,6721372,0.9631776101129088,1.0,1.0
+4,True,3,0.0,907,3,0,true,"['/home/thoams/Documents/TUDelft/thesis/codt/target/release/codt-cli', '--file', 'data/openml/sampled/analcatdata_bankruptcy.txt', '--strategy', 'and-or-dfs-prio', '--lowerbound', 'class-count', 'improvement', 'pair', 'one-off', '--upperbound', 'for-remaining-interval', '--cart-upperbound', 'true', '--cart-upper-bound-patience', '5', '--cache', 'true', '--cache-max-branch-budget', '3', '--data-reduction', 'true', '--memory-limit', '4294967296', '--timeout', '600']",cache-enabled,analcatdata_bankruptcy,,562,True,"class-count,improvement,pair,one-off",6721372,2,50,5,3,0.039931588020408526,perfect-tree-found,perfect-tree-found,"[2026-06-16T20:42:42Z INFO  codt_cli] Starting solve with options:
+    SolverOptions { lb_strategy: {Improvement, Pair, ClassCount, OneOff}, ub_strategy: ForRemainingInterval, cart_ub: true, cart_ub_patience: 5, cache_max_branch_budget: Some(3), data_reduction: true, track_intermediates: false, timeout: Some(600s), memory_limit: Some(4294967296) }
+    
+[2026-06-16T20:42:42Z INFO  codt::search::solver_impl] One off witnesses: 0
+[2026-06-16T20:42:42Z INFO  codt::search::solver_impl] Pair lower bound: (primary: 0, secondary: 4)
+[2026-06-16T20:42:42Z INFO  codt::search::solver_impl] Root lower bound after pair lower bound: (primary: 0, secondary: 4)
+[2026-06-16T20:42:42Z INFO  codt::search::solver_impl] Final root bounds: lower (primary: 0, secondary: 4), upper (primary: 0, secondary: 4), best (primary: 0, secondary: 4), complete true
+[2026-06-16T20:42:42Z INFO  codt::search::solver_impl] Solution cache: 0 useful hits / 907 lookups (0.0%), 3 entries
+[2026-06-16T20:42:42Z INFO  codt_cli] Read time (s): 0.0000455
+[2026-06-16T20:42:42Z INFO  codt_cli] Solve time (s): 0.036630581
+[2026-06-16T20:42:42Z INFO  codt_cli] Max memory usage (MB): 6.41
+[2026-06-16T20:42:42Z INFO  codt_cli] Graph expansions: 562
+[2026-06-16T20:42:42Z INFO  codt_cli] Tree: [4<=0.70:1,[2<=-3.75:[1<=-46.25:1,0],[3<=21.35:1,0]]]
+","Set parameter WLSAccessID
+Set parameter WLSSecret
+Set parameter LicenseID to value 2781812
+Academic license 2781812 - for non-commercial use only - registered to tt___@tudelft.nl
+Misclassifications: 0. Branch nodes: 4. Accuracy: 100%.
+",and-or-dfs-prio,9,for-remaining-interval,0.043273396004224196,562,6721372,0.922774538344773,1.0,1.0
+4,False,0,0.0,0,3,0,true,"['/home/thoams/Documents/TUDelft/thesis/codt/target/release/codt-cli', '--file', 'data/openml/sampled/analcatdata_bankruptcy.txt', '--strategy', 'and-or-dfs-prio', '--lowerbound', 'class-count', 'improvement', 'pair', 'one-off', '--upperbound', 'for-remaining-interval', '--cart-upperbound', 'true', '--cart-upper-bound-patience', '5', '--cache', 'false', '--cache-max-branch-budget', '3', '--data-reduction', 'true', '--memory-limit', '4294967296', '--timeout', '600']",cache-disabled,analcatdata_bankruptcy,,562,True,"class-count,improvement,pair,one-off",6721372,2,50,5,3,0.043273396004224196,perfect-tree-found,perfect-tree-found,"[2026-06-16T20:42:42Z INFO  codt_cli] Starting solve with options:
+    SolverOptions { lb_strategy: {Pair, OneOff, Improvement, ClassCount}, ub_strategy: ForRemainingInterval, cart_ub: true, cart_ub_patience: 5, cache_max_branch_budget: None, data_reduction: true, track_intermediates: false, timeout: Some(600s), memory_limit: Some(4294967296) }
+    
+[2026-06-16T20:42:42Z INFO  codt::search::solver_impl] One off witnesses: 0
+[2026-06-16T20:42:42Z INFO  codt::search::solver_impl] Pair lower bound: (primary: 0, secondary: 4)
+[2026-06-16T20:42:42Z INFO  codt::search::solver_impl] Root lower bound after pair lower bound: (primary: 0, secondary: 4)
+[2026-06-16T20:42:42Z INFO  codt::search::solver_impl] Final root bounds: lower (primary: 0, secondary: 4), upper (primary: 0, secondary: 4), best (primary: 0, secondary: 4), complete true
+[2026-06-16T20:42:42Z INFO  codt::search::solver_impl] Solution cache: 0 useful hits / 0 lookups (0.0%), 0 entries
+[2026-06-16T20:42:42Z INFO  codt_cli] Read time (s): 0.0000458
+[2026-06-16T20:42:42Z INFO  codt_cli] Solve time (s): 0.039609487
+[2026-06-16T20:42:42Z INFO  codt_cli] Max memory usage (MB): 6.41
+[2026-06-16T20:42:42Z INFO  codt_cli] Graph expansions: 562
+[2026-06-16T20:42:42Z INFO  codt_cli] Tree: [4<=0.70:1,[2<=-3.75:[1<=-46.25:1,0],[3<=21.35:1,0]]]
+","Set parameter WLSAccessID
+Set parameter WLSSecret
+Set parameter LicenseID to value 2781812
+Academic license 2781812 - for non-commercial use only - registered to tt___@tudelft.nl
+Misclassifications: 0. Branch nodes: 4. Accuracy: 100%.
+",and-or-dfs-prio,9,for-remaining-interval,0.043273396004224196,562,6721372,1.0,1.0,1.0
+4,False,0,0.0,0,3,0,true,"['/home/thoams/Documents/TUDelft/thesis/codt/target/release/codt-cli', '--file', 'data/openml/sampled/analcatdata_bankruptcy.txt', '--strategy', 'and-or-dfs-prio', '--lowerbound', 'class-count', 'improvement', 'pair', 'one-off', '--upperbound', 'for-remaining-interval', '--cart-upperbound', 'true', '--cart-upper-bound-patience', '5', '--cache', 'false', '--cache-max-branch-budget', '3', '--data-reduction', 'true', '--memory-limit', '4294967296', '--timeout', '600']",cache-disabled,analcatdata_bankruptcy,,562,True,"class-count,improvement,pair,one-off",6721372,2,50,5,4,0.04319239500910044,perfect-tree-found,perfect-tree-found,"[2026-06-16T20:42:42Z INFO  codt_cli] Starting solve with options:
+    SolverOptions { lb_strategy: {Improvement, OneOff, ClassCount, Pair}, ub_strategy: ForRemainingInterval, cart_ub: true, cart_ub_patience: 5, cache_max_branch_budget: None, data_reduction: true, track_intermediates: false, timeout: Some(600s), memory_limit: Some(4294967296) }
+    
+[2026-06-16T20:42:42Z INFO  codt::search::solver_impl] One off witnesses: 0
+[2026-06-16T20:42:42Z INFO  codt::search::solver_impl] Pair lower bound: (primary: 0, secondary: 4)
+[2026-06-16T20:42:42Z INFO  codt::search::solver_impl] Root lower bound after pair lower bound: (primary: 0, secondary: 4)
+[2026-06-16T20:42:42Z INFO  codt::search::solver_impl] Final root bounds: lower (primary: 0, secondary: 4), upper (primary: 0, secondary: 4), best (primary: 0, secondary: 4), complete true
+[2026-06-16T20:42:42Z INFO  codt::search::solver_impl] Solution cache: 0 useful hits / 0 lookups (0.0%), 0 entries
+[2026-06-16T20:42:42Z INFO  codt_cli] Read time (s): 0.000036901
+[2026-06-16T20:42:42Z INFO  codt_cli] Solve time (s): 0.040235188
+[2026-06-16T20:42:42Z INFO  codt_cli] Max memory usage (MB): 6.41
+[2026-06-16T20:42:42Z INFO  codt_cli] Graph expansions: 562
+[2026-06-16T20:42:42Z INFO  codt_cli] Tree: [4<=0.70:1,[2<=-3.75:[1<=-46.25:1,0],[3<=21.35:1,0]]]
+","Set parameter WLSAccessID
+Set parameter WLSSecret
+Set parameter LicenseID to value 2781812
+Academic license 2781812 - for non-commercial use only - registered to tt___@tudelft.nl
+Misclassifications: 0. Branch nodes: 4. Accuracy: 100%.
+",and-or-dfs-prio,9,for-remaining-interval,0.04319239500910044,562,6721372,1.0,1.0,1.0
+4,True,3,0.0,907,3,0,true,"['/home/thoams/Documents/TUDelft/thesis/codt/target/release/codt-cli', '--file', 'data/openml/sampled/analcatdata_bankruptcy.txt', '--strategy', 'and-or-dfs-prio', '--lowerbound', 'class-count', 'improvement', 'pair', 'one-off', '--upperbound', 'for-remaining-interval', '--cart-upperbound', 'true', '--cart-upper-bound-patience', '5', '--cache', 'true', '--cache-max-branch-budget', '3', '--data-reduction', 'true', '--memory-limit', '4294967296', '--timeout', '600']",cache-enabled,analcatdata_bankruptcy,,562,True,"class-count,improvement,pair,one-off",6721372,2,50,5,4,0.04079019001801498,perfect-tree-found,perfect-tree-found,"[2026-06-16T20:42:42Z INFO  codt_cli] Starting solve with options:
+    SolverOptions { lb_strategy: {Pair, ClassCount, Improvement, OneOff}, ub_strategy: ForRemainingInterval, cart_ub: true, cart_ub_patience: 5, cache_max_branch_budget: Some(3), data_reduction: true, track_intermediates: false, timeout: Some(600s), memory_limit: Some(4294967296) }
+    
+[2026-06-16T20:42:42Z INFO  codt::search::solver_impl] One off witnesses: 0
+[2026-06-16T20:42:42Z INFO  codt::search::solver_impl] Pair lower bound: (primary: 0, secondary: 4)
+[2026-06-16T20:42:42Z INFO  codt::search::solver_impl] Root lower bound after pair lower bound: (primary: 0, secondary: 4)
+[2026-06-16T20:42:42Z INFO  codt::search::solver_impl] Final root bounds: lower (primary: 0, secondary: 4), upper (primary: 0, secondary: 4), best (primary: 0, secondary: 4), complete true
+[2026-06-16T20:42:42Z INFO  codt::search::solver_impl] Solution cache: 0 useful hits / 907 lookups (0.0%), 3 entries
+[2026-06-16T20:42:42Z INFO  codt_cli] Read time (s): 0.0000365
+[2026-06-16T20:42:42Z INFO  codt_cli] Solve time (s): 0.037636983
+[2026-06-16T20:42:42Z INFO  codt_cli] Max memory usage (MB): 6.41
+[2026-06-16T20:42:42Z INFO  codt_cli] Graph expansions: 562
+[2026-06-16T20:42:42Z INFO  codt_cli] Tree: [4<=0.70:1,[2<=-3.75:[1<=-46.25:1,0],[3<=21.35:1,0]]]
+","Set parameter WLSAccessID
+Set parameter WLSSecret
+Set parameter LicenseID to value 2781812
+Academic license 2781812 - for non-commercial use only - registered to tt___@tudelft.nl
+Misclassifications: 0. Branch nodes: 4. Accuracy: 100%.
+",and-or-dfs-prio,9,for-remaining-interval,0.04319239500910044,562,6721372,0.9443836121942457,1.0,1.0
+2,True,1,0.0,45,3,0,true,"['/home/thoams/Documents/TUDelft/thesis/codt/target/release/codt-cli', '--file', 'data/openml/sampled/analcatdata_election2000.txt', '--strategy', 'and-or-dfs-prio', '--lowerbound', 'class-count', 'improvement', 'pair', 'one-off', '--upperbound', 'for-remaining-interval', '--cart-upperbound', 'true', '--cart-upper-bound-patience', '5', '--cache', 'true', '--cache-max-branch-budget', '3', '--data-reduction', 'true', '--memory-limit', '4294967296', '--timeout', '600']",cache-enabled,analcatdata_election2000,,31,True,"class-count,improvement,pair,one-off",849346,2,67,14,0,0.028346061997581273,perfect-tree-found,perfect-tree-found,"[2026-06-16T20:41:24Z INFO  codt_cli] Starting solve with options:
+    SolverOptions { lb_strategy: {Pair, ClassCount, OneOff, Improvement}, ub_strategy: ForRemainingInterval, cart_ub: true, cart_ub_patience: 5, cache_max_branch_budget: Some(3), data_reduction: true, track_intermediates: false, timeout: Some(600s), memory_limit: Some(4294967296) }
+    
+[2026-06-16T20:41:24Z INFO  codt::search::solver_impl] One off witnesses: 0
+[2026-06-16T20:41:24Z INFO  codt::search::solver_impl] Pair lower bound: (primary: 0, secondary: 2)
+[2026-06-16T20:41:24Z INFO  codt::search::solver_impl] Root lower bound after pair lower bound: (primary: 0, secondary: 2)
+[2026-06-16T20:41:24Z INFO  codt::search::solver_impl] Final root bounds: lower (primary: 0, secondary: 2), upper (primary: 0, secondary: 2), best (primary: 0, secondary: 2), complete true
+[2026-06-16T20:41:24Z INFO  codt::search::solver_impl] Solution cache: 0 useful hits / 45 lookups (0.0%), 1 entries
+[2026-06-16T20:41:24Z INFO  codt_cli] Read time (s): 0.000086501
+[2026-06-16T20:41:24Z INFO  codt_cli] Solve time (s): 0.025578856
+[2026-06-16T20:41:24Z INFO  codt_cli] Max memory usage (MB): 0.81
+[2026-06-16T20:41:24Z INFO  codt_cli] Graph expansions: 31
+[2026-06-16T20:41:24Z INFO  codt_cli] Tree: [11<=40989.50:[2<=308.00:1,0],0]
+","Set parameter WLSAccessID
+Set parameter WLSSecret
+Set parameter LicenseID to value 2781812
+Academic license 2781812 - for non-commercial use only - registered to tt___@tudelft.nl
+Misclassifications: 0. Branch nodes: 2. Accuracy: 100%.
+",and-or-dfs-prio,5,for-remaining-interval,0.02958996602683328,31,849346,0.9579619649402777,1.0,1.0
+2,False,0,0.0,0,3,0,true,"['/home/thoams/Documents/TUDelft/thesis/codt/target/release/codt-cli', '--file', 'data/openml/sampled/analcatdata_election2000.txt', '--strategy', 'and-or-dfs-prio', '--lowerbound', 'class-count', 'improvement', 'pair', 'one-off', '--upperbound', 'for-remaining-interval', '--cart-upperbound', 'true', '--cart-upper-bound-patience', '5', '--cache', 'false', '--cache-max-branch-budget', '3', '--data-reduction', 'true', '--memory-limit', '4294967296', '--timeout', '600']",cache-disabled,analcatdata_election2000,,31,True,"class-count,improvement,pair,one-off",849346,2,67,14,0,0.02958996602683328,perfect-tree-found,perfect-tree-found,"[2026-06-16T20:41:24Z INFO  codt_cli] Starting solve with options:
+    SolverOptions { lb_strategy: {OneOff, Pair, ClassCount, Improvement}, ub_strategy: ForRemainingInterval, cart_ub: true, cart_ub_patience: 5, cache_max_branch_budget: None, data_reduction: true, track_intermediates: false, timeout: Some(600s), memory_limit: Some(4294967296) }
+    
+[2026-06-16T20:41:24Z INFO  codt::search::solver_impl] One off witnesses: 0
+[2026-06-16T20:41:24Z INFO  codt::search::solver_impl] Pair lower bound: (primary: 0, secondary: 2)
+[2026-06-16T20:41:24Z INFO  codt::search::solver_impl] Root lower bound after pair lower bound: (primary: 0, secondary: 2)
+[2026-06-16T20:41:24Z INFO  codt::search::solver_impl] Final root bounds: lower (primary: 0, secondary: 2), upper (primary: 0, secondary: 2), best (primary: 0, secondary: 2), complete true
+[2026-06-16T20:41:24Z INFO  codt::search::solver_impl] Solution cache: 0 useful hits / 0 lookups (0.0%), 0 entries
+[2026-06-16T20:41:24Z INFO  codt_cli] Read time (s): 0.0001058
+[2026-06-16T20:41:24Z INFO  codt_cli] Solve time (s): 0.026455058
+[2026-06-16T20:41:24Z INFO  codt_cli] Max memory usage (MB): 0.81
+[2026-06-16T20:41:24Z INFO  codt_cli] Graph expansions: 31
+[2026-06-16T20:41:24Z INFO  codt_cli] Tree: [11<=40989.50:[2<=308.00:1,0],0]
+","Set parameter WLSAccessID
+Set parameter WLSSecret
+Set parameter LicenseID to value 2781812
+Academic license 2781812 - for non-commercial use only - registered to tt___@tudelft.nl
+Misclassifications: 0. Branch nodes: 2. Accuracy: 100%.
+",and-or-dfs-prio,5,for-remaining-interval,0.02958996602683328,31,849346,1.0,1.0,1.0
+2,False,0,0.0,0,3,0,true,"['/home/thoams/Documents/TUDelft/thesis/codt/target/release/codt-cli', '--file', 'data/openml/sampled/analcatdata_election2000.txt', '--strategy', 'and-or-dfs-prio', '--lowerbound', 'class-count', 'improvement', 'pair', 'one-off', '--upperbound', 'for-remaining-interval', '--cart-upperbound', 'true', '--cart-upper-bound-patience', '5', '--cache', 'false', '--cache-max-branch-budget', '3', '--data-reduction', 'true', '--memory-limit', '4294967296', '--timeout', '600']",cache-disabled,analcatdata_election2000,,31,True,"class-count,improvement,pair,one-off",849346,2,67,14,1,0.029332264995900914,perfect-tree-found,perfect-tree-found,"[2026-06-16T20:42:42Z INFO  codt_cli] Starting solve with options:
+    SolverOptions { lb_strategy: {Improvement, OneOff, Pair, ClassCount}, ub_strategy: ForRemainingInterval, cart_ub: true, cart_ub_patience: 5, cache_max_branch_budget: None, data_reduction: true, track_intermediates: false, timeout: Some(600s), memory_limit: Some(4294967296) }
+    
+[2026-06-16T20:42:42Z INFO  codt::search::solver_impl] One off witnesses: 0
+[2026-06-16T20:42:42Z INFO  codt::search::solver_impl] Pair lower bound: (primary: 0, secondary: 2)
+[2026-06-16T20:42:42Z INFO  codt::search::solver_impl] Root lower bound after pair lower bound: (primary: 0, secondary: 2)
+[2026-06-16T20:42:42Z INFO  codt::search::solver_impl] Final root bounds: lower (primary: 0, secondary: 2), upper (primary: 0, secondary: 2), best (primary: 0, secondary: 2), complete true
+[2026-06-16T20:42:42Z INFO  codt::search::solver_impl] Solution cache: 0 useful hits / 0 lookups (0.0%), 0 entries
+[2026-06-16T20:42:42Z INFO  codt_cli] Read time (s): 0.0000838
+[2026-06-16T20:42:42Z INFO  codt_cli] Solve time (s): 0.025761157
+[2026-06-16T20:42:42Z INFO  codt_cli] Max memory usage (MB): 0.81
+[2026-06-16T20:42:42Z INFO  codt_cli] Graph expansions: 31
+[2026-06-16T20:42:42Z INFO  codt_cli] Tree: [11<=40989.50:[2<=308.00:1,0],0]
+","Set parameter WLSAccessID
+Set parameter WLSSecret
+Set parameter LicenseID to value 2781812
+Academic license 2781812 - for non-commercial use only - registered to tt___@tudelft.nl
+Misclassifications: 0. Branch nodes: 2. Accuracy: 100%.
+",and-or-dfs-prio,5,for-remaining-interval,0.029332264995900914,31,849346,1.0,1.0,1.0
+2,True,1,0.0,45,3,0,true,"['/home/thoams/Documents/TUDelft/thesis/codt/target/release/codt-cli', '--file', 'data/openml/sampled/analcatdata_election2000.txt', '--strategy', 'and-or-dfs-prio', '--lowerbound', 'class-count', 'improvement', 'pair', 'one-off', '--upperbound', 'for-remaining-interval', '--cart-upperbound', 'true', '--cart-upper-bound-patience', '5', '--cache', 'true', '--cache-max-branch-budget', '3', '--data-reduction', 'true', '--memory-limit', '4294967296', '--timeout', '600']",cache-enabled,analcatdata_election2000,,31,True,"class-count,improvement,pair,one-off",849346,2,67,14,1,0.031028668017825112,perfect-tree-found,perfect-tree-found,"[2026-06-16T20:42:42Z INFO  codt_cli] Starting solve with options:
+    SolverOptions { lb_strategy: {ClassCount, Improvement, OneOff, Pair}, ub_strategy: ForRemainingInterval, cart_ub: true, cart_ub_patience: 5, cache_max_branch_budget: Some(3), data_reduction: true, track_intermediates: false, timeout: Some(600s), memory_limit: Some(4294967296) }
+    
+[2026-06-16T20:42:42Z INFO  codt::search::solver_impl] One off witnesses: 0
+[2026-06-16T20:42:42Z INFO  codt::search::solver_impl] Pair lower bound: (primary: 0, secondary: 2)
+[2026-06-16T20:42:42Z INFO  codt::search::solver_impl] Root lower bound after pair lower bound: (primary: 0, secondary: 2)
+[2026-06-16T20:42:42Z INFO  codt::search::solver_impl] Final root bounds: lower (primary: 0, secondary: 2), upper (primary: 0, secondary: 2), best (primary: 0, secondary: 2), complete true
+[2026-06-16T20:42:42Z INFO  codt::search::solver_impl] Solution cache: 0 useful hits / 45 lookups (0.0%), 1 entries
+[2026-06-16T20:42:42Z INFO  codt_cli] Read time (s): 0.0001045
+[2026-06-16T20:42:42Z INFO  codt_cli] Solve time (s): 0.027990962
+[2026-06-16T20:42:42Z INFO  codt_cli] Max memory usage (MB): 0.81
+[2026-06-16T20:42:42Z INFO  codt_cli] Graph expansions: 31
+[2026-06-16T20:42:42Z INFO  codt_cli] Tree: [11<=40989.50:[2<=308.00:1,0],0]
+","Set parameter WLSAccessID
+Set parameter WLSSecret
+Set parameter LicenseID to value 2781812
+Academic license 2781812 - for non-commercial use only - registered to tt___@tudelft.nl
+Misclassifications: 0. Branch nodes: 2. Accuracy: 100%.
+",and-or-dfs-prio,5,for-remaining-interval,0.029332264995900914,31,849346,1.0578340275516147,1.0,1.0
+2,True,1,0.0,45,3,0,true,"['/home/thoams/Documents/TUDelft/thesis/codt/target/release/codt-cli', '--file', 'data/openml/sampled/analcatdata_election2000.txt', '--strategy', 'and-or-dfs-prio', '--lowerbound', 'class-count', 'improvement', 'pair', 'one-off', '--upperbound', 'for-remaining-interval', '--cart-upperbound', 'true', '--cart-upper-bound-patience', '5', '--cache', 'true', '--cache-max-branch-budget', '3', '--data-reduction', 'true', '--memory-limit', '4294967296', '--timeout', '600']",cache-enabled,analcatdata_election2000,,31,True,"class-count,improvement,pair,one-off",849346,2,67,14,2,0.029353965015616268,perfect-tree-found,perfect-tree-found,"[2026-06-16T20:42:42Z INFO  codt_cli] Starting solve with options:
+    SolverOptions { lb_strategy: {OneOff, Improvement, ClassCount, Pair}, ub_strategy: ForRemainingInterval, cart_ub: true, cart_ub_patience: 5, cache_max_branch_budget: Some(3), data_reduction: true, track_intermediates: false, timeout: Some(600s), memory_limit: Some(4294967296) }
+    
+[2026-06-16T20:42:42Z INFO  codt::search::solver_impl] One off witnesses: 0
+[2026-06-16T20:42:42Z INFO  codt::search::solver_impl] Pair lower bound: (primary: 0, secondary: 2)
+[2026-06-16T20:42:42Z INFO  codt::search::solver_impl] Root lower bound after pair lower bound: (primary: 0, secondary: 2)
+[2026-06-16T20:42:42Z INFO  codt::search::solver_impl] Final root bounds: lower (primary: 0, secondary: 2), upper (primary: 0, secondary: 2), best (primary: 0, secondary: 2), complete true
+[2026-06-16T20:42:42Z INFO  codt::search::solver_impl] Solution cache: 0 useful hits / 45 lookups (0.0%), 1 entries
+[2026-06-16T20:42:42Z INFO  codt_cli] Read time (s): 0.000187601
+[2026-06-16T20:42:42Z INFO  codt_cli] Solve time (s): 0.025903857
+[2026-06-16T20:42:42Z INFO  codt_cli] Max memory usage (MB): 0.81
+[2026-06-16T20:42:42Z INFO  codt_cli] Graph expansions: 31
+[2026-06-16T20:42:42Z INFO  codt_cli] Tree: [11<=40989.50:[2<=308.00:1,0],0]
+","Set parameter WLSAccessID
+Set parameter WLSSecret
+Set parameter LicenseID to value 2781812
+Academic license 2781812 - for non-commercial use only - registered to tt___@tudelft.nl
+Misclassifications: 0. Branch nodes: 2. Accuracy: 100%.
+",and-or-dfs-prio,5,for-remaining-interval,0.031539269984932616,31,849346,0.9307116185517185,1.0,1.0
+2,False,0,0.0,0,3,0,true,"['/home/thoams/Documents/TUDelft/thesis/codt/target/release/codt-cli', '--file', 'data/openml/sampled/analcatdata_election2000.txt', '--strategy', 'and-or-dfs-prio', '--lowerbound', 'class-count', 'improvement', 'pair', 'one-off', '--upperbound', 'for-remaining-interval', '--cart-upperbound', 'true', '--cart-upper-bound-patience', '5', '--cache', 'false', '--cache-max-branch-budget', '3', '--data-reduction', 'true', '--memory-limit', '4294967296', '--timeout', '600']",cache-disabled,analcatdata_election2000,,31,True,"class-count,improvement,pair,one-off",849346,2,67,14,2,0.031539269984932616,perfect-tree-found,perfect-tree-found,"[2026-06-16T20:42:42Z INFO  codt_cli] Starting solve with options:
+    SolverOptions { lb_strategy: {OneOff, Pair, Improvement, ClassCount}, ub_strategy: ForRemainingInterval, cart_ub: true, cart_ub_patience: 5, cache_max_branch_budget: None, data_reduction: true, track_intermediates: false, timeout: Some(600s), memory_limit: Some(4294967296) }
+    
+[2026-06-16T20:42:42Z INFO  codt::search::solver_impl] One off witnesses: 0
+[2026-06-16T20:42:42Z INFO  codt::search::solver_impl] Pair lower bound: (primary: 0, secondary: 2)
+[2026-06-16T20:42:42Z INFO  codt::search::solver_impl] Root lower bound after pair lower bound: (primary: 0, secondary: 2)
+[2026-06-16T20:42:42Z INFO  codt::search::solver_impl] Final root bounds: lower (primary: 0, secondary: 2), upper (primary: 0, secondary: 2), best (primary: 0, secondary: 2), complete true
+[2026-06-16T20:42:42Z INFO  codt::search::solver_impl] Solution cache: 0 useful hits / 0 lookups (0.0%), 0 entries
+[2026-06-16T20:42:42Z INFO  codt_cli] Read time (s): 0.0000846
+[2026-06-16T20:42:42Z INFO  codt_cli] Solve time (s): 0.028584963
+[2026-06-16T20:42:42Z INFO  codt_cli] Max memory usage (MB): 0.81
+[2026-06-16T20:42:42Z INFO  codt_cli] Graph expansions: 31
+[2026-06-16T20:42:42Z INFO  codt_cli] Tree: [11<=40989.50:[2<=308.00:1,0],0]
+","Set parameter WLSAccessID
+Set parameter WLSSecret
+Set parameter LicenseID to value 2781812
+Academic license 2781812 - for non-commercial use only - registered to tt___@tudelft.nl
+Misclassifications: 0. Branch nodes: 2. Accuracy: 100%.
+",and-or-dfs-prio,5,for-remaining-interval,0.031539269984932616,31,849346,1.0,1.0,1.0
+2,False,0,0.0,0,3,0,true,"['/home/thoams/Documents/TUDelft/thesis/codt/target/release/codt-cli', '--file', 'data/openml/sampled/analcatdata_election2000.txt', '--strategy', 'and-or-dfs-prio', '--lowerbound', 'class-count', 'improvement', 'pair', 'one-off', '--upperbound', 'for-remaining-interval', '--cart-upperbound', 'true', '--cart-upper-bound-patience', '5', '--cache', 'false', '--cache-max-branch-budget', '3', '--data-reduction', 'true', '--memory-limit', '4294967296', '--timeout', '600']",cache-disabled,analcatdata_election2000,,31,True,"class-count,improvement,pair,one-off",849346,2,67,14,3,0.03126806899672374,perfect-tree-found,perfect-tree-found,"[2026-06-16T20:42:42Z INFO  codt_cli] Starting solve with options:
+    SolverOptions { lb_strategy: {Pair, ClassCount, OneOff, Improvement}, ub_strategy: ForRemainingInterval, cart_ub: true, cart_ub_patience: 5, cache_max_branch_budget: None, data_reduction: true, track_intermediates: false, timeout: Some(600s), memory_limit: Some(4294967296) }
+    
+[2026-06-16T20:42:42Z INFO  codt::search::solver_impl] One off witnesses: 0
+[2026-06-16T20:42:42Z INFO  codt::search::solver_impl] Pair lower bound: (primary: 0, secondary: 2)
+[2026-06-16T20:42:42Z INFO  codt::search::solver_impl] Root lower bound after pair lower bound: (primary: 0, secondary: 2)
+[2026-06-16T20:42:42Z INFO  codt::search::solver_impl] Final root bounds: lower (primary: 0, secondary: 2), upper (primary: 0, secondary: 2), best (primary: 0, secondary: 2), complete true
+[2026-06-16T20:42:42Z INFO  codt::search::solver_impl] Solution cache: 0 useful hits / 0 lookups (0.0%), 0 entries
+[2026-06-16T20:42:42Z INFO  codt_cli] Read time (s): 0.0001075
+[2026-06-16T20:42:42Z INFO  codt_cli] Solve time (s): 0.028070162
+[2026-06-16T20:42:42Z INFO  codt_cli] Max memory usage (MB): 0.81
+[2026-06-16T20:42:42Z INFO  codt_cli] Graph expansions: 31
+[2026-06-16T20:42:42Z INFO  codt_cli] Tree: [11<=40989.50:[2<=308.00:1,0],0]
+","Set parameter WLSAccessID
+Set parameter WLSSecret
+Set parameter LicenseID to value 2781812
+Academic license 2781812 - for non-commercial use only - registered to tt___@tudelft.nl
+Misclassifications: 0. Branch nodes: 2. Accuracy: 100%.
+",and-or-dfs-prio,5,for-remaining-interval,0.03126806899672374,31,849346,1.0,1.0,1.0
+2,True,1,0.0,45,3,0,true,"['/home/thoams/Documents/TUDelft/thesis/codt/target/release/codt-cli', '--file', 'data/openml/sampled/analcatdata_election2000.txt', '--strategy', 'and-or-dfs-prio', '--lowerbound', 'class-count', 'improvement', 'pair', 'one-off', '--upperbound', 'for-remaining-interval', '--cart-upperbound', 'true', '--cart-upper-bound-patience', '5', '--cache', 'true', '--cache-max-branch-budget', '3', '--data-reduction', 'true', '--memory-limit', '4294967296', '--timeout', '600']",cache-enabled,analcatdata_election2000,,31,True,"class-count,improvement,pair,one-off",849346,2,67,14,3,0.032407271006377414,perfect-tree-found,perfect-tree-found,"[2026-06-16T20:42:42Z INFO  codt_cli] Starting solve with options:
+    SolverOptions { lb_strategy: {Improvement, OneOff, ClassCount, Pair}, ub_strategy: ForRemainingInterval, cart_ub: true, cart_ub_patience: 5, cache_max_branch_budget: Some(3), data_reduction: true, track_intermediates: false, timeout: Some(600s), memory_limit: Some(4294967296) }
+    
+[2026-06-16T20:42:42Z INFO  codt::search::solver_impl] One off witnesses: 0
+[2026-06-16T20:42:42Z INFO  codt::search::solver_impl] Pair lower bound: (primary: 0, secondary: 2)
+[2026-06-16T20:42:42Z INFO  codt::search::solver_impl] Root lower bound after pair lower bound: (primary: 0, secondary: 2)
+[2026-06-16T20:42:42Z INFO  codt::search::solver_impl] Final root bounds: lower (primary: 0, secondary: 2), upper (primary: 0, secondary: 2), best (primary: 0, secondary: 2), complete true
+[2026-06-16T20:42:42Z INFO  codt::search::solver_impl] Solution cache: 0 useful hits / 45 lookups (0.0%), 1 entries
+[2026-06-16T20:42:42Z INFO  codt_cli] Read time (s): 0.000088101
+[2026-06-16T20:42:42Z INFO  codt_cli] Solve time (s): 0.028973264
+[2026-06-16T20:42:42Z INFO  codt_cli] Max memory usage (MB): 0.81
+[2026-06-16T20:42:42Z INFO  codt_cli] Graph expansions: 31
+[2026-06-16T20:42:42Z INFO  codt_cli] Tree: [11<=40989.50:[2<=308.00:1,0],0]
+","Set parameter WLSAccessID
+Set parameter WLSSecret
+Set parameter LicenseID to value 2781812
+Academic license 2781812 - for non-commercial use only - registered to tt___@tudelft.nl
+Misclassifications: 0. Branch nodes: 2. Accuracy: 100%.
+",and-or-dfs-prio,5,for-remaining-interval,0.03126806899672374,31,849346,1.0364333982304132,1.0,1.0
+2,True,1,0.0,45,3,0,true,"['/home/thoams/Documents/TUDelft/thesis/codt/target/release/codt-cli', '--file', 'data/openml/sampled/analcatdata_election2000.txt', '--strategy', 'and-or-dfs-prio', '--lowerbound', 'class-count', 'improvement', 'pair', 'one-off', '--upperbound', 'for-remaining-interval', '--cart-upperbound', 'true', '--cart-upper-bound-patience', '5', '--cache', 'true', '--cache-max-branch-budget', '3', '--data-reduction', 'true', '--memory-limit', '4294967296', '--timeout', '600']",cache-enabled,analcatdata_election2000,,31,True,"class-count,improvement,pair,one-off",849346,2,67,14,4,0.028108063008403406,perfect-tree-found,perfect-tree-found,"[2026-06-16T20:42:42Z INFO  codt_cli] Starting solve with options:
+    SolverOptions { lb_strategy: {ClassCount, OneOff, Pair, Improvement}, ub_strategy: ForRemainingInterval, cart_ub: true, cart_ub_patience: 5, cache_max_branch_budget: Some(3), data_reduction: true, track_intermediates: false, timeout: Some(600s), memory_limit: Some(4294967296) }
+    
+[2026-06-16T20:42:42Z INFO  codt::search::solver_impl] One off witnesses: 0
+[2026-06-16T20:42:42Z INFO  codt::search::solver_impl] Pair lower bound: (primary: 0, secondary: 2)
+[2026-06-16T20:42:42Z INFO  codt::search::solver_impl] Root lower bound after pair lower bound: (primary: 0, secondary: 2)
+[2026-06-16T20:42:42Z INFO  codt::search::solver_impl] Final root bounds: lower (primary: 0, secondary: 2), upper (primary: 0, secondary: 2), best (primary: 0, secondary: 2), complete true
+[2026-06-16T20:42:42Z INFO  codt::search::solver_impl] Solution cache: 0 useful hits / 45 lookups (0.0%), 1 entries
+[2026-06-16T20:42:42Z INFO  codt_cli] Read time (s): 0.0000861
+[2026-06-16T20:42:42Z INFO  codt_cli] Solve time (s): 0.025242856
+[2026-06-16T20:42:42Z INFO  codt_cli] Max memory usage (MB): 0.81
+[2026-06-16T20:42:42Z INFO  codt_cli] Graph expansions: 31
+[2026-06-16T20:42:42Z INFO  codt_cli] Tree: [11<=40989.50:[2<=308.00:1,0],0]
+","Set parameter WLSAccessID
+Set parameter WLSSecret
+Set parameter LicenseID to value 2781812
+Academic license 2781812 - for non-commercial use only - registered to tt___@tudelft.nl
+Misclassifications: 0. Branch nodes: 2. Accuracy: 100%.
+",and-or-dfs-prio,5,for-remaining-interval,0.029730965005001053,31,849346,0.9454137463642819,1.0,1.0
+2,False,0,0.0,0,3,0,true,"['/home/thoams/Documents/TUDelft/thesis/codt/target/release/codt-cli', '--file', 'data/openml/sampled/analcatdata_election2000.txt', '--strategy', 'and-or-dfs-prio', '--lowerbound', 'class-count', 'improvement', 'pair', 'one-off', '--upperbound', 'for-remaining-interval', '--cart-upperbound', 'true', '--cart-upper-bound-patience', '5', '--cache', 'false', '--cache-max-branch-budget', '3', '--data-reduction', 'true', '--memory-limit', '4294967296', '--timeout', '600']",cache-disabled,analcatdata_election2000,,31,True,"class-count,improvement,pair,one-off",849346,2,67,14,4,0.029730965005001053,perfect-tree-found,perfect-tree-found,"[2026-06-16T20:42:42Z INFO  codt_cli] Starting solve with options:
+    SolverOptions { lb_strategy: {OneOff, Pair, Improvement, ClassCount}, ub_strategy: ForRemainingInterval, cart_ub: true, cart_ub_patience: 5, cache_max_branch_budget: None, data_reduction: true, track_intermediates: false, timeout: Some(600s), memory_limit: Some(4294967296) }
+    
+[2026-06-16T20:42:42Z INFO  codt::search::solver_impl] One off witnesses: 0
+[2026-06-16T20:42:42Z INFO  codt::search::solver_impl] Pair lower bound: (primary: 0, secondary: 2)
+[2026-06-16T20:42:42Z INFO  codt::search::solver_impl] Root lower bound after pair lower bound: (primary: 0, secondary: 2)
+[2026-06-16T20:42:42Z INFO  codt::search::solver_impl] Final root bounds: lower (primary: 0, secondary: 2), upper (primary: 0, secondary: 2), best (primary: 0, secondary: 2), complete true
+[2026-06-16T20:42:42Z INFO  codt::search::solver_impl] Solution cache: 0 useful hits / 0 lookups (0.0%), 0 entries
+[2026-06-16T20:42:42Z INFO  codt_cli] Read time (s): 0.000085801
+[2026-06-16T20:42:42Z INFO  codt_cli] Solve time (s): 0.026794759
+[2026-06-16T20:42:42Z INFO  codt_cli] Max memory usage (MB): 0.81
+[2026-06-16T20:42:42Z INFO  codt_cli] Graph expansions: 31
+[2026-06-16T20:42:42Z INFO  codt_cli] Tree: [11<=40989.50:[2<=308.00:1,0],0]
+","Set parameter WLSAccessID
+Set parameter WLSSecret
+Set parameter LicenseID to value 2781812
+Academic license 2781812 - for non-commercial use only - registered to tt___@tudelft.nl
+Misclassifications: 0. Branch nodes: 2. Accuracy: 100%.
+",and-or-dfs-prio,5,for-remaining-interval,0.029730965005001053,31,849346,1.0,1.0,1.0
+5,True,2,0.0,45129,3,1,true,"['/home/thoams/Documents/TUDelft/thesis/codt/target/release/codt-cli', '--file', 'data/openml/sampled/breast-w.txt', '--strategy', 'and-or-dfs-prio', '--lowerbound', 'class-count', 'improvement', 'pair', 'one-off', '--upperbound', 'for-remaining-interval', '--cart-upperbound', 'true', '--cart-upper-bound-patience', '5', '--cache', 'true', '--cache-max-branch-budget', '3', '--data-reduction', 'true', '--memory-limit', '4294967296', '--timeout', '600']",cache-enabled,breast-w,,20429,True,"class-count,improvement,pair,one-off",1048869601,2,100,9,0,1.7173680879932363,perfect-tree-found,perfect-tree-found,"[2026-06-16T20:41:24Z INFO  codt_cli] Starting solve with options:
+    SolverOptions { lb_strategy: {Pair, ClassCount, Improvement, OneOff}, ub_strategy: ForRemainingInterval, cart_ub: true, cart_ub_patience: 5, cache_max_branch_budget: Some(3), data_reduction: true, track_intermediates: false, timeout: Some(600s), memory_limit: Some(4294967296) }
+    
+[2026-06-16T20:41:24Z INFO  codt::search::solver_impl] One off witnesses: 0
+[2026-06-16T20:41:24Z INFO  codt::search::solver_impl] Pair lower bound: (primary: 0, secondary: 4)
+[2026-06-16T20:41:24Z INFO  codt::search::solver_impl] Root lower bound after pair lower bound: (primary: 0, secondary: 4)
+[2026-06-16T20:41:25Z INFO  codt::search::solver_impl] Final root bounds: lower (primary: 0, secondary: 5), upper (primary: 0, secondary: 5), best (primary: 0, secondary: 5), complete true
+[2026-06-16T20:41:25Z INFO  codt::search::solver_impl] Solution cache: 1 useful hits / 45129 lookups (0.0%), 2 entries
+[2026-06-16T20:41:25Z INFO  codt_cli] Read time (s): 0.000061001
+[2026-06-16T20:41:25Z INFO  codt_cli] Solve time (s): 1.659734661
+[2026-06-16T20:41:25Z INFO  codt_cli] Max memory usage (MB): 1000.28
+[2026-06-16T20:41:25Z INFO  codt_cli] Graph expansions: 20429
+[2026-06-16T20:41:25Z INFO  codt_cli] Tree: [4<=7.50:[0<=6.50:[3<=1.50:[4<=3.50:0,1],[7<=2.50:0,1]],1],1]
+","Set parameter WLSAccessID
+Set parameter WLSSecret
+Set parameter LicenseID to value 2781812
+Academic license 2781812 - for non-commercial use only - registered to tt___@tudelft.nl
+Misclassifications: 0. Branch nodes: 5. Accuracy: 100%.
+",and-or-dfs-prio,11,for-remaining-interval,1.3457547689904459,20429,1048869601,1.276137471377171,1.0,1.0
+5,False,0,0.0,0,3,0,true,"['/home/thoams/Documents/TUDelft/thesis/codt/target/release/codt-cli', '--file', 'data/openml/sampled/breast-w.txt', '--strategy', 'and-or-dfs-prio', '--lowerbound', 'class-count', 'improvement', 'pair', 'one-off', '--upperbound', 'for-remaining-interval', '--cart-upperbound', 'true', '--cart-upper-bound-patience', '5', '--cache', 'false', '--cache-max-branch-budget', '3', '--data-reduction', 'true', '--memory-limit', '4294967296', '--timeout', '600']",cache-disabled,breast-w,,20429,True,"class-count,improvement,pair,one-off",1048869601,2,100,9,0,1.3457547689904459,perfect-tree-found,perfect-tree-found,"[2026-06-16T20:41:25Z INFO  codt_cli] Starting solve with options:
+    SolverOptions { lb_strategy: {ClassCount, Improvement, OneOff, Pair}, ub_strategy: ForRemainingInterval, cart_ub: true, cart_ub_patience: 5, cache_max_branch_budget: None, data_reduction: true, track_intermediates: false, timeout: Some(600s), memory_limit: Some(4294967296) }
+    
+[2026-06-16T20:41:25Z INFO  codt::search::solver_impl] One off witnesses: 0
+[2026-06-16T20:41:25Z INFO  codt::search::solver_impl] Pair lower bound: (primary: 0, secondary: 4)
+[2026-06-16T20:41:25Z INFO  codt::search::solver_impl] Root lower bound after pair lower bound: (primary: 0, secondary: 4)
+[2026-06-16T20:41:27Z INFO  codt::search::solver_impl] Final root bounds: lower (primary: 0, secondary: 5), upper (primary: 0, secondary: 5), best (primary: 0, secondary: 5), complete true
+[2026-06-16T20:41:27Z INFO  codt::search::solver_impl] Solution cache: 0 useful hits / 0 lookups (0.0%), 0 entries
+[2026-06-16T20:41:27Z INFO  codt_cli] Read time (s): 0.0000765
+[2026-06-16T20:41:27Z INFO  codt_cli] Solve time (s): 1.285810637
+[2026-06-16T20:41:27Z INFO  codt_cli] Max memory usage (MB): 1000.28
+[2026-06-16T20:41:27Z INFO  codt_cli] Graph expansions: 20429
+[2026-06-16T20:41:27Z INFO  codt_cli] Tree: [4<=7.50:[0<=6.50:[3<=1.50:[4<=3.50:0,1],[7<=2.50:0,1]],1],1]
+","Set parameter WLSAccessID
+Set parameter WLSSecret
+Set parameter LicenseID to value 2781812
+Academic license 2781812 - for non-commercial use only - registered to tt___@tudelft.nl
+Misclassifications: 0. Branch nodes: 5. Accuracy: 100%.
+",and-or-dfs-prio,11,for-remaining-interval,1.3457547689904459,20429,1048869601,1.0,1.0,1.0
+5,False,0,0.0,0,3,0,true,"['/home/thoams/Documents/TUDelft/thesis/codt/target/release/codt-cli', '--file', 'data/openml/sampled/breast-w.txt', '--strategy', 'and-or-dfs-prio', '--lowerbound', 'class-count', 'improvement', 'pair', 'one-off', '--upperbound', 'for-remaining-interval', '--cart-upperbound', 'true', '--cart-upper-bound-patience', '5', '--cache', 'false', '--cache-max-branch-budget', '3', '--data-reduction', 'true', '--memory-limit', '4294967296', '--timeout', '600']",cache-disabled,breast-w,,20429,True,"class-count,improvement,pair,one-off",1048869601,2,100,9,1,1.6593262660026085,perfect-tree-found,perfect-tree-found,"[2026-06-16T20:42:42Z INFO  codt_cli] Starting solve with options:
+    SolverOptions { lb_strategy: {Improvement, OneOff, Pair, ClassCount}, ub_strategy: ForRemainingInterval, cart_ub: true, cart_ub_patience: 5, cache_max_branch_budget: None, data_reduction: true, track_intermediates: false, timeout: Some(600s), memory_limit: Some(4294967296) }
+    
+[2026-06-16T20:42:42Z INFO  codt::search::solver_impl] One off witnesses: 0
+[2026-06-16T20:42:42Z INFO  codt::search::solver_impl] Pair lower bound: (primary: 0, secondary: 4)
+[2026-06-16T20:42:42Z INFO  codt::search::solver_impl] Root lower bound after pair lower bound: (primary: 0, secondary: 4)
+[2026-06-16T20:42:44Z INFO  codt::search::solver_impl] Final root bounds: lower (primary: 0, secondary: 5), upper (primary: 0, secondary: 5), best (primary: 0, secondary: 5), complete true
+[2026-06-16T20:42:44Z INFO  codt::search::solver_impl] Solution cache: 0 useful hits / 0 lookups (0.0%), 0 entries
+[2026-06-16T20:42:44Z INFO  codt_cli] Read time (s): 0.0000611
+[2026-06-16T20:42:44Z INFO  codt_cli] Solve time (s): 1.604360345
+[2026-06-16T20:42:44Z INFO  codt_cli] Max memory usage (MB): 1000.28
+[2026-06-16T20:42:44Z INFO  codt_cli] Graph expansions: 20429
+[2026-06-16T20:42:44Z INFO  codt_cli] Tree: [4<=7.50:[0<=6.50:[3<=1.50:[4<=3.50:0,1],[7<=2.50:0,1]],1],1]
+","Set parameter WLSAccessID
+Set parameter WLSSecret
+Set parameter LicenseID to value 2781812
+Academic license 2781812 - for non-commercial use only - registered to tt___@tudelft.nl
+Misclassifications: 0. Branch nodes: 5. Accuracy: 100%.
+",and-or-dfs-prio,11,for-remaining-interval,1.6593262660026085,20429,1048869601,1.0,1.0,1.0
+5,True,2,0.0,45129,3,1,true,"['/home/thoams/Documents/TUDelft/thesis/codt/target/release/codt-cli', '--file', 'data/openml/sampled/breast-w.txt', '--strategy', 'and-or-dfs-prio', '--lowerbound', 'class-count', 'improvement', 'pair', 'one-off', '--upperbound', 'for-remaining-interval', '--cart-upperbound', 'true', '--cart-upper-bound-patience', '5', '--cache', 'true', '--cache-max-branch-budget', '3', '--data-reduction', 'true', '--memory-limit', '4294967296', '--timeout', '600']",cache-enabled,breast-w,,20429,True,"class-count,improvement,pair,one-off",1048869601,2,100,9,1,1.4230647450021934,perfect-tree-found,perfect-tree-found,"[2026-06-16T20:42:44Z INFO  codt_cli] Starting solve with options:
+    SolverOptions { lb_strategy: {Pair, ClassCount, Improvement, OneOff}, ub_strategy: ForRemainingInterval, cart_ub: true, cart_ub_patience: 5, cache_max_branch_budget: Some(3), data_reduction: true, track_intermediates: false, timeout: Some(600s), memory_limit: Some(4294967296) }
+    
+[2026-06-16T20:42:44Z INFO  codt::search::solver_impl] One off witnesses: 0
+[2026-06-16T20:42:44Z INFO  codt::search::solver_impl] Pair lower bound: (primary: 0, secondary: 4)
+[2026-06-16T20:42:44Z INFO  codt::search::solver_impl] Root lower bound after pair lower bound: (primary: 0, secondary: 4)
+[2026-06-16T20:42:45Z INFO  codt::search::solver_impl] Final root bounds: lower (primary: 0, secondary: 5), upper (primary: 0, secondary: 5), best (primary: 0, secondary: 5), complete true
+[2026-06-16T20:42:45Z INFO  codt::search::solver_impl] Solution cache: 1 useful hits / 45129 lookups (0.0%), 2 entries
+[2026-06-16T20:42:45Z INFO  codt_cli] Read time (s): 0.000071101
+[2026-06-16T20:42:45Z INFO  codt_cli] Solve time (s): 1.361396708
+[2026-06-16T20:42:45Z INFO  codt_cli] Max memory usage (MB): 1000.28
+[2026-06-16T20:42:45Z INFO  codt_cli] Graph expansions: 20429
+[2026-06-16T20:42:45Z INFO  codt_cli] Tree: [4<=7.50:[0<=6.50:[3<=1.50:[4<=3.50:0,1],[7<=2.50:0,1]],1],1]
+","Set parameter WLSAccessID
+Set parameter WLSSecret
+Set parameter LicenseID to value 2781812
+Academic license 2781812 - for non-commercial use only - registered to tt___@tudelft.nl
+Misclassifications: 0. Branch nodes: 5. Accuracy: 100%.
+",and-or-dfs-prio,11,for-remaining-interval,1.6593262660026085,20429,1048869601,0.8576159940084721,1.0,1.0
+5,True,2,0.0,45129,3,1,true,"['/home/thoams/Documents/TUDelft/thesis/codt/target/release/codt-cli', '--file', 'data/openml/sampled/breast-w.txt', '--strategy', 'and-or-dfs-prio', '--lowerbound', 'class-count', 'improvement', 'pair', 'one-off', '--upperbound', 'for-remaining-interval', '--cart-upperbound', 'true', '--cart-upper-bound-patience', '5', '--cache', 'true', '--cache-max-branch-budget', '3', '--data-reduction', 'true', '--memory-limit', '4294967296', '--timeout', '600']",cache-enabled,breast-w,,20429,True,"class-count,improvement,pair,one-off",1048869601,2,100,9,2,1.5997727350040805,perfect-tree-found,perfect-tree-found,"[2026-06-16T20:42:46Z INFO  codt_cli] Starting solve with options:
+    SolverOptions { lb_strategy: {ClassCount, Pair, OneOff, Improvement}, ub_strategy: ForRemainingInterval, cart_ub: true, cart_ub_patience: 5, cache_max_branch_budget: Some(3), data_reduction: true, track_intermediates: false, timeout: Some(600s), memory_limit: Some(4294967296) }
+    
+[2026-06-16T20:42:46Z INFO  codt::search::solver_impl] One off witnesses: 0
+[2026-06-16T20:42:46Z INFO  codt::search::solver_impl] Pair lower bound: (primary: 0, secondary: 4)
+[2026-06-16T20:42:46Z INFO  codt::search::solver_impl] Root lower bound after pair lower bound: (primary: 0, secondary: 4)
+[2026-06-16T20:42:47Z INFO  codt::search::solver_impl] Final root bounds: lower (primary: 0, secondary: 5), upper (primary: 0, secondary: 5), best (primary: 0, secondary: 5), complete true
+[2026-06-16T20:42:47Z INFO  codt::search::solver_impl] Solution cache: 1 useful hits / 45129 lookups (0.0%), 2 entries
+[2026-06-16T20:42:47Z INFO  codt_cli] Read time (s): 0.0000641
+[2026-06-16T20:42:47Z INFO  codt_cli] Solve time (s): 1.544095512
+[2026-06-16T20:42:47Z INFO  codt_cli] Max memory usage (MB): 1000.28
+[2026-06-16T20:42:47Z INFO  codt_cli] Graph expansions: 20429
+[2026-06-16T20:42:47Z INFO  codt_cli] Tree: [4<=7.50:[0<=6.50:[3<=1.50:[4<=3.50:0,1],[7<=2.50:0,1]],1],1]
+","Set parameter WLSAccessID
+Set parameter WLSSecret
+Set parameter LicenseID to value 2781812
+Academic license 2781812 - for non-commercial use only - registered to tt___@tudelft.nl
+Misclassifications: 0. Branch nodes: 5. Accuracy: 100%.
+",and-or-dfs-prio,11,for-remaining-interval,1.3543346910155378,20429,1048869601,1.1812240693653817,1.0,1.0
+5,False,0,0.0,0,3,0,true,"['/home/thoams/Documents/TUDelft/thesis/codt/target/release/codt-cli', '--file', 'data/openml/sampled/breast-w.txt', '--strategy', 'and-or-dfs-prio', '--lowerbound', 'class-count', 'improvement', 'pair', 'one-off', '--upperbound', 'for-remaining-interval', '--cart-upperbound', 'true', '--cart-upper-bound-patience', '5', '--cache', 'false', '--cache-max-branch-budget', '3', '--data-reduction', 'true', '--memory-limit', '4294967296', '--timeout', '600']",cache-disabled,breast-w,,20429,True,"class-count,improvement,pair,one-off",1048869601,2,100,9,2,1.3543346910155378,perfect-tree-found,perfect-tree-found,"[2026-06-16T20:42:47Z INFO  codt_cli] Starting solve with options:
+    SolverOptions { lb_strategy: {ClassCount, Pair, OneOff, Improvement}, ub_strategy: ForRemainingInterval, cart_ub: true, cart_ub_patience: 5, cache_max_branch_budget: None, data_reduction: true, track_intermediates: false, timeout: Some(600s), memory_limit: Some(4294967296) }
+    
+[2026-06-16T20:42:47Z INFO  codt::search::solver_impl] One off witnesses: 0
+[2026-06-16T20:42:47Z INFO  codt::search::solver_impl] Pair lower bound: (primary: 0, secondary: 4)
+[2026-06-16T20:42:47Z INFO  codt::search::solver_impl] Root lower bound after pair lower bound: (primary: 0, secondary: 4)
+[2026-06-16T20:42:48Z INFO  codt::search::solver_impl] Final root bounds: lower (primary: 0, secondary: 5), upper (primary: 0, secondary: 5), best (primary: 0, secondary: 5), complete true
+[2026-06-16T20:42:48Z INFO  codt::search::solver_impl] Solution cache: 0 useful hits / 0 lookups (0.0%), 0 entries
+[2026-06-16T20:42:48Z INFO  codt_cli] Read time (s): 0.0000631
+[2026-06-16T20:42:48Z INFO  codt_cli] Solve time (s): 1.300561173
+[2026-06-16T20:42:48Z INFO  codt_cli] Max memory usage (MB): 1000.28
+[2026-06-16T20:42:48Z INFO  codt_cli] Graph expansions: 20429
+[2026-06-16T20:42:48Z INFO  codt_cli] Tree: [4<=7.50:[0<=6.50:[3<=1.50:[4<=3.50:0,1],[7<=2.50:0,1]],1],1]
+","Set parameter WLSAccessID
+Set parameter WLSSecret
+Set parameter LicenseID to value 2781812
+Academic license 2781812 - for non-commercial use only - registered to tt___@tudelft.nl
+Misclassifications: 0. Branch nodes: 5. Accuracy: 100%.
+",and-or-dfs-prio,11,for-remaining-interval,1.3543346910155378,20429,1048869601,1.0,1.0,1.0
+5,False,0,0.0,0,3,0,true,"['/home/thoams/Documents/TUDelft/thesis/codt/target/release/codt-cli', '--file', 'data/openml/sampled/breast-w.txt', '--strategy', 'and-or-dfs-prio', '--lowerbound', 'class-count', 'improvement', 'pair', 'one-off', '--upperbound', 'for-remaining-interval', '--cart-upperbound', 'true', '--cart-upper-bound-patience', '5', '--cache', 'false', '--cache-max-branch-budget', '3', '--data-reduction', 'true', '--memory-limit', '4294967296', '--timeout', '600']",cache-disabled,breast-w,,20429,True,"class-count,improvement,pair,one-off",1048869601,2,100,9,3,1.3562721879861783,perfect-tree-found,perfect-tree-found,"[2026-06-16T20:42:48Z INFO  codt_cli] Starting solve with options:
+    SolverOptions { lb_strategy: {OneOff, Pair, ClassCount, Improvement}, ub_strategy: ForRemainingInterval, cart_ub: true, cart_ub_patience: 5, cache_max_branch_budget: None, data_reduction: true, track_intermediates: false, timeout: Some(600s), memory_limit: Some(4294967296) }
+    
+[2026-06-16T20:42:48Z INFO  codt::search::solver_impl] One off witnesses: 0
+[2026-06-16T20:42:48Z INFO  codt::search::solver_impl] Pair lower bound: (primary: 0, secondary: 4)
+[2026-06-16T20:42:48Z INFO  codt::search::solver_impl] Root lower bound after pair lower bound: (primary: 0, secondary: 4)
+[2026-06-16T20:42:50Z INFO  codt::search::solver_impl] Final root bounds: lower (primary: 0, secondary: 5), upper (primary: 0, secondary: 5), best (primary: 0, secondary: 5), complete true
+[2026-06-16T20:42:50Z INFO  codt::search::solver_impl] Solution cache: 0 useful hits / 0 lookups (0.0%), 0 entries
+[2026-06-16T20:42:50Z INFO  codt_cli] Read time (s): 0.0000767
+[2026-06-16T20:42:50Z INFO  codt_cli] Solve time (s): 1.302207969
+[2026-06-16T20:42:50Z INFO  codt_cli] Max memory usage (MB): 1000.28
+[2026-06-16T20:42:50Z INFO  codt_cli] Graph expansions: 20429
+[2026-06-16T20:42:50Z INFO  codt_cli] Tree: [4<=7.50:[0<=6.50:[3<=1.50:[4<=3.50:0,1],[7<=2.50:0,1]],1],1]
+","Set parameter WLSAccessID
+Set parameter WLSSecret
+Set parameter LicenseID to value 2781812
+Academic license 2781812 - for non-commercial use only - registered to tt___@tudelft.nl
+Misclassifications: 0. Branch nodes: 5. Accuracy: 100%.
+",and-or-dfs-prio,11,for-remaining-interval,1.3562721879861783,20429,1048869601,1.0,1.0,1.0
+5,True,2,0.0,45129,3,1,true,"['/home/thoams/Documents/TUDelft/thesis/codt/target/release/codt-cli', '--file', 'data/openml/sampled/breast-w.txt', '--strategy', 'and-or-dfs-prio', '--lowerbound', 'class-count', 'improvement', 'pair', 'one-off', '--upperbound', 'for-remaining-interval', '--cart-upperbound', 'true', '--cart-upper-bound-patience', '5', '--cache', 'true', '--cache-max-branch-budget', '3', '--data-reduction', 'true', '--memory-limit', '4294967296', '--timeout', '600']",cache-enabled,breast-w,,20429,True,"class-count,improvement,pair,one-off",1048869601,2,100,9,3,1.502794210013235,perfect-tree-found,perfect-tree-found,"[2026-06-16T20:42:50Z INFO  codt_cli] Starting solve with options:
+    SolverOptions { lb_strategy: {OneOff, Improvement, ClassCount, Pair}, ub_strategy: ForRemainingInterval, cart_ub: true, cart_ub_patience: 5, cache_max_branch_budget: Some(3), data_reduction: true, track_intermediates: false, timeout: Some(600s), memory_limit: Some(4294967296) }
+    
+[2026-06-16T20:42:50Z INFO  codt::search::solver_impl] One off witnesses: 0
+[2026-06-16T20:42:50Z INFO  codt::search::solver_impl] Pair lower bound: (primary: 0, secondary: 4)
+[2026-06-16T20:42:50Z INFO  codt::search::solver_impl] Root lower bound after pair lower bound: (primary: 0, secondary: 4)
+[2026-06-16T20:42:51Z INFO  codt::search::solver_impl] Final root bounds: lower (primary: 0, secondary: 5), upper (primary: 0, secondary: 5), best (primary: 0, secondary: 5), complete true
+[2026-06-16T20:42:51Z INFO  codt::search::solver_impl] Solution cache: 1 useful hits / 45129 lookups (0.0%), 2 entries
+[2026-06-16T20:42:51Z INFO  codt_cli] Read time (s): 0.0000783
+[2026-06-16T20:42:51Z INFO  codt_cli] Solve time (s): 1.446505787
+[2026-06-16T20:42:51Z INFO  codt_cli] Max memory usage (MB): 1000.28
+[2026-06-16T20:42:51Z INFO  codt_cli] Graph expansions: 20429
+[2026-06-16T20:42:51Z INFO  codt_cli] Tree: [4<=7.50:[0<=6.50:[3<=1.50:[4<=3.50:0,1],[7<=2.50:0,1]],1],1]
+","Set parameter WLSAccessID
+Set parameter WLSSecret
+Set parameter LicenseID to value 2781812
+Academic license 2781812 - for non-commercial use only - registered to tt___@tudelft.nl
+Misclassifications: 0. Branch nodes: 5. Accuracy: 100%.
+",and-or-dfs-prio,11,for-remaining-interval,1.3562721879861783,20429,1048869601,1.1080329032217462,1.0,1.0
+5,True,2,0.0,45129,3,1,true,"['/home/thoams/Documents/TUDelft/thesis/codt/target/release/codt-cli', '--file', 'data/openml/sampled/breast-w.txt', '--strategy', 'and-or-dfs-prio', '--lowerbound', 'class-count', 'improvement', 'pair', 'one-off', '--upperbound', 'for-remaining-interval', '--cart-upperbound', 'true', '--cart-upper-bound-patience', '5', '--cache', 'true', '--cache-max-branch-budget', '3', '--data-reduction', 'true', '--memory-limit', '4294967296', '--timeout', '600']",cache-enabled,breast-w,,20429,True,"class-count,improvement,pair,one-off",1048869601,2,100,9,4,1.3212246100010816,perfect-tree-found,perfect-tree-found,"[2026-06-16T20:42:51Z INFO  codt_cli] Starting solve with options:
+    SolverOptions { lb_strategy: {ClassCount, OneOff, Pair, Improvement}, ub_strategy: ForRemainingInterval, cart_ub: true, cart_ub_patience: 5, cache_max_branch_budget: Some(3), data_reduction: true, track_intermediates: false, timeout: Some(600s), memory_limit: Some(4294967296) }
+    
+[2026-06-16T20:42:51Z INFO  codt::search::solver_impl] One off witnesses: 0
+[2026-06-16T20:42:51Z INFO  codt::search::solver_impl] Pair lower bound: (primary: 0, secondary: 4)
+[2026-06-16T20:42:51Z INFO  codt::search::solver_impl] Root lower bound after pair lower bound: (primary: 0, secondary: 4)
+[2026-06-16T20:42:53Z INFO  codt::search::solver_impl] Final root bounds: lower (primary: 0, secondary: 5), upper (primary: 0, secondary: 5), best (primary: 0, secondary: 5), complete true
+[2026-06-16T20:42:53Z INFO  codt::search::solver_impl] Solution cache: 1 useful hits / 45129 lookups (0.0%), 2 entries
+[2026-06-16T20:42:53Z INFO  codt_cli] Read time (s): 0.0000947
+[2026-06-16T20:42:53Z INFO  codt_cli] Solve time (s): 1.2686317950000001
+[2026-06-16T20:42:53Z INFO  codt_cli] Max memory usage (MB): 1000.28
+[2026-06-16T20:42:53Z INFO  codt_cli] Graph expansions: 20429
+[2026-06-16T20:42:53Z INFO  codt_cli] Tree: [4<=7.50:[0<=6.50:[3<=1.50:[4<=3.50:0,1],[7<=2.50:0,1]],1],1]
+","Set parameter WLSAccessID
+Set parameter WLSSecret
+Set parameter LicenseID to value 2781812
+Academic license 2781812 - for non-commercial use only - registered to tt___@tudelft.nl
+Misclassifications: 0. Branch nodes: 5. Accuracy: 100%.
+",and-or-dfs-prio,11,for-remaining-interval,1.5487029119976796,20429,1048869601,0.8531168888271976,1.0,1.0
+5,False,0,0.0,0,3,0,true,"['/home/thoams/Documents/TUDelft/thesis/codt/target/release/codt-cli', '--file', 'data/openml/sampled/breast-w.txt', '--strategy', 'and-or-dfs-prio', '--lowerbound', 'class-count', 'improvement', 'pair', 'one-off', '--upperbound', 'for-remaining-interval', '--cart-upperbound', 'true', '--cart-upper-bound-patience', '5', '--cache', 'false', '--cache-max-branch-budget', '3', '--data-reduction', 'true', '--memory-limit', '4294967296', '--timeout', '600']",cache-disabled,breast-w,,20429,True,"class-count,improvement,pair,one-off",1048869601,2,100,9,4,1.5487029119976796,perfect-tree-found,perfect-tree-found,"[2026-06-16T20:42:53Z INFO  codt_cli] Starting solve with options:
+    SolverOptions { lb_strategy: {ClassCount, Improvement, Pair, OneOff}, ub_strategy: ForRemainingInterval, cart_ub: true, cart_ub_patience: 5, cache_max_branch_budget: None, data_reduction: true, track_intermediates: false, timeout: Some(600s), memory_limit: Some(4294967296) }
+    
+[2026-06-16T20:42:53Z INFO  codt::search::solver_impl] One off witnesses: 0
+[2026-06-16T20:42:53Z INFO  codt::search::solver_impl] Pair lower bound: (primary: 0, secondary: 4)
+[2026-06-16T20:42:53Z INFO  codt::search::solver_impl] Root lower bound after pair lower bound: (primary: 0, secondary: 4)
+[2026-06-16T20:42:54Z INFO  codt::search::solver_impl] Final root bounds: lower (primary: 0, secondary: 5), upper (primary: 0, secondary: 5), best (primary: 0, secondary: 5), complete true
+[2026-06-16T20:42:54Z INFO  codt::search::solver_impl] Solution cache: 0 useful hits / 0 lookups (0.0%), 0 entries
+[2026-06-16T20:42:54Z INFO  codt_cli] Read time (s): 0.000062501
+[2026-06-16T20:42:54Z INFO  codt_cli] Solve time (s): 1.492929789
+[2026-06-16T20:42:54Z INFO  codt_cli] Max memory usage (MB): 1000.28
+[2026-06-16T20:42:54Z INFO  codt_cli] Graph expansions: 20429
+[2026-06-16T20:42:54Z INFO  codt_cli] Tree: [4<=7.50:[0<=6.50:[3<=1.50:[4<=3.50:0,1],[7<=2.50:0,1]],1],1]
+","Set parameter WLSAccessID
+Set parameter WLSSecret
+Set parameter LicenseID to value 2781812
+Academic license 2781812 - for non-commercial use only - registered to tt___@tudelft.nl
+Misclassifications: 0. Branch nodes: 5. Accuracy: 100%.
+",and-or-dfs-prio,11,for-remaining-interval,1.5487029119976796,20429,1048869601,1.0,1.0,1.0
+8,False,0,0.0,0,3,0,true,"['/home/thoams/Documents/TUDelft/thesis/codt/target/release/codt-cli', '--file', 'data/openml/sampled/chscase_adopt.txt', '--strategy', 'and-or-dfs-prio', '--lowerbound', 'class-count', 'improvement', 'pair', 'one-off', '--upperbound', 'for-remaining-interval', '--cart-upperbound', 'true', '--cart-upper-bound-patience', '5', '--cache', 'false', '--cache-max-branch-budget', '3', '--data-reduction', 'true', '--memory-limit', '4294967296', '--timeout', '600']",cache-disabled,chscase_adopt,,22953,True,"class-count,improvement,pair,one-off",308564459,2,39,2,0,0.4928726879879832,perfect-tree-found,perfect-tree-found,"[2026-06-16T20:41:27Z INFO  codt_cli] Starting solve with options:
+    SolverOptions { lb_strategy: {Improvement, ClassCount, Pair, OneOff}, ub_strategy: ForRemainingInterval, cart_ub: true, cart_ub_patience: 5, cache_max_branch_budget: None, data_reduction: true, track_intermediates: false, timeout: Some(600s), memory_limit: Some(4294967296) }
+    
+[2026-06-16T20:41:27Z INFO  codt::search::solver_impl] One off witnesses: 2
+[2026-06-16T20:41:27Z INFO  codt::search::solver_impl] Pair lower bound: (primary: 0, secondary: 8)
+[2026-06-16T20:41:27Z INFO  codt::search::solver_impl] Root lower bound after pair lower bound: (primary: 0, secondary: 8)
+[2026-06-16T20:41:27Z INFO  codt::search::solver_impl] Final root bounds: lower (primary: 0, secondary: 8), upper (primary: 0, secondary: 8), best (primary: 0, secondary: 8), complete true
+[2026-06-16T20:41:27Z INFO  codt::search::solver_impl] Solution cache: 0 useful hits / 0 lookups (0.0%), 0 entries
+[2026-06-16T20:41:27Z INFO  codt_cli] Read time (s): 0.0000261
+[2026-06-16T20:41:27Z INFO  codt_cli] Solve time (s): 0.473528344
+[2026-06-16T20:41:27Z INFO  codt_cli] Max memory usage (MB): 294.27
+[2026-06-16T20:41:27Z INFO  codt_cli] Graph expansions: 22953
+[2026-06-16T20:41:27Z INFO  codt_cli] Tree: [0<=8.00:1,[1<=5.50:0,[1<=211.00:[0<=16.00:1,[0<=19.00:0,[0<=53.00:[0<=51.50:1,0],[0<=186.50:1,0]]]],0]]]
+","Set parameter WLSAccessID
+Set parameter WLSSecret
+Set parameter LicenseID to value 2781812
+Academic license 2781812 - for non-commercial use only - registered to tt___@tudelft.nl
+Misclassifications: 0. Branch nodes: 8. Accuracy: 100%.
+",and-or-dfs-prio,17,for-remaining-interval,0.4928726879879832,22953,308564459,1.0,1.0,1.0
+8,True,16,0.004,32573,3,116,true,"['/home/thoams/Documents/TUDelft/thesis/codt/target/release/codt-cli', '--file', 'data/openml/sampled/chscase_adopt.txt', '--strategy', 'and-or-dfs-prio', '--lowerbound', 'class-count', 'improvement', 'pair', 'one-off', '--upperbound', 'for-remaining-interval', '--cart-upperbound', 'true', '--cart-upper-bound-patience', '5', '--cache', 'true', '--cache-max-branch-budget', '3', '--data-reduction', 'true', '--memory-limit', '4294967296', '--timeout', '600']",cache-enabled,chscase_adopt,,22690,True,"class-count,improvement,pair,one-off",305093672,2,39,2,0,0.6006853250146378,perfect-tree-found,perfect-tree-found,"[2026-06-16T20:41:27Z INFO  codt_cli] Starting solve with options:
+    SolverOptions { lb_strategy: {Improvement, Pair, ClassCount, OneOff}, ub_strategy: ForRemainingInterval, cart_ub: true, cart_ub_patience: 5, cache_max_branch_budget: Some(3), data_reduction: true, track_intermediates: false, timeout: Some(600s), memory_limit: Some(4294967296) }
+    
+[2026-06-16T20:41:27Z INFO  codt::search::solver_impl] One off witnesses: 2
+[2026-06-16T20:41:27Z INFO  codt::search::solver_impl] Pair lower bound: (primary: 0, secondary: 8)
+[2026-06-16T20:41:27Z INFO  codt::search::solver_impl] Root lower bound after pair lower bound: (primary: 0, secondary: 8)
+[2026-06-16T20:41:28Z INFO  codt::search::solver_impl] Final root bounds: lower (primary: 0, secondary: 8), upper (primary: 0, secondary: 8), best (primary: 0, secondary: 8), complete true
+[2026-06-16T20:41:28Z INFO  codt::search::solver_impl] Solution cache: 116 useful hits / 32573 lookups (0.4%), 16 entries
+[2026-06-16T20:41:28Z INFO  codt_cli] Read time (s): 0.0000225
+[2026-06-16T20:41:28Z INFO  codt_cli] Solve time (s): 0.581175282
+[2026-06-16T20:41:28Z INFO  codt_cli] Max memory usage (MB): 290.96
+[2026-06-16T20:41:28Z INFO  codt_cli] Graph expansions: 22690
+[2026-06-16T20:41:28Z INFO  codt_cli] Tree: [0<=8.00:1,[1<=5.50:0,[1<=211.00:[0<=16.00:1,[0<=19.00:0,[0<=53.00:[0<=51.50:1,0],[0<=186.50:1,0]]]],0]]]
+","Set parameter WLSAccessID
+Set parameter WLSSecret
+Set parameter LicenseID to value 2781812
+Academic license 2781812 - for non-commercial use only - registered to tt___@tudelft.nl
+Misclassifications: 0. Branch nodes: 8. Accuracy: 100%.
+",and-or-dfs-prio,17,for-remaining-interval,0.4928726879879832,22953,308564459,1.2187433786740545,0.9885423019952949,0.9887518251089313
+8,True,16,0.004,32573,3,116,true,"['/home/thoams/Documents/TUDelft/thesis/codt/target/release/codt-cli', '--file', 'data/openml/sampled/chscase_adopt.txt', '--strategy', 'and-or-dfs-prio', '--lowerbound', 'class-count', 'improvement', 'pair', 'one-off', '--upperbound', 'for-remaining-interval', '--cart-upperbound', 'true', '--cart-upper-bound-patience', '5', '--cache', 'true', '--cache-max-branch-budget', '3', '--data-reduction', 'true', '--memory-limit', '4294967296', '--timeout', '600']",cache-enabled,chscase_adopt,,22690,True,"class-count,improvement,pair,one-off",305093672,2,39,2,1,0.48577616998227313,perfect-tree-found,perfect-tree-found,"[2026-06-16T20:42:54Z INFO  codt_cli] Starting solve with options:
+    SolverOptions { lb_strategy: {Improvement, ClassCount, Pair, OneOff}, ub_strategy: ForRemainingInterval, cart_ub: true, cart_ub_patience: 5, cache_max_branch_budget: Some(3), data_reduction: true, track_intermediates: false, timeout: Some(600s), memory_limit: Some(4294967296) }
+    
+[2026-06-16T20:42:54Z INFO  codt::search::solver_impl] One off witnesses: 2
+[2026-06-16T20:42:54Z INFO  codt::search::solver_impl] Pair lower bound: (primary: 0, secondary: 8)
+[2026-06-16T20:42:54Z INFO  codt::search::solver_impl] Root lower bound after pair lower bound: (primary: 0, secondary: 8)
+[2026-06-16T20:42:55Z INFO  codt::search::solver_impl] Final root bounds: lower (primary: 0, secondary: 8), upper (primary: 0, secondary: 8), best (primary: 0, secondary: 8), complete true
+[2026-06-16T20:42:55Z INFO  codt::search::solver_impl] Solution cache: 116 useful hits / 32573 lookups (0.4%), 16 entries
+[2026-06-16T20:42:55Z INFO  codt_cli] Read time (s): 0.0000256
+[2026-06-16T20:42:55Z INFO  codt_cli] Solve time (s): 0.465550025
+[2026-06-16T20:42:55Z INFO  codt_cli] Max memory usage (MB): 290.96
+[2026-06-16T20:42:55Z INFO  codt_cli] Graph expansions: 22690
+[2026-06-16T20:42:55Z INFO  codt_cli] Tree: [0<=8.00:1,[1<=5.50:0,[1<=211.00:[0<=16.00:1,[0<=19.00:0,[0<=53.00:[0<=51.50:1,0],[0<=186.50:1,0]]]],0]]]
+","Set parameter WLSAccessID
+Set parameter WLSSecret
+Set parameter LicenseID to value 2781812
+Academic license 2781812 - for non-commercial use only - registered to tt___@tudelft.nl
+Misclassifications: 0. Branch nodes: 8. Accuracy: 100%.
+",and-or-dfs-prio,17,for-remaining-interval,0.48948257899610326,22953,308564459,0.9924279041320904,0.9885423019952949,0.9887518251089313
+8,False,0,0.0,0,3,0,true,"['/home/thoams/Documents/TUDelft/thesis/codt/target/release/codt-cli', '--file', 'data/openml/sampled/chscase_adopt.txt', '--strategy', 'and-or-dfs-prio', '--lowerbound', 'class-count', 'improvement', 'pair', 'one-off', '--upperbound', 'for-remaining-interval', '--cart-upperbound', 'true', '--cart-upper-bound-patience', '5', '--cache', 'false', '--cache-max-branch-budget', '3', '--data-reduction', 'true', '--memory-limit', '4294967296', '--timeout', '600']",cache-disabled,chscase_adopt,,22953,True,"class-count,improvement,pair,one-off",308564459,2,39,2,1,0.48948257899610326,perfect-tree-found,perfect-tree-found,"[2026-06-16T20:42:55Z INFO  codt_cli] Starting solve with options:
+    SolverOptions { lb_strategy: {OneOff, ClassCount, Improvement, Pair}, ub_strategy: ForRemainingInterval, cart_ub: true, cart_ub_patience: 5, cache_max_branch_budget: None, data_reduction: true, track_intermediates: false, timeout: Some(600s), memory_limit: Some(4294967296) }
+    
+[2026-06-16T20:42:55Z INFO  codt::search::solver_impl] One off witnesses: 2
+[2026-06-16T20:42:55Z INFO  codt::search::solver_impl] Pair lower bound: (primary: 0, secondary: 8)
+[2026-06-16T20:42:55Z INFO  codt::search::solver_impl] Root lower bound after pair lower bound: (primary: 0, secondary: 8)
+[2026-06-16T20:42:55Z INFO  codt::search::solver_impl] Final root bounds: lower (primary: 0, secondary: 8), upper (primary: 0, secondary: 8), best (primary: 0, secondary: 8), complete true
+[2026-06-16T20:42:55Z INFO  codt::search::solver_impl] Solution cache: 0 useful hits / 0 lookups (0.0%), 0 entries
+[2026-06-16T20:42:55Z INFO  codt_cli] Read time (s): 0.0000295
+[2026-06-16T20:42:55Z INFO  codt_cli] Solve time (s): 0.468642432
+[2026-06-16T20:42:55Z INFO  codt_cli] Max memory usage (MB): 294.27
+[2026-06-16T20:42:55Z INFO  codt_cli] Graph expansions: 22953
+[2026-06-16T20:42:55Z INFO  codt_cli] Tree: [0<=8.00:1,[1<=5.50:0,[1<=211.00:[0<=16.00:1,[0<=19.00:0,[0<=53.00:[0<=51.50:1,0],[0<=186.50:1,0]]]],0]]]
+","Set parameter WLSAccessID
+Set parameter WLSSecret
+Set parameter LicenseID to value 2781812
+Academic license 2781812 - for non-commercial use only - registered to tt___@tudelft.nl
+Misclassifications: 0. Branch nodes: 8. Accuracy: 100%.
+",and-or-dfs-prio,17,for-remaining-interval,0.48948257899610326,22953,308564459,1.0,1.0,1.0
+8,False,0,0.0,0,3,0,true,"['/home/thoams/Documents/TUDelft/thesis/codt/target/release/codt-cli', '--file', 'data/openml/sampled/chscase_adopt.txt', '--strategy', 'and-or-dfs-prio', '--lowerbound', 'class-count', 'improvement', 'pair', 'one-off', '--upperbound', 'for-remaining-interval', '--cart-upperbound', 'true', '--cart-upper-bound-patience', '5', '--cache', 'false', '--cache-max-branch-budget', '3', '--data-reduction', 'true', '--memory-limit', '4294967296', '--timeout', '600']",cache-disabled,chscase_adopt,,22953,True,"class-count,improvement,pair,one-off",308564459,2,39,2,2,0.5325762729917187,perfect-tree-found,perfect-tree-found,"[2026-06-16T20:42:55Z INFO  codt_cli] Starting solve with options:
+    SolverOptions { lb_strategy: {Pair, ClassCount, Improvement, OneOff}, ub_strategy: ForRemainingInterval, cart_ub: true, cart_ub_patience: 5, cache_max_branch_budget: None, data_reduction: true, track_intermediates: false, timeout: Some(600s), memory_limit: Some(4294967296) }
+    
+[2026-06-16T20:42:55Z INFO  codt::search::solver_impl] One off witnesses: 2
+[2026-06-16T20:42:55Z INFO  codt::search::solver_impl] Pair lower bound: (primary: 0, secondary: 8)
+[2026-06-16T20:42:55Z INFO  codt::search::solver_impl] Root lower bound after pair lower bound: (primary: 0, secondary: 8)
+[2026-06-16T20:42:56Z INFO  codt::search::solver_impl] Final root bounds: lower (primary: 0, secondary: 8), upper (primary: 0, secondary: 8), best (primary: 0, secondary: 8), complete true
+[2026-06-16T20:42:56Z INFO  codt::search::solver_impl] Solution cache: 0 useful hits / 0 lookups (0.0%), 0 entries
+[2026-06-16T20:42:56Z INFO  codt_cli] Read time (s): 0.0000354
+[2026-06-16T20:42:56Z INFO  codt_cli] Solve time (s): 0.512093129
+[2026-06-16T20:42:56Z INFO  codt_cli] Max memory usage (MB): 294.27
+[2026-06-16T20:42:56Z INFO  codt_cli] Graph expansions: 22953
+[2026-06-16T20:42:56Z INFO  codt_cli] Tree: [0<=8.00:1,[1<=5.50:0,[1<=211.00:[0<=16.00:1,[0<=19.00:0,[0<=53.00:[0<=51.50:1,0],[0<=186.50:1,0]]]],0]]]
+","Set parameter WLSAccessID
+Set parameter WLSSecret
+Set parameter LicenseID to value 2781812
+Academic license 2781812 - for non-commercial use only - registered to tt___@tudelft.nl
+Misclassifications: 0. Branch nodes: 8. Accuracy: 100%.
+",and-or-dfs-prio,17,for-remaining-interval,0.5325762729917187,22953,308564459,1.0,1.0,1.0
+8,True,16,0.004,32573,3,116,true,"['/home/thoams/Documents/TUDelft/thesis/codt/target/release/codt-cli', '--file', 'data/openml/sampled/chscase_adopt.txt', '--strategy', 'and-or-dfs-prio', '--lowerbound', 'class-count', 'improvement', 'pair', 'one-off', '--upperbound', 'for-remaining-interval', '--cart-upperbound', 'true', '--cart-upper-bound-patience', '5', '--cache', 'true', '--cache-max-branch-budget', '3', '--data-reduction', 'true', '--memory-limit', '4294967296', '--timeout', '600']",cache-enabled,chscase_adopt,,22690,True,"class-count,improvement,pair,one-off",305093672,2,39,2,2,0.49173688399605453,perfect-tree-found,perfect-tree-found,"[2026-06-16T20:42:56Z INFO  codt_cli] Starting solve with options:
+    SolverOptions { lb_strategy: {Pair, OneOff, ClassCount, Improvement}, ub_strategy: ForRemainingInterval, cart_ub: true, cart_ub_patience: 5, cache_max_branch_budget: Some(3), data_reduction: true, track_intermediates: false, timeout: Some(600s), memory_limit: Some(4294967296) }
+    
+[2026-06-16T20:42:56Z INFO  codt::search::solver_impl] One off witnesses: 2
+[2026-06-16T20:42:56Z INFO  codt::search::solver_impl] Pair lower bound: (primary: 0, secondary: 8)
+[2026-06-16T20:42:56Z INFO  codt::search::solver_impl] Root lower bound after pair lower bound: (primary: 0, secondary: 8)
+[2026-06-16T20:42:56Z INFO  codt::search::solver_impl] Final root bounds: lower (primary: 0, secondary: 8), upper (primary: 0, secondary: 8), best (primary: 0, secondary: 8), complete true
+[2026-06-16T20:42:56Z INFO  codt::search::solver_impl] Solution cache: 116 useful hits / 32573 lookups (0.4%), 16 entries
+[2026-06-16T20:42:56Z INFO  codt_cli] Read time (s): 0.0000283
+[2026-06-16T20:42:56Z INFO  codt_cli] Solve time (s): 0.46789693
+[2026-06-16T20:42:56Z INFO  codt_cli] Max memory usage (MB): 290.96
+[2026-06-16T20:42:56Z INFO  codt_cli] Graph expansions: 22690
+[2026-06-16T20:42:56Z INFO  codt_cli] Tree: [0<=8.00:1,[1<=5.50:0,[1<=211.00:[0<=16.00:1,[0<=19.00:0,[0<=53.00:[0<=51.50:1,0],[0<=186.50:1,0]]]],0]]]
+","Set parameter WLSAccessID
+Set parameter WLSSecret
+Set parameter LicenseID to value 2781812
+Academic license 2781812 - for non-commercial use only - registered to tt___@tudelft.nl
+Misclassifications: 0. Branch nodes: 8. Accuracy: 100%.
+",and-or-dfs-prio,17,for-remaining-interval,0.5325762729917187,22953,308564459,0.923317295443428,0.9885423019952949,0.9887518251089313
+8,True,16,0.004,32573,3,116,true,"['/home/thoams/Documents/TUDelft/thesis/codt/target/release/codt-cli', '--file', 'data/openml/sampled/chscase_adopt.txt', '--strategy', 'and-or-dfs-prio', '--lowerbound', 'class-count', 'improvement', 'pair', 'one-off', '--upperbound', 'for-remaining-interval', '--cart-upperbound', 'true', '--cart-upper-bound-patience', '5', '--cache', 'true', '--cache-max-branch-budget', '3', '--data-reduction', 'true', '--memory-limit', '4294967296', '--timeout', '600']",cache-enabled,chscase_adopt,,22690,True,"class-count,improvement,pair,one-off",305093672,2,39,2,3,0.5088422220142093,perfect-tree-found,perfect-tree-found,"[2026-06-16T20:42:56Z INFO  codt_cli] Starting solve with options:
+    SolverOptions { lb_strategy: {OneOff, Pair, Improvement, ClassCount}, ub_strategy: ForRemainingInterval, cart_ub: true, cart_ub_patience: 5, cache_max_branch_budget: Some(3), data_reduction: true, track_intermediates: false, timeout: Some(600s), memory_limit: Some(4294967296) }
+    
+[2026-06-16T20:42:56Z INFO  codt::search::solver_impl] One off witnesses: 2
+[2026-06-16T20:42:56Z INFO  codt::search::solver_impl] Pair lower bound: (primary: 0, secondary: 8)
+[2026-06-16T20:42:56Z INFO  codt::search::solver_impl] Root lower bound after pair lower bound: (primary: 0, secondary: 8)
+[2026-06-16T20:42:57Z INFO  codt::search::solver_impl] Final root bounds: lower (primary: 0, secondary: 8), upper (primary: 0, secondary: 8), best (primary: 0, secondary: 8), complete true
+[2026-06-16T20:42:57Z INFO  codt::search::solver_impl] Solution cache: 116 useful hits / 32573 lookups (0.4%), 16 entries
+[2026-06-16T20:42:57Z INFO  codt_cli] Read time (s): 0.0000296
+[2026-06-16T20:42:57Z INFO  codt_cli] Solve time (s): 0.489810281
+[2026-06-16T20:42:57Z INFO  codt_cli] Max memory usage (MB): 290.96
+[2026-06-16T20:42:57Z INFO  codt_cli] Graph expansions: 22690
+[2026-06-16T20:42:57Z INFO  codt_cli] Tree: [0<=8.00:1,[1<=5.50:0,[1<=211.00:[0<=16.00:1,[0<=19.00:0,[0<=53.00:[0<=51.50:1,0],[0<=186.50:1,0]]]],0]]]
+","Set parameter WLSAccessID
+Set parameter WLSSecret
+Set parameter LicenseID to value 2781812
+Academic license 2781812 - for non-commercial use only - registered to tt___@tudelft.nl
+Misclassifications: 0. Branch nodes: 8. Accuracy: 100%.
+",and-or-dfs-prio,17,for-remaining-interval,0.5067316179920454,22953,308564459,1.0041651318907774,0.9885423019952949,0.9887518251089313
+8,False,0,0.0,0,3,0,true,"['/home/thoams/Documents/TUDelft/thesis/codt/target/release/codt-cli', '--file', 'data/openml/sampled/chscase_adopt.txt', '--strategy', 'and-or-dfs-prio', '--lowerbound', 'class-count', 'improvement', 'pair', 'one-off', '--upperbound', 'for-remaining-interval', '--cart-upperbound', 'true', '--cart-upper-bound-patience', '5', '--cache', 'false', '--cache-max-branch-budget', '3', '--data-reduction', 'true', '--memory-limit', '4294967296', '--timeout', '600']",cache-disabled,chscase_adopt,,22953,True,"class-count,improvement,pair,one-off",308564459,2,39,2,3,0.5067316179920454,perfect-tree-found,perfect-tree-found,"[2026-06-16T20:42:57Z INFO  codt_cli] Starting solve with options:
+    SolverOptions { lb_strategy: {ClassCount, Pair, OneOff, Improvement}, ub_strategy: ForRemainingInterval, cart_ub: true, cart_ub_patience: 5, cache_max_branch_budget: None, data_reduction: true, track_intermediates: false, timeout: Some(600s), memory_limit: Some(4294967296) }
+    
+[2026-06-16T20:42:57Z INFO  codt::search::solver_impl] One off witnesses: 2
+[2026-06-16T20:42:57Z INFO  codt::search::solver_impl] Pair lower bound: (primary: 0, secondary: 8)
+[2026-06-16T20:42:57Z INFO  codt::search::solver_impl] Root lower bound after pair lower bound: (primary: 0, secondary: 8)
+[2026-06-16T20:42:57Z INFO  codt::search::solver_impl] Final root bounds: lower (primary: 0, secondary: 8), upper (primary: 0, secondary: 8), best (primary: 0, secondary: 8), complete true
+[2026-06-16T20:42:57Z INFO  codt::search::solver_impl] Solution cache: 0 useful hits / 0 lookups (0.0%), 0 entries
+[2026-06-16T20:42:57Z INFO  codt_cli] Read time (s): 0.0000236
+[2026-06-16T20:42:57Z INFO  codt_cli] Solve time (s): 0.488030376
+[2026-06-16T20:42:57Z INFO  codt_cli] Max memory usage (MB): 294.27
+[2026-06-16T20:42:57Z INFO  codt_cli] Graph expansions: 22953
+[2026-06-16T20:42:57Z INFO  codt_cli] Tree: [0<=8.00:1,[1<=5.50:0,[1<=211.00:[0<=16.00:1,[0<=19.00:0,[0<=53.00:[0<=51.50:1,0],[0<=186.50:1,0]]]],0]]]
+","Set parameter WLSAccessID
+Set parameter WLSSecret
+Set parameter LicenseID to value 2781812
+Academic license 2781812 - for non-commercial use only - registered to tt___@tudelft.nl
+Misclassifications: 0. Branch nodes: 8. Accuracy: 100%.
+",and-or-dfs-prio,17,for-remaining-interval,0.5067316179920454,22953,308564459,1.0,1.0,1.0
+8,False,0,0.0,0,3,0,true,"['/home/thoams/Documents/TUDelft/thesis/codt/target/release/codt-cli', '--file', 'data/openml/sampled/chscase_adopt.txt', '--strategy', 'and-or-dfs-prio', '--lowerbound', 'class-count', 'improvement', 'pair', 'one-off', '--upperbound', 'for-remaining-interval', '--cart-upperbound', 'true', '--cart-upper-bound-patience', '5', '--cache', 'false', '--cache-max-branch-budget', '3', '--data-reduction', 'true', '--memory-limit', '4294967296', '--timeout', '600']",cache-disabled,chscase_adopt,,22953,True,"class-count,improvement,pair,one-off",308564459,2,39,2,4,0.46826263301772997,perfect-tree-found,perfect-tree-found,"[2026-06-16T20:42:57Z INFO  codt_cli] Starting solve with options:
+    SolverOptions { lb_strategy: {ClassCount, Pair, Improvement, OneOff}, ub_strategy: ForRemainingInterval, cart_ub: true, cart_ub_patience: 5, cache_max_branch_budget: None, data_reduction: true, track_intermediates: false, timeout: Some(600s), memory_limit: Some(4294967296) }
+    
+[2026-06-16T20:42:57Z INFO  codt::search::solver_impl] One off witnesses: 2
+[2026-06-16T20:42:57Z INFO  codt::search::solver_impl] Pair lower bound: (primary: 0, secondary: 8)
+[2026-06-16T20:42:57Z INFO  codt::search::solver_impl] Root lower bound after pair lower bound: (primary: 0, secondary: 8)
+[2026-06-16T20:42:58Z INFO  codt::search::solver_impl] Final root bounds: lower (primary: 0, secondary: 8), upper (primary: 0, secondary: 8), best (primary: 0, secondary: 8), complete true
+[2026-06-16T20:42:58Z INFO  codt::search::solver_impl] Solution cache: 0 useful hits / 0 lookups (0.0%), 0 entries
+[2026-06-16T20:42:58Z INFO  codt_cli] Read time (s): 0.000027
+[2026-06-16T20:42:58Z INFO  codt_cli] Solve time (s): 0.449205491
+[2026-06-16T20:42:58Z INFO  codt_cli] Max memory usage (MB): 294.27
+[2026-06-16T20:42:58Z INFO  codt_cli] Graph expansions: 22953
+[2026-06-16T20:42:58Z INFO  codt_cli] Tree: [0<=8.00:1,[1<=5.50:0,[1<=211.00:[0<=16.00:1,[0<=19.00:0,[0<=53.00:[0<=51.50:1,0],[0<=186.50:1,0]]]],0]]]
+","Set parameter WLSAccessID
+Set parameter WLSSecret
+Set parameter LicenseID to value 2781812
+Academic license 2781812 - for non-commercial use only - registered to tt___@tudelft.nl
+Misclassifications: 0. Branch nodes: 8. Accuracy: 100%.
+",and-or-dfs-prio,17,for-remaining-interval,0.46826263301772997,22953,308564459,1.0,1.0,1.0
+8,True,16,0.004,32573,3,116,true,"['/home/thoams/Documents/TUDelft/thesis/codt/target/release/codt-cli', '--file', 'data/openml/sampled/chscase_adopt.txt', '--strategy', 'and-or-dfs-prio', '--lowerbound', 'class-count', 'improvement', 'pair', 'one-off', '--upperbound', 'for-remaining-interval', '--cart-upperbound', 'true', '--cart-upper-bound-patience', '5', '--cache', 'true', '--cache-max-branch-budget', '3', '--data-reduction', 'true', '--memory-limit', '4294967296', '--timeout', '600']",cache-enabled,chscase_adopt,,22690,True,"class-count,improvement,pair,one-off",305093672,2,39,2,4,0.4916291840199847,perfect-tree-found,perfect-tree-found,"[2026-06-16T20:42:58Z INFO  codt_cli] Starting solve with options:
+    SolverOptions { lb_strategy: {Pair, OneOff, ClassCount, Improvement}, ub_strategy: ForRemainingInterval, cart_ub: true, cart_ub_patience: 5, cache_max_branch_budget: Some(3), data_reduction: true, track_intermediates: false, timeout: Some(600s), memory_limit: Some(4294967296) }
+    
+[2026-06-16T20:42:58Z INFO  codt::search::solver_impl] One off witnesses: 2
+[2026-06-16T20:42:58Z INFO  codt::search::solver_impl] Pair lower bound: (primary: 0, secondary: 8)
+[2026-06-16T20:42:58Z INFO  codt::search::solver_impl] Root lower bound after pair lower bound: (primary: 0, secondary: 8)
+[2026-06-16T20:42:58Z INFO  codt::search::solver_impl] Final root bounds: lower (primary: 0, secondary: 8), upper (primary: 0, secondary: 8), best (primary: 0, secondary: 8), complete true
+[2026-06-16T20:42:58Z INFO  codt::search::solver_impl] Solution cache: 116 useful hits / 32573 lookups (0.4%), 16 entries
+[2026-06-16T20:42:58Z INFO  codt_cli] Read time (s): 0.0000277
+[2026-06-16T20:42:58Z INFO  codt_cli] Solve time (s): 0.472344142
+[2026-06-16T20:42:58Z INFO  codt_cli] Max memory usage (MB): 290.96
+[2026-06-16T20:42:58Z INFO  codt_cli] Graph expansions: 22690
+[2026-06-16T20:42:58Z INFO  codt_cli] Tree: [0<=8.00:1,[1<=5.50:0,[1<=211.00:[0<=16.00:1,[0<=19.00:0,[0<=53.00:[0<=51.50:1,0],[0<=186.50:1,0]]]],0]]]
+","Set parameter WLSAccessID
+Set parameter WLSSecret
+Set parameter LicenseID to value 2781812
+Academic license 2781812 - for non-commercial use only - registered to tt___@tudelft.nl
+Misclassifications: 0. Branch nodes: 8. Accuracy: 100%.
+",and-or-dfs-prio,17,for-remaining-interval,0.46826263301772997,22953,308564459,1.049900524523318,0.9885423019952949,0.9887518251089313
+2,True,0,0.0,0,3,0,true,"['/home/thoams/Documents/TUDelft/thesis/codt/target/release/codt-cli', '--file', 'data/openml/sampled/divorce_prediction.txt', '--strategy', 'and-or-dfs-prio', '--lowerbound', 'class-count', 'improvement', 'pair', 'one-off', '--upperbound', 'for-remaining-interval', '--cart-upperbound', 'true', '--cart-upper-bound-patience', '5', '--cache', 'true', '--cache-max-branch-budget', '3', '--data-reduction', 'true', '--memory-limit', '4294967296', '--timeout', '600']",cache-enabled,divorce_prediction,,0,True,"class-count,improvement,pair,one-off",492830,2,100,54,0,0.04148619098123163,perfect-tree-found,perfect-tree-found,"[2026-06-16T20:41:28Z INFO  codt_cli] Starting solve with options:
+    SolverOptions { lb_strategy: {ClassCount, Improvement, Pair, OneOff}, ub_strategy: ForRemainingInterval, cart_ub: true, cart_ub_patience: 5, cache_max_branch_budget: Some(3), data_reduction: true, track_intermediates: false, timeout: Some(600s), memory_limit: Some(4294967296) }
+    
+[2026-06-16T20:41:28Z INFO  codt::search::solver_impl] One off witnesses: 0
+[2026-06-16T20:41:28Z INFO  codt::search::solver_impl] Pair lower bound: (primary: 0, secondary: 2)
+[2026-06-16T20:41:28Z INFO  codt::search::solver_impl] Root lower bound after pair lower bound: (primary: 0, secondary: 2)
+[2026-06-16T20:41:28Z INFO  codt::search::solver_impl] Final root bounds: lower (primary: 0, secondary: 2), upper (primary: 0, secondary: 2), best (primary: 0, secondary: 2), complete true
+[2026-06-16T20:41:28Z INFO  codt::search::solver_impl] Solution cache: 0 useful hits / 0 lookups (0.0%), 0 entries
+[2026-06-16T20:41:28Z INFO  codt_cli] Read time (s): 0.0003019
+[2026-06-16T20:41:28Z INFO  codt_cli] Solve time (s): 0.037890184
+[2026-06-16T20:41:28Z INFO  codt_cli] Max memory usage (MB): 0.47
+[2026-06-16T20:41:28Z INFO  codt_cli] Graph expansions: 0
+[2026-06-16T20:41:28Z INFO  codt_cli] Tree: [39<=0.50:[10<=0.50:0,1],1]
+","Set parameter WLSAccessID
+Set parameter WLSSecret
+Set parameter LicenseID to value 2781812
+Academic license 2781812 - for non-commercial use only - registered to tt___@tudelft.nl
+Misclassifications: 0. Branch nodes: 2. Accuracy: 100%.
+",and-or-dfs-prio,5,for-remaining-interval,0.04076558901579119,0,492830,1.017676721539858,1.0,1.0
+2,False,0,0.0,0,3,0,true,"['/home/thoams/Documents/TUDelft/thesis/codt/target/release/codt-cli', '--file', 'data/openml/sampled/divorce_prediction.txt', '--strategy', 'and-or-dfs-prio', '--lowerbound', 'class-count', 'improvement', 'pair', 'one-off', '--upperbound', 'for-remaining-interval', '--cart-upperbound', 'true', '--cart-upper-bound-patience', '5', '--cache', 'false', '--cache-max-branch-budget', '3', '--data-reduction', 'true', '--memory-limit', '4294967296', '--timeout', '600']",cache-disabled,divorce_prediction,,0,True,"class-count,improvement,pair,one-off",492830,2,100,54,0,0.04076558901579119,perfect-tree-found,perfect-tree-found,"[2026-06-16T20:41:28Z INFO  codt_cli] Starting solve with options:
+    SolverOptions { lb_strategy: {ClassCount, OneOff, Improvement, Pair}, ub_strategy: ForRemainingInterval, cart_ub: true, cart_ub_patience: 5, cache_max_branch_budget: None, data_reduction: true, track_intermediates: false, timeout: Some(600s), memory_limit: Some(4294967296) }
+    
+[2026-06-16T20:41:28Z INFO  codt::search::solver_impl] One off witnesses: 0
+[2026-06-16T20:41:28Z INFO  codt::search::solver_impl] Pair lower bound: (primary: 0, secondary: 2)
+[2026-06-16T20:41:28Z INFO  codt::search::solver_impl] Root lower bound after pair lower bound: (primary: 0, secondary: 2)
+[2026-06-16T20:41:28Z INFO  codt::search::solver_impl] Final root bounds: lower (primary: 0, secondary: 2), upper (primary: 0, secondary: 2), best (primary: 0, secondary: 2), complete true
+[2026-06-16T20:41:28Z INFO  codt::search::solver_impl] Solution cache: 0 useful hits / 0 lookups (0.0%), 0 entries
+[2026-06-16T20:41:28Z INFO  codt_cli] Read time (s): 0.0002767
+[2026-06-16T20:41:28Z INFO  codt_cli] Solve time (s): 0.037343783
+[2026-06-16T20:41:28Z INFO  codt_cli] Max memory usage (MB): 0.47
+[2026-06-16T20:41:28Z INFO  codt_cli] Graph expansions: 0
+[2026-06-16T20:41:28Z INFO  codt_cli] Tree: [39<=0.50:[10<=0.50:0,1],1]
+","Set parameter WLSAccessID
+Set parameter WLSSecret
+Set parameter LicenseID to value 2781812
+Academic license 2781812 - for non-commercial use only - registered to tt___@tudelft.nl
+Misclassifications: 0. Branch nodes: 2. Accuracy: 100%.
+",and-or-dfs-prio,5,for-remaining-interval,0.04076558901579119,0,492830,1.0,1.0,1.0
+2,False,0,0.0,0,3,0,true,"['/home/thoams/Documents/TUDelft/thesis/codt/target/release/codt-cli', '--file', 'data/openml/sampled/divorce_prediction.txt', '--strategy', 'and-or-dfs-prio', '--lowerbound', 'class-count', 'improvement', 'pair', 'one-off', '--upperbound', 'for-remaining-interval', '--cart-upperbound', 'true', '--cart-upper-bound-patience', '5', '--cache', 'false', '--cache-max-branch-budget', '3', '--data-reduction', 'true', '--memory-limit', '4294967296', '--timeout', '600']",cache-disabled,divorce_prediction,,0,True,"class-count,improvement,pair,one-off",492830,2,100,54,1,0.04044168899417855,perfect-tree-found,perfect-tree-found,"[2026-06-16T20:42:58Z INFO  codt_cli] Starting solve with options:
+    SolverOptions { lb_strategy: {ClassCount, Pair, Improvement, OneOff}, ub_strategy: ForRemainingInterval, cart_ub: true, cart_ub_patience: 5, cache_max_branch_budget: None, data_reduction: true, track_intermediates: false, timeout: Some(600s), memory_limit: Some(4294967296) }
+    
+[2026-06-16T20:42:58Z INFO  codt::search::solver_impl] One off witnesses: 0
+[2026-06-16T20:42:58Z INFO  codt::search::solver_impl] Pair lower bound: (primary: 0, secondary: 2)
+[2026-06-16T20:42:58Z INFO  codt::search::solver_impl] Root lower bound after pair lower bound: (primary: 0, secondary: 2)
+[2026-06-16T20:42:58Z INFO  codt::search::solver_impl] Final root bounds: lower (primary: 0, secondary: 2), upper (primary: 0, secondary: 2), best (primary: 0, secondary: 2), complete true
+[2026-06-16T20:42:58Z INFO  codt::search::solver_impl] Solution cache: 0 useful hits / 0 lookups (0.0%), 0 entries
+[2026-06-16T20:42:58Z INFO  codt_cli] Read time (s): 0.0002668
+[2026-06-16T20:42:58Z INFO  codt_cli] Solve time (s): 0.037459383
+[2026-06-16T20:42:58Z INFO  codt_cli] Max memory usage (MB): 0.47
+[2026-06-16T20:42:58Z INFO  codt_cli] Graph expansions: 0
+[2026-06-16T20:42:58Z INFO  codt_cli] Tree: [39<=0.50:[10<=0.50:0,1],1]
+","Set parameter WLSAccessID
+Set parameter WLSSecret
+Set parameter LicenseID to value 2781812
+Academic license 2781812 - for non-commercial use only - registered to tt___@tudelft.nl
+Misclassifications: 0. Branch nodes: 2. Accuracy: 100%.
+",and-or-dfs-prio,5,for-remaining-interval,0.04044168899417855,0,492830,1.0,1.0,1.0
+2,True,0,0.0,0,3,0,true,"['/home/thoams/Documents/TUDelft/thesis/codt/target/release/codt-cli', '--file', 'data/openml/sampled/divorce_prediction.txt', '--strategy', 'and-or-dfs-prio', '--lowerbound', 'class-count', 'improvement', 'pair', 'one-off', '--upperbound', 'for-remaining-interval', '--cart-upperbound', 'true', '--cart-upper-bound-patience', '5', '--cache', 'true', '--cache-max-branch-budget', '3', '--data-reduction', 'true', '--memory-limit', '4294967296', '--timeout', '600']",cache-enabled,divorce_prediction,,0,True,"class-count,improvement,pair,one-off",492830,2,100,54,1,0.041562691010767594,perfect-tree-found,perfect-tree-found,"[2026-06-16T20:42:58Z INFO  codt_cli] Starting solve with options:
+    SolverOptions { lb_strategy: {ClassCount, Improvement, Pair, OneOff}, ub_strategy: ForRemainingInterval, cart_ub: true, cart_ub_patience: 5, cache_max_branch_budget: Some(3), data_reduction: true, track_intermediates: false, timeout: Some(600s), memory_limit: Some(4294967296) }
+    
+[2026-06-16T20:42:58Z INFO  codt::search::solver_impl] One off witnesses: 0
+[2026-06-16T20:42:58Z INFO  codt::search::solver_impl] Pair lower bound: (primary: 0, secondary: 2)
+[2026-06-16T20:42:58Z INFO  codt::search::solver_impl] Root lower bound after pair lower bound: (primary: 0, secondary: 2)
+[2026-06-16T20:42:58Z INFO  codt::search::solver_impl] Final root bounds: lower (primary: 0, secondary: 2), upper (primary: 0, secondary: 2), best (primary: 0, secondary: 2), complete true
+[2026-06-16T20:42:58Z INFO  codt::search::solver_impl] Solution cache: 0 useful hits / 0 lookups (0.0%), 0 entries
+[2026-06-16T20:42:58Z INFO  codt_cli] Read time (s): 0.000241201
+[2026-06-16T20:42:58Z INFO  codt_cli] Solve time (s): 0.038641485
+[2026-06-16T20:42:58Z INFO  codt_cli] Max memory usage (MB): 0.47
+[2026-06-16T20:42:58Z INFO  codt_cli] Graph expansions: 0
+[2026-06-16T20:42:58Z INFO  codt_cli] Tree: [39<=0.50:[10<=0.50:0,1],1]
+","Set parameter WLSAccessID
+Set parameter WLSSecret
+Set parameter LicenseID to value 2781812
+Academic license 2781812 - for non-commercial use only - registered to tt___@tudelft.nl
+Misclassifications: 0. Branch nodes: 2. Accuracy: 100%.
+",and-or-dfs-prio,5,for-remaining-interval,0.04044168899417855,0,492830,1.0277189713008874,1.0,1.0
+2,True,0,0.0,0,3,0,true,"['/home/thoams/Documents/TUDelft/thesis/codt/target/release/codt-cli', '--file', 'data/openml/sampled/divorce_prediction.txt', '--strategy', 'and-or-dfs-prio', '--lowerbound', 'class-count', 'improvement', 'pair', 'one-off', '--upperbound', 'for-remaining-interval', '--cart-upperbound', 'true', '--cart-upper-bound-patience', '5', '--cache', 'true', '--cache-max-branch-budget', '3', '--data-reduction', 'true', '--memory-limit', '4294967296', '--timeout', '600']",cache-enabled,divorce_prediction,,0,True,"class-count,improvement,pair,one-off",492830,2,100,54,2,0.043472095974721014,perfect-tree-found,perfect-tree-found,"[2026-06-16T20:42:58Z INFO  codt_cli] Starting solve with options:
+    SolverOptions { lb_strategy: {Pair, Improvement, ClassCount, OneOff}, ub_strategy: ForRemainingInterval, cart_ub: true, cart_ub_patience: 5, cache_max_branch_budget: Some(3), data_reduction: true, track_intermediates: false, timeout: Some(600s), memory_limit: Some(4294967296) }
+    
+[2026-06-16T20:42:58Z INFO  codt::search::solver_impl] One off witnesses: 0
+[2026-06-16T20:42:58Z INFO  codt::search::solver_impl] Pair lower bound: (primary: 0, secondary: 2)
+[2026-06-16T20:42:58Z INFO  codt::search::solver_impl] Root lower bound after pair lower bound: (primary: 0, secondary: 2)
+[2026-06-16T20:42:58Z INFO  codt::search::solver_impl] Final root bounds: lower (primary: 0, secondary: 2), upper (primary: 0, secondary: 2), best (primary: 0, secondary: 2), complete true
+[2026-06-16T20:42:58Z INFO  codt::search::solver_impl] Solution cache: 0 useful hits / 0 lookups (0.0%), 0 entries
+[2026-06-16T20:42:58Z INFO  codt_cli] Read time (s): 0.000311601
+[2026-06-16T20:42:58Z INFO  codt_cli] Solve time (s): 0.040399389
+[2026-06-16T20:42:58Z INFO  codt_cli] Max memory usage (MB): 0.47
+[2026-06-16T20:42:58Z INFO  codt_cli] Graph expansions: 0
+[2026-06-16T20:42:58Z INFO  codt_cli] Tree: [39<=0.50:[10<=0.50:0,1],1]
+","Set parameter WLSAccessID
+Set parameter WLSSecret
+Set parameter LicenseID to value 2781812
+Academic license 2781812 - for non-commercial use only - registered to tt___@tudelft.nl
+Misclassifications: 0. Branch nodes: 2. Accuracy: 100%.
+",and-or-dfs-prio,5,for-remaining-interval,0.040714389993809164,0,492830,1.067732955874598,1.0,1.0
+2,False,0,0.0,0,3,0,true,"['/home/thoams/Documents/TUDelft/thesis/codt/target/release/codt-cli', '--file', 'data/openml/sampled/divorce_prediction.txt', '--strategy', 'and-or-dfs-prio', '--lowerbound', 'class-count', 'improvement', 'pair', 'one-off', '--upperbound', 'for-remaining-interval', '--cart-upperbound', 'true', '--cart-upper-bound-patience', '5', '--cache', 'false', '--cache-max-branch-budget', '3', '--data-reduction', 'true', '--memory-limit', '4294967296', '--timeout', '600']",cache-disabled,divorce_prediction,,0,True,"class-count,improvement,pair,one-off",492830,2,100,54,2,0.040714389993809164,perfect-tree-found,perfect-tree-found,"[2026-06-16T20:42:58Z INFO  codt_cli] Starting solve with options:
+    SolverOptions { lb_strategy: {Pair, ClassCount, OneOff, Improvement}, ub_strategy: ForRemainingInterval, cart_ub: true, cart_ub_patience: 5, cache_max_branch_budget: None, data_reduction: true, track_intermediates: false, timeout: Some(600s), memory_limit: Some(4294967296) }
+    
+[2026-06-16T20:42:58Z INFO  codt::search::solver_impl] One off witnesses: 0
+[2026-06-16T20:42:58Z INFO  codt::search::solver_impl] Pair lower bound: (primary: 0, secondary: 2)
+[2026-06-16T20:42:58Z INFO  codt::search::solver_impl] Root lower bound after pair lower bound: (primary: 0, secondary: 2)
+[2026-06-16T20:42:58Z INFO  codt::search::solver_impl] Final root bounds: lower (primary: 0, secondary: 2), upper (primary: 0, secondary: 2), best (primary: 0, secondary: 2), complete true
+[2026-06-16T20:42:58Z INFO  codt::search::solver_impl] Solution cache: 0 useful hits / 0 lookups (0.0%), 0 entries
+[2026-06-16T20:42:58Z INFO  codt_cli] Read time (s): 0.000307301
+[2026-06-16T20:42:58Z INFO  codt_cli] Solve time (s): 0.037495983
+[2026-06-16T20:42:58Z INFO  codt_cli] Max memory usage (MB): 0.47
+[2026-06-16T20:42:58Z INFO  codt_cli] Graph expansions: 0
+[2026-06-16T20:42:58Z INFO  codt_cli] Tree: [39<=0.50:[10<=0.50:0,1],1]
+","Set parameter WLSAccessID
+Set parameter WLSSecret
+Set parameter LicenseID to value 2781812
+Academic license 2781812 - for non-commercial use only - registered to tt___@tudelft.nl
+Misclassifications: 0. Branch nodes: 2. Accuracy: 100%.
+",and-or-dfs-prio,5,for-remaining-interval,0.040714389993809164,0,492830,1.0,1.0,1.0
+2,False,0,0.0,0,3,0,true,"['/home/thoams/Documents/TUDelft/thesis/codt/target/release/codt-cli', '--file', 'data/openml/sampled/divorce_prediction.txt', '--strategy', 'and-or-dfs-prio', '--lowerbound', 'class-count', 'improvement', 'pair', 'one-off', '--upperbound', 'for-remaining-interval', '--cart-upperbound', 'true', '--cart-upper-bound-patience', '5', '--cache', 'false', '--cache-max-branch-budget', '3', '--data-reduction', 'true', '--memory-limit', '4294967296', '--timeout', '600']",cache-disabled,divorce_prediction,,0,True,"class-count,improvement,pair,one-off",492830,2,100,54,3,0.04071468999609351,perfect-tree-found,perfect-tree-found,"[2026-06-16T20:42:58Z INFO  codt_cli] Starting solve with options:
+    SolverOptions { lb_strategy: {ClassCount, Pair, OneOff, Improvement}, ub_strategy: ForRemainingInterval, cart_ub: true, cart_ub_patience: 5, cache_max_branch_budget: None, data_reduction: true, track_intermediates: false, timeout: Some(600s), memory_limit: Some(4294967296) }
+    
+[2026-06-16T20:42:58Z INFO  codt::search::solver_impl] One off witnesses: 0
+[2026-06-16T20:42:58Z INFO  codt::search::solver_impl] Pair lower bound: (primary: 0, secondary: 2)
+[2026-06-16T20:42:58Z INFO  codt::search::solver_impl] Root lower bound after pair lower bound: (primary: 0, secondary: 2)
+[2026-06-16T20:42:58Z INFO  codt::search::solver_impl] Final root bounds: lower (primary: 0, secondary: 2), upper (primary: 0, secondary: 2), best (primary: 0, secondary: 2), complete true
+[2026-06-16T20:42:58Z INFO  codt::search::solver_impl] Solution cache: 0 useful hits / 0 lookups (0.0%), 0 entries
+[2026-06-16T20:42:58Z INFO  codt_cli] Read time (s): 0.0002421
+[2026-06-16T20:42:58Z INFO  codt_cli] Solve time (s): 0.037683984
+[2026-06-16T20:42:58Z INFO  codt_cli] Max memory usage (MB): 0.47
+[2026-06-16T20:42:58Z INFO  codt_cli] Graph expansions: 0
+[2026-06-16T20:42:58Z INFO  codt_cli] Tree: [39<=0.50:[10<=0.50:0,1],1]
+","Set parameter WLSAccessID
+Set parameter WLSSecret
+Set parameter LicenseID to value 2781812
+Academic license 2781812 - for non-commercial use only - registered to tt___@tudelft.nl
+Misclassifications: 0. Branch nodes: 2. Accuracy: 100%.
+",and-or-dfs-prio,5,for-remaining-interval,0.04071468999609351,0,492830,1.0,1.0,1.0
+2,True,0,0.0,0,3,0,true,"['/home/thoams/Documents/TUDelft/thesis/codt/target/release/codt-cli', '--file', 'data/openml/sampled/divorce_prediction.txt', '--strategy', 'and-or-dfs-prio', '--lowerbound', 'class-count', 'improvement', 'pair', 'one-off', '--upperbound', 'for-remaining-interval', '--cart-upperbound', 'true', '--cart-upper-bound-patience', '5', '--cache', 'true', '--cache-max-branch-budget', '3', '--data-reduction', 'true', '--memory-limit', '4294967296', '--timeout', '600']",cache-enabled,divorce_prediction,,0,True,"class-count,improvement,pair,one-off",492830,2,100,54,3,0.04123859098763205,perfect-tree-found,perfect-tree-found,"[2026-06-16T20:42:58Z INFO  codt_cli] Starting solve with options:
+    SolverOptions { lb_strategy: {ClassCount, OneOff, Pair, Improvement}, ub_strategy: ForRemainingInterval, cart_ub: true, cart_ub_patience: 5, cache_max_branch_budget: Some(3), data_reduction: true, track_intermediates: false, timeout: Some(600s), memory_limit: Some(4294967296) }
+    
+[2026-06-16T20:42:58Z INFO  codt::search::solver_impl] One off witnesses: 0
+[2026-06-16T20:42:58Z INFO  codt::search::solver_impl] Pair lower bound: (primary: 0, secondary: 2)
+[2026-06-16T20:42:58Z INFO  codt::search::solver_impl] Root lower bound after pair lower bound: (primary: 0, secondary: 2)
+[2026-06-16T20:42:58Z INFO  codt::search::solver_impl] Final root bounds: lower (primary: 0, secondary: 2), upper (primary: 0, secondary: 2), best (primary: 0, secondary: 2), complete true
+[2026-06-16T20:42:58Z INFO  codt::search::solver_impl] Solution cache: 0 useful hits / 0 lookups (0.0%), 0 entries
+[2026-06-16T20:42:58Z INFO  codt_cli] Read time (s): 0.000298601
+[2026-06-16T20:42:58Z INFO  codt_cli] Solve time (s): 0.038170684
+[2026-06-16T20:42:58Z INFO  codt_cli] Max memory usage (MB): 0.47
+[2026-06-16T20:42:58Z INFO  codt_cli] Graph expansions: 0
+[2026-06-16T20:42:58Z INFO  codt_cli] Tree: [39<=0.50:[10<=0.50:0,1],1]
+","Set parameter WLSAccessID
+Set parameter WLSSecret
+Set parameter LicenseID to value 2781812
+Academic license 2781812 - for non-commercial use only - registered to tt___@tudelft.nl
+Misclassifications: 0. Branch nodes: 2. Accuracy: 100%.
+",and-or-dfs-prio,5,for-remaining-interval,0.04071468999609351,0,492830,1.0128676158798902,1.0,1.0
+2,True,0,0.0,0,3,0,true,"['/home/thoams/Documents/TUDelft/thesis/codt/target/release/codt-cli', '--file', 'data/openml/sampled/divorce_prediction.txt', '--strategy', 'and-or-dfs-prio', '--lowerbound', 'class-count', 'improvement', 'pair', 'one-off', '--upperbound', 'for-remaining-interval', '--cart-upperbound', 'true', '--cart-upper-bound-patience', '5', '--cache', 'true', '--cache-max-branch-budget', '3', '--data-reduction', 'true', '--memory-limit', '4294967296', '--timeout', '600']",cache-enabled,divorce_prediction,,0,True,"class-count,improvement,pair,one-off",492830,2,100,54,4,0.040845890005584806,perfect-tree-found,perfect-tree-found,"[2026-06-16T20:42:58Z INFO  codt_cli] Starting solve with options:
+    SolverOptions { lb_strategy: {Improvement, ClassCount, Pair, OneOff}, ub_strategy: ForRemainingInterval, cart_ub: true, cart_ub_patience: 5, cache_max_branch_budget: Some(3), data_reduction: true, track_intermediates: false, timeout: Some(600s), memory_limit: Some(4294967296) }
+    
+[2026-06-16T20:42:58Z INFO  codt::search::solver_impl] One off witnesses: 0
+[2026-06-16T20:42:58Z INFO  codt::search::solver_impl] Pair lower bound: (primary: 0, secondary: 2)
+[2026-06-16T20:42:58Z INFO  codt::search::solver_impl] Root lower bound after pair lower bound: (primary: 0, secondary: 2)
+[2026-06-16T20:42:58Z INFO  codt::search::solver_impl] Final root bounds: lower (primary: 0, secondary: 2), upper (primary: 0, secondary: 2), best (primary: 0, secondary: 2), complete true
+[2026-06-16T20:42:58Z INFO  codt::search::solver_impl] Solution cache: 0 useful hits / 0 lookups (0.0%), 0 entries
+[2026-06-16T20:42:58Z INFO  codt_cli] Read time (s): 0.0002519
+[2026-06-16T20:42:58Z INFO  codt_cli] Solve time (s): 0.037736183
+[2026-06-16T20:42:58Z INFO  codt_cli] Max memory usage (MB): 0.47
+[2026-06-16T20:42:58Z INFO  codt_cli] Graph expansions: 0
+[2026-06-16T20:42:58Z INFO  codt_cli] Tree: [39<=0.50:[10<=0.50:0,1],1]
+","Set parameter WLSAccessID
+Set parameter WLSSecret
+Set parameter LicenseID to value 2781812
+Academic license 2781812 - for non-commercial use only - registered to tt___@tudelft.nl
+Misclassifications: 0. Branch nodes: 2. Accuracy: 100%.
+",and-or-dfs-prio,5,for-remaining-interval,0.03915918598067947,0,492830,1.0430730103975485,1.0,1.0
+2,False,0,0.0,0,3,0,true,"['/home/thoams/Documents/TUDelft/thesis/codt/target/release/codt-cli', '--file', 'data/openml/sampled/divorce_prediction.txt', '--strategy', 'and-or-dfs-prio', '--lowerbound', 'class-count', 'improvement', 'pair', 'one-off', '--upperbound', 'for-remaining-interval', '--cart-upperbound', 'true', '--cart-upper-bound-patience', '5', '--cache', 'false', '--cache-max-branch-budget', '3', '--data-reduction', 'true', '--memory-limit', '4294967296', '--timeout', '600']",cache-disabled,divorce_prediction,,0,True,"class-count,improvement,pair,one-off",492830,2,100,54,4,0.03915918598067947,perfect-tree-found,perfect-tree-found,"[2026-06-16T20:42:58Z INFO  codt_cli] Starting solve with options:
+    SolverOptions { lb_strategy: {OneOff, Pair, Improvement, ClassCount}, ub_strategy: ForRemainingInterval, cart_ub: true, cart_ub_patience: 5, cache_max_branch_budget: None, data_reduction: true, track_intermediates: false, timeout: Some(600s), memory_limit: Some(4294967296) }
+    
+[2026-06-16T20:42:58Z INFO  codt::search::solver_impl] One off witnesses: 0
+[2026-06-16T20:42:59Z INFO  codt::search::solver_impl] Pair lower bound: (primary: 0, secondary: 2)
+[2026-06-16T20:42:59Z INFO  codt::search::solver_impl] Root lower bound after pair lower bound: (primary: 0, secondary: 2)
+[2026-06-16T20:42:59Z INFO  codt::search::solver_impl] Final root bounds: lower (primary: 0, secondary: 2), upper (primary: 0, secondary: 2), best (primary: 0, secondary: 2), complete true
+[2026-06-16T20:42:59Z INFO  codt::search::solver_impl] Solution cache: 0 useful hits / 0 lookups (0.0%), 0 entries
+[2026-06-16T20:42:59Z INFO  codt_cli] Read time (s): 0.0002447
+[2026-06-16T20:42:59Z INFO  codt_cli] Solve time (s): 0.03600788
+[2026-06-16T20:42:59Z INFO  codt_cli] Max memory usage (MB): 0.47
+[2026-06-16T20:42:59Z INFO  codt_cli] Graph expansions: 0
+[2026-06-16T20:42:59Z INFO  codt_cli] Tree: [39<=0.50:[10<=0.50:0,1],1]
+","Set parameter WLSAccessID
+Set parameter WLSSecret
+Set parameter LicenseID to value 2781812
+Academic license 2781812 - for non-commercial use only - registered to tt___@tudelft.nl
+Misclassifications: 0. Branch nodes: 2. Accuracy: 100%.
+",and-or-dfs-prio,5,for-remaining-interval,0.03915918598067947,0,492830,1.0,1.0,1.0
+3,False,0,0.0,0,3,0,true,"['/home/thoams/Documents/TUDelft/thesis/codt/target/release/codt-cli', '--file', 'data/openml/sampled/kc1-top5.txt', '--strategy', 'and-or-dfs-prio', '--lowerbound', 'class-count', 'improvement', 'pair', 'one-off', '--upperbound', 'for-remaining-interval', '--cart-upperbound', 'true', '--cart-upper-bound-patience', '5', '--cache', 'false', '--cache-max-branch-budget', '3', '--data-reduction', 'true', '--memory-limit', '4294967296', '--timeout', '600']",cache-disabled,kc1-top5,,1904,True,"class-count,improvement,pair,one-off",1180140830,2,100,94,0,2.4817149710142985,perfect-tree-found,perfect-tree-found,"[2026-06-16T20:41:28Z INFO  codt_cli] Starting solve with options:
+    SolverOptions { lb_strategy: {OneOff, Pair, ClassCount, Improvement}, ub_strategy: ForRemainingInterval, cart_ub: true, cart_ub_patience: 5, cache_max_branch_budget: None, data_reduction: true, track_intermediates: false, timeout: Some(600s), memory_limit: Some(4294967296) }
+    
+[2026-06-16T20:41:29Z INFO  codt::search::solver_impl] One off witnesses: 0
+[2026-06-16T20:41:29Z INFO  codt::search::solver_impl] Pair lower bound: (primary: 0, secondary: 3)
+[2026-06-16T20:41:29Z INFO  codt::search::solver_impl] Root lower bound after pair lower bound: (primary: 0, secondary: 3)
+[2026-06-16T20:41:30Z INFO  codt::search::solver_impl] Final root bounds: lower (primary: 0, secondary: 3), upper (primary: 0, secondary: 3), best (primary: 0, secondary: 3), complete true
+[2026-06-16T20:41:30Z INFO  codt::search::solver_impl] Solution cache: 0 useful hits / 0 lookups (0.0%), 0 entries
+[2026-06-16T20:41:30Z INFO  codt_cli] Read time (s): 0.000625301
+[2026-06-16T20:41:30Z INFO  codt_cli] Solve time (s): 2.425823748
+[2026-06-16T20:41:30Z INFO  codt_cli] Max memory usage (MB): 1125.47
+[2026-06-16T20:41:30Z INFO  codt_cli] Graph expansions: 1904
+[2026-06-16T20:41:30Z INFO  codt_cli] Tree: [45<=1370.45:1,[91<=609.50:[48<=129.00:0,1],0]]
+","Set parameter WLSAccessID
+Set parameter WLSSecret
+Set parameter LicenseID to value 2781812
+Academic license 2781812 - for non-commercial use only - registered to tt___@tudelft.nl
+Misclassifications: 0. Branch nodes: 3. Accuracy: 100%.
+",and-or-dfs-prio,7,for-remaining-interval,2.4817149710142985,1904,1180140830,1.0,1.0,1.0
+3,True,1,0.0,2042,3,0,true,"['/home/thoams/Documents/TUDelft/thesis/codt/target/release/codt-cli', '--file', 'data/openml/sampled/kc1-top5.txt', '--strategy', 'and-or-dfs-prio', '--lowerbound', 'class-count', 'improvement', 'pair', 'one-off', '--upperbound', 'for-remaining-interval', '--cart-upperbound', 'true', '--cart-upper-bound-patience', '5', '--cache', 'true', '--cache-max-branch-budget', '3', '--data-reduction', 'true', '--memory-limit', '4294967296', '--timeout', '600']",cache-enabled,kc1-top5,,1904,True,"class-count,improvement,pair,one-off",1180140830,2,100,94,0,2.2962844610156026,perfect-tree-found,perfect-tree-found,"[2026-06-16T20:41:30Z INFO  codt_cli] Starting solve with options:
+    SolverOptions { lb_strategy: {OneOff, Pair, Improvement, ClassCount}, ub_strategy: ForRemainingInterval, cart_ub: true, cart_ub_patience: 5, cache_max_branch_budget: Some(3), data_reduction: true, track_intermediates: false, timeout: Some(600s), memory_limit: Some(4294967296) }
+    
+[2026-06-16T20:41:31Z INFO  codt::search::solver_impl] One off witnesses: 0
+[2026-06-16T20:41:31Z INFO  codt::search::solver_impl] Pair lower bound: (primary: 0, secondary: 3)
+[2026-06-16T20:41:31Z INFO  codt::search::solver_impl] Root lower bound after pair lower bound: (primary: 0, secondary: 3)
+[2026-06-16T20:41:33Z INFO  codt::search::solver_impl] Final root bounds: lower (primary: 0, secondary: 3), upper (primary: 0, secondary: 3), best (primary: 0, secondary: 3), complete true
+[2026-06-16T20:41:33Z INFO  codt::search::solver_impl] Solution cache: 0 useful hits / 2042 lookups (0.0%), 1 entries
+[2026-06-16T20:41:33Z INFO  codt_cli] Read time (s): 0.000769301
+[2026-06-16T20:41:33Z INFO  codt_cli] Solve time (s): 2.238897635
+[2026-06-16T20:41:33Z INFO  codt_cli] Max memory usage (MB): 1125.47
+[2026-06-16T20:41:33Z INFO  codt_cli] Graph expansions: 1904
+[2026-06-16T20:41:33Z INFO  codt_cli] Tree: [45<=1370.45:1,[91<=609.50:[48<=129.00:0,1],0]]
+","Set parameter WLSAccessID
+Set parameter WLSSecret
+Set parameter LicenseID to value 2781812
+Academic license 2781812 - for non-commercial use only - registered to tt___@tudelft.nl
+Misclassifications: 0. Branch nodes: 3. Accuracy: 100%.
+",and-or-dfs-prio,7,for-remaining-interval,2.4817149710142985,1904,1180140830,0.9252813025812916,1.0,1.0
+3,True,1,0.0,2042,3,0,true,"['/home/thoams/Documents/TUDelft/thesis/codt/target/release/codt-cli', '--file', 'data/openml/sampled/kc1-top5.txt', '--strategy', 'and-or-dfs-prio', '--lowerbound', 'class-count', 'improvement', 'pair', 'one-off', '--upperbound', 'for-remaining-interval', '--cart-upperbound', 'true', '--cart-upper-bound-patience', '5', '--cache', 'true', '--cache-max-branch-budget', '3', '--data-reduction', 'true', '--memory-limit', '4294967296', '--timeout', '600']",cache-enabled,kc1-top5,,1904,True,"class-count,improvement,pair,one-off",1180140830,2,100,94,1,2.3261945309932344,perfect-tree-found,perfect-tree-found,"[2026-06-16T20:42:59Z INFO  codt_cli] Starting solve with options:
+    SolverOptions { lb_strategy: {Pair, Improvement, ClassCount, OneOff}, ub_strategy: ForRemainingInterval, cart_ub: true, cart_ub_patience: 5, cache_max_branch_budget: Some(3), data_reduction: true, track_intermediates: false, timeout: Some(600s), memory_limit: Some(4294967296) }
+    
+[2026-06-16T20:42:59Z INFO  codt::search::solver_impl] One off witnesses: 0
+[2026-06-16T20:43:00Z INFO  codt::search::solver_impl] Pair lower bound: (primary: 0, secondary: 3)
+[2026-06-16T20:43:00Z INFO  codt::search::solver_impl] Root lower bound after pair lower bound: (primary: 0, secondary: 3)
+[2026-06-16T20:43:01Z INFO  codt::search::solver_impl] Final root bounds: lower (primary: 0, secondary: 3), upper (primary: 0, secondary: 3), best (primary: 0, secondary: 3), complete true
+[2026-06-16T20:43:01Z INFO  codt::search::solver_impl] Solution cache: 0 useful hits / 2042 lookups (0.0%), 1 entries
+[2026-06-16T20:43:01Z INFO  codt_cli] Read time (s): 0.000791501
+[2026-06-16T20:43:01Z INFO  codt_cli] Solve time (s): 2.270370109
+[2026-06-16T20:43:01Z INFO  codt_cli] Max memory usage (MB): 1125.47
+[2026-06-16T20:43:01Z INFO  codt_cli] Graph expansions: 1904
+[2026-06-16T20:43:01Z INFO  codt_cli] Tree: [45<=1370.45:1,[91<=609.50:[48<=129.00:0,1],0]]
+","Set parameter WLSAccessID
+Set parameter WLSSecret
+Set parameter LicenseID to value 2781812
+Academic license 2781812 - for non-commercial use only - registered to tt___@tudelft.nl
+Misclassifications: 0. Branch nodes: 3. Accuracy: 100%.
+",and-or-dfs-prio,7,for-remaining-interval,2.308915194007568,1904,1180140830,1.007483746926051,1.0,1.0
+3,False,0,0.0,0,3,0,true,"['/home/thoams/Documents/TUDelft/thesis/codt/target/release/codt-cli', '--file', 'data/openml/sampled/kc1-top5.txt', '--strategy', 'and-or-dfs-prio', '--lowerbound', 'class-count', 'improvement', 'pair', 'one-off', '--upperbound', 'for-remaining-interval', '--cart-upperbound', 'true', '--cart-upper-bound-patience', '5', '--cache', 'false', '--cache-max-branch-budget', '3', '--data-reduction', 'true', '--memory-limit', '4294967296', '--timeout', '600']",cache-disabled,kc1-top5,,1904,True,"class-count,improvement,pair,one-off",1180140830,2,100,94,1,2.308915194007568,perfect-tree-found,perfect-tree-found,"[2026-06-16T20:43:01Z INFO  codt_cli] Starting solve with options:
+    SolverOptions { lb_strategy: {ClassCount, OneOff, Pair, Improvement}, ub_strategy: ForRemainingInterval, cart_ub: true, cart_ub_patience: 5, cache_max_branch_budget: None, data_reduction: true, track_intermediates: false, timeout: Some(600s), memory_limit: Some(4294967296) }
+    
+[2026-06-16T20:43:02Z INFO  codt::search::solver_impl] One off witnesses: 0
+[2026-06-16T20:43:02Z INFO  codt::search::solver_impl] Pair lower bound: (primary: 0, secondary: 3)
+[2026-06-16T20:43:02Z INFO  codt::search::solver_impl] Root lower bound after pair lower bound: (primary: 0, secondary: 3)
+[2026-06-16T20:43:03Z INFO  codt::search::solver_impl] Final root bounds: lower (primary: 0, secondary: 3), upper (primary: 0, secondary: 3), best (primary: 0, secondary: 3), complete true
+[2026-06-16T20:43:03Z INFO  codt::search::solver_impl] Solution cache: 0 useful hits / 0 lookups (0.0%), 0 entries
+[2026-06-16T20:43:03Z INFO  codt_cli] Read time (s): 0.000614001
+[2026-06-16T20:43:03Z INFO  codt_cli] Solve time (s): 2.249125962
+[2026-06-16T20:43:03Z INFO  codt_cli] Max memory usage (MB): 1125.47
+[2026-06-16T20:43:03Z INFO  codt_cli] Graph expansions: 1904
+[2026-06-16T20:43:03Z INFO  codt_cli] Tree: [45<=1370.45:1,[91<=609.50:[48<=129.00:0,1],0]]
+","Set parameter WLSAccessID
+Set parameter WLSSecret
+Set parameter LicenseID to value 2781812
+Academic license 2781812 - for non-commercial use only - registered to tt___@tudelft.nl
+Misclassifications: 0. Branch nodes: 3. Accuracy: 100%.
+",and-or-dfs-prio,7,for-remaining-interval,2.308915194007568,1904,1180140830,1.0,1.0,1.0
+3,False,0,0.0,0,3,0,true,"['/home/thoams/Documents/TUDelft/thesis/codt/target/release/codt-cli', '--file', 'data/openml/sampled/kc1-top5.txt', '--strategy', 'and-or-dfs-prio', '--lowerbound', 'class-count', 'improvement', 'pair', 'one-off', '--upperbound', 'for-remaining-interval', '--cart-upperbound', 'true', '--cart-upper-bound-patience', '5', '--cache', 'false', '--cache-max-branch-budget', '3', '--data-reduction', 'true', '--memory-limit', '4294967296', '--timeout', '600']",cache-disabled,kc1-top5,,1904,True,"class-count,improvement,pair,one-off",1180140830,2,100,94,2,2.354486791009549,perfect-tree-found,perfect-tree-found,"[2026-06-16T20:43:03Z INFO  codt_cli] Starting solve with options:
+    SolverOptions { lb_strategy: {OneOff, ClassCount, Pair, Improvement}, ub_strategy: ForRemainingInterval, cart_ub: true, cart_ub_patience: 5, cache_max_branch_budget: None, data_reduction: true, track_intermediates: false, timeout: Some(600s), memory_limit: Some(4294967296) }
+    
+[2026-06-16T20:43:04Z INFO  codt::search::solver_impl] One off witnesses: 0
+[2026-06-16T20:43:04Z INFO  codt::search::solver_impl] Pair lower bound: (primary: 0, secondary: 3)
+[2026-06-16T20:43:04Z INFO  codt::search::solver_impl] Root lower bound after pair lower bound: (primary: 0, secondary: 3)
+[2026-06-16T20:43:05Z INFO  codt::search::solver_impl] Final root bounds: lower (primary: 0, secondary: 3), upper (primary: 0, secondary: 3), best (primary: 0, secondary: 3), complete true
+[2026-06-16T20:43:05Z INFO  codt::search::solver_impl] Solution cache: 0 useful hits / 0 lookups (0.0%), 0 entries
+[2026-06-16T20:43:05Z INFO  codt_cli] Read time (s): 0.000630101
+[2026-06-16T20:43:05Z INFO  codt_cli] Solve time (s): 2.287420743
+[2026-06-16T20:43:05Z INFO  codt_cli] Max memory usage (MB): 1125.47
+[2026-06-16T20:43:05Z INFO  codt_cli] Graph expansions: 1904
+[2026-06-16T20:43:05Z INFO  codt_cli] Tree: [45<=1370.45:1,[91<=609.50:[48<=129.00:0,1],0]]
+","Set parameter WLSAccessID
+Set parameter WLSSecret
+Set parameter LicenseID to value 2781812
+Academic license 2781812 - for non-commercial use only - registered to tt___@tudelft.nl
+Misclassifications: 0. Branch nodes: 3. Accuracy: 100%.
+",and-or-dfs-prio,7,for-remaining-interval,2.354486791009549,1904,1180140830,1.0,1.0,1.0
+3,True,1,0.0,2042,3,0,true,"['/home/thoams/Documents/TUDelft/thesis/codt/target/release/codt-cli', '--file', 'data/openml/sampled/kc1-top5.txt', '--strategy', 'and-or-dfs-prio', '--lowerbound', 'class-count', 'improvement', 'pair', 'one-off', '--upperbound', 'for-remaining-interval', '--cart-upperbound', 'true', '--cart-upper-bound-patience', '5', '--cache', 'true', '--cache-max-branch-budget', '3', '--data-reduction', 'true', '--memory-limit', '4294967296', '--timeout', '600']",cache-enabled,kc1-top5,,1904,True,"class-count,improvement,pair,one-off",1180140830,2,100,94,2,2.3153625020058826,perfect-tree-found,perfect-tree-found,"[2026-06-16T20:43:06Z INFO  codt_cli] Starting solve with options:
+    SolverOptions { lb_strategy: {OneOff, ClassCount, Improvement, Pair}, ub_strategy: ForRemainingInterval, cart_ub: true, cart_ub_patience: 5, cache_max_branch_budget: Some(3), data_reduction: true, track_intermediates: false, timeout: Some(600s), memory_limit: Some(4294967296) }
+    
+[2026-06-16T20:43:06Z INFO  codt::search::solver_impl] One off witnesses: 0
+[2026-06-16T20:43:07Z INFO  codt::search::solver_impl] Pair lower bound: (primary: 0, secondary: 3)
+[2026-06-16T20:43:07Z INFO  codt::search::solver_impl] Root lower bound after pair lower bound: (primary: 0, secondary: 3)
+[2026-06-16T20:43:08Z INFO  codt::search::solver_impl] Final root bounds: lower (primary: 0, secondary: 3), upper (primary: 0, secondary: 3), best (primary: 0, secondary: 3), complete true
+[2026-06-16T20:43:08Z INFO  codt::search::solver_impl] Solution cache: 0 useful hits / 2042 lookups (0.0%), 1 entries
+[2026-06-16T20:43:08Z INFO  codt_cli] Read time (s): 0.000628501
+[2026-06-16T20:43:08Z INFO  codt_cli] Solve time (s): 2.2597926790000002
+[2026-06-16T20:43:08Z INFO  codt_cli] Max memory usage (MB): 1125.47
+[2026-06-16T20:43:08Z INFO  codt_cli] Graph expansions: 1904
+[2026-06-16T20:43:08Z INFO  codt_cli] Tree: [45<=1370.45:1,[91<=609.50:[48<=129.00:0,1],0]]
+","Set parameter WLSAccessID
+Set parameter WLSSecret
+Set parameter LicenseID to value 2781812
+Academic license 2781812 - for non-commercial use only - registered to tt___@tudelft.nl
+Misclassifications: 0. Branch nodes: 3. Accuracy: 100%.
+",and-or-dfs-prio,7,for-remaining-interval,2.354486791009549,1904,1180140830,0.9833830925902579,1.0,1.0
+3,True,1,0.0,2042,3,0,true,"['/home/thoams/Documents/TUDelft/thesis/codt/target/release/codt-cli', '--file', 'data/openml/sampled/kc1-top5.txt', '--strategy', 'and-or-dfs-prio', '--lowerbound', 'class-count', 'improvement', 'pair', 'one-off', '--upperbound', 'for-remaining-interval', '--cart-upperbound', 'true', '--cart-upper-bound-patience', '5', '--cache', 'true', '--cache-max-branch-budget', '3', '--data-reduction', 'true', '--memory-limit', '4294967296', '--timeout', '600']",cache-enabled,kc1-top5,,1904,True,"class-count,improvement,pair,one-off",1180140830,2,100,94,3,2.292092949996004,perfect-tree-found,perfect-tree-found,"[2026-06-16T20:43:08Z INFO  codt_cli] Starting solve with options:
+    SolverOptions { lb_strategy: {Improvement, OneOff, ClassCount, Pair}, ub_strategy: ForRemainingInterval, cart_ub: true, cart_ub_patience: 5, cache_max_branch_budget: Some(3), data_reduction: true, track_intermediates: false, timeout: Some(600s), memory_limit: Some(4294967296) }
+    
+[2026-06-16T20:43:09Z INFO  codt::search::solver_impl] One off witnesses: 0
+[2026-06-16T20:43:09Z INFO  codt::search::solver_impl] Pair lower bound: (primary: 0, secondary: 3)
+[2026-06-16T20:43:09Z INFO  codt::search::solver_impl] Root lower bound after pair lower bound: (primary: 0, secondary: 3)
+[2026-06-16T20:43:10Z INFO  codt::search::solver_impl] Final root bounds: lower (primary: 0, secondary: 3), upper (primary: 0, secondary: 3), best (primary: 0, secondary: 3), complete true
+[2026-06-16T20:43:10Z INFO  codt::search::solver_impl] Solution cache: 0 useful hits / 2042 lookups (0.0%), 1 entries
+[2026-06-16T20:43:10Z INFO  codt_cli] Read time (s): 0.000773701
+[2026-06-16T20:43:10Z INFO  codt_cli] Solve time (s): 2.232271919
+[2026-06-16T20:43:10Z INFO  codt_cli] Max memory usage (MB): 1125.47
+[2026-06-16T20:43:10Z INFO  codt_cli] Graph expansions: 1904
+[2026-06-16T20:43:10Z INFO  codt_cli] Tree: [45<=1370.45:1,[91<=609.50:[48<=129.00:0,1],0]]
+","Set parameter WLSAccessID
+Set parameter WLSSecret
+Set parameter LicenseID to value 2781812
+Academic license 2781812 - for non-commercial use only - registered to tt___@tudelft.nl
+Misclassifications: 0. Branch nodes: 3. Accuracy: 100%.
+",and-or-dfs-prio,7,for-remaining-interval,2.3527871840051375,1904,1180140830,0.9742032622322372,1.0,1.0
+3,False,0,0.0,0,3,0,true,"['/home/thoams/Documents/TUDelft/thesis/codt/target/release/codt-cli', '--file', 'data/openml/sampled/kc1-top5.txt', '--strategy', 'and-or-dfs-prio', '--lowerbound', 'class-count', 'improvement', 'pair', 'one-off', '--upperbound', 'for-remaining-interval', '--cart-upperbound', 'true', '--cart-upper-bound-patience', '5', '--cache', 'false', '--cache-max-branch-budget', '3', '--data-reduction', 'true', '--memory-limit', '4294967296', '--timeout', '600']",cache-disabled,kc1-top5,,1904,True,"class-count,improvement,pair,one-off",1180140830,2,100,94,3,2.3527871840051375,perfect-tree-found,perfect-tree-found,"[2026-06-16T20:43:10Z INFO  codt_cli] Starting solve with options:
+    SolverOptions { lb_strategy: {Pair, OneOff, ClassCount, Improvement}, ub_strategy: ForRemainingInterval, cart_ub: true, cart_ub_patience: 5, cache_max_branch_budget: None, data_reduction: true, track_intermediates: false, timeout: Some(600s), memory_limit: Some(4294967296) }
+    
+[2026-06-16T20:43:11Z INFO  codt::search::solver_impl] One off witnesses: 0
+[2026-06-16T20:43:11Z INFO  codt::search::solver_impl] Pair lower bound: (primary: 0, secondary: 3)
+[2026-06-16T20:43:11Z INFO  codt::search::solver_impl] Root lower bound after pair lower bound: (primary: 0, secondary: 3)
+[2026-06-16T20:43:12Z INFO  codt::search::solver_impl] Final root bounds: lower (primary: 0, secondary: 3), upper (primary: 0, secondary: 3), best (primary: 0, secondary: 3), complete true
+[2026-06-16T20:43:12Z INFO  codt::search::solver_impl] Solution cache: 0 useful hits / 0 lookups (0.0%), 0 entries
+[2026-06-16T20:43:12Z INFO  codt_cli] Read time (s): 0.000878602
+[2026-06-16T20:43:12Z INFO  codt_cli] Solve time (s): 2.295546358
+[2026-06-16T20:43:12Z INFO  codt_cli] Max memory usage (MB): 1125.47
+[2026-06-16T20:43:12Z INFO  codt_cli] Graph expansions: 1904
+[2026-06-16T20:43:12Z INFO  codt_cli] Tree: [45<=1370.45:1,[91<=609.50:[48<=129.00:0,1],0]]
+","Set parameter WLSAccessID
+Set parameter WLSSecret
+Set parameter LicenseID to value 2781812
+Academic license 2781812 - for non-commercial use only - registered to tt___@tudelft.nl
+Misclassifications: 0. Branch nodes: 3. Accuracy: 100%.
+",and-or-dfs-prio,7,for-remaining-interval,2.3527871840051375,1904,1180140830,1.0,1.0,1.0
+3,False,0,0.0,0,3,0,true,"['/home/thoams/Documents/TUDelft/thesis/codt/target/release/codt-cli', '--file', 'data/openml/sampled/kc1-top5.txt', '--strategy', 'and-or-dfs-prio', '--lowerbound', 'class-count', 'improvement', 'pair', 'one-off', '--upperbound', 'for-remaining-interval', '--cart-upperbound', 'true', '--cart-upper-bound-patience', '5', '--cache', 'false', '--cache-max-branch-budget', '3', '--data-reduction', 'true', '--memory-limit', '4294967296', '--timeout', '600']",cache-disabled,kc1-top5,,1904,True,"class-count,improvement,pair,one-off",1180140830,2,100,94,4,2.3824610480223782,perfect-tree-found,perfect-tree-found,"[2026-06-16T20:43:12Z INFO  codt_cli] Starting solve with options:
+    SolverOptions { lb_strategy: {ClassCount, Improvement, OneOff, Pair}, ub_strategy: ForRemainingInterval, cart_ub: true, cart_ub_patience: 5, cache_max_branch_budget: None, data_reduction: true, track_intermediates: false, timeout: Some(600s), memory_limit: Some(4294967296) }
+    
+[2026-06-16T20:43:13Z INFO  codt::search::solver_impl] One off witnesses: 0
+[2026-06-16T20:43:13Z INFO  codt::search::solver_impl] Pair lower bound: (primary: 0, secondary: 3)
+[2026-06-16T20:43:13Z INFO  codt::search::solver_impl] Root lower bound after pair lower bound: (primary: 0, secondary: 3)
+[2026-06-16T20:43:15Z INFO  codt::search::solver_impl] Final root bounds: lower (primary: 0, secondary: 3), upper (primary: 0, secondary: 3), best (primary: 0, secondary: 3), complete true
+[2026-06-16T20:43:15Z INFO  codt::search::solver_impl] Solution cache: 0 useful hits / 0 lookups (0.0%), 0 entries
+[2026-06-16T20:43:15Z INFO  codt_cli] Read time (s): 0.000626201
+[2026-06-16T20:43:15Z INFO  codt_cli] Solve time (s): 2.32421742
+[2026-06-16T20:43:15Z INFO  codt_cli] Max memory usage (MB): 1125.47
+[2026-06-16T20:43:15Z INFO  codt_cli] Graph expansions: 1904
+[2026-06-16T20:43:15Z INFO  codt_cli] Tree: [45<=1370.45:1,[91<=609.50:[48<=129.00:0,1],0]]
+","Set parameter WLSAccessID
+Set parameter WLSSecret
+Set parameter LicenseID to value 2781812
+Academic license 2781812 - for non-commercial use only - registered to tt___@tudelft.nl
+Misclassifications: 0. Branch nodes: 3. Accuracy: 100%.
+",and-or-dfs-prio,7,for-remaining-interval,2.3824610480223782,1904,1180140830,1.0,1.0,1.0
+3,True,1,0.0,2042,3,0,true,"['/home/thoams/Documents/TUDelft/thesis/codt/target/release/codt-cli', '--file', 'data/openml/sampled/kc1-top5.txt', '--strategy', 'and-or-dfs-prio', '--lowerbound', 'class-count', 'improvement', 'pair', 'one-off', '--upperbound', 'for-remaining-interval', '--cart-upperbound', 'true', '--cart-upper-bound-patience', '5', '--cache', 'true', '--cache-max-branch-budget', '3', '--data-reduction', 'true', '--memory-limit', '4294967296', '--timeout', '600']",cache-enabled,kc1-top5,,1904,True,"class-count,improvement,pair,one-off",1180140830,2,100,94,4,2.181207005021861,perfect-tree-found,perfect-tree-found,"[2026-06-16T20:43:15Z INFO  codt_cli] Starting solve with options:
+    SolverOptions { lb_strategy: {ClassCount, OneOff, Improvement, Pair}, ub_strategy: ForRemainingInterval, cart_ub: true, cart_ub_patience: 5, cache_max_branch_budget: Some(3), data_reduction: true, track_intermediates: false, timeout: Some(600s), memory_limit: Some(4294967296) }
+    
+[2026-06-16T20:43:16Z INFO  codt::search::solver_impl] One off witnesses: 0
+[2026-06-16T20:43:16Z INFO  codt::search::solver_impl] Pair lower bound: (primary: 0, secondary: 3)
+[2026-06-16T20:43:16Z INFO  codt::search::solver_impl] Root lower bound after pair lower bound: (primary: 0, secondary: 3)
+[2026-06-16T20:43:17Z INFO  codt::search::solver_impl] Final root bounds: lower (primary: 0, secondary: 3), upper (primary: 0, secondary: 3), best (primary: 0, secondary: 3), complete true
+[2026-06-16T20:43:17Z INFO  codt::search::solver_impl] Solution cache: 0 useful hits / 2042 lookups (0.0%), 1 entries
+[2026-06-16T20:43:17Z INFO  codt_cli] Read time (s): 0.000839002
+[2026-06-16T20:43:17Z INFO  codt_cli] Solve time (s): 2.12413528
+[2026-06-16T20:43:17Z INFO  codt_cli] Max memory usage (MB): 1125.47
+[2026-06-16T20:43:17Z INFO  codt_cli] Graph expansions: 1904
+[2026-06-16T20:43:17Z INFO  codt_cli] Tree: [45<=1370.45:1,[91<=609.50:[48<=129.00:0,1],0]]
+","Set parameter WLSAccessID
+Set parameter WLSSecret
+Set parameter LicenseID to value 2781812
+Academic license 2781812 - for non-commercial use only - registered to tt___@tudelft.nl
+Misclassifications: 0. Branch nodes: 3. Accuracy: 100%.
+",and-or-dfs-prio,7,for-remaining-interval,2.3824610480223782,1904,1180140830,0.915526827535093,1.0,1.0
+3,True,0,0.0,58,3,0,true,"['/home/thoams/Documents/TUDelft/thesis/codt/target/release/codt-cli', '--file', 'data/openml/sampled/wine.txt', '--strategy', 'and-or-dfs-prio', '--lowerbound', 'class-count', 'improvement', 'pair', 'one-off', '--upperbound', 'for-remaining-interval', '--cart-upperbound', 'true', '--cart-upper-bound-patience', '5', '--cache', 'true', '--cache-max-branch-budget', '3', '--data-reduction', 'true', '--memory-limit', '4294967296', '--timeout', '600']",cache-enabled,wine,,63,True,"class-count,improvement,pair,one-off",5274337,2,100,13,0,0.35700388700934127,perfect-tree-found,perfect-tree-found,"[2026-06-16T20:41:33Z INFO  codt_cli] Starting solve with options:
+    SolverOptions { lb_strategy: {Pair, ClassCount, Improvement, OneOff}, ub_strategy: ForRemainingInterval, cart_ub: true, cart_ub_patience: 5, cache_max_branch_budget: Some(3), data_reduction: true, track_intermediates: false, timeout: Some(600s), memory_limit: Some(4294967296) }
+    
+[2026-06-16T20:41:33Z INFO  codt::search::solver_impl] One off witnesses: 0
+[2026-06-16T20:41:33Z INFO  codt::search::solver_impl] Pair lower bound: (primary: 0, secondary: 3)
+[2026-06-16T20:41:33Z INFO  codt::search::solver_impl] Root lower bound after pair lower bound: (primary: 0, secondary: 3)
+[2026-06-16T20:41:33Z INFO  codt::search::solver_impl] Final root bounds: lower (primary: 0, secondary: 3), upper (primary: 0, secondary: 3), best (primary: 0, secondary: 3), complete true
+[2026-06-16T20:41:33Z INFO  codt::search::solver_impl] Solution cache: 0 useful hits / 58 lookups (0.0%), 0 entries
+[2026-06-16T20:41:33Z INFO  codt_cli] Read time (s): 0.0001386
+[2026-06-16T20:41:33Z INFO  codt_cli] Solve time (s): 0.352378277
+[2026-06-16T20:41:33Z INFO  codt_cli] Max memory usage (MB): 5.03
+[2026-06-16T20:41:33Z INFO  codt_cli] Graph expansions: 63
+[2026-06-16T20:41:33Z INFO  codt_cli] Tree: [12<=716.00:[1<=3.92:1,0],[9<=3.46:1,0]]
+","Set parameter WLSAccessID
+Set parameter WLSSecret
+Set parameter LicenseID to value 2781812
+Academic license 2781812 - for non-commercial use only - registered to tt___@tudelft.nl
+Misclassifications: 0. Branch nodes: 3. Accuracy: 100%.
+",and-or-dfs-prio,7,for-remaining-interval,0.34879506900324486,63,5274337,1.0235347880047583,1.0,1.0
+3,False,0,0.0,0,3,0,true,"['/home/thoams/Documents/TUDelft/thesis/codt/target/release/codt-cli', '--file', 'data/openml/sampled/wine.txt', '--strategy', 'and-or-dfs-prio', '--lowerbound', 'class-count', 'improvement', 'pair', 'one-off', '--upperbound', 'for-remaining-interval', '--cart-upperbound', 'true', '--cart-upper-bound-patience', '5', '--cache', 'false', '--cache-max-branch-budget', '3', '--data-reduction', 'true', '--memory-limit', '4294967296', '--timeout', '600']",cache-disabled,wine,,63,True,"class-count,improvement,pair,one-off",5274337,2,100,13,0,0.34879506900324486,perfect-tree-found,perfect-tree-found,"[2026-06-16T20:41:33Z INFO  codt_cli] Starting solve with options:
+    SolverOptions { lb_strategy: {ClassCount, Pair, Improvement, OneOff}, ub_strategy: ForRemainingInterval, cart_ub: true, cart_ub_patience: 5, cache_max_branch_budget: None, data_reduction: true, track_intermediates: false, timeout: Some(600s), memory_limit: Some(4294967296) }
+    
+[2026-06-16T20:41:33Z INFO  codt::search::solver_impl] One off witnesses: 0
+[2026-06-16T20:41:33Z INFO  codt::search::solver_impl] Pair lower bound: (primary: 0, secondary: 3)
+[2026-06-16T20:41:33Z INFO  codt::search::solver_impl] Root lower bound after pair lower bound: (primary: 0, secondary: 3)
+[2026-06-16T20:41:33Z INFO  codt::search::solver_impl] Final root bounds: lower (primary: 0, secondary: 3), upper (primary: 0, secondary: 3), best (primary: 0, secondary: 3), complete true
+[2026-06-16T20:41:33Z INFO  codt::search::solver_impl] Solution cache: 0 useful hits / 0 lookups (0.0%), 0 entries
+[2026-06-16T20:41:33Z INFO  codt_cli] Read time (s): 0.0001127
+[2026-06-16T20:41:33Z INFO  codt_cli] Solve time (s): 0.343199457
+[2026-06-16T20:41:33Z INFO  codt_cli] Max memory usage (MB): 5.03
+[2026-06-16T20:41:33Z INFO  codt_cli] Graph expansions: 63
+[2026-06-16T20:41:33Z INFO  codt_cli] Tree: [12<=716.00:[1<=3.92:1,0],[9<=3.46:1,0]]
+","Set parameter WLSAccessID
+Set parameter WLSSecret
+Set parameter LicenseID to value 2781812
+Academic license 2781812 - for non-commercial use only - registered to tt___@tudelft.nl
+Misclassifications: 0. Branch nodes: 3. Accuracy: 100%.
+",and-or-dfs-prio,7,for-remaining-interval,0.34879506900324486,63,5274337,1.0,1.0,1.0
+3,False,0,0.0,0,3,0,true,"['/home/thoams/Documents/TUDelft/thesis/codt/target/release/codt-cli', '--file', 'data/openml/sampled/wine.txt', '--strategy', 'and-or-dfs-prio', '--lowerbound', 'class-count', 'improvement', 'pair', 'one-off', '--upperbound', 'for-remaining-interval', '--cart-upperbound', 'true', '--cart-upper-bound-patience', '5', '--cache', 'false', '--cache-max-branch-budget', '3', '--data-reduction', 'true', '--memory-limit', '4294967296', '--timeout', '600']",cache-disabled,wine,,63,True,"class-count,improvement,pair,one-off",5274337,2,100,13,1,0.3571435859776102,perfect-tree-found,perfect-tree-found,"[2026-06-16T20:43:17Z INFO  codt_cli] Starting solve with options:
+    SolverOptions { lb_strategy: {OneOff, ClassCount, Improvement, Pair}, ub_strategy: ForRemainingInterval, cart_ub: true, cart_ub_patience: 5, cache_max_branch_budget: None, data_reduction: true, track_intermediates: false, timeout: Some(600s), memory_limit: Some(4294967296) }
+    
+[2026-06-16T20:43:17Z INFO  codt::search::solver_impl] One off witnesses: 0
+[2026-06-16T20:43:17Z INFO  codt::search::solver_impl] Pair lower bound: (primary: 0, secondary: 3)
+[2026-06-16T20:43:17Z INFO  codt::search::solver_impl] Root lower bound after pair lower bound: (primary: 0, secondary: 3)
+[2026-06-16T20:43:17Z INFO  codt::search::solver_impl] Final root bounds: lower (primary: 0, secondary: 3), upper (primary: 0, secondary: 3), best (primary: 0, secondary: 3), complete true
+[2026-06-16T20:43:17Z INFO  codt::search::solver_impl] Solution cache: 0 useful hits / 0 lookups (0.0%), 0 entries
+[2026-06-16T20:43:17Z INFO  codt_cli] Read time (s): 0.000138
+[2026-06-16T20:43:17Z INFO  codt_cli] Solve time (s): 0.351112373
+[2026-06-16T20:43:17Z INFO  codt_cli] Max memory usage (MB): 5.03
+[2026-06-16T20:43:17Z INFO  codt_cli] Graph expansions: 63
+[2026-06-16T20:43:17Z INFO  codt_cli] Tree: [12<=716.00:[1<=3.92:1,0],[9<=3.46:1,0]]
+","Set parameter WLSAccessID
+Set parameter WLSSecret
+Set parameter LicenseID to value 2781812
+Academic license 2781812 - for non-commercial use only - registered to tt___@tudelft.nl
+Misclassifications: 0. Branch nodes: 3. Accuracy: 100%.
+",and-or-dfs-prio,7,for-remaining-interval,0.3571435859776102,63,5274337,1.0,1.0,1.0
+3,True,0,0.0,58,3,0,true,"['/home/thoams/Documents/TUDelft/thesis/codt/target/release/codt-cli', '--file', 'data/openml/sampled/wine.txt', '--strategy', 'and-or-dfs-prio', '--lowerbound', 'class-count', 'improvement', 'pair', 'one-off', '--upperbound', 'for-remaining-interval', '--cart-upperbound', 'true', '--cart-upper-bound-patience', '5', '--cache', 'true', '--cache-max-branch-budget', '3', '--data-reduction', 'true', '--memory-limit', '4294967296', '--timeout', '600']",cache-enabled,wine,,63,True,"class-count,improvement,pair,one-off",5274337,2,100,13,1,0.3499327710014768,perfect-tree-found,perfect-tree-found,"[2026-06-16T20:43:17Z INFO  codt_cli] Starting solve with options:
+    SolverOptions { lb_strategy: {OneOff, ClassCount, Pair, Improvement}, ub_strategy: ForRemainingInterval, cart_ub: true, cart_ub_patience: 5, cache_max_branch_budget: Some(3), data_reduction: true, track_intermediates: false, timeout: Some(600s), memory_limit: Some(4294967296) }
+    
+[2026-06-16T20:43:17Z INFO  codt::search::solver_impl] One off witnesses: 0
+[2026-06-16T20:43:18Z INFO  codt::search::solver_impl] Pair lower bound: (primary: 0, secondary: 3)
+[2026-06-16T20:43:18Z INFO  codt::search::solver_impl] Root lower bound after pair lower bound: (primary: 0, secondary: 3)
+[2026-06-16T20:43:18Z INFO  codt::search::solver_impl] Final root bounds: lower (primary: 0, secondary: 3), upper (primary: 0, secondary: 3), best (primary: 0, secondary: 3), complete true
+[2026-06-16T20:43:18Z INFO  codt::search::solver_impl] Solution cache: 0 useful hits / 58 lookups (0.0%), 0 entries
+[2026-06-16T20:43:18Z INFO  codt_cli] Read time (s): 0.0001384
+[2026-06-16T20:43:18Z INFO  codt_cli] Solve time (s): 0.340081749
+[2026-06-16T20:43:18Z INFO  codt_cli] Max memory usage (MB): 5.03
+[2026-06-16T20:43:18Z INFO  codt_cli] Graph expansions: 63
+[2026-06-16T20:43:18Z INFO  codt_cli] Tree: [12<=716.00:[1<=3.92:1,0],[9<=3.46:1,0]]
+","Set parameter WLSAccessID
+Set parameter WLSSecret
+Set parameter LicenseID to value 2781812
+Academic license 2781812 - for non-commercial use only - registered to tt___@tudelft.nl
+Misclassifications: 0. Branch nodes: 3. Accuracy: 100%.
+",and-or-dfs-prio,7,for-remaining-interval,0.3571435859776102,63,5274337,0.979809759269804,1.0,1.0
+3,True,0,0.0,58,3,0,true,"['/home/thoams/Documents/TUDelft/thesis/codt/target/release/codt-cli', '--file', 'data/openml/sampled/wine.txt', '--strategy', 'and-or-dfs-prio', '--lowerbound', 'class-count', 'improvement', 'pair', 'one-off', '--upperbound', 'for-remaining-interval', '--cart-upperbound', 'true', '--cart-upper-bound-patience', '5', '--cache', 'true', '--cache-max-branch-budget', '3', '--data-reduction', 'true', '--memory-limit', '4294967296', '--timeout', '600']",cache-enabled,wine,,63,True,"class-count,improvement,pair,one-off",5274337,2,100,13,2,0.3521141759993043,perfect-tree-found,perfect-tree-found,"[2026-06-16T20:43:18Z INFO  codt_cli] Starting solve with options:
+    SolverOptions { lb_strategy: {Pair, OneOff, ClassCount, Improvement}, ub_strategy: ForRemainingInterval, cart_ub: true, cart_ub_patience: 5, cache_max_branch_budget: Some(3), data_reduction: true, track_intermediates: false, timeout: Some(600s), memory_limit: Some(4294967296) }
+    
+[2026-06-16T20:43:18Z INFO  codt::search::solver_impl] One off witnesses: 0
+[2026-06-16T20:43:18Z INFO  codt::search::solver_impl] Pair lower bound: (primary: 0, secondary: 3)
+[2026-06-16T20:43:18Z INFO  codt::search::solver_impl] Root lower bound after pair lower bound: (primary: 0, secondary: 3)
+[2026-06-16T20:43:18Z INFO  codt::search::solver_impl] Final root bounds: lower (primary: 0, secondary: 3), upper (primary: 0, secondary: 3), best (primary: 0, secondary: 3), complete true
+[2026-06-16T20:43:18Z INFO  codt::search::solver_impl] Solution cache: 0 useful hits / 58 lookups (0.0%), 0 entries
+[2026-06-16T20:43:18Z INFO  codt_cli] Read time (s): 0.000138601
+[2026-06-16T20:43:18Z INFO  codt_cli] Solve time (s): 0.347974566
+[2026-06-16T20:43:18Z INFO  codt_cli] Max memory usage (MB): 5.03
+[2026-06-16T20:43:18Z INFO  codt_cli] Graph expansions: 63
+[2026-06-16T20:43:18Z INFO  codt_cli] Tree: [12<=716.00:[1<=3.92:1,0],[9<=3.46:1,0]]
+","Set parameter WLSAccessID
+Set parameter WLSSecret
+Set parameter LicenseID to value 2781812
+Academic license 2781812 - for non-commercial use only - registered to tt___@tudelft.nl
+Misclassifications: 0. Branch nodes: 3. Accuracy: 100%.
+",and-or-dfs-prio,7,for-remaining-interval,0.33629444098914973,63,5274337,1.047041321776309,1.0,1.0
+3,False,0,0.0,0,3,0,true,"['/home/thoams/Documents/TUDelft/thesis/codt/target/release/codt-cli', '--file', 'data/openml/sampled/wine.txt', '--strategy', 'and-or-dfs-prio', '--lowerbound', 'class-count', 'improvement', 'pair', 'one-off', '--upperbound', 'for-remaining-interval', '--cart-upperbound', 'true', '--cart-upper-bound-patience', '5', '--cache', 'false', '--cache-max-branch-budget', '3', '--data-reduction', 'true', '--memory-limit', '4294967296', '--timeout', '600']",cache-disabled,wine,,63,True,"class-count,improvement,pair,one-off",5274337,2,100,13,2,0.33629444098914973,perfect-tree-found,perfect-tree-found,"[2026-06-16T20:43:18Z INFO  codt_cli] Starting solve with options:
+    SolverOptions { lb_strategy: {Pair, ClassCount, Improvement, OneOff}, ub_strategy: ForRemainingInterval, cart_ub: true, cart_ub_patience: 5, cache_max_branch_budget: None, data_reduction: true, track_intermediates: false, timeout: Some(600s), memory_limit: Some(4294967296) }
+    
+[2026-06-16T20:43:18Z INFO  codt::search::solver_impl] One off witnesses: 0
+[2026-06-16T20:43:18Z INFO  codt::search::solver_impl] Pair lower bound: (primary: 0, secondary: 3)
+[2026-06-16T20:43:18Z INFO  codt::search::solver_impl] Root lower bound after pair lower bound: (primary: 0, secondary: 3)
+[2026-06-16T20:43:18Z INFO  codt::search::solver_impl] Final root bounds: lower (primary: 0, secondary: 3), upper (primary: 0, secondary: 3), best (primary: 0, secondary: 3), complete true
+[2026-06-16T20:43:18Z INFO  codt::search::solver_impl] Solution cache: 0 useful hits / 0 lookups (0.0%), 0 entries
+[2026-06-16T20:43:18Z INFO  codt_cli] Read time (s): 0.0001398
+[2026-06-16T20:43:18Z INFO  codt_cli] Solve time (s): 0.32650882
+[2026-06-16T20:43:18Z INFO  codt_cli] Max memory usage (MB): 5.03
+[2026-06-16T20:43:18Z INFO  codt_cli] Graph expansions: 63
+[2026-06-16T20:43:18Z INFO  codt_cli] Tree: [12<=716.00:[1<=3.92:1,0],[9<=3.46:1,0]]
+","Set parameter WLSAccessID
+Set parameter WLSSecret
+Set parameter LicenseID to value 2781812
+Academic license 2781812 - for non-commercial use only - registered to tt___@tudelft.nl
+Misclassifications: 0. Branch nodes: 3. Accuracy: 100%.
+",and-or-dfs-prio,7,for-remaining-interval,0.33629444098914973,63,5274337,1.0,1.0,1.0
+3,False,0,0.0,0,3,0,true,"['/home/thoams/Documents/TUDelft/thesis/codt/target/release/codt-cli', '--file', 'data/openml/sampled/wine.txt', '--strategy', 'and-or-dfs-prio', '--lowerbound', 'class-count', 'improvement', 'pair', 'one-off', '--upperbound', 'for-remaining-interval', '--cart-upperbound', 'true', '--cart-upper-bound-patience', '5', '--cache', 'false', '--cache-max-branch-budget', '3', '--data-reduction', 'true', '--memory-limit', '4294967296', '--timeout', '600']",cache-disabled,wine,,63,True,"class-count,improvement,pair,one-off",5274337,2,100,13,3,0.345742061996134,perfect-tree-found,perfect-tree-found,"[2026-06-16T20:43:18Z INFO  codt_cli] Starting solve with options:
+    SolverOptions { lb_strategy: {OneOff, ClassCount, Pair, Improvement}, ub_strategy: ForRemainingInterval, cart_ub: true, cart_ub_patience: 5, cache_max_branch_budget: None, data_reduction: true, track_intermediates: false, timeout: Some(600s), memory_limit: Some(4294967296) }
+    
+[2026-06-16T20:43:18Z INFO  codt::search::solver_impl] One off witnesses: 0
+[2026-06-16T20:43:19Z INFO  codt::search::solver_impl] Pair lower bound: (primary: 0, secondary: 3)
+[2026-06-16T20:43:19Z INFO  codt::search::solver_impl] Root lower bound after pair lower bound: (primary: 0, secondary: 3)
+[2026-06-16T20:43:19Z INFO  codt::search::solver_impl] Final root bounds: lower (primary: 0, secondary: 3), upper (primary: 0, secondary: 3), best (primary: 0, secondary: 3), complete true
+[2026-06-16T20:43:19Z INFO  codt::search::solver_impl] Solution cache: 0 useful hits / 0 lookups (0.0%), 0 entries
+[2026-06-16T20:43:19Z INFO  codt_cli] Read time (s): 0.0001658
+[2026-06-16T20:43:19Z INFO  codt_cli] Solve time (s): 0.338902147
+[2026-06-16T20:43:19Z INFO  codt_cli] Max memory usage (MB): 5.03
+[2026-06-16T20:43:19Z INFO  codt_cli] Graph expansions: 63
+[2026-06-16T20:43:19Z INFO  codt_cli] Tree: [12<=716.00:[1<=3.92:1,0],[9<=3.46:1,0]]
+","Set parameter WLSAccessID
+Set parameter WLSSecret
+Set parameter LicenseID to value 2781812
+Academic license 2781812 - for non-commercial use only - registered to tt___@tudelft.nl
+Misclassifications: 0. Branch nodes: 3. Accuracy: 100%.
+",and-or-dfs-prio,7,for-remaining-interval,0.345742061996134,63,5274337,1.0,1.0,1.0
+3,True,0,0.0,58,3,0,true,"['/home/thoams/Documents/TUDelft/thesis/codt/target/release/codt-cli', '--file', 'data/openml/sampled/wine.txt', '--strategy', 'and-or-dfs-prio', '--lowerbound', 'class-count', 'improvement', 'pair', 'one-off', '--upperbound', 'for-remaining-interval', '--cart-upperbound', 'true', '--cart-upper-bound-patience', '5', '--cache', 'true', '--cache-max-branch-budget', '3', '--data-reduction', 'true', '--memory-limit', '4294967296', '--timeout', '600']",cache-enabled,wine,,63,True,"class-count,improvement,pair,one-off",5274337,2,100,13,3,0.35754248799639754,perfect-tree-found,perfect-tree-found,"[2026-06-16T20:43:19Z INFO  codt_cli] Starting solve with options:
+    SolverOptions { lb_strategy: {ClassCount, Improvement, Pair, OneOff}, ub_strategy: ForRemainingInterval, cart_ub: true, cart_ub_patience: 5, cache_max_branch_budget: Some(3), data_reduction: true, track_intermediates: false, timeout: Some(600s), memory_limit: Some(4294967296) }
+    
+[2026-06-16T20:43:19Z INFO  codt::search::solver_impl] One off witnesses: 0
+[2026-06-16T20:43:19Z INFO  codt::search::solver_impl] Pair lower bound: (primary: 0, secondary: 3)
+[2026-06-16T20:43:19Z INFO  codt::search::solver_impl] Root lower bound after pair lower bound: (primary: 0, secondary: 3)
+[2026-06-16T20:43:19Z INFO  codt::search::solver_impl] Final root bounds: lower (primary: 0, secondary: 3), upper (primary: 0, secondary: 3), best (primary: 0, secondary: 3), complete true
+[2026-06-16T20:43:19Z INFO  codt::search::solver_impl] Solution cache: 0 useful hits / 58 lookups (0.0%), 0 entries
+[2026-06-16T20:43:19Z INFO  codt_cli] Read time (s): 0.0001368
+[2026-06-16T20:43:19Z INFO  codt_cli] Solve time (s): 0.351442375
+[2026-06-16T20:43:19Z INFO  codt_cli] Max memory usage (MB): 5.03
+[2026-06-16T20:43:19Z INFO  codt_cli] Graph expansions: 63
+[2026-06-16T20:43:19Z INFO  codt_cli] Tree: [12<=716.00:[1<=3.92:1,0],[9<=3.46:1,0]]
+","Set parameter WLSAccessID
+Set parameter WLSSecret
+Set parameter LicenseID to value 2781812
+Academic license 2781812 - for non-commercial use only - registered to tt___@tudelft.nl
+Misclassifications: 0. Branch nodes: 3. Accuracy: 100%.
+",and-or-dfs-prio,7,for-remaining-interval,0.345742061996134,63,5274337,1.0341307214173885,1.0,1.0
+3,True,0,0.0,58,3,0,true,"['/home/thoams/Documents/TUDelft/thesis/codt/target/release/codt-cli', '--file', 'data/openml/sampled/wine.txt', '--strategy', 'and-or-dfs-prio', '--lowerbound', 'class-count', 'improvement', 'pair', 'one-off', '--upperbound', 'for-remaining-interval', '--cart-upperbound', 'true', '--cart-upper-bound-patience', '5', '--cache', 'true', '--cache-max-branch-budget', '3', '--data-reduction', 'true', '--memory-limit', '4294967296', '--timeout', '600']",cache-enabled,wine,,63,True,"class-count,improvement,pair,one-off",5274337,2,100,13,4,0.3324882320011966,perfect-tree-found,perfect-tree-found,"[2026-06-16T20:43:19Z INFO  codt_cli] Starting solve with options:
+    SolverOptions { lb_strategy: {Improvement, OneOff, Pair, ClassCount}, ub_strategy: ForRemainingInterval, cart_ub: true, cart_ub_patience: 5, cache_max_branch_budget: Some(3), data_reduction: true, track_intermediates: false, timeout: Some(600s), memory_limit: Some(4294967296) }
+    
+[2026-06-16T20:43:19Z INFO  codt::search::solver_impl] One off witnesses: 0
+[2026-06-16T20:43:19Z INFO  codt::search::solver_impl] Pair lower bound: (primary: 0, secondary: 3)
+[2026-06-16T20:43:19Z INFO  codt::search::solver_impl] Root lower bound after pair lower bound: (primary: 0, secondary: 3)
+[2026-06-16T20:43:19Z INFO  codt::search::solver_impl] Final root bounds: lower (primary: 0, secondary: 3), upper (primary: 0, secondary: 3), best (primary: 0, secondary: 3), complete true
+[2026-06-16T20:43:19Z INFO  codt::search::solver_impl] Solution cache: 0 useful hits / 58 lookups (0.0%), 0 entries
+[2026-06-16T20:43:19Z INFO  codt_cli] Read time (s): 0.0001119
+[2026-06-16T20:43:19Z INFO  codt_cli] Solve time (s): 0.322647211
+[2026-06-16T20:43:19Z INFO  codt_cli] Max memory usage (MB): 5.03
+[2026-06-16T20:43:19Z INFO  codt_cli] Graph expansions: 63
+[2026-06-16T20:43:19Z INFO  codt_cli] Tree: [12<=716.00:[1<=3.92:1,0],[9<=3.46:1,0]]
+","Set parameter WLSAccessID
+Set parameter WLSSecret
+Set parameter LicenseID to value 2781812
+Academic license 2781812 - for non-commercial use only - registered to tt___@tudelft.nl
+Misclassifications: 0. Branch nodes: 3. Accuracy: 100%.
+",and-or-dfs-prio,7,for-remaining-interval,0.36438880299101584,63,5274337,0.9124545794822193,1.0,1.0
+3,False,0,0.0,0,3,0,true,"['/home/thoams/Documents/TUDelft/thesis/codt/target/release/codt-cli', '--file', 'data/openml/sampled/wine.txt', '--strategy', 'and-or-dfs-prio', '--lowerbound', 'class-count', 'improvement', 'pair', 'one-off', '--upperbound', 'for-remaining-interval', '--cart-upperbound', 'true', '--cart-upper-bound-patience', '5', '--cache', 'false', '--cache-max-branch-budget', '3', '--data-reduction', 'true', '--memory-limit', '4294967296', '--timeout', '600']",cache-disabled,wine,,63,True,"class-count,improvement,pair,one-off",5274337,2,100,13,4,0.36438880299101584,perfect-tree-found,perfect-tree-found,"[2026-06-16T20:43:19Z INFO  codt_cli] Starting solve with options:
+    SolverOptions { lb_strategy: {ClassCount, Improvement, Pair, OneOff}, ub_strategy: ForRemainingInterval, cart_ub: true, cart_ub_patience: 5, cache_max_branch_budget: None, data_reduction: true, track_intermediates: false, timeout: Some(600s), memory_limit: Some(4294967296) }
+    
+[2026-06-16T20:43:19Z INFO  codt::search::solver_impl] One off witnesses: 0
+[2026-06-16T20:43:20Z INFO  codt::search::solver_impl] Pair lower bound: (primary: 0, secondary: 3)
+[2026-06-16T20:43:20Z INFO  codt::search::solver_impl] Root lower bound after pair lower bound: (primary: 0, secondary: 3)
+[2026-06-16T20:43:20Z INFO  codt::search::solver_impl] Final root bounds: lower (primary: 0, secondary: 3), upper (primary: 0, secondary: 3), best (primary: 0, secondary: 3), complete true
+[2026-06-16T20:43:20Z INFO  codt::search::solver_impl] Solution cache: 0 useful hits / 0 lookups (0.0%), 0 entries
+[2026-06-16T20:43:20Z INFO  codt_cli] Read time (s): 0.0001386
+[2026-06-16T20:43:20Z INFO  codt_cli] Solve time (s): 0.353405378
+[2026-06-16T20:43:20Z INFO  codt_cli] Max memory usage (MB): 5.03
+[2026-06-16T20:43:20Z INFO  codt_cli] Graph expansions: 63
+[2026-06-16T20:43:20Z INFO  codt_cli] Tree: [12<=716.00:[1<=3.92:1,0],[9<=3.46:1,0]]
+","Set parameter WLSAccessID
+Set parameter WLSSecret
+Set parameter LicenseID to value 2781812
+Academic license 2781812 - for non-commercial use only - registered to tt___@tudelft.nl
+Misclassifications: 0. Branch nodes: 3. Accuracy: 100%.
+",and-or-dfs-prio,7,for-remaining-interval,0.36438880299101584,63,5274337,1.0,1.0,1.0

@@ -1,4 +1,3 @@
-from typing import Optional, Dict
 #!/usr/bin/env python3
 """
 Plot EDFC (Empirical Distribution Function of Computation) comparing CODT and Witty.
@@ -8,10 +7,11 @@ Shows runtime vs instances solved, with special handling for timeouts and memory
 import json
 import argparse
 from pathlib import Path
-from typing import Dict, List, Tuple
+from typing import Dict, List, Optional, Tuple
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
+from matplotlib.lines import Line2D
 
 from plot_style import tab10_colors
 
@@ -128,18 +128,73 @@ def load_all_results(results_dir: Path) -> Dict[str, Dict[str, Dict]]:
 
 def plot_edfc(all_results: Dict[str, Dict[str, Dict]],
               output_path: Path = None, timeout_seconds: float = 1800):
-    """Plot ECDFs for all solvers in `all_results` on a single plot."""
+    """Plot runtime and search-effort ECDFs side by side."""
     if not all_results:
         print("No solver results provided to plot.")
         return
 
-    # Prepare colors
     solver_names = list(all_results.keys())
     colors = tab10_colors(max(3, len(solver_names)))
 
-    # Figure
-    fig, ax1 = plt.subplots(1, 1, figsize=(5, 4))
+    fig, (runtime_ax, nodes_ax) = plt.subplots(1, 2, figsize=(10, 4))
 
+    summary_stats = plot_runtime_panel(
+        runtime_ax,
+        all_results,
+        solver_names,
+        colors,
+        timeout_seconds,
+    )
+    nodes_plotted = plot_search_nodes_panel(nodes_ax, all_results, solver_names, colors)
+
+    if not nodes_plotted:
+        print("No node/expansion info found for any solver; leaving node panel empty.")
+
+    handles = [
+        Line2D([0], [0], color=colors[index % len(colors)], linewidth=3)
+        for index, _ in enumerate(solver_names)
+    ]
+    fig.legend(
+        handles,
+        solver_names,
+        loc="lower center",
+        bbox_to_anchor=(0.5, 1.01),
+        ncol=len(solver_names),
+        frameon=False,
+        columnspacing=1.4,
+        handlelength=1.8,
+    )
+
+    fig.tight_layout()
+
+    if output_path:
+        plt.savefig(output_path, dpi=300, bbox_inches='tight')
+        print(f"Plot saved to {output_path}")
+
+    plt.close(fig)
+
+    # Print summary
+    print("\n" + "=" * 60)
+    print("SOLVER COMPARISON SUMMARY")
+    print("=" * 60)
+    for solver, stats in summary_stats.items():
+        print(f"\n{solver}:")
+        print(f"  Solved:          {stats['solved']}/{stats['total']}")
+        print(f"  Memory errors:   {stats['memory_errors']}")
+        print(f"  Timeouts:        {stats['timeouts']}")
+        if stats['avg_solved_runtime'] is not None:
+            print(f"  Avg runtime (solved): {stats['avg_solved_runtime']:.2f}s")
+            print(f"  Median runtime (solved): {stats['median_solved_runtime']:.2f}s")
+    print("=" * 60 + "\n")
+
+
+def plot_runtime_panel(
+    ax,
+    all_results: Dict[str, Dict[str, Dict]],
+    solver_names: List[str],
+    colors,
+    timeout_seconds: float,
+) -> Dict[str, Dict[str, float]]:
     summary_stats = {}
 
     for i, solver in enumerate(solver_names):
@@ -168,18 +223,17 @@ def plot_edfc(all_results: Dict[str, Dict[str, Dict]],
         if solved_runtimes:
             sorted_r = np.sort(np.asarray(solved_runtimes))
             fraction = np.arange(1, len(sorted_r) + 1) / total
-            ax1.step(
+            ax.step(
                 sorted_r,
                 fraction,
                 where='post',
                 linewidth=3,
                 color=colors[i % len(colors)],
-                label=solver,
             )
 
         # Plot unsolved cases: timeouts and memory errors as crosses, others as 'x'
         if other_unsolved:
-            ax1.scatter(
+            ax.scatter(
                 other_unsolved,
                 np.zeros(len(other_unsolved)),
                 marker='x',
@@ -188,7 +242,7 @@ def plot_edfc(all_results: Dict[str, Dict[str, Dict]],
                 alpha=0.7,
             )
         if timeout_runtimes:
-            ax1.scatter(
+            ax.scatter(
                 timeout_runtimes,
                 np.zeros(len(timeout_runtimes)),
                 marker='x',
@@ -197,7 +251,7 @@ def plot_edfc(all_results: Dict[str, Dict[str, Dict]],
                 alpha=0.7,
             )
         if memerr_runtimes:
-            ax1.scatter(
+            ax.scatter(
                 memerr_runtimes,
                 np.zeros(len(memerr_runtimes)),
                 marker='x',
@@ -216,38 +270,15 @@ def plot_edfc(all_results: Dict[str, Dict[str, Dict]],
             'median_solved_runtime': float(np.median([r for r, s in zip(runtimes, solved_flags) if s])) if any(solved_flags) else None,
         }
 
-    ax1.set_xscale('log')
-    ax1.set_ylim(bottom=0)
-    ax1.set_xlabel('Runtime (seconds, log scale)')
-    ax1.set_ylabel('Fraction of instances solved')
-    ax1.grid(True, which='major', alpha=0.4)
-    ax1.grid(True, which='minor', alpha=0.4, linestyle=':')
-    ax1.legend()
-    ax1.tick_params(axis='y')
-    ax1.tick_params(axis='x')
-
-    plt.tight_layout()
-
-    if output_path:
-        plt.savefig(output_path, dpi=300, bbox_inches='tight')
-        print(f"Plot saved to {output_path}")
-
-    # Plot search nodes for all solvers that have node info
-    plot_search_nodes(all_results, output_path)
-
-    # Print summary
-    print("\n" + "=" * 60)
-    print("SOLVER COMPARISON SUMMARY")
-    print("=" * 60)
-    for solver, stats in summary_stats.items():
-        print(f"\n{solver}:")
-        print(f"  Solved:          {stats['solved']}/{stats['total']}")
-        print(f"  Memory errors:   {stats['memory_errors']}")
-        print(f"  Timeouts:        {stats['timeouts']}")
-        if stats['avg_solved_runtime'] is not None:
-            print(f"  Avg runtime (solved): {stats['avg_solved_runtime']:.2f}s")
-            print(f"  Median runtime (solved): {stats['median_solved_runtime']:.2f}s")
-    print("=" * 60 + "\n")
+    ax.set_xscale('log')
+    ax.set_ylim(bottom=0)
+    ax.set_xlabel('Runtime (seconds, log scale)')
+    ax.set_ylabel('Fraction of instances solved')
+    ax.grid(True, which='major', alpha=0.4)
+    ax.grid(True, which='minor', alpha=0.4, linestyle=':')
+    ax.tick_params(axis='y')
+    ax.tick_params(axis='x')
+    return summary_stats
 
 
 def plot_search_nodes(all_results: Dict[str, Dict[str, Dict]], output_path: Path = None):
@@ -256,7 +287,30 @@ def plot_search_nodes(all_results: Dict[str, Dict[str, Dict]], output_path: Path
     colors = tab10_colors(max(3, len(solver_names)))
 
     fig, ax = plt.subplots(1, 1, figsize=(5, 4))
+    any_plotted = plot_search_nodes_panel(ax, all_results, solver_names, colors)
 
+    if not any_plotted:
+        print("No node/expansion info found for any solver; skipping node plot.")
+        plt.close(fig)
+        return
+
+    plt.tight_layout()
+
+    if output_path:
+        nodes_path = output_path.with_name(f"{output_path.stem}_nodes{output_path.suffix}")
+        plt.savefig(nodes_path, dpi=300, bbox_inches='tight')
+        print(f"Plot saved to {nodes_path}")
+
+    plt.close(fig)
+
+
+def plot_search_nodes_panel(
+    ax,
+    all_results: Dict[str, Dict[str, Dict]],
+    solver_names: List[str],
+    colors,
+) -> bool:
+    """Plot search effort (expansions / nodes checked) into an existing axis."""
     any_plotted = False
     for i, solver in enumerate(solver_names):
         items = sorted(all_results[solver].items())
@@ -295,7 +349,6 @@ def plot_search_nodes(all_results: Dict[str, Dict[str, Dict]], output_path: Path
                 where='post',
                 linewidth=3,
                 color=colors[i % len(colors)],
-                label=f"{solver}",
             )
             any_plotted = True
 
@@ -310,26 +363,16 @@ def plot_search_nodes(all_results: Dict[str, Dict[str, Dict]], output_path: Path
             )
 
     if not any_plotted:
-        print("No node/expansion info found for any solver; skipping node plot.")
-        return
+        return False
 
     ax.set_xscale('log')
     ax.set_ylim(bottom=0)
-    ax.set_xlabel('Search effort (log scale)')
+    ax.set_xlabel('Expanded search nodes (log scale)')
     ax.grid(True, which='major', alpha=0.4)
     ax.grid(True, which='minor', alpha=0.4, linestyle=':')
-    ax.legend()
     ax.tick_params(axis='y')
     ax.tick_params(axis='x')
-
-    plt.tight_layout()
-
-    if output_path:
-        nodes_path = output_path.with_name(f"{output_path.stem}_nodes{output_path.suffix}")
-        plt.savefig(nodes_path, dpi=300, bbox_inches='tight')
-        print(f"Plot saved to {nodes_path}")
-
-    plt.show()
+    return True
 
 
 def _is_memory_error_result(result: Dict[str, Dict]) -> bool:
